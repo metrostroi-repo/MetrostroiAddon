@@ -1,0 +1,7 @@
+// Extracted with MulleDK19's GMAD Extractor
+"AddonInfo"
+{
+	"name" "Metrostroi_temp"
+	"author_name" "Author Name"
+	"info" " { 	"description": "Description", 	"type": "gamemode", 	"tags":  	[ 		"fun", 		"realism" 	] }"
+}

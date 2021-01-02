@@ -1,0 +1,22 @@
+{
+	"title"		:	"Metrostroi Subway Simulator - Scripts",
+	"type"		:	"ServerContent",
+	"tags"		:	[ "realism" ],
+	"ignore"	:
+	[
+		"*.gma",
+		"*.jpg",
+		"*.exe",
+		"*.tga",
+		"*.bmp",
+		"*.md",
+		"*.dll",
+		"*.rar",
+		"*.zip",
+		"*.sfk",
+		"*.patch",
+		"*.txt",
+		"*.todo",
+		"*.lnk"
+	]
+}
