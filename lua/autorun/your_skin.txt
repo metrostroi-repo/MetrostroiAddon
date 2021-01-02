@@ -1,0 +1,21 @@
+
+THIS FILE MUST HAVE THAT SYNTAXIS:
+
+if not Metrostroi.Skins then Metrostroi.Skins = {} end
+if not Metrostroi.Skins["ezh3"] then Metrostroi.Skins["ezh3"] = {} end
+table.insert(Metrostroi.Skins["ezh3"],{
+	name = "Green-Blue",
+	path = "metrostroi_skins/ezh3/1",
+})
+
+WHERE:
+table.insert(Metrostroi.Skins["ezh3"],{
+	name = "Green-Blue",
+	path = "metrostroi_skins/ezh3/1",
+})
+
+YOUR SKIN
+table.insert(Metrostroi.Skins["type of train(ezh3 or 717)"],{
+name = "YOUR NAME"
+path = "PATH_TO_VMT_AND_VTF",
+})
