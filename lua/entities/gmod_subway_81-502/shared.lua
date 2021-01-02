@@ -25,15 +25,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 ENT.AnnouncerPositions = {
     {Vector(412,-49 ,61),80,0.6},
     {Vector(-3,-60, 62),300,0.6},
@@ -499,11 +490,8 @@ ENT.Spawner = {
     },
     spawnfunc = function(i,tbls,tblt)
         local WagNum = tbls.WagNum
-        if tbls.EWagons and i==1 then
-            tbls.EID = 2+math.floor(math.random()*(WagNum-2))
-        end
         if 1<i and i<WagNum  then
-            return (tbls.EWagons and tbls.EMAType>1 and (tbls.EID==i or math.random()>0.9)) and "gmod_subway_81-703_int" or "gmod_subway_81-501"
+            return (tbls.EWagons and tbls.EMAType>1 and math.random()>0.9) and "gmod_subway_81-703_int" or "gmod_subway_81-501"
         else
             return "gmod_subway_81-502"
         end
@@ -561,7 +549,6 @@ ENT.Spawner = {
                 ent.PassengerDoor = val==4
                 ent.RearDoor = val==4
             else
-                ent.VU2:TriggerInput("Set",0)
                 ent.FrontDoor = val==4
                 ent.RearDoor = val==4
             end

@@ -7,6 +7,7 @@ end
 CreateConVar("metrostroi_train_requirethirdrail",1,FCVAR_ARCHIVE,"Whether or not Metrostroi trains require power from the third rail")
 CreateConVar("metrostroi_debugger_update_interval",1,FCVAR_ARCHIVE,"Seconds between debugger data messages")
 
+CreateConVar("metrostroi_passengers_scale",50,FCVAR_ARCHIVE)
 CreateConVar("metrostroi_arsmode",1,FCVAR_ARCHIVE)
 CreateConVar("metrostroi_arsmode_nogreen",0,FCVAR_ARCHIVE)
 CreateConVar("metrostroi_write_telemetry",0,FCVAR_ARCHIVE)
@@ -81,7 +82,7 @@ concommand.Add("metrostroi_expel_passengers",function()
     net.Start("metrostroi_expel_passengers") net.SendToServer()
 end,nil,"Expel passengers from train")
 
-CreateClientConVar("metrostroi_language","",true,true)
+CreateClientConVar("metrostroi_language","",true)
 CreateClientConVar("metrostroi_language_softreload",0,true)
 
 CreateClientConVar("metrostroi_stop_helper",0,true)
@@ -90,10 +91,8 @@ CreateClientConVar("metrostroi_drawdebug",0,true)
 CreateClientConVar("metrostroi_drawsignaldebug",0,true)
 CreateClientConVar("metrostroi_drawcams",1,true)
 CreateClientConVar("metrostroi_cabfov",75,true)
-CreateClientConVar("metrostroi_cabz",0,true)
 CreateClientConVar("metrostroi_disablecamaccel",0,true)
 CreateClientConVar("metrostroi_disablehovertext",0,true)
-CreateClientConVar("metrostroi_disablehovertextpos",0,true)
 CreateClientConVar("metrostroi_debugger_data_timeout",2,true,false)
 
 CreateClientConVar("metrostroi_disablehud",0,true)
@@ -101,12 +100,9 @@ CreateClientConVar("metrostroi_renderdistance",1024,true)
 CreateClientConVar("metrostroi_screenshotmode",0,true)
 CreateClientConVar("metrostroi_softdrawmultipier",100,true)
 
-CreateClientConVar("metrostroi_route_number",61,true,true)
 CreateClientConVar("metrostroi_shadows1",1,true)
 CreateClientConVar("metrostroi_shadows2",1,true)
 CreateClientConVar("metrostroi_shadows3",0,true)
-CreateClientConVar("metrostroi_shadows4",0,true)
-CreateClientConVar("metrostroi_sprites",1,true)
 CreateClientConVar("metrostroi_minimizedshow",0,true)
 local function reload()
     --Metrostroi.ReloadClientside = true
@@ -114,3 +110,6 @@ end
 cvars.AddChangeCallback("metrostroi_shadows1",reload,"reload_shadows")
 cvars.AddChangeCallback("metrostroi_shadows2",reload,"reload_shadows")
 CreateClientConVar("metrostroi_tooltip_delay",0,true)
+
+CreateClientConVar("metrostroi_addons_check_skip_error",0,true)
+CreateClientConVar("metrostroi_addons_check_ignore",0,true)

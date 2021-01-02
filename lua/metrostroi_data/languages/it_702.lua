@@ -14,14 +14,14 @@ Train.703.RCARS     = RC-1: selezionatore circuiti ARS
 Train.703.AVU       = Blocca AVU
 
 #Spawner
-Spawner.707.Type    = Tipo di pannello
-Spawner.707.Type1   = Vecchio + RRI
-Spawner.707.Type2   = Nuovo + ASNP
-Spawner.710.RRI     = Radio-relè annunciatore
+Spawner.707.Type    = Tipo di pannello #FIXME
+Spawner.707.Type1   = Vecchio + RRI #FIXME
+Spawner.707.Type2   = Nuovo + ASNP #FIXME
+Spawner.710.RRI     = Radio-relè annunciatore #FIXME
 
 #######Buttons###########
 #Common
-Common.702.VZ1                  = Valvola pneumatica №1
+Common.702.VZ1                  = Valvola pneumatica №1 #FIXME!!
 Common.703.ParkingBrakeLeft     = Rilascia freno di parcheggio
 Common.703.ParkingBrakeRight    = Imposta freno di parcheggio 
 Common.703.KSD                  = KSD: Pulsante di controllo interblocco porte
@@ -32,7 +32,7 @@ Common.703.VU3                  = Luci Cabina
 Common.703.AV                   = Interruttore principale (circuiti ad alta tensione)
 Common.703.LOn                  = Abilita illuminazione
 Common.703.LOff                 = Disabilita l'illuminazione
-Common.703.KRR                  = KRR: Ruota RK nella prima posizione
+Common.703.KRR                  = KRR: Ruota RK nella prima posizione #FIXME
 Common.703.RUT                  = RUT regolazione (accelerazione ridotta)
 Common.707.SEQ                  = Spia di controllo del controller reostato
 Common.707.TAH                  = TAH: Modalità di guida d'emergenza per la guida senza ARS

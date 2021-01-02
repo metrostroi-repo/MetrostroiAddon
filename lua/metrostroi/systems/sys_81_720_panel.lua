@@ -202,7 +202,7 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
     self.ControllerTimer = CurTime()-1
 end
 function TRAIN_SYSTEM:Think()
-    if self.ControllerTimer and CurTime() - self.ControllerTimer > 0.03 and self.Controller ~= self.TargetController then
+    if self.ControllerTimer and CurTime() - self.ControllerTimer > 0.06 and self.Controller ~= self.TargetController then
         local previousPosition = self.Controller
         self.ControllerTimer = CurTime()
         if self.TargetController > self.Controller then

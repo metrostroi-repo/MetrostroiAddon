@@ -81,7 +81,6 @@ function ENT:Initialize()
     end
     self.FrontBogey.DisableSound = 1
     self.RearBogey.DisableSound = 1
-    self.FrontCouple.EKKDisconnected = true
 
     -- Initialize key mapping
     self.KeyMap = {
@@ -227,48 +226,6 @@ function ENT:Think()
     local retVal = self.BaseClass.Think(self)
     local power = self.BUKV.Power > 0
 
-    --[[
-    if self:GetWagonNumber() == 22010 or self:EntIndex()==1560 then --DEBUG
-        local accel = 0
-        for i=1,#self.WagonList do
-            accel=accel+self.WagonList[i].Acceleration
-        end
-        local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
-        if math.abs(accel) > 0.1 then
-            for k,v in pairs(drivers) do
-                if IsValid(v) and IsValid(v:GetDriver()) then
-                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,0 or (self.Electric.I13+self.Electric.I24)/2,0 or self.RheostatController.SelectedPosition or 0,accel/#self.WagonList))--(accel/#self.WagonList)))
-                end
-            end
-        end
-    end
-    --[[
-    self.TestA = self.TestA or nil
-    self.TestV = self.TestV or nil
-    local accel = self.Acceleration
-
-    if (1 < self.Speed and self.Speed < 99) and self.Panel.TargetController < 0 and not self.TestA then
-        self.TestA = CurTime()
-        self.TestV = self.Speed/3600*1000
-        self.TestTyp = self.Speed > 55 and 2 or 1
-        self.TestS = 0
-    end
-    if self.Panel.TargetController >= 0 and self.TestA then
-        self.TestA = nil
-        self.TestV = nil
-        self.TestS = nil
-    end
-    if self.TestS then self.TestS=self.TestS+self.Speed*self.SpeedSign/3600*1000*self.DeltaTime end
-    if (self.Speed<2 and self.TestTyp ==2 or self.Speed<2 and self.TestTyp ==1) and self.TestA then
-        local curSpeed = self.Speed/3600*1000
-        local a = (curSpeed-self.TestV)/(CurTime()-self.TestA)
-        RunConsoleCommand("say",Format("[%05d]V0= %.1f V1=%.1f t=%.2f a=%.2f s=%.1f",self:GetWagonNumber(),self.TestV*3600/1000,curSpeed*3600/1000,CurTime()-self.TestA,a,self.TestS))
-
-
-        self.TestA = nil
-        self.TestV = nil
-        self.TestS = nil
-    end--]]
     --self:SetPackedRatio("async1", math.min(self.Speed/7,self.AsyncInverter.State*math.Clamp(1+(self.Speed-15)/120,1,2)))
     --self:SetPackedRatio("async1state", self.AsyncInverter.State)
     --self:SetPackedRatio("asyncfreq", self.AsyncInverter.InverterFrequency)
@@ -301,21 +258,21 @@ function ENT:Think()
     self:SetPackedRatio("DoorClose",self.DoorClose.Value/2)
     self:SetPackedRatio("CabinLight",self.CabinLight.Value/2)
     self:SetPackedBool("LampLPT",self.BUKP.LPT)
-    self:SetPackedBool("LampRU",self.Panel.LRU > 0)
-    self:SetPackedBool("LampAVS",self.Panel.AVS > 0)
-    self:SetPackedBool("LampRC",self.Panel.RC > 0)
+    self:SetPackedBool("LampRU",self.Panel.LRU)
+    self:SetPackedBool("LampAVS",self.Panel.AVS)
+    self:SetPackedBool("LampRC",self.Panel.RC)
     self:SetPackedBool("LampSD",self.Electric.LSD > 0)
 
     self:SetPackedBool("RadioRVS",self.Panel.VPR1>0)
     self:SetPackedBool("RadioMotorola",self.Panel.VPR2>0)
 
-    self:SetPackedBool("LampLRD",self.ALSCoil.F6 > 0)
-    self:SetPackedBool("Lamp04",self.ALSCoil.NoFreq > 0)
-    self:SetPackedBool("Lamp0",self.ALSCoil.F5 > 0)
-    self:SetPackedBool("Lamp40",self.ALSCoil.F4 > 0)
-    self:SetPackedBool("Lamp60",self.ALSCoil.F3 > 0)
-    self:SetPackedBool("Lamp70",self.ALSCoil.F2 > 0)
-    self:SetPackedBool("Lamp80",self.ALSCoil.F1 > 0)
+    self:SetPackedBool("LampLRD",self.BARS.F6 > 0)
+    self:SetPackedBool("Lamp04",self.BARS.NoFreq > 0)
+    self:SetPackedBool("Lamp0",self.BARS.F5 > 0)
+    self:SetPackedBool("Lamp40",self.BARS.F4 > 0)
+    self:SetPackedBool("Lamp60",self.BARS.F3 > 0)
+    self:SetPackedBool("Lamp70",self.BARS.F2 > 0)
+    self:SetPackedBool("Lamp80",self.BARS.F1 > 0)
 
     local cablight = self.Panel.CabLights
     self:SetLightPower(10,cablight > 0,cablight)
@@ -397,11 +354,11 @@ function ENT:Think()
     self.AsyncInverter:TriggerInput("Speed",self.Speed)
     if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
         local A = self.AsyncInverter.Torque
-        self.FrontBogey.MotorForce = 43000+9000*(A < 0 and 1 or 0)--35300
+        self.FrontBogey.MotorForce = 39000+5000*(A < 0 and 1 or 0)--35300
         self.FrontBogey.Reversed = self.Electric.Reverser < 0
         self.FrontBogey.DisableSound = 1
         self.FrontBogey.DisableContacts = self.Electric.DisablePant > 0
-        self.RearBogey.MotorForce  = 43000+9000*(A < 0 and 1 or 0)--35300
+        self.RearBogey.MotorForce  = 39000+5000*(A < 0 and 1 or 0)--35300
         self.RearBogey.Reversed = self.Electric.Reverser > 0
         self.RearBogey.DisableSound = 1
         self.RearBogey.DisableContacts = self.Electric.DisablePant > 0
@@ -417,12 +374,92 @@ function ENT:Think()
         -- Apply brakes
         self.FrontBogey.PneumaticBrakeForce = 50000.0--3000 --40000
         self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
+        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)
         self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
         self.RearBogey.PneumaticBrakeForce = 50000.0--3000 --40000
         self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
         self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.RearBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
+    end
+    if true then return retVal end
+    self:SetPackedRatio("async1", math.min(self.Speed/7,self.AsyncInverter.State*math.Clamp(1+(self.Speed-15)/120,1,2)))
+    self:SetPackedRatio("async1state", self.AsyncInverter.State)
+    self:SetPackedRatio("asyncfreq", self.AsyncInverter.InverterFrequency)
+
+    self:SetPackedRatio("Speed", self.Speed)
+
+
+    --self:SetPackedRatio("TrainLine",7.3/16)
+    --self:SetPackedRatio("BrakeLine",5.2/16)
+    --self:SetPackedRatio("BrakeCylinder",self.AsyncInverter.PN1*1.1/6)
+    self:SetPackedBool("BattEnabled",self.BUKV.Battery)
+    self:SetPackedBool("BattOffLight",self.BUKV.BatteryTimer2)
+    self:SetPackedBool("PSNEnabled",self.BUKV.PSN)
+
+    self:SetPackedBool("LampLRD",power and (self.ALSCoil.F6*self.ALSCoil.RealF5) > 0)
+    self:SetPackedBool("Lamp04",self.ALSCoil.NoFreq > 0 or power and (self.ALSCoil.Enabled == 0 and self.VRD.Value > 0))
+    self:SetPackedBool("Lamp0",self.ALSCoil.F5 > 0)
+    self:SetPackedBool("Lamp40",self.ALSCoil.F4 > 0)
+    self:SetPackedBool("Lamp60",self.ALSCoil.F3 > 0)
+    self:SetPackedBool("Lamp70",self.ALSCoil.F2 > 0)
+    self:SetPackedBool("Lamp80",self.ALSCoil.F1 > 0)
+
+    --Радио
+    self:SetPackedBool("RadioRVS",(power or self.EmergencyRadioPower.Value > 0.5) and self.SF14.Value > 0.5)
+    self:SetPackedBool("RadioMotorola",(power or self.EmergencyRadioPower.Value > 0.5) and self.SF15.Value > 0.5)
+
+
+    self:SetNW2Int("SarmatLED",self.BUKV.SarmatLED)
+    self:SetNW2Int("SarmatLEDN",self.BUKV.SarmadLEDNext)
+
+    self:SetNW2Int("TickersLine",self.BUKV.SarmatLine)
+    self:SetNW2Int("TickersStation",self.BUKV.SarmatStation)
+    self:SetNW2Bool("TickersArrived",self.BUKV.SarmatArrived)
+    self:SetNW2Bool("TickersLast",self.BUKV.SarmatLast)
+
+    self:SetPackedBool("SarmatLEDO",self.BUKV.SarmatPath)
+    self:SetPackedBool("SarmatLeft",power and self.SF34.Value > 0)
+    self:SetPackedBool("SarmatRight",power and self.SF35.Value > 0)
+
+    self:SetPackedBool("DoorLeftLamp",power and not self.BUKP.BlockLeft)
+    self:SetPackedBool("DoorRightLamp",power and not self.BUKP.BlockRight)
+
+    self:SetPackedBool("CompressorWork",self.Pneumatic.Compressor)
+
+    self:SetPackedBool("RingEnabled",self.BUKP.Ring)
+    self:SetPackedBool("RingEnabledARS",self.BUKP.RingARS)
+
+    self:SetPackedBool("BortPneumo",power and self.Pneumatic.BrakeCylinderPressure > 0.2)
+    self:SetPackedBool("BortLSD",power and (self.LeftDoorsOpen or self.RightDoorsOpen))
+    self:SetPackedBool("BortBV",power and self.BUKV.BV == 0)
+
+
+    self.SOSD = self.BUKV.SOSDEnabled and (self.LeftDoorsOpen or self.RightDoorsOpen)
+    self:SetPackedBool("SOSDLamp",self.BUKV.SOSDEnabled)
+    --self:SetPackedBool("DoorAlarm",self.BUKV.DoorAlarm)
+    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+        local A = self.AsyncInverter.Torque
+        self.FrontBogey.MotorForce = 39000+10500*(A < 0 and 1 or 0)--35300
+        self.FrontBogey.Reversed = self:ReadTrainWire(13) > 0
+        self.FrontBogey.DisableSound = 3
+        self.RearBogey.MotorForce  = 39000+10500*(A < 0 and 1 or 0)--35300
+        self.RearBogey.Reversed = self:ReadTrainWire(13) == 0
+        self.RearBogey.DisableSound = 3
+
+        -- These corrections are required to beat source engine friction at very low values of motor power
+        local P = math.max(0,0.04449 + 1.06879*math.abs(A) - 0.465729*A^2)
+        if math.abs(A) > 0.4 then P = math.abs(A) end
+        if math.abs(A) < 0.05 then P = 0 end
+        if self.Speed < 10 then P = P*(1.0 + 0.5*(10.0-self.Speed)/10.0) end
+        self.RearBogey.MotorPower  = P*0.5*((A > 0) and 1 or -1)
+        self.FrontBogey.MotorPower = P*0.5*((A > 0) and 1 or -1)
+
+        -- Apply brakes
+        self.FrontBogey.PneumaticBrakeForce = 50000.0+5000+4500 --40000
+        self.FrontBogey.BrakeCylinderPressure = math.max(self.Pneumatic.BrakeCylinderPressure,(2.95-self.Pneumatic.ParkingBrakePressure)/2)
+        self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
+        self.RearBogey.PneumaticBrakeForce = 50000.0+5000+4500 --40000
+        self.RearBogey.BrakeCylinderPressure = math.max(self.Pneumatic.BrakeCylinderPressure,(2.95-self.Pneumatic.ParkingBrakePressure))
+        self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
     end
     return retVal
 end

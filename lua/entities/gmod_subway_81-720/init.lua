@@ -83,7 +83,6 @@ function ENT:Initialize()
     local rand = math.random()*0.05
     self.FrontBogey:SetNWFloat("SqualPitch",1.45+rand)
     self.RearBogey:SetNWFloat("SqualPitch",1.45+rand)
-    self.FrontCouple.EKKDisconnected = true
 
     -- Initialize key mapping
     self.KeyMap = {
@@ -119,7 +118,7 @@ function ENT:Initialize()
             [KEY_V] = "EmergencyDoorsToggle",
             [KEY_7] = "WrenchNone",
             [KEY_8] = "WrenchKRR",
-            [KEY_9] = "WrenchKRO9",
+            [KEY_9] = "WrenchKRO",
             [KEY_0] = "WrenchKRO",
             [KEY_G] = "EnableBVEmerSet",
             [KEY_2] = "RingSet",
@@ -324,13 +323,13 @@ function ENT:Think()
     if self:GetWagonNumber() == 37 then
         --self.BV:TriggerInput("Set",0)
     end
-    self:SetPackedRatio("BIAccel",power and self.BARS.BIAccel or 0)
+    self:SetPackedRatio("BIAccel",0 or power and self.BARS.BIAccel or 0)
     self:SetNW2Int("BISpeed",power and self.Speed or -1)--CurTime()%5*20
     self:SetNW2Bool("BISpeedLimitBlink",power and self.BARS.BINoFreq > 0)
     self:SetNW2Int("BISpeedLimit",power and self.BARS.SpeedLimit or 100)
     self:SetNW2Int("BISpeedLimitNext",power and self.BARS.NextLimit or 100)
-    self:SetNW2Bool("BIForward",power and self.BARS.BIDirection >= 0)--power and (self.RV["KRO3-4"] > 0 or self.RV["KRR5-6"] > 0) and self.BARS.Speed > -0.2)
-    self:SetNW2Bool("BIBack",power and self.BARS.BIDirection <= 0)--power and (self.RV["KRO3-4"] > 0 or self.RV["KRR5-6"] > 0) and self.BARS.Speed < 0.2)
+    self:SetNW2Bool("BIForward",power and (self.RV["KRO3-4"] > 0 or self.RV["KRR5-6"] > 0) and self.BARS.Speed > -0.2)
+    self:SetNW2Bool("BIBack",power and (self.RV["KRO3-4"] > 0 or self.RV["KRR5-6"] > 0) and self.BARS.Speed < 0.2)
     self:SetNW2Bool("DoorsClosed",power and self.BUKP.DoorClosed)
     self:SetNW2Bool("HVoltage",power and self.BUKP.HVBad)
     self:SetNW2Bool("DoorLeftLamp",self.Panel.DoorLeft>0)
@@ -393,13 +392,12 @@ function ENT:Think()
         -- Apply brakes
         self.FrontBogey.PneumaticBrakeForce = (50000.0--[[ +5000+10000--]] ) --40000
         self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
+        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)
         self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
         self.FrontBogey.DisableContacts = self.BUV.Pant
         self.RearBogey.PneumaticBrakeForce = (50000.0--[[ +5000+10000--]] ) --40000
         self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
         self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.RearBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
         self.RearBogey.DisableContacts = self.BUV.Pant
     end
     return retVal
@@ -466,24 +464,24 @@ function ENT:OnButtonPress(button,ply)
             self.RV:TriggerInput("KRRSet",self.RV.KRRPosition-1)
         end
     end
-    if button == "WrenchKRO" or button == "WrenchKRO9" then
+    if button == "WrenchKRO" then
         if self.WrenchMode == 0 then
             self:PlayOnce("kro_in","cabin",1)
             self.WrenchMode = 1
-        else
-            self:OnButtonPress(button == "WrenchKRO9" and "KRO-" or "KRO+")
         end
     end
     if button == "WrenchKRR" then
         if self.WrenchMode == 0 then
             self:PlayOnce("krr_in","cabin",1)
             self.WrenchMode = 2
+            RunConsoleCommand("say",ply:GetName().." want drive with KRU!")
         end
     end
     if button == "WrenchNone" then
         if self.WrenchMode ~= 0 then
             if self.WrenchMode == 2 and self.RV.KRRPosition == 0 then
                 self:PlayOnce("krr_out","cabin",1,1)
+                RunConsoleCommand("say",ply:GetName().." stop drive with KRU!")
                 self.WrenchMode = 0
             elseif self.WrenchMode == 1 and self.RV.KROPosition == 0 then
                 self:PlayOnce("kro_out","cabin",1,1)

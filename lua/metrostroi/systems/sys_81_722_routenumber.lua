@@ -21,11 +21,9 @@ function TRAIN_SYSTEM:Initialize()
         if self.Train[v] then self.Triggers[v] = self.Train[v].Value > 0.5 end
     end
 
-    if not TURBOSTROI then
-        self.RouteNumber = IsValid(self.Train.Owner) and Format("%03d",tonumber(self.Train.Owner:GetInfo("metrostroi_route_number","61")) or 0) or "000"
-        self.CurrentRouteNumber = self.RouteNumber
-        self.RouteNumberState = 42
-    end
+    self.CurrentRouteNumber = 777
+    self.RouteNumber = 777
+    self.RouteNumberState = 42
 end
 
 function TRAIN_SYSTEM:Outputs()

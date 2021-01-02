@@ -9,7 +9,6 @@ TRAIN_SYSTEM.MVM = 1
 TRAIN_SYSTEM.LVZ_1 = 2
 TRAIN_SYSTEM.LVZ_2 = 3
 TRAIN_SYSTEM.LVZ_3 = 4
-TRAIN_SYSTEM.DOT_2 = 5
 function TRAIN_SYSTEM:Initialize(typ1,typ2)
     self.TrainSolver = "81_717"
     self.ThyristorController = true
@@ -63,7 +62,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local T     = Train.SolverTemporaryVariables
 
     local isMVM = self.Type == 1
-    local isDot2 = self.Type == 5
 
     local Panel = Train.Panel
     Panel.V1 = BO
@@ -104,10 +102,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train.KSB2:TriggerInput("Set",S["6G2"])
     --20-A20-20A-Rp-20B
     S["20A"] = T[20]*Train.A20.Value*Train.IGLA_PCBK.KVC
-    --Train.RPL:TriggerInput("Set",--[[ S["20A"]--]] BO*(1-Train.RPvozvrat.Value)*(Train.DR1.Value+Train.DR2.Value+(1-Train.BV.State)))
-    if not isDot2 then
-        Train.RPL:TriggerInput("Set",S["20A"]*(1-Train.RPvozvrat.Value)*(Train.DR1.Value+Train.DR2.Value+(1-Train.BV.State)))
-    end
+    Train.RPL:TriggerInput("Set",--[[ S["20A"]--]] BO*(1-Train.RPvozvrat.Value)*(Train.DR1.Value+Train.DR2.Value+(1-Train.BV.State)))
     S["20B"] = S["20A"]*(1-Train.RPvozvrat.Value)
     S["20K"] = S["20B"]*P.PS
     Train.LK2:TriggerInput("Set",S["20K"]*S["ZR"])
@@ -134,11 +129,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["5A"] = T[5]*Train.A5.Value
     Reverser:TriggerInput("VP",S["5A"]*Reverser.NZ*(1-Train.LK1.Value)*S["ZR"])
     --Train.RKR:TriggerInput("Set",(S["4A"]*Reverser.NZ+S["5A"]*Reverser.VP)) --81-717.5(м) МСК
-    if isDot2 then
-        Train.RKR:TriggerInput("Set",(S["4A"]*Reverser.NZ+S["5A"]*Reverser.VP)*S["ZR"]) --81-717.5 Харько*S["ZR"]в
-    else
-        Train.RKR:TriggerInput("Set",(S["4A"]*Reverser.NZ+S["5A"]*Reverser.VP)*Train.BV.State*S["ZR"]) --81-717.5 Харько*S["ZR"]в
-    end
+    Train.RKR:TriggerInput("Set",(S["4A"]*Reverser.NZ+S["5A"]*Reverser.VP)*Train.BV.State*S["ZR"]) --81-717.5 Харько*S["ZR"]в
     --+B
     S["1N"] = C(11<=RK and RK<=18)*(1-Train.LK4.Value)
     Train.RR:TriggerInput("Set",S["10A"]*S["1N"] + P.PS*Train.LK4.Value)
@@ -148,7 +139,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     P:TriggerInput("PM",S["5Zh"]*(1-Train.TR1.Value)*Train.KSH2.Value)
     P:TriggerInput("PT",S["5Zh"]*(P.PM)*(1-Train.KSH2.Value))
     --P:TriggerInput("PP",S["5Zh"]*(P.PM))
-    S["2A"] = (T[2]+T[-2])*Train.A2.Value
+    S["2A"] = T[2]*Train.A2.Value
     S["2T"] = S["2A"]*Train.TR1.Value
     Train.RSU:TriggerInput("Set",S["2T"]*Train.ThyristorBU5_6.Value)
     Train.RU:TriggerInput("Set",S["2T"])
@@ -161,19 +152,13 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["2U"] = S["10R"]+S["2C"]*S["ZR"]
     Train.SR1:TriggerInput("Set",S["2U"])
     Train.RV1:TriggerInput("Set",S["2U"])
-    S["2Zh"] = T[2]*Train.A2.Value*Train.TR1.Value*C(17<=RK and RK<=18)
+    S["2Zh"] = S["2A"]*Train.TR1.Value*C(17<=RK and RK<=18)
     if self.NoRT2 then
         Train.PneumaticNo1:TriggerInput("Set",S["2Zh"]+T[48]*Train.A72.Value)
-        Train:WriteTrainWire(-2,Train.A2.Value*Train.TR1.Value*C(17<=RK and RK<=18)*T[48]*Train.A72.Value)
     else
         Train.PneumaticNo1:TriggerInput("Set",S["2Zh"]+T[48]*Train.A72.Value*(1-Train.RT2.Value))
-        Train:WriteTrainWire(-2,Train.A2.Value*Train.TR1.Value*C(17<=RK and RK<=18)*T[48]*Train.A72.Value*(1-Train.RT2.Value))
     end
-    if isMVM then --UNREALISTIC
-        S["8A"] = T[8]*Train.A8.Value*(1-Train.RV1.Value)*(1-Train.RT2r.Value)*(1-Train.RV3.Value)
-    else
-        S["8A"] = T[8]*Train.A8.Value*(1-Train.RV1.Value)*(1-Train.RT2.Value)*(1-Train.RV3.Value)
-    end
+    S["8A"] = T[8]*Train.A8.Value*(1-Train.RV1.Value)*(1-Train.RT2.Value)*(1-Train.RV3.Value)
     Train.PneumaticNo2:TriggerInput("Set",S["8A"]+T[39]*Train.A52.Value)
     Train.RV3:TriggerInput("Set",T[19]*Train.A19.Value)
     S["25A"] = T[25]*Train.A25.Value
@@ -208,10 +193,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     Train.RZ_2:TriggerInput("Set",T[24]*(1-Train.LK4.Value))
     S["17A"] = T[17]*Train.A18.Value
-    if not isDot2 then
-        Train.BV:TriggerInput("Power",BO*Train.A80.Value)
-        Train.BV:TriggerInput("Enable",S["17A"])
-    end
+    Train.BV:TriggerInput("Power",B*Train.A80.Value)
+    Train.BV:TriggerInput("Enable",S["17A"]*Train.A81.Value)
     if isMVM then
         Train.BV:TriggerInput("Disable",T[71]*Train.A66.Value)
     end
@@ -278,11 +261,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Panel.BrW = S[64]
 
     --Вспом цепи приём
-    if isDot2 then
-        Panel.EmergencyLights = T[11]*Train.A15.Value*(1-Train.KPP.Value)
-    else
-        Panel.EmergencyLights = BO*Train.A49.Value*Train.A15.Value
-    end
+    Panel.EmergencyLights = BO*Train.A49.Value*Train.A15.Value
     Train.RPU:TriggerInput("Set",T[37]*Train.A37.Value)
 
     S["D6"] = S["D4"]*Train.BD.Value
@@ -294,8 +273,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["32A"] = T[32]*Train.A32.Value
     Train.VDOL:TriggerInput("Set",S["31A"]+S["12A"])
     Train.VDOP:TriggerInput("Set",S["32A"]+S["12A"])
-    Train:WriteTrainWire(31,S["12A"]*Train.A31.Value)
-    Train:WriteTrainWire(32,S["12A"]*Train.A32.Value)
 
     S["36A"] = T[36]*Train.A51.Value*Train.RVO.Value--36
     Train.KVP:TriggerInput("Set",S["36A"]*Train.KPP.Value)
@@ -352,14 +329,14 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     S["1N"] = C(11<=RK and RK<=18)*(1-Train.LK4.Value)
     Train.RR:TriggerInput("Set",S["10A"]*S["1N"] + P.PS*Train.LK4.Value)
 
-    S["2A"] = (T[2]+T[-2])*Train.A2.Value
+    S["2A"] = T[2]*Train.A2.Value
     S["2B"] = S["2A"]*((1-Train.KSB1.Value)*(1-Train.KSB2.Value)+(1-Train.TR1.Value))
 
     S["2Ca"] = P.PS*C(1<=RK and RK<=17)*Train.RR.Value --CHECK
     S["2Cb"] = P.PP*(C(6<=RK and RK<=18)+C(2<=RK and RK<=5)*Train.KSH1.Value)*(1-Train.RR.Value) --CHECK
     S["2C"] = S["2B"]*(S["2Ca"]+S["2Cb"])*Train.LK4.Value
     S["10R"] = S["10A"]*(1-Train.LK3.Value)*C(2<=RK and RK<=18)*(1-Train.LK4.Value)
-    S["2U"] = (S["10R"]+S["2C"])*S["ZR"]
+    S["2U"] = S["10R"]+S["2C"]*S["ZR"]
     Train.SR1:TriggerInput("Set",S["2U"])
     Train.RV1:TriggerInput("Set",S["2U"])
 
@@ -386,7 +363,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     return S
 end
 
-local wires = {10,11,1,6,3,20,4,5,-2,2,48,8,39,19,25,13,-13,14,24,17,71,36,-28,37,16,12,31,32,69,27,23,22,23,37,59,60,58,61}
+local wires = {10,1,6,3,20,4,5,2,48,8,39,19,25,13,-13,14,24,17,71,36,-28,37,16,12,31,32,69,27,23,22,23,37,59,60,58,61}
 function TRAIN_SYSTEM:SolveInternalCircuits(Train,dT,firstIter)
     local T     = Train.SolverTemporaryVariables
     if not T then

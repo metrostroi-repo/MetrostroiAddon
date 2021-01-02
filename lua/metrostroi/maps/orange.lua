@@ -26,17 +26,18 @@ Metrostroi.AddLastStationTex("720",404,"models/metrostroi_schemes/destination_ta
 Metrostroi.AddLastStationTex("720",408,"models/metrostroi_schemes/destination_table_white/label_park")
 Metrostroi.AddLastStationTex("720",411,"models/metrostroi_schemes/destination_table_white/label_wallance_breen")
 
-Metrostroi.AddPassSchemeTex("717_new","1 Line",{
-    "models/metrostroi_schemes/mus_neoorange",
-})
-Metrostroi.AddPassSchemeTex("720","Crossline",{
-    "metrostroi_skins/81-720_schemes/oranger",
-    "metrostroi_skins/81-720_schemes/orange",
-})
-Metrostroi.AddPassSchemeTex("722","Crossline",{
-    "metrostroi_skins/81-722_schemes/oranger",
-    "metrostroi_skins/81-722_schemes/orange",
-})
+Metrostroi.Skins["722_schemes"] = {
+    {
+        name = "Line 1",
+        "metrostroi_skins/81-722_schemes/oranger",
+        "metrostroi_skins/81-722_schemes/orange"
+    },
+    {
+        name = "Crossline",
+        "metrostroi_skins/81-722_schemes/crossline",
+        "metrostroi_skins/81-722_schemes/crossliner",
+    }
+}
 
 Metrostroi.TickerAdverts = {"МЕТРОПОЛИТЕН ИМЕНИ ГАРРИ НЬЮМАНА ПРИГЛАШАЕТ НА РАБОТУ РЕАЛЬНЕ МАФЕНЕСТОВ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,ТЕЛЕФОН ДЛЯ СПРАВОК 8 (800) 555-35-35", "ЭЛЕКТРОДЕПО 'РАБА' ПРИГЛАШАЕТ НА РАБОТУ МОЙЩИКОВ", "В СВЯЗИ С ВВЕЕДЕНИЕМ ЭЛЕКТРОПОЕЗДОВ НОВОГО ПОКОЛЕНИЯ В ЭКСПЛУАТАЦИЮ, ЭЛЕКТРОДЕПО 'РАБА' ПРИГЛАШАЕТ НА РАБОТУ СЛЕСАРЕЙ ПОДИВЖНОГО СОСТАВА", "УПЦ МЕТРОПОЛИТЕНА ИМЕНИ ГАРРИ НЬЮМАНА ПРОВОДИТ НАБОР НА ОБУЧЕНИЕ ПО ПРОФЕССИИ 'МАШИНИСТ ЭЛЕКТРОПОЕЗДА'. ВО ВРЕМЯ ОБУЧЕНИЯ ВЫПЛАЧИВАЕТСЯ СТИПЕНДИЯ В РАЗМЕРЕ 10У.Е.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,ТЕЛЕФОН ДЛЯ СПРАВОК 8 (800) 555-35-35", "СТАНЦИЯ СЛАВУТИЧ ПРИГЛАШАЕТ НА РАБОТУ МАШИНИСТОВ И ПОМОЩНИКОВ МАШИНИСТА ЭСКАЛАТОРА. ОПЛАТА 5 КУСОЧКОВ НОМЕРНОГО.", "ЭЛЕКТРОДЕПО ТЧ1АААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААА"}
 Metrostroi.SetUPOAnnouncer({
@@ -220,31 +221,35 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO", {
 },{
     {
         LED = {2, 2, 3, 3, 4, 3, 3, 3, 3, 3, 3},
-        Name = "Line 1",
+        Name = "Линия 1",
         -- Loop = false,
         {
-            462,"Икарус","Ikarus",
+            462,
+            "Икарус","Ikarus",
             arrlast = {nil, "last_ikarus"},
             dep = {"next_smrc", nil},
             odz = "odz1",
             dist = 40,
         },
         {
-            461,"СМРК","SMRC",
+            461,
+            "СМРК","SMRC",
             arr = {{"smrk", 3, "next_flora",0.4,"spec_attention_politeness"}, {"smrk", 3, "next_ikarus",0.4,"spec_attention_handrails"}},
             dep = {"next_flora", "next_ikarus"},
             odz = "odz1",
             dist = 40,
         },
         {
-            460,"Флора","Flora",
+            460,
+            "Флора","Flora",
             arr = {{"flora", 3, "next_aeroport"}, {"flora", 3, "next_smrc",0.4,"spec_attention_politeness"}},
             dep = {"next_aeroport", "next_smrc"},
             odz = "odz2",
             dist = 40,
         },
         {
-            458,"Аэропорт","Airport",
+            458,
+            "Аэропорт","Airport",
             arr = {{"aeroport", 3, "next_slavnaya_strana", "spec_line6"}, {"aeroport", 3, "next_flora",0.4,"spec_attention_handrails"}},
             dep = {"next_slavnaya_strana", "next_flora"},
             arrlast = {"last_aeroport", "last_aeroport"},
@@ -252,28 +257,32 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO", {
             dist = 40,
         },
         {
-            457,"Славная стр.","Glorius c.",
+            457,
+            "Славная стр.","Gl. country",
             arr = {{"slavnaya_strana", 3, "next_litievaya", "spec_line5"}, {"slavnaya_strana", 3, "next_aeroport",0.4,"spec_attention_politeness"}},
             dep = {"next_litievaya", "next_aeroport"},
             odz = "odz1",
             dist = 40,
         },
         {
-            456,"Литиевая","Lithium",
+            456,
+            "Литиевая","Lithium",
             arr = {{"litievaya", 3, "next_arsenal",0.4,"spec_attention_handrails"}, {"litievaya", 3, "next_slavnaya_strana", "spec_line6"}},
             dep = {"next_arsenal", "next_slavnaya_strana"},
             odz = "odz2",
             dist = 40,
         },
         {
-            455,"Арсенал","Arsenal",
+            455,
+            "Арсенал","Arsenal",
             arr = {{"arsenal", 3, "next_park", "spec_line6"}, {"arsenal", 3, "next_litievaya", "spec_line5",0.4,"spec_attention_politeness"}},
             dep = {"next_park1", "next_litievaya"},
             odz = "odz1",
             dist = 40,
         },
         {
-            454,"Парк","Park",
+            454,
+            "Парк","Park",
             arr = {{"park", 3, "next_gcfscape",0.4,"spec_attention_politeness"}, {"park", 3, "next_arsenal",0.4,"spec_attention_handrails"}},
             dep = {"next_gcfscape1", "next_arsenal"},
             arrlast = {{"last_park", "spec_line6"}, {"last_park", "spec_line6"}},
@@ -281,21 +290,24 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO", {
             dist = 40,
         },
         {
-            453,"GCFScape","GCFScape",
+            453,
+            "GCFScape","GCFScape",
             arr = {{"gcfscape", 3, "next_vhe",0.4,"spec_attention_handrails"}, {"gcfscape", 3, "next_park", "spec_line6"}},
             dep = {"next_vhe", "next_park1"},
             odz = "odz2",
             dist = 40,
         },
         {
-            452,"VHE","VHE",
+            452,
+            "VHE","VHE",
             arr = {{"vhe", 3, "next_imeni_uollesa_brina"}, {"vhe", 3, "next_gcfscape",0.4,"spec_attention_politeness"}},
             dep = {"next_imeni_uollesa_brina", "next_gcfscape1"},
             odz = "odz1",
             dist = 40,
         },
         {
-            451,"У. Брина","W. Breen",
+            451,
+            "У. Брина","W. Breen",
             arrlast = {"last_imeni_uollesa_brina"},
             dep = {nil, "next_vhe"},
             odz = "odz1",
@@ -304,464 +316,280 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO", {
     }
 })
 
-Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
-    asnp = true,
-
-    click1 = {"subway_announcers/asnp/boiko_new/click1.mp3",0.5},
-    click2 = {"subway_announcers/asnp/boiko_new/click2.mp3",0.3},
-    click3 = {"subway_announcers/asnp/boiko_new/click3.mp3",0.3},
-    click_start = {"subway_announcers/asnp/boiko_new/click1.mp3",0.5},
-    click_end = {"subway_announcers/asnp/boiko_new/click3.mp3",0.3},
-
-    announcer_ready = {"subway_announcers/asnp/boiko_new/announcer_ready.mp3",3.295479},
-    doors_closing_m = {"subway_announcers/asnp/boiko_new/doors_closing.mp3",3.782542},
-    deadlock_m = {"subway_announcers/asnp/boiko_new/spec_attention_deadlock.mp3",9.352500},
-    exit_m = {"subway_announcers/asnp/boiko_new/spec_attention_exit.mp3",5.363563},
-    handrails_m = {"subway_announcers/asnp/boiko_new/spec_attention_handrails.mp3",4.221854},
-    last_m = {"subway_announcers/asnp/boiko_new/spec_attention_last.mp3",4.425625},
-    objects_m = {"subway_announcers/asnp/boiko_new/spec_attention_objects.mp3",4.674771},
-    politeness_m = {"subway_announcers/asnp/boiko_new/spec_attention_politeness.mp3",9.057104},
-    things_m = {"subway_announcers/asnp/boiko_new/spec_attention_things.mp3",4.559146},
-    train_depeat_m = {"subway_announcers/asnp/boiko_new/spec_attention_train_depeat.mp3",4.633417},
-    train_stop_m = {"subway_announcers/asnp/boiko_new/spec_attention_train_stop.mp3",6.501979},
-    station_m = {"subway_announcers/asnp/boiko_new/station.mp3",0.943438},
-    train_goes_to_m = {"subway_announcers/asnp/boiko_new/train_goes_to.mp3",2.077708},
-
-
-    aeroport_m = {"subway_announcers/asnp/boiko_new/neoorange/aeroport.mp3",0.936042},
-    arsenal_m = {"subway_announcers/asnp/boiko_new/neoorange/arsenal.mp3",0.897958},
-    flora_m = {"subway_announcers/asnp/boiko_new/neoorange/flora.mp3",0.713271},
-    gcfscape_m = {"subway_announcers/asnp/boiko_new/neoorange/gcfscape.mp3",2.977167},
-    ikarus_m = {"subway_announcers/asnp/boiko_new/neoorange/ikarus.mp3",0.767938},
-    imeni_uollesa_brina_m = {"subway_announcers/asnp/boiko_new/neoorange/imeni_uollesa_brina.mp3",1.710667},
-    litiyevaya_arr_m = {"subway_announcers/asnp/boiko_new/neoorange/litiyevaya_arr.mp3",3.008667},
-    litiyevaya_next_m = {"subway_announcers/asnp/boiko_new/neoorange/litiyevaya_next.mp3",1.011000},
-    park_m = {"subway_announcers/asnp/boiko_new/neoorange/park.mp3",0.600000},
-    park_arr_m = {"subway_announcers/asnp/boiko_new/neoorange/park_arr.mp3",3.896833},
-    park_next_m = {"subway_announcers/asnp/boiko_new/neoorange/park_next.mp3",2.024271},
-    slavnaya_strana_arr_m = {"subway_announcers/asnp/boiko_new/neoorange/slavnaya_strana_next.mp3",3.397833},
-    slavnaya_strana_next_m = {"subway_announcers/asnp/boiko_new/neoorange/slavnaya_strana_arr.mp3",1.482604},
-    smrc_m = {"subway_announcers/asnp/boiko_new/neoorange/smrc.mp3",1.083688},
-    spec_attention_aeroport_m = {"subway_announcers/asnp/boiko_new/neoorange/spec_attention_aeroport.mp3",11.032125},
-    vhe_m = {"subway_announcers/asnp/boiko_new/neoorange/vhe.mp3",1.387604},
-
-
-    doors_closing_f = {"subway_announcers/asnp/pyaseckaya/doors_closing.mp3",2.340813},
-    deadlock_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_deadlock.mp3",10.501979},
-    exit_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_exit.mp3",5.111104},
-    handrails_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_handrails.mp3",4.675083},
-    last_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_last.mp3",4.878542},
-    objects_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_objects.mp3",5.323146},
-    politeness_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_politeness.mp3",10.685375},
-    things_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_things.mp3",5.144021},
-    train_depeat_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_train_depeat.mp3",4.481875},
-    train_stop_f = {"subway_announcers/asnp/pyaseckaya/spec_attention_train_stop.mp3",6.395313},
-
-    aeroport_f = {"subway_announcers/asnp/pyaseckaya/neoorange/aeroport.mp3",0.913667},
-    arr_aeroport_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_aeroport.mp3",1.800000},
-    arr_arsenal_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_arsenal.mp3",1.895021},
-    arr_flora_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_flora.mp3",1.536813},
-    arr_gcfscape_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_gcfscape.mp3",3.838000},
-    arr_ikarus_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_ikarus.mp3",1.810500},
-    arr_imeni_uollesa_brina_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_imeni_uollesa_brina.mp3",2.713104},
-    arr_litiyevaya_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_litiyevaya.mp3",4.139396},
-    arr_park_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_park.mp3",5.076708},
-    arr_slavnaya_strana_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_slavnaya_strana.mp3",4.527333},
-    arr_smrc_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_smrc.mp3",1.941479},
-    arr_vhe_f = {"subway_announcers/asnp/pyaseckaya/neoorange/arr_vhe.mp3",2.162292},
-    ikarus_f = {"subway_announcers/asnp/pyaseckaya/neoorange/ikarus.mp3",1.029813},
-    next_aeroport_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_aeroport.mp3",2.693333},
-    next_arsenal_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_arsenal.mp3",2.515958},
-    next_flora_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_flora.mp3",2.473229},
-    next_gcfscape_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_gcfscape.mp3",4.695188},
-    next_ikarus_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_ikarus.mp3",2.365021},
-    next_imeni_uollesa_brina_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_imeni_uollesa_brina.mp3",3.516208},
-    next_litiyevaya_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_litiyevaya.mp3",2.865813},
-    next_park_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_park.mp3",3.773146},
-    next_slavnaya_strana_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_slavnaya_strana.mp3",3.161896},
-    next_smrc_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_smrc.mp3",2.622750},
-    next_vhe_f = {"subway_announcers/asnp/pyaseckaya/neoorange/next_vhe.mp3",2.779979},
-    park_f = {"subway_announcers/asnp/pyaseckaya/neoorange/park.mp3",0.625875},
-    spec_attention_aeroport3_f = {"subway_announcers/asnp/pyaseckaya/neoorange/spec_attention_aeroport3.mp3",11.147292},
-    to_aeroport_f = {"subway_announcers/asnp/pyaseckaya/neoorange/to_aeroport.mp3",3.230083},
-    to_park_f = {"subway_announcers/asnp/pyaseckaya/neoorange/to_park.mp3",2.990750},
+Metrostroi.AddANSPAnnouncer("ASNP MakichOS", {
+    click1 = {"subway_announcers/asnp/click.mp3", 0.3},
+    click2 = {"subway_announcers/asnp/click2.mp3", 0.1},
+    announcer_ready = {"subway_announcers/asnp/makich/announcer_ready.mp3", 3.575700},
+    last = {"subway_announcers/asnp/makich/last.mp3", 20.358000},
+    odz = {"subway_announcers/asnp/makich/odz.mp3", 2.427300},
+    spec_attention_exit = {"subway_announcers/asnp/makich/spec_attention_exit.mp3", 5.220000},
+    spec_attention_last = {"subway_announcers/asnp/makich/spec_attention_last.mp3", 5.063400},
+    spec_attention_objects = {"subway_announcers/asnp/makich/spec_attention_objects.mp3", 4.176000},
+    spec_attention_politeness = {"subway_announcers/asnp/makich/spec_attention_politeness.mp3", 8.952300},
+    spec_attention_things = {"subway_announcers/asnp/makich/spec_attention_things.mp3", 4.698000},
+    spec_attention_train_depeat = {"subway_announcers/asnp/makich/spec_attention_train_depeat.mp3", 4.332600},
+    spec_attention_train_stop = {"subway_announcers/asnp/makich/spec_attention_train_stop.mp3", 5.246100},
+    spec_attention_handrails = {"subway_announcers/asnp/makich/spec_attention_handrails.mp3", 4.880700},
+    train_goes_to = {"subway_announcers/asnp/makich/train_goes_to.mp3", 2.322900},
+    aeroport = {"subway_announcers/asnp/makich/orange/aeroport.mp3", 0.965700},
+    arr_aeroport = {"subway_announcers/asnp/makich/orange/arr_aeroport.mp3", 2.009700},
+    arr_arsenal = {"subway_announcers/asnp/makich/orange/arr_arsenal.mp3", 1.670400},
+    arr_flora = {"subway_announcers/asnp/makich/orange/arr_flora.mp3", 1.592100},
+    arr_gcfscape = {"subway_announcers/asnp/makich/orange/arr_gcfcape.mp3", 3.680100},
+    arr_ikarus = {"subway_announcers/asnp/makich/orange/arr_ikarus.mp3", 1.722600},
+    arr_imeni_uollesa_brina = {"subway_announcers/asnp/makich/orange/arr_imeni_uollesa_brina.mp3", 2.401200},
+    arr_litievaya = {"subway_announcers/asnp/makich/orange/arr_litievaya.mp3", 3.784500},
+    arr_park = {"subway_announcers/asnp/makich/orange/arr_park.mp3", 5.141700},
+    arr_slavnaya_strana = {"subway_announcers/asnp/makich/orange/arr_slavnaya_strana.mp3", 4.228200},
+    arr_smrc = {"subway_announcers/asnp/makich/orange/arr_smrk.mp3", 1.748700},
+    arr_vhe = {"subway_announcers/asnp/makich/orange/arr_vhe.mp3", 1.983600},
+    next_aeroport = {"subway_announcers/asnp/makich/orange/next_aeroport.mp3", 2.688300},
+    next_arsenal = {"subway_announcers/asnp/makich/orange/next_arsenal.mp3", 2.296800},
+    next_flora = {"subway_announcers/asnp/makich/orange/next_flora.mp3", 1.983600},
+    next_gcfscape = {"subway_announcers/asnp/makich/orange/next_gcfcape.mp3", 4.384800},
+    next_ikarus = {"subway_announcers/asnp/makich/orange/next_ikarus.mp3", 2.218500},
+    next_imeni_uollesa_brina = {"subway_announcers/asnp/makich/orange/next_imeni_uollesa_brina.mp3", 3.158100},
+    next_litievaya = {"subway_announcers/asnp/makich/orange/next_litievaya.mp3", 2.244600},
+    next_park = {"subway_announcers/asnp/makich/orange/next_park.mp3", 3.836700},
+    next_slavnaya_strana = {"subway_announcers/asnp/makich/orange/next_slavnaya_strana.mp3", 2.636100},
+    next_smrc = {"subway_announcers/asnp/makich/orange/next_smrk.mp3", 2.375100},
+    next_vhe = {"subway_announcers/asnp/makich/orange/next_vhe.mp3", 2.427300},
+    park = {"subway_announcers/asnp/makich/orange/park.mp3", 0.626400},
+    ikarus = {"subway_announcers/asnp/makich/orange/ikarus.mp3", 0.991800},
+    vhe = {"subway_announcers/asnp/makich/orange/vhe.mp3", 1.409400}
 },{
     {
         LED = {2, 1, 2, 3, 3, 3, 3, 3, 3, 3, 4},
-        Name = "Line 1",
-        spec_last = {"last_m",0.5,"things_m"},
-        spec_last_f = {"last_f",0.5,"things_f"},
-        spec_wait = {{"train_stop_m"},{"train_depeat_m"}},
-        spec_wait_f = {{"train_stop_f"},{"train_depeat_f"}},
+        Name = "Линия 1",
         Loop = false,
-        BlockDoors = true,
+        spec_last = {"spec_attention_last",0.5,"spec_attention_things"},
+        spec_wait = {{"spec_attention_train_stop"},{"spec_attention_train_depeat"}},
         {
-            462, "Икарус","Ikarus",
-            arrlast = {nil, {"arr_ikarus_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, "ikarus_m"},
-            dep = {{"doors_closing_m","smrc_m",0.1,"politeness_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            462,
+            "Икарус",
+            arrlast = {nil, {"arr_ikarus", 0.5, "last"}, "ikarus"},
+            dep = {{"odz", "next_smrc", 0.1, "spec_attention_politeness"}}
         },
         {
-            461, "СМРК","SMRC",
-            arr = {{"station_m","smrc_m"}, "arr_smrc_f"},
-            dep = {{"doors_closing_m","flora_m", 0.1,"handrails_m"}, {"doors_closing_f","next_ikarus_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            460, "Флора","Flora",
-            arr = {{"station_m","flora_m"}, "arr_flora_f"},
-            dep = {{"doors_closing_m","aeroport_m", 0.1,"things_m"}, {"doors_closing_f","next_smrc_f",0.1,"handrails_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            458, "Аэропорт","Airport",
-            arr = {{"station_m","aeroport_m",0.1,"objects_m"}, {"arr_aeroport_f",0.1,"things_f"}},
-            dep = {{"doors_closing_m","slavnaya_strana_next_m"}, {"doors_closing_f","next_flora_f",0.1,"politeness_f"}},
-            arrlast = {{"station_m","aeroport_m",0.5,"last_m",2,"things_m",2,"deadlock_m"}, {"arr_aeroport_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, "aeroport_m"},
-            not_last = {3,"train_goes_to_m","aeroport_m"},
-            not_last_f = {3,"to_aeroport_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            --not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            457, "Славная стр.","Glorius c.",
-            arr = {{"station_m","slavnaya_strana_arr_m"}, "arr_slavnaya_strana_f"},
-            dep = {{"doors_closing_m","litiyevaya_next_m",0.1,"politeness_m"}, {"doors_closing_f","next_aeroport_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
-        },
-        {
-            --male<->female
-            456, "Литиевая","Lithium",
-            arr = {{"station_m","litiyevaya_arr_m"}, {"station_m","litiyevaya_arr_m"}},
-            dep = {{"doors_closing_f","next_arsenal_f"}, {"doors_closing_f","next_slavnaya_strana_f",0.1,"objects_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
-        },
-        {
-            455, "Арсенал","Arsenal",
-            arr = {"arr_arsenal_f", {"station_m","arsenal_m"}},
-            dep = {{"doors_closing_f","next_park_f",0.1,"handrails_f"}, {"doors_closing_m","litiyevaya_next_m",0.1,"handrails_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            454, "Парк","Park",
-            arr = {{"arr_park_f", 0.1,"things_f"}, {"station_m","park_arr_m",0.1,"things_m"}},
-            dep = {{"doors_closing_f","next_gcfscape_f"}, {"doors_closing_m","arsenal_m",0.1,"objects_m"}},
-            arrlast = {{"arr_park_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, {"station_m","park_arr_m",0.5,"last_m",2,"things_m",2,"deadlock_m"}, "aeroport_m"},
-            not_last = {3,"train_goes_to_m","park_m"},
-            not_last_f = {3,"to_park_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
-            right_doors = true,
-        },
-        {
-            453, "GCFScape",
-            arr = {"arr_gcfscape_f", {"station_m","gcfscape_m"}},
-            dep = {{"doors_closing_f","next_vhe_f"}, {"doors_closing_m","park_next_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            right_doors = true,
-        },
-        {
-            452, "VHE",
-            arr = {"arr_vhe_f", {"station_m","vhe_m"}},
-            dep = {{"doors_closing_f","next_imeni_uollesa_brina_f",0.1,"exit_f"}, {"doors_closing_m","gcfscape_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true
-        },
-        {
-            451, "У. Брина","W. Breen",
-            arrlast = {{"arr_imeni_uollesa_brina_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, nil, "imeni_uollesa_brina_m"},
-            dep = {nil, {"doors_closing_m","vhe_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-        }
-    }
-})
-
-
-
-Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
-    riu  = true,
-
-    click1 = {"subway_announcers/riu/boiko_new/click1.mp3",0.5},
-    click2 = {"subway_announcers/riu/boiko_new/click2.mp3",0.3},
-    click3 = {"subway_announcers/riu/boiko_new/click3.mp3",0.3},
-    click_start = {"subway_announcers/riu/boiko_new/click1.mp3",0.5},
-    click_end = {"subway_announcers/riu/boiko_new/click3.mp3",0.3},
-
-
-    announcer_ready = {"subway_announcers/riu/boiko_new/announcer_ready.mp3",3.785},
-    doors_closing_m = {"subway_announcers/riu/boiko_new/doors_closing.mp3",5},
-    deadlock_m = {"subway_announcers/riu/boiko_new/spec_attention_deadlock.mp3",9.608},
-    exit_m = {"subway_announcers/riu/boiko_new/spec_attention_exit.mp3",5.985},
-    handrails_m = {"subway_announcers/riu/boiko_new/spec_attention_handrails.mp3",4.929},
-    last_m = {"subway_announcers/riu/boiko_new/spec_attention_last.mp3",4.556},
-    objects_m = {"subway_announcers/riu/boiko_new/spec_attention_objects.mp3",5.278},
-    politeness_m = {"subway_announcers/riu/boiko_new/spec_attention_politeness.mp3",10.335},
-    things_m = {"subway_announcers/riu/boiko_new/spec_attention_things.mp3",5.101},
-    train_depeat_m = {"subway_announcers/riu/boiko_new/spec_attention_train_depeat.mp3",5.209},
-    train_stop_m = {"subway_announcers/riu/boiko_new/spec_attention_train_stop.mp3",7.370},
-    station_m = {"subway_announcers/riu/boiko_new/station.mp3",1.2},
-    train_goes_to_m = {"subway_announcers/riu/boiko_new/train_goes_to.mp3",2.540},
-
-    aeroport_m = {"subway_announcers/riu/boiko_new/neoorange/aeroport.mp3",0.967891},
-    arsenal_m = {"subway_announcers/riu/boiko_new/neoorange/arsenal.mp3",1.054218},
-    flora_m = {"subway_announcers/riu/boiko_new/neoorange/flora.mp3",0.831474},
-    gcfscape_m = {"subway_announcers/riu/boiko_new/neoorange/gcfscape.mp3",3.509569},
-    ikarus_m = {"subway_announcers/riu/boiko_new/neoorange/ikarus.mp3",0.937528},
-    imeni_uollesa_brina_m = {"subway_announcers/riu/boiko_new/neoorange/imeni_uollesa_brina.mp3",1.850499},
-    litiyevaya_arr_m = {"subway_announcers/riu/boiko_new/neoorange/litiyevaya_arr.mp3",3.323265},
-    litiyevaya_next_m = {"subway_announcers/riu/boiko_new/neoorange/litiyevaya_next.mp3",1.072630},
-    park_m = {"subway_announcers/riu/boiko_new/neoorange/park.mp3",0.777211},
-    park_arr_m = {"subway_announcers/riu/boiko_new/neoorange/park_arr.mp3",4.777211},
-    park_next_m = {"subway_announcers/riu/boiko_new/neoorange/park_next.mp3",2.277211},
-    slavnaya_strana_arr_m = {"subway_announcers/riu/boiko_new/neoorange/slavnaya_strana_arr.mp3",3.743923},
-    slavnaya_strana_next_m = {"subway_announcers/riu/boiko_new/neoorange/slavnaya_strana_next.mp3",1.543129},
-    smrc_m = {"subway_announcers/riu/boiko_new/neoorange/smrc.mp3",1.282971},
-    spec_attention_aeroport_m = {"subway_announcers/riu/boiko_new/neoorange/spec_attention_aeroport.mp3",11.860317},
-    vhe_m = {"subway_announcers/riu/boiko_new/neoorange/vhe.mp3",1.384308},
-
-    doors_closing_f = {"subway_announcers/riu/pyaseckaya/doors_closing.mp3",2.994},
-    deadlock_f = {"subway_announcers/riu/pyaseckaya/spec_attention_deadlock.mp3",10.133},
-    exit_f = {"subway_announcers/riu/pyaseckaya/spec_attention_exit.mp3",5.466},
-    handrails_f = {"subway_announcers/riu/pyaseckaya/spec_attention_handrails.mp3",4.744},
-    last_f = {"subway_announcers/riu/pyaseckaya/spec_attention_last.mp3",4.506},
-    objects_f = {"subway_announcers/riu/pyaseckaya/spec_attention_objects.mp3",5.219},
-    politeness_f = {"subway_announcers/riu/pyaseckaya/spec_attention_politeness.mp3",10.221},
-    things_f = {"subway_announcers/riu/pyaseckaya/spec_attention_things.mp3",5.154},
-    train_depeat_f = {"subway_announcers/riu/pyaseckaya/spec_attention_train_depeat.mp3",4.829},
-    train_stop_f = {"subway_announcers/riu/pyaseckaya/spec_attention_train_stop.mp3",7.240},
-
-
-    aeroport_f = {"subway_announcers/riu/pyaseckaya/neoorange/aeroport.mp3",0.919796},
-    arr_aeroport_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_aeroport.mp3",1.757120},
-    arr_arsenal_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_arsenal.mp3",1.782177},
-    arr_flora_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_flora.mp3",1.500068},
-    arr_gcfscape_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_gcfscape.mp3",3.953605},
-    arr_ikarus_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_ikarus.mp3",1.826327},
-    arr_imeni_uollesa_brina_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_imeni_uollesa_brina.mp3",2.669433},
-    arr_litiyevaya_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_litiyevaya.mp3",4.173039},
-    arr_park_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_park.mp3",5.374286},
-    arr_slavnaya_strana_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_slavnaya_strana.mp3",4.443878},
-    arr_smrc_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_smrc.mp3",1.938571},
-    arr_vhe_f = {"subway_announcers/riu/pyaseckaya/neoorange/arr_vhe.mp3",2.146213},
-    ikarus_f = {"subway_announcers/riu/pyaseckaya/neoorange/ikarus.mp3",0.887551},
-    next_aeroport_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_aeroport.mp3",2.785510},
-    next_arsenal_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_arsenal.mp3",2.537188},
-    next_flora_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_flora.mp3",2.504785},
-    next_gcfscape_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_gcfscape.mp3",4.949478},
-    next_ikarus_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_ikarus.mp3",2.355102},
-    next_imeni_uollesa_brina_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_imeni_uollesa_brina.mp3",3.467687},
-    next_litiyevaya_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_litiyevaya.mp3",2.990249},
-    next_park_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_park.mp3",3.788617},
-    next_slavnaya_strana_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_slavnaya_strana.mp3",3.204467},
-    next_smrc_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_smrc.mp3",2.746145},
-    next_vhe_f = {"subway_announcers/riu/pyaseckaya/neoorange/next_vhe.mp3",2.763560},
-    park_f = {"subway_announcers/riu/pyaseckaya/neoorange/park.mp3",0.596961},
-    spec_attention_aeroport3_f = {"subway_announcers/riu/pyaseckaya/neoorange/spec_attention_aeroport3.mp3",11.945805},
-    to_aeroport_f = {"subway_announcers/riu/pyaseckaya/neoorange/to_aeroport.mp3",3.273401},
-    to_park_f = {"subway_announcers/riu/pyaseckaya/neoorange/to_park.mp3",3.055488},
-},{
-    {
-        LED = {2, 1, 2, 3, 3, 3, 3, 3, 3, 3, 4},
-        Name = "Line 1",
-        spec_last = {"last_m",0.5,"things_m"},
-        spec_last_f = {"last_f",0.5,"things_f"},
-        spec_wait = {{"train_stop_m"},{"train_depeat_m"}},
-        spec_wait_f = {{"train_stop_f"},{"train_depeat_f"}},
-        Loop = false,
-        BlockDoors = true,
-        {
-            462, "Икарус","Ikarus",
-            arrlast = {nil, {"arr_ikarus_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, "ikarus_m"},
-            dep = {{"doors_closing_m","smrc_m",0.1,"politeness_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            461, "СМРК","SMRC",
-            arr = {{"station_m","smrc_m"}, "arr_smrc_f"},
-            dep = {{"doors_closing_m","flora_m", 0.1,"handrails_m"}, {"doors_closing_f","next_ikarus_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            460, "Флора","Flora",
-            arr = {{"station_m","flora_m"}, "arr_flora_f"},
-            dep = {{"doors_closing_m","aeroport_m", 0.1,"things_m"}, {"doors_closing_f","next_smrc_f",0.1,"handrails_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            458, "Аэропорт","Airport",
-            arr = {{"station_m","aeroport_m",0.1,"objects_m"}, {"arr_aeroport_f",0.1,"things_f"}},
-            dep = {{"doors_closing_m","slavnaya_strana_next_m"}, {"doors_closing_f","next_flora_f",0.1,"politeness_f"}},
-            arrlast = {{"station_m","aeroport_m",0.5,"last_m",2,"things_m",2,"deadlock_m"}, {"arr_aeroport_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, "aeroport_m"},
-            not_last = {3,"train_goes_to_m","aeroport_m"},
-            not_last_f = {3,"to_aeroport_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-        },
-        {
-            457, "Славная стр.","Glorius c.",
-            arr = {{"station_m","slavnaya_strana_arr_m"}, "arr_slavnaya_strana_f"},
-            dep = {{"doors_closing_m","litiyevaya_next_m",0.1,"politeness_m"}, {"doors_closing_f","next_aeroport_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
-        },
-        {
-            --male<->female
-            456, "Литиевая","Lithium",
-            arr = {{"station_m","litiyevaya_arr_m"}, {"station_m","litiyevaya_arr_m"}},
-            dep = {{"doors_closing_f","next_arsenal_f"}, {"doors_closing_f","next_slavnaya_strana_f",0.1,"objects_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
-        },
-        {
-            455, "Арсенал","Arsenal",
-            arr = {"arr_arsenal_f", {"station_m","arsenal_m"}},
-            dep = {{"doors_closing_f","next_park_f",0.1,"handrails_f"}, {"doors_closing_m","litiyevaya_next_m",0.1,"handrails_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-        },
-        {
-            454, "Парк","Park",
-            arr = {{"arr_park_f", 0.1,"things_f"}, {"station_m","park_arr_m",0.1,"things_m"}},
-            dep = {{"doors_closing_f","next_gcfscape_f"}, {"doors_closing_m","arsenal_m",0.1,"objects_m"}},
-            arrlast = {{"arr_park_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, {"station_m","park_arr_m",0.5,"last_m",2,"things_m",2,"deadlock_m"}, "aeroport_m"},
-            not_last = {3,"train_goes_to_m","park_m"},
-            not_last_f = {3,"to_park_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            right_doors = true,
-            have_inrerchange = true
-        },
-        {
-            453, "GCFScape",
-            arr = {"arr_gcfscape_f", {"station_m","gcfscape_m"}},
-            dep = {{"doors_closing_f","next_vhe_f"}, {"doors_closing_m","park_next_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            right_doors = true,
-        },
-        {
-            452, "VHE",
-            arr = {"arr_vhe_f", {"station_m","vhe_m"}},
-            dep = {{"doors_closing_f","next_imeni_uollesa_brina_f",0.1,"exit_f"}, {"doors_closing_m","gcfscape_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true
-        },
-        {
-            451, "У. Брина","W. Breen",
-            arrlast = {{"arr_imeni_uollesa_brina_f",0.5,"last_f",2,"things_f",2,"deadlock_f"}, nil, "imeni_uollesa_brina_m"},
-            dep = {nil, {"doors_closing_m","vhe_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-        }
-    }
-})
-
-Metrostroi.SetRRIAnnouncer({
-    click_end = {"subway_announcers/rri/boiko/spec/click_end.mp3",0.1},
-    click_start = {"subway_announcers/rri/boiko/spec/click_start.mp3",0.1},
-    last = {"subway_announcers/rri/boiko/spec/last.mp3",22.264354},
-    exit = {"subway_announcers/rri/boiko/spec/spec_attention_exit.mp3",5.446236},
-    handrails = {"subway_announcers/rri/boiko/spec/spec_attention_handrails.mp3",4.594558},
-    objects = {"subway_announcers/rri/boiko/spec/spec_attention_objects.mp3",5.143175},
-    things = {"subway_announcers/rri/boiko/spec/spec_attention_things.mp3",05.093},
-    politeness = {"subway_announcers/rri/boiko/spec/spec_attention_politeness.mp3",11.457075},
-    train_depeat = {"subway_announcers/rri/boiko/spec/spec_attention_train_depeat.mp3",4.842222},
-    train_stop = {"subway_announcers/rri/boiko/spec/spec_attention_train_stop.mp3",6.963424},
-
-    arr_aeroport = {"subway_announcers/rri/boiko/orange/arr_aeroport.mp3",1.884000},
-    arr_arsenal = {"subway_announcers/rri/boiko/orange/arr_arsenal.mp3",1.939388},
-    arr_flora = {"subway_announcers/rri/boiko/orange/arr_flora.mp3",1.813628},
-    arr_gcfscape = {"subway_announcers/rri/boiko/orange/arr_gcfscape.mp3",3.924717},
-    arr_ikarus = {"subway_announcers/rri/boiko/orange/arr_ikarus.mp3",2.137075},
-    arr_imeni_uollesa_brina = {"subway_announcers/rri/boiko/orange/arr_imeni_uollesa_brina.mp3",2.906961},
-    arr_litiyevaya = {"subway_announcers/rri/boiko/orange/arr_litiyevaya.mp3",3.487029},
-    arr_park = {"subway_announcers/rri/boiko/orange/arr_park.mp3",4.575147},
-    arr_slavnaya_strana = {"subway_announcers/rri/boiko/orange/arr_slavnaya_strana.mp3",2.483492},
-    arr_smrc = {"subway_announcers/rri/boiko/orange/arr_smrc.mp3",2.227914},
-    arr_vhe = {"subway_announcers/rri/boiko/orange/arr_vhe.mp3",2.472018},
-    next_aeroport = {"subway_announcers/rri/boiko/orange/next_aeroport.mp3",4.956000},
-    next_arsenal = {"subway_announcers/rri/boiko/orange/next_arsenal.mp3",5.055873},
-    next_flora = {"subway_announcers/rri/boiko/orange/next_flora.mp3",5.021905},
-    next_gcfscape = {"subway_announcers/rri/boiko/orange/next_gcfscape.mp3",7.011995},
-    next_ikarus = {"subway_announcers/rri/boiko/orange/next_ikarus.mp3",5.147483},
-    next_imeni_uollesa_brina = {"subway_announcers/rri/boiko/orange/next_imeni_uollesa_brina.mp3",5.538209},
-    next_litiyevaya = {"subway_announcers/rri/boiko/orange/next_litiyevaya.mp3",4.949320},
-    next_park = {"subway_announcers/rri/boiko/orange/next_park.mp3",6.216032},
-    next_slavnaya_strana = {"subway_announcers/rri/boiko/orange/next_slavnaya_strana.mp3",5.626304},
-    next_smrc = {"subway_announcers/rri/boiko/orange/next_smrc.mp3",5.320068},
-    next_vhe = {"subway_announcers/rri/boiko/orange/next_vhe.mp3",5.457755},
-    spec_aeroport = {"subway_announcers/rri/boiko/orange/spec_aeroport.mp3",11.101020},
-    to_aeroport = {"subway_announcers/rri/boiko/orange/to_aeroport.mp3",4.759955},
-    to_park = {"subway_announcers/rri/boiko/orange/to_park.mp3",2.882993},
-
-},{
-    {
-        Name = "Line 1",
-        spec_last = {"last"},
-        spec_wait = {{"train_stop"},{"train_depeat"}},
-        {
-            462, "Икарус","Ikarus",
-            arrlast = {nil, {"arr_ikarus",0.5,"last"}},
-            dep = {{"next_smrc",0.1,"politeness"}}
-        },
-        {
-            461, "СМРК","SMRC",
+            461,
+            "СМРК",
             arr = {"arr_smrc", "arr_smrc"},
-            dep = {{"next_flora", 0.1,"handrails"}, "next_ikarus"}
+            dep = {{"odz", "next_flora", 0.1, "spec_attention_handrails"}, {"odz", "next_ikarus"}}
         },
         {
-            460, "Флора","Flora",
+            460,
+            "Флора",
             arr = {"arr_flora", "arr_flora"},
-            dep = {{"next_aeroport", 0.1,"things"}, {"next_smrc",0.1,"handrails"}}
+            dep = {{"odz", "next_aeroport", 0.1, "spec_attention_things"}, {"odz", "next_smrc", 0.1, "spec_attention_handrails"}}
         },
         {
-            458, "Аэропорт","Airport",
-            arr = {{"arr_aeroport",0.1,"objects"}, {"arr_aeroport",0.1,"things"}},
-            dep = {{"next_slavnaya_strana"}, {"next_flora",0.1,"politeness"}},
-            arrlast = {{"arr_aeroport",0.5,"last"}, {"arr_aeroport",0.5,"last"}},
-            not_last = {3,"to_aeroport"},
+            458,
+            "Аэропорт",
+            arr = {{"arr_aeroport", 0.1, "spec_attention_objects"}, {"arr_aeroport", 0.1, "spec_attention_things"}},
+            dep = {{"odz", "next_slavnaya_strana"}, {"odz", "next_flora", 0.1, "spec_attention_politeness"}},
+            arrlast = {{"arr_aeroport", 0.5, "last"}, {"arr_aeroport", 0.5, "last"}, "aeroport"},
+            not_last = {3, "train_goes_to", "aeroport"}
         },
         {
-            457, "Славная стр.","Glorius c.",
+            457,
+            "Славная стр.",
             arr = {"arr_slavnaya_strana", "arr_slavnaya_strana"},
-            dep = {{"next_litiyevaya",0.1,"politeness"}, "next_aeroport"},
+            dep = {{"odz", "next_litievaya", 0.1, "spec_attention_politeness"}, {"odz", "next_aeroport"}},
             have_inrerchange = true
         },
         {
-            --male<->female
-            456, "Литиевая","Lithium",
-            arr = {"arr_litiyevaya", "arr_litiyevaya"},
-            dep = {"next_arsenal", {"next_slavnaya_strana",0.1,"objects"}},
+            456,
+            "Литиевая",
+            arr = {"arr_litievaya", "arr_litievaya"},
+            dep = {{"odz", "next_arsenal"}, {"odz", "next_slavnaya_strana", 0.1, "spec_attention_objects"}},
             have_inrerchange = true
         },
         {
-            455, "Арсенал","Arsenal",
+            455,
+            "Арсенал",
             arr = {"arr_arsenal", "arr_arsenal"},
-            dep = {{"next_park",0.1,"handrails"}, {"next_litiyevaya",0.1,"handrails"}},
+            dep = {{"odz", "next_park", 0.1, "spec_attention_handrails"}, {"odz", "next_litievaya", 0.1, "spec_attention_handrails"}}
         },
         {
-            454, "Парк","Park",
-            arr = {{"arr_park", 0.1,"things"}, {"arr_park",0.1,"things"}},
-            dep = {{"next_gcfscape"}, {"next_arsenal",0.1,"objects"}},
-            arrlast = {{"arr_park",0.5,"last"}, {"arr_park",0.5,"last"}},
-            not_last = {3,"to_park"},
+            454,
+            "Парк",
+            arr = {{"arr_park", 0.1, "spec_attention_things"}, {"arr_park", 0.1, "spec_attention_things"}},
+            dep = {{"odz", "next_gcfscape"}, {"odz", "next_arsenal", 0.1, "spec_attention_objects"}},
+            arrlast = {{"arr_park", 0.5, "last"}, {"arr_park", 0.5, "last"}, "park"},
+            not_last = {3, "train_goes_to", "park"},
             have_inrerchange = true
         },
         {
-            453, "GCFScape",
-            arr = {"arr_gcfscape", {"arr_gcfscape"}},
-            dep = {{"next_vhe"}, {"next_park",0.1,"politeness"}},
+            453,
+            "GCFScape",
+            arr = {"arr_gcfscape", "arr_gcfscape"},
+            dep = {{"odz", "next_vhe"}, {"odz", "next_park", 0.1, "spec_attention_politeness"}}
         },
         {
-            452, "VHE",
+            452,
+            "VHE",
             arr = {"arr_vhe", "arr_vhe"},
-            dep = {{"next_imeni_uollesa_brina",0.1,"exit"}, "next_gcfscape"},
+            dep = {{"odz", "next_imeni_uollesa_brina", 0.1, "spec_attention_exit"}, {"odz", "next_gcfscape"}},
             have_inrerchange = true
         },
         {
-            451, "У. Брина","W. Breen",
-            arrlast = {{"arr_imeni_uollesa_brina",0.5,"last"}},
-            dep = {nil, {"next_vhe",0.1,"politeness"}},
+            451,
+            "У. Брина",
+            arrlast = {{"arr_imeni_uollesa_brina", 0.5, "last"}, nil, "arr_imeni_uollesa_brina"},
+            dep = {nil, {"odz", "next_vhe", 0.1, "spec_attention_politeness"}}
         }
-    },
+    }
 })
+Metrostroi.AddANSPAnnouncer("ASNP MakichOS + Concord En", {
+    click1 = {"subway_announcers/asnp/click.mp3", 0.3},
+    click2 = {"subway_announcers/asnp/click2.mp3", 0.1},
+    announcer_ready = {"subway_announcers/asnp/makich/announcer_ready.mp3", 3.575700},
+    last = {"subway_announcers/asnp/makich/last.mp3", 20.358000},
+    odz = {"subway_announcers/asnp/makich/odz.mp3", 2.427300},
+    spec_attention_exit = {"subway_announcers/asnp/makich/spec_attention_exit.mp3", 5.220000},
+    spec_attention_last = {"subway_announcers/asnp/makich/spec_attention_last.mp3", 5.063400},
+    spec_attention_objects = {"subway_announcers/asnp/makich/spec_attention_objects.mp3", 4.176000},
+    spec_attention_politeness = {"subway_announcers/asnp/makich/spec_attention_politeness.mp3", 8.952300},
+    spec_attention_things = {"subway_announcers/asnp/makich/spec_attention_things.mp3", 4.698000},
+    spec_attention_train_depeat = {"subway_announcers/asnp/makich/spec_attention_train_depeat.mp3", 4.332600},
+    spec_attention_train_stop = {"subway_announcers/asnp/makich/spec_attention_train_stop.mp3", 5.246100},
+    spec_attention_handrails = {"subway_announcers/asnp/makich/spec_attention_handrails.mp3", 4.880700},
+    train_goes_to = {"subway_announcers/asnp/makich/train_goes_to.mp3", 2.322900},
+    aeroport = {"subway_announcers/asnp/makich/orange/aeroport.mp3", 0.965700},
+    arr_aeroport = {"subway_announcers/asnp/makich/orange/arr_aeroport.mp3", 2.009700},
+    arr_arsenal = {"subway_announcers/asnp/makich/orange/arr_arsenal.mp3", 1.670400},
+    arr_flora = {"subway_announcers/asnp/makich/orange/arr_flora.mp3", 1.592100},
+    arr_gcfscape = {"subway_announcers/asnp/makich/orange/arr_gcfcape.mp3", 3.680100},
+    arr_ikarus = {"subway_announcers/asnp/makich/orange/arr_ikarus.mp3", 1.722600},
+    arr_imeni_uollesa_brina = {"subway_announcers/asnp/makich/orange/arr_imeni_uollesa_brina.mp3", 2.401200},
+    arr_litievaya = {"subway_announcers/asnp/makich/orange/arr_litievaya.mp3", 3.784500},
+    arr_park = {"subway_announcers/asnp/makich/orange/arr_park.mp3", 5.141700},
+    arr_slavnaya_strana = {"subway_announcers/asnp/makich/orange/arr_slavnaya_strana.mp3", 4.228200},
+    arr_smrc = {"subway_announcers/asnp/makich/orange/arr_smrk.mp3", 1.748700},
+    arr_vhe = {"subway_announcers/asnp/makich/orange/arr_vhe.mp3", 1.983600},
+    next_aeroport = {"subway_announcers/asnp/makich/orange/next_aeroport.mp3", 2.688300},
+    next_arsenal = {"subway_announcers/asnp/makich/orange/next_arsenal.mp3", 2.296800},
+    next_flora = {"subway_announcers/asnp/makich/orange/next_flora.mp3", 1.983600},
+    next_gcfscape = {"subway_announcers/asnp/makich/orange/next_gcfcape.mp3", 4.384800},
+    next_ikarus = {"subway_announcers/asnp/makich/orange/next_ikarus.mp3", 2.218500},
+    next_imeni_uollesa_brina = {"subway_announcers/asnp/makich/orange/next_imeni_uollesa_brina.mp3", 3.158100},
+    next_litievaya = {"subway_announcers/asnp/makich/orange/next_litievaya.mp3", 2.244600},
+    next_park = {"subway_announcers/asnp/makich/orange/next_park.mp3", 3.836700},
+    next_slavnaya_strana = {"subway_announcers/asnp/makich/orange/next_slavnaya_strana.mp3", 2.636100},
+    next_smrc = {"subway_announcers/asnp/makich/orange/next_smrk.mp3", 2.375100},
+    next_vhe = {"subway_announcers/asnp/makich/orange/next_vhe.mp3", 2.427300},
+    park = {"subway_announcers/asnp/makich/orange/park.mp3", 0.626400},
+    ikarus = {"subway_announcers/asnp/makich/orange/ikarus.mp3", 0.991800},
+    vhe = {"subway_announcers/asnp/makich/orange/vhe.mp3", 1.409400},
+    arr_aeroport_en = {"subway_announcers/asnp/english/orange/arr_aeroport.mp3", 1.688},
+    arr_aeroport_last_en = {"subway_announcers/asnp/english/orange/arr_aeroport_last.mp3", 3.781},
+    arr_arsenal_en = {"subway_announcers/asnp/english/orange/arr_arsenal.mp3", 1.624},
+    arr_flora_en = {"subway_announcers/asnp/english/orange/arr_flora.mp3", 1.538},
+    arr_gcfscape_en = {"subway_announcers/asnp/english/orange/arr_gcfcape.mp3", 2.183},
+    arr_ikarus_en = {"subway_announcers/asnp/english/orange/arr_ikarus.mp3", 3.806},
+    arr_imeni_uollesa_brina_en = {"subway_announcers/asnp/english/orange/arr_imeni_uollesa_brina.mp3", 4.580},
+    arr_litievaya_en = {"subway_announcers/asnp/english/orange/arr_litievaya.mp3", 3.585},
+    arr_park_en = {"subway_announcers/asnp/english/orange/arr_park.mp3", 3.334},
+    arr_park_last_en = {"subway_announcers/asnp/english/orange/arr_park_last.mp3", 5.427},
+    arr_slavnaya_strana_en = {"subway_announcers/asnp/english/orange/arr_slavnaya_strana.mp3", 4.092},
+    arr_smrc_en = {"subway_announcers/asnp/english/orange/arr_smrc.mp3", 1.934},
+    arr_vhe_en = {"subway_announcers/asnp/english/orange/arr_vhe.mp3", 1.717},
+    next_aeroport_en = {"subway_announcers/asnp/english/orange/next_aeroport.mp3", 2.427},
+    next_arsenal_en = {"subway_announcers/asnp/english/orange/next_arsenal.mp3", 2.363},
+    next_flora_en = {"subway_announcers/asnp/english/orange/next_flora.mp3", 2.277},
+    next_gcfscape_en = {"subway_announcers/asnp/english/orange/next_gcfcape.mp3", 4.802},
+    next_ikarus_en = {"subway_announcers/asnp/english/orange/next_ikarus.mp3", 2.451},
+    next_imeni_uollesa_brina_en = {"subway_announcers/asnp/english/orange/next_imeni_uollesa_brina.mp3", 3.225},
+    next_litievaya_en = {"subway_announcers/asnp/english/orange/next_litievaya.mp3", 2.335},
+    next_park_en = {"subway_announcers/asnp/english/orange/next_park.mp3", 3.993},
+    next_slavnaya_strana_en = {"subway_announcers/asnp/english/orange/next_slavnaya_strana.mp3", 2.871},
+    next_smrc_en = {"subway_announcers/asnp/english/orange/next_smrc.mp3", 2.673},
+    next_vhe_en = {"subway_announcers/asnp/english/orange/next_vhe.mp3", 2.456}
+},{
+    {
+        LED = {2, 1, 2, 3, 3, 3, 3, 3, 3, 3, 4},
+        Name = "Линия 1",
+        Loop = false,
+        spec_last = {"spec_attention_last",0.5,"spec_attention_things"},
+        spec_wait = {{"spec_attention_train_stop"},{"spec_attention_train_depeat"}},
+        {
+            462,
+            "Икарус",
+            arrlast = {nil, {"arr_ikarus", "arr_ikarus_en", 0.5, "last"}, "ikarus"},
+            dep = {{"odz", "next_smrc", "next_smrc_en", 0.1, "spec_attention_politeness"}}
+        },
+        {
+            461,
+            "СМРК",
+            arr = {{"arr_smrc", "arr_smrc_en"}, {"arr_smrc", "arr_smrc_en"}},
+            dep = {{"odz", "next_flora", "next_flora_en", 0.1, "spec_attention_handrails"}, {"odz", "next_ikarus", "next_ikarus_en"}}
+        },
+        {
+            460,
+            "Флора",
+            arr = {{"arr_flora", "arr_flora_en"}, {"arr_flora", "arr_flora_en"}},
+            dep = {{"odz", "next_aeroport", "next_aeroport_en", 0.1, "spec_attention_politeness"}, {"odz", "next_smrc", "next_smrc_en", 0.1, "spec_attention_handrails"}}
+        },
+        {
+            458,
+            "Аэропорт",
+            arr = {{"arr_aeroport", "arr_aeroport_en", 0.1, "spec_attention_objects"}, {"arr_aeroport", "arr_aeroport_en", 0.1, "spec_attention_things"}},
+            dep = {{"odz", "next_slavnaya_strana", "next_slavnaya_strana_en"}, {"odz", "next_flora", "next_flora_en", 0.1, "spec_attention_politeness"}},
+            arrlast = {{"arr_aeroport", "arr_aeroport_last_en", 0.5, "last"}, {"arr_aeroport", "arr_aeroport_last_en", 0.5, "last"}, "aeroport"},
+            not_last = {3, "train_goes_to", "aeroport"}
+        },
+        {
+            457,
+            "Славная стр.",
+            arr = {{"arr_slavnaya_strana", "arr_slavnaya_strana_en"}, {"arr_slavnaya_strana", "arr_slavnaya_strana_en"}},
+            dep = {{"odz", "next_litievaya", "next_litievaya_en", 0.1, "spec_attention_politeness"}, {"odz", "next_aeroport", "next_aeroport_en"}},
+            have_inrerchange = true
+        },
+        {
+            456,
+            "Литиевая",
+            arr = {{"arr_litievaya", "arr_litievaya_en"}, {"arr_litievaya", "arr_litievaya_en"}},
+            dep = {{"odz", "next_arsenal", "next_arsenal_en"}, {"odz", "next_slavnaya_strana", "next_slavnaya_strana_en"}},
+            have_inrerchange = true
+        },
+        {
+            455,
+            "Арсенал",
+            arr = {{"arr_arsenal", "arr_arsenal_en", 0.1, "spec_attention_objects"}, {"arr_arsenal", "arr_arsenal_en"}},
+            dep = {{"odz", "next_park", "next_park_en"}, {"odz", "next_litievaya", "next_litievaya_en", 0.1, "spec_attention_handrails"}}
+        },
+        {
+            454,
+            "Парк",
+            arr = {{"arr_park", "arr_park_en", 0.1, "spec_attention_things"}, {"arr_park", "arr_park_en", 0.1, "spec_attention_things"}},
+            dep = {{"odz", "next_gcfscape", "next_gcfscape_en"}, {"odz", "next_arsenal", "next_arsenal_en", 0.1, "spec_attention_politeness"}},
+            arrlast = {{"arr_park", "arr_park_last_en", 0.5, "last"}, {"arr_park", "arr_park_last_en", 0.5, "last"}, "park"},
+            not_last = {3, "train_goes_to", "park"},
+            have_inrerchange = true
+        },
+        {
+            453,
+            "GCFScape",
+            arr = {{"arr_gcfscape", "arr_gcfscape_en"}, {"arr_gcfscape", "arr_gcfscape_en"}},
+            dep = {{"odz", "next_vhe", "next_vhe_en"}, {"odz", "next_park", "next_park_en", 0.1, "spec_attention_handrails"}}
+        },
+        {
+            452,
+            "VHE",
+            arr = {{"arr_vhe", "arr_vhe_en"}, {"arr_vhe", "arr_vhe_en"}},
+            dep = {{"odz", "next_imeni_uollesa_brina", "next_imeni_uollesa_brina_en", 0.1, "spec_attention_exit"}, {"odz", "next_gcfscape", "next_gcfscape_en"}},
+            have_inrerchange = true
+        },
+        {
+            451,
+            "У. Брина",
+            arrlast = {{"arr_imeni_uollesa_brina", "arr_imeni_uollesa_brina_en", 0.5, "last"}, nil, "arr_imeni_uollesa_brina"},
+            dep = {nil, {"odz", "next_vhe", "next_vhe_en", 0.1, "spec_attention_politeness"}}
+        }
+    }
+})
+
+
 
 Metrostroi.StationSound = {
     {"subway_stations/announces/orange/orange_1.mp3",51.965563},

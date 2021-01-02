@@ -74,16 +74,16 @@ function TRAIN_SYSTEM:Think(dT)
         self.TPSpeed = math.max(-1,math.min(1,self.TPSpeed+dT*(self.TPTS-self.TPMS)*0.9))
     end
     self.TPPosition = math.max(0,math.min(1,self.TPPosition + self.RotationRate*self.TPSpeed))
-    self.NZ = self.ReverserPosition < 0.2 and 1 or 0
-    self.VP = self.ReverserPosition > 0.2 and 1 or 0
-    self.TPM = self.TPPosition < 0.2 and 1 or 0
-    self.TPT = self.TPPosition > 0.2 and 1 or 0
-    if self.ReverserPosition < 0.1 and self.RKRSmd or self.ReverserPosition > 0.9 and not self.RKRSmd then
-        self.RKRSmd = self.ReverserPosition > 0.9
+    self.NZ = self.ReverserPosition <  0.5 and 1 or 0
+    self.VP = self.ReverserPosition >= 0.5 and 1 or 0
+    self.TPM = self.TPPosition <  0.5 and 1 or 0
+    self.TPT = self.TPPosition >= 0.5 and 1 or 0
+    if self.OldVP ~= self.VP then
+        self.OldVP = self.VP
         self.Train:PlayOnce("RKR","bass",1,1)
     end
-    if self.TPPosition < 0.1 and self.TPMSnd or self.TPPosition > 0.9 and not self.TPMSnd then
-        self.TPMSnd = self.TPPosition > 0.9
+    if self.OldTPM ~= self.TPM then
+        self.OldTPM = self.TPM
         self.Train:PlayOnce("T","bass",1,1)
     end
 

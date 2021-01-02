@@ -23,15 +23,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 ENT.AnnouncerPositions = {
     {Vector(-3,-60, 62),300,0.3},
     {Vector(-3,60 ,62),300,0.3},
@@ -124,26 +115,26 @@ function ENT:InitializeSounds()
     self.SoundNames["pak_off"] = "subway_trains/717/switches/rc_off.mp3"
 
     self.SoundNames["k2_on"] = "subway_trains/717/pneumo/lk2_on.mp3"
-    self.SoundNames["k2_off"] = "subway_trains/717/pneumatic/lk/lk2_off.mp3"
+    self.SoundNames["k2_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
     self.SoundNames["k1_on"] = "subway_trains/717/pneumo/lk1_on.mp3"
     self.SoundNames["k3_on"] = self.SoundNames["k2_on"]
     self.SoundNames["kmr1_on"] = self.SoundNames["k1_on"]
     self.SoundNames["kmr2_on"] = self.SoundNames["k1_on"]
     self.SoundNames["k1_off"] = self.SoundNames["k2_off"]
     self.SoundNames["k3_off"] = self.SoundNames["k2_off"]
-    self.SoundNames["kmr1_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
-    self.SoundNames["kmr2_off"] = self.SoundNames["kmr1_off"]
+    self.SoundNames["kmr1_off"] = self.SoundNames["k2_off"]
+    self.SoundNames["kmr2_off"] = self.SoundNames["k2_off"]
     --self.SoundNames["ksh1_off"] = "subway_trains/717/pneumo/ksh1.mp3"
     self.SoundPositions["k2_on"] = {440,1e9,Vector(-60,-40,-66),0.22}
     self.SoundPositions["k1_on"] = {440,1e9,Vector(-60,-40,-66),0.3}
-    self.SoundPositions["k2_off"] = {440,1e9,Vector(-60,-40,-66),0.1}
-    self.SoundPositions["k3_off"] = self.SoundPositions["k2_off"]
+    self.SoundPositions["k2_off"] = self.SoundPositions["k2_on"]
+    self.SoundPositions["k3_off"] = self.SoundPositions["k2_on"]
     self.SoundPositions["k3_on"] = self.SoundPositions["k2_on"]
-    self.SoundPositions["k3_off"] = self.SoundPositions["k2_off"]
+    self.SoundPositions["k3_off"] = self.SoundPositions["k2_on"]
     self.SoundPositions["kmr1_on"] = self.SoundPositions["k2_on"]
-    self.SoundPositions["kmr1_off"] = {440,1e9,Vector(-60,-40,-66),0.3}
+    self.SoundPositions["kmr1_off"] = self.SoundPositions["k2_on"]
     self.SoundPositions["kmr2_on"] = self.SoundPositions["k2_on"]
-    self.SoundPositions["kmr2_off"] = {440,1e9,Vector(-60,-40,-66),0.3}
+    self.SoundPositions["kmr2_off"] = self.SoundPositions["k2_on"]
     --self.SoundPositions["ksh1_off"] = self.SoundPositions["lk1_on"]
 
     self.SoundNames["qf1_on"] = "subway_trains/717/pneumo/ksh1.mp3"
@@ -166,14 +157,6 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(-420,45,-30),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",

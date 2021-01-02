@@ -166,7 +166,7 @@ Entities.gmod_subway_81-502.Buttons.Stopkran.EmergencyBrakeValveToggle          
 Entities.gmod_subway_81-502.Buttons.ParkingBrake.ParkingBrakeLeft                           = @[Common.703.ParkingBrakeLeft]
 Entities.gmod_subway_81-502.Buttons.ParkingBrake.ParkingBrakeRight                          = @[Common.703.ParkingBrakeRight]
 Entities.gmod_subway_81-502.Buttons.UAVAPanel.UAVAToggle                                    = @[Common.ALL.UAVA]
-Entities.gmod_subway_81-502.Buttons.UAVAPanel.UAVACToggle                                   = @[Common.ALL.UAVAContact]
+Entities.gmod_subway_81-502.Buttons.UAVAPanel.UAVAContactSet                                = @[Common.ALL.UAVAContact]
 Entities.gmod_subway_81-502.Buttons.DriverValveBLDisconnect.DriverValveBLDisconnectToggle   = @[Common.ALL.DriverValveBLDisconnect]
 Entities.gmod_subway_81-502.Buttons.DriverValveTLDisconnect.DriverValveTLDisconnectToggle   = @[Common.ALL.DriverValveTLDisconnect]
 Entities.gmod_subway_81-502.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle            = @[Common.ALL.FrontBrakeLineIsolationToggle]
@@ -208,8 +208,8 @@ Entities.gmod_subway_81-501.Buttons.AV1.VU3Toggle               = @[Common.703.V
 
 Entities.gmod_subway_81-501.Buttons.VU.VUToggle                 = @[Common.ALL.VU]
 
-Entities.gmod_subway_81-501.Buttons.Main.!GRP                   = @[Common.ALL.GRP]
-Entities.gmod_subway_81-501.Buttons.Main.!RRP                   = @[Common.ALL.RRP]
+Entities.gmod_subway_81-501.Buttons.Main.!GRP                   = @[Common.ALL.RRP]
+Entities.gmod_subway_81-501.Buttons.Main.!RRP                   = @[Common.ALL.GRP]
 Entities.gmod_subway_81-501.Buttons.Main.!SD                    = @[Common.703.SD]
 Entities.gmod_subway_81-501.Buttons.Main.LOnSet                 = @[Common.703.LOn]
 Entities.gmod_subway_81-501.Buttons.Main.LOffSet                = @[Common.703.LOff]

@@ -25,12 +25,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
-ENT.MirrorCams = {
-    Vector(441,72,15),Angle(1,180,0),15,
-    Vector(441,-72,15),Angle(1,180,0),15,
-}
-
 ENT.AnnouncerPositions = {
     {Vector(420,-38.2 ,40),80,0.4},
     {Vector(-3,-60, 62),300,0.3},
@@ -51,14 +45,6 @@ ENT.Cameras = {
     {Vector(407.5+80,0,6)   ,Angle(20,180,0),"Train.Common.LastStation"},
     {Vector(450+13,0,26),Angle(60,0,0),"Train.Common.CouplerCamera"},
 }
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
 
 function ENT:InitializeSounds()
      self.BaseClass.InitializeSounds(self)
@@ -414,8 +400,8 @@ function ENT:InitializeSounds()
     self.SoundPositions["samm_revers_out"] = {60,1e9,Vector(442.2-6,-50,-10)}
     self.SoundPositions["samm_revers_in"] = {60,1e9,Vector(442.2-6,-50,-10)}
 
-    self.SoundNames["ring"] = {loop=0.15,"subway_trains/717/ring/ringo_start.wav","subway_trains/717/ring/ringo_loop.wav","subway_trains/717/ring/ringo_end.mp3"}--{loop=0.15,"subway_trains/717/ring/ring_start.wav","subway_trains/717/ring/ring_loop.wav","subway_trains/717/ring/ring_end.wav"}
-    self.SoundPositions["ring"] = {60,1e9,Vector(400,-30,55),0.5}--{100,1e9,Vector(445,-55,-15),0.2}
+    self.SoundNames["ring"] = {loop=0.15,"subway_trains/717/ring/ring_start.wav","subway_trains/717/ring/ring_loop.wav","subway_trains/717/ring/ring_end.wav"}
+    self.SoundPositions["ring"] = {100,1e9,Vector(445,-55,-15),0.2}
 
     self.SoundNames["vpr"] = {loop=0.8,"subway_trains/common/other/radio/vpr_start.wav","subway_trains/common/other/radio/vpr_loop.wav","subway_trains/common/other/radio/vpr_off.wav"}
     self.SoundPositions["vpr"] = {60,1e9,Vector(420,-38.2 ,40),0.05}
@@ -504,14 +490,10 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(410,20,-45),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
+    self.SoundNames["vdol_loud"] = "subway_trains/common/pneumatic/door_valve/vdo3_on.mp3"
+    self.SoundNames["vdop_loud"] = self.SoundNames["vdol_loud"]
+    self.SoundPositions["vdol_loud"] = {100,1e9,Vector(410,20,-45),1}
+    self.SoundPositions["vdop_loud"] = self.SoundPositions["vdol_loud"]
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",
@@ -586,7 +568,7 @@ function ENT:InitializeSystems()
     -- Ящики с реле и контакторами
     self:LoadSystem("LK_755A")
     self:LoadSystem("YAR_15A")
-    self:LoadSystem("YAR_27")
+    self:LoadSystem("YAR_27",nil,"Ezh3")
     self:LoadSystem("YAK_37A")
     self:LoadSystem("YAK_36")
     self:LoadSystem("YAS_44V")
@@ -618,7 +600,6 @@ function ENT:InitializeSystems()
 end
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("RRI",1)
-    self.YAR_27:TriggerInput("NoRKTT",1)
 end
 
 ENT.SubwayTrain = {
@@ -697,7 +678,6 @@ ENT.Spawner = {
                 ent.PassengerDoor = val==4
                 ent.RearDoor = val==4
             else
-                ent.VU2:TriggerInput("Set",0)
                 ent.FrontDoor = val==4
                 ent.RearDoor = val==4
             end

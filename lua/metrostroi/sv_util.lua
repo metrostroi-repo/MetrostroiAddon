@@ -87,16 +87,15 @@ local periodNumbers = {}
 local randomPeriodStart = 0
 local randomPeriodNumber = math.random()
 function Metrostroi.PeriodRandomNumber(typ)
-    typ = typ or 0
-    if not prediods[typ] or (CurTime() - prediods[typ]) > 60 then
-        periodNumbers[typ] = math.random()
+    if not prediods[typ or 0] or (CurTime() - prediods[typ or 0]) > 60 then
+        periodNumbers[typ or 0] = math.random()
     end
 
     -- Refresh the period
-    prediods[typ] = CurTime()
+    prediods[typ or 0] = CurTime()
 
     -- Return number
-    return periodNumbers[typ]
+    return periodNumbers[typ or 0]
 end
 
 
@@ -180,12 +179,7 @@ function Player:GetTrain()
     end
 end
 
-hook.Add("PlayerEnteredVehicle","MetrostroiPlayerTrain",function(ply,veh)
-    ply.InMetrostroiTrain = IsValid(veh:GetNW2Entity("TrainEntity")) and veh:GetNW2Entity("TrainEntity")
-end)
-hook.Add("PlayerLeaveVehicle","MetrostroiPlayerTrain",function(ply,veh)
-    ply.InMetrostroiTrain = false
-end)
+
 
 
 --------------------------------------------------------------------------------
@@ -241,6 +235,36 @@ concommand.Add("metrostroi_train_count", function(ply, _, args)
         end
         for k,v in pairs(N) do
             print(k,"Trains count: "..v)
+        end
+    end
+end)
+
+concommand.Add("metrostroi_time", function(ply, _, args)
+    if IsValid(ply) then
+        ply:PrintMessage(HUD_PRINTCONSOLE, "Time on server is "..
+            Format("%02d:%02d:%02d",
+                math.floor(os.time()/3600)%24,
+                math.floor(os.time()/60)%60,
+                math.floor(os.time())%60))
+
+        local t = (os.time()/60)%(60*24)
+        local printed = false
+        local train = ply:GetTrain()
+        if IsValid(train) and train.Schedule then
+            for k,v in ipairs(train.Schedule) do
+                local prefix = ""
+                if (not printed) and (t < v[3]) then
+                    prefix = ">>>>"
+                    printed = true
+                end
+                ply:PrintMessage(HUD_PRINTCONSOLE,
+                    Format(prefix.."\t[%03d][%s] %02d:%02d:%02d",v[1],
+                        Metrostroi.StationNames[v[1]] or "N/A",
+                        math.floor(v[3]/60)%24,
+                        math.floor(v[3])%60,
+                        math.floor(v[3]*60)%60))
+
+            end
         end
     end
 end)
@@ -455,8 +479,72 @@ concommand.Add("metrostroi_can", function(ply, _, args)
     ply:PrintMessage(HUD_PRINTCONSOLE,"Hacking CAN!")
     print(Format("Player %s hack CAN(%s->%s:%s %s=%s)",ply,srcid,system,id,name,value))
     train:CANWrite("Hacker",srcid or train:GetWagonNumber(),system,id,name,value)
+    --[[
+    local trainList = {}
+    if not IsValid(ply) then
+        for _,class in pairs(Metrostroi.TrainClasses) do
+            local trains = ents.FindByClass(class)
+            for _,train in pairs(trains) do
+                table.insert(trainList,train)
+            end
+        end
+    else
+        local train = ply:GetTrain()
+        if IsValid(train) then
+            --train:UpdateWagonList()
+            for k,v in pairs(train.WagonList) do
+                trainList[k] = v
+            end
+        end
+    end
+
+    if #trainList > 0 then
+        if IsValid(ply) then
+            ply:PrintMessage(HUD_PRINTCONSOLE,"reset wire outside power in train!")
+            print("Player "..tostring(ply).." reset outside power in train ")
+        else
+            print("Reset outside power in trains ")
+        end
+    else
+        if IsValid(ply) then
+            ply:PrintMessage(HUD_PRINTCONSOLE,"You must be inside a train!")
+        end
+    end]]
 end)
 
+local function UpdateTimeSync()
+    --if GetGlobalFloat("MetrostroiT0",0) == 0 then
+        local year = os.time{hour=3,day=1,month=1,year=1971}
+        SetGlobalFloat("MetrostroiTY",year*math.ceil(os.time()/year))
+        SetGlobalFloat("MetrostroiT0",os.time()-GetGlobalFloat("MetrostroiTY"))
+        SetGlobalFloat("MetrostroiT1",CurTime())
+    --[[else
+        print"GETSECOND"
+        SetGlobalFloat("MetrostroiT0",GetGlobalFloat("MetrostroiT0"))
+        SetGlobalFloat("MetrostroiT1",GetGlobalFloat("MetrostroiT1"))
+    end]]
+end
+timer.Create("metrostroi_time_update",60,0,UpdateTimeSync)
+util.AddNetworkString("MetrostroiUpdateTimeSync")
+net.Receive("MetrostroiUpdateTimeSync",UpdateTimeSync)
+hook.Add("PlayerInitialSpawn","metrostroi_time_sync",UpdateTimeSync)
+UpdateTimeSync()
+
+
+function Metrostroi.GetTimedT(notsync)
+    local T0 = GetGlobalFloat("MetrostroiT0",os.time())+GetGlobalFloat("MetrostroiTY")
+    local T1 = GetGlobalFloat("MetrostroiT1",CurTime())
+    local dT
+    if notsync then
+        dT = (os.time()-T0) - (CurTime()-T1)
+    else
+        dT = (os.time()-T0 + (CurTime() % 1.0)) - (CurTime()-T1)
+    end
+    return dT
+end
+function Metrostroi.GetSyncTime(notsync)
+    return os.time()-Metrostroi.GetTimedT(notsync)
+end
 --------------------------------------------------------------------------------
 -- Electric consumption stats
 --------------------------------------------------------------------------------
@@ -503,7 +591,7 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
                 local rB = train.RearBogey
                 if IsValid(fB) then
                     if fB.Feeder then
-                        Metrostroi.Currents[fB.Feeder] = Metrostroi.Currents[fB.Feeder] + fB.DropByPeople+current*0.4
+                        Metrostroi.Currents[fB.Feeder] = Metrostroi.Currents[fB.Feeder] + fB.DropByPeople+current
                         feeder = true
                     else
                         Metrostroi.Current = Metrostroi.Current + fB.DropByPeople
@@ -511,13 +599,13 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
                 end
                 if IsValid(rB) then
                     if rB.Feeder then
-                        Metrostroi.Currents[rB.Feeder] = Metrostroi.Currents[rB.Feeder] + rB.DropByPeople+current*0.4
+                        Metrostroi.Currents[rB.Feeder] = Metrostroi.Currents[rB.Feeder] + rB.DropByPeople+current
                         feeder = true
                     else
                         Metrostroi.Current = Metrostroi.Current + rB.DropByPeople
                     end
                 end
-                if not feeder then Metrostroi.Current = Metrostroi.Current + current*0.4 end
+                if not feeder then Metrostroi.Current = Metrostroi.Current + current end
             end
         end
     end
@@ -669,49 +757,49 @@ function Metrostroi.MapHasFullSupport(typ)
 end
 
 concommand.Add("metrostroi_insert_signs", function(ply,_,args)
-    if IsValid(ply) then error("Metrostroi: This command can be run only from server console!") end
-    local MAP_NAME = game.GetMap() --"gm_mus_loopline_a3"
-    local MAP_VERSION = args and args[1] or ""
+  if IsValid(ply) and not ply:IsAdmin() then error("Metrostroi: This command can be run only from server console or by admin!") end
+  local MAP_NAME = game.GetMap() --"gm_mus_loopline_a3"
+  local MAP_VERSION = args and args[1] or ""
 
-    local commands = {Format("session_begin %s %s",MAP_NAME,MAP_VERSION)}
+  local commands = {Format("session_begin %s %s",MAP_NAME,MAP_VERSION)}
 
-    local function createSign(pos,ang,model)
-        table.insert(commands,Format("entity_create prop_static %s",pos))
-        table.insert(commands,Format("entity_set_keyvalue prop_static %s \"angles\" \"%s\"",pos,ang))--table.insert(commands,Format("entity_rotate_incremental prop_static %s %s",pos,ang))
-        table.insert(commands,Format("entity_set_keyvalue prop_static %s \"model\" \"%s\"",pos,model))
-    end
+  local function createSign(pos,ang,model)
+    table.insert(commands,Format("entity_create prop_static %s",pos))
+    table.insert(commands,Format("entity_set_keyvalue prop_static %s \"angles\" \"%s\"",pos,ang))--table.insert(commands,Format("entity_rotate_incremental prop_static %s %s",pos,ang))
+    table.insert(commands,Format("entity_set_keyvalue prop_static %s \"model\" \"%s\"",pos,model))
+  end
 
-    for k,v in pairs(ents.FindByClass("gmod_track_signs")) do
-        local data = v.SignModels[v.SignType-1]
-        local left = v.Left
-        local offset = Vector(0,v.YOffset,v.ZOffset)
-        local model = data.model
-        if left and not data.noleft then
-            if model:find("_r.mdl") then
-                model = model:Replace("_r.mdl","_l.mdl")
-            else
-                model = model:Replace("_l.mdl","_r.mdl")
-            end
+  for k,v in pairs(ents.FindByClass("gmod_track_signs")) do
+    local data = v.SignModels[v.SignType-1]
+    local left = v.Left
+    local offset = Vector(0,v.YOffset,v.ZOffset)
+    local model = data.model
+    if left and not data.noleft then
+        if model:find("_r.mdl") then
+            model = model:Replace("_r.mdl","_l.mdl")
+        else
+            model = model:Replace("_l.mdl","_r.mdl")
         end
-        local RAND = math.random(-10,10)
-        local pos = data.pos + offset
-        local ang = data.angles
-        if not data.noauto then pos = pos+Vector(0,0,RAND/5); ang = ang+Angle(0,0,RAND) end
-        if left then pos = pos*Vector(1,-1,1) end
-        if left and data.rotate then ang = ang-Angle(0,180,0) end
-
-        createSign(v:LocalToWorld(pos),v:LocalToWorldAngles(ang),model)
     end
+    local RAND = math.random(-10,10)
+    local pos = data.pos + offset
+    local ang = data.angles
+    if not data.noauto then pos = pos+Vector(0,0,RAND/5); ang = ang+Angle(0,0,RAND) end
+    if left then pos = pos*Vector(1,-1,1) end
+    if left and data.rotate then ang = ang-Angle(0,180,0) end
 
-    table.insert(commands,"session_end")
+    createSign(v:LocalToWorld(pos),v:LocalToWorldAngles(ang),model)
+  end
 
-    for k,v in pairs(commands) do
-        local result = hammer.SendCommand(v)
-        if result ~= "ok" then
+  table.insert(commands,"session_end")
+
+  for k,v in pairs(commands) do
+    local result = hammer.SendCommand(v)
+    if result ~= "ok" then
             hammer.SendCommand("session_end")
             error(Format("Error \"%s\" on command %s(%d)",result,v,k))
         end
-    end
+  end
 end)
 SafeRemoveEntity(Metrostroi.RTCamera)
 function Metrostroi.GetCam()
@@ -721,7 +809,7 @@ function Metrostroi.GetCam()
         Metrostroi.RTCamera:SetKeyValue( "fogEnable", 1 )
         Metrostroi.RTCamera:SetKeyValue( "fogStart", 1 )
         Metrostroi.RTCamera:SetKeyValue( "fogEnd", 4096  )
-        Metrostroi.RTCamera:SetKeyValue( "fogColor", "0 0 0 127"     )
+        Metrostroi.RTCamera:SetKeyValue( "fogColor", "255 0 255 127"     )
         Metrostroi.RTCamera:SetPos(Vector(0,0,-2^16))
         Metrostroi.RTCamera:SetNoDraw(true)
         Metrostroi.RTCamera:Activate()
@@ -780,9 +868,9 @@ function Metrostroi.FindNextStation(src,stationsPath,stations)
     -- Accumulate travel time
     local iter = 0
     local function scan(node,stations,path,trace,dist,branches)
-        while node do
+        while (node) and (node ~= dest) do
             local nextnode = path and node.next or not path and node.prev
-            assert(iter < 1000000, "OH SHI~")
+            assert(iter < 10000, "OH SHI~")
             iter = iter + 1
             if nextnode then
                 local heightDist = (nextnode.pos.z-node.pos.z)*0.01905
@@ -822,7 +910,7 @@ function Metrostroi.FindNextStation(src,stationsPath,stations)
                     if #restbl~=0 then
                         table.insert(restbl,{0,dist})
                         for k,v in pairs(restbl) do
-                            --print(k,v[1],v[2],v[3])
+                            print(k,v[1],v[2],v[3])
                             table.insert(trace.slopes,v)
                         end
                     end
@@ -835,9 +923,7 @@ function Metrostroi.FindNextStation(src,stationsPath,stations)
             --local stationT = Metrostroi.Stations[tonumber(id)]
             if markersForNode[node] then
                 for i,marker in ipairs(markersForNode[node]) do
-                    if marker.PAType == 1 then
-                        print("MAKR",marker.TrackX,marker.TrackPosition.x,marker.PAStationID,targetStation,marker.PAStationPath,stationsPath)
-                        if marker.PAStationID ~= targetStation or tonumber(marker.PAStationPath) ~= stationsPath then return end
+                    if marker.PAType == 1 and marker.PAStationID == targetStation and tonumber(marker.PAStationPath) == stationsPath then
                         table.remove(stations,1)
                         --if marker.PAStationCorrection then print(targetStation) end
                         local distance = dist+(marker.TrackPosition.x-node.x)-(marker.PAStationCorrection or 0)
@@ -861,7 +947,7 @@ function Metrostroi.FindNextStation(src,stationsPath,stations)
                             dist_last_end = marker.PADeadlockEnd and distance+marker.PADeadlockEnd,
                             linkedSensor = lastSens,
                         })
-                        --print("MAKR GOOD",marker.TrackX,marker.TrackPosition.x,targetStation)
+                        print("MAKR",marker.TrackX,marker.TrackPosition.x,targetStation)
                         break
                     end
                 end
@@ -875,40 +961,34 @@ function Metrostroi.FindNextStation(src,stationsPath,stations)
             if sensorsForNode[node] then
                 local sensor = sensorsForNode[node][1]
                 local x = sensorsForNode[sensor].x
-                --print("SENS",node,dist,dist+(x-node.x))
+                print("SENS",node,dist,dist+(x-node.x))
                 table.insert(trace.sensors,dist+(x-node.x)--[[ sensor.TrackPosition.x--]] )
             end
             dist = dist+node.length
-            if node.branches then
-                for k,v in pairs(node.branches) do
-                    if branches[v[2]] or v[2].path == src.path then continue end
-                    branches[v[2]] = true
-                    local result = scan(v[2],table.Copy(stations),true,table.Copy(trace),dist,branches) or scan(v[2],table.Copy(stations),false,table.Copy(trace),dist,branches)
-                    if result and #result[3] == 0 then return result end
-                end
-            end
-            --[=[if node.branches and not branches[node.branches[1]] and node.branches[1][2].path ~= src.path then
+
+            if node.branches and branches[node.branches[1]] and node.branches[1][2].path == src.path then
                 branches[node.branches[1]] = true
                 local result = scan(node,table.Copy(stations),true,table.Copy(trace),dist,branches) or scan(node,table.Copy(stations),false,table.Copy(trace),dist,branches)
-                if result and #stations == 0 then return result end
+                if result then return result end
             end
-            if node.branches and not node.branches[2] and branches[node.branches[2]] and node.branches[2][2].path ~= src.path then
+            if node.branches and node.branches[2] and branches[node.branches[2]] and node.branches[2][2].path == src.path then
                 branches[node.branches[2]] = true
                 local result = scan(node,table.Copy(stations),true,table.Copy(trace),dist,branches) or scan(node,table.Copy(stations),false,table.Copy(trace),dist,branches)
-                if result and #stations == 0 then return result end
-            end]=]
-            node = nextnode
+                if result then return result end
+            end
+            if path then
+                node = node.next
+            else
+                node = node.prev
+            end
             if not node then break end
         end
-        if #stations == 0 then print(debug.traceback()) end
-        return #stations == 0 and {trace,dist,stations}
+        return {trace,dist}
     end
 
-    return scan(src,stations,true,{signals={},stations={},sensors={},slopes={}},0,{}) or scan(src,stations,false,{signals={},stations={},sensors={},slopes={}},0,{})
+    return scan(src,stations,true,{signals={},stations={},sensors={},slopes={}},0,{})
 end
 concommand.Add("metrostroi_pam_genconfig", function(ply, _, args)
-    if not IsValid(ply) or not ply:IsAdmin() then return end
-
     if args[1] == "clear" then
         ply:PrintMessage(HUD_PRINTCONSOLE,"Cleared!")
         Metrostroi.PAMConfTest = {}
@@ -941,11 +1021,6 @@ concommand.Add("metrostroi_pam_genconfig", function(ply, _, args)
     for k,v in pairs(results) do
         --ply:PrintMessage(HUD_PRINTCONSOLE,Format("\t[%d] Path #%d, ID #%d: (%.2f x %.2f x %.2f) m  Facing %s",k,v.path.id,v.node1.id,v.x,v.y,v.z,v.forward and "forward" or "v.node1"))
         local result = Metrostroi.FindNextStation(v.node1,path,args)
-        if not result then
-            ply:PrintMessage(HUD_PRINTCONSOLE,Format("Config not generated! Can't find all stations"))
-            return
-        end
-        PrintTable(result)
         if not Metrostroi.PAMConfTest then
             Metrostroi.PAMConfTest = {}
         end
@@ -979,8 +1054,6 @@ function Metrostroi.PARebuildStations()
 end
 
 concommand.Add("metrostroi_pam_add_station", function(ply, _, args)
-    if not IsValid(ply) or not ply:IsAdmin() then return end
-
     local line = tonumber(table.remove(args,1) or false)
     local path = tonumber(table.remove(args,1) or false)
     local station = tonumber(table.remove(args,1) or false)

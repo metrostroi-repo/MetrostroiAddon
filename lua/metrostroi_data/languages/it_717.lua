@@ -742,7 +742,7 @@ Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.3:KRZDSet            
 Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.3:VozvratRPSet           = @[Common.ALL.VRPBV]
 Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.!GreenRPLight3           = @[Common.ALL.GRP]
 Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.!RZPLight3               = @[Common.717.RZPL]
-Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.!LKVPLight3              = @[Common.717.KVP]
+Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.!LKVPLight3              = @[Common.717.RZPL]
 Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.3:OtklAVUToggle          = @[Common.ALL.OAVU]
 Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.3:ConverterProtectionSet = @[Common.717.ConverterProtection]
 Entities.gmod_subway_81-717_lvz.Buttons.Block5_6_old_paksd.3:KSNSet                 = @[Common.ALL.KSN]

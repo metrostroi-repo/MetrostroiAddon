@@ -13,7 +13,6 @@ function TRAIN_SYSTEM:Initialize()
     self.KM4 = 0 --Реле контроля наличия тормозного тока
 
     self.KV1 = 0
-    self.KV2 = 0
 end
 
 function TRAIN_SYSTEM:Inputs()
@@ -21,7 +20,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-	return { "KV1","KV2" }
+	return { "KM1","KM2" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)

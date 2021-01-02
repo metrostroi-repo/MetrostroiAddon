@@ -42,8 +42,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "BogeyMoment", }
-    --"Speed","Rwa","Rws","E13","E24","RotationRate","MagneticFlux13","MagneticFlux24","FieldReduction13","FieldReduction24","Moment13","Moment24","BogeyMoment"}
+    return { "BogeyMoment" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)

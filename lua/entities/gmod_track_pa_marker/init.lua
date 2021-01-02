@@ -33,6 +33,7 @@ function ENT:SetTrackPosition(path,x)
     local results = Metrostroi.GetPositionOnTrack(self:GetPos(),self:GetAngles())
     local pos,ang = Metrostroi.GetTrackPosition(path,x)
     if not pos then
+        --for k,v in pairs(results[1]) do print(k,v) end
         pos,ang = Metrostroi.GetTrackPosition(results[1].path,results[1].x)
         if not pos then
             ErrorNoHalt(Format("Metrostroi: Can't find PA track position: %s!\n",self:GetPos()))

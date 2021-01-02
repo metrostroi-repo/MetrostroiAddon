@@ -4,7 +4,7 @@
 if not TURBOSTROI and (not Turbostroi or not Turbostroi.SetMTAffinityMask) then return end
 local turbostroiTrains = {}
 if Turbostroi and not TURBOSTROI then
-    local FPS = 1/engine.TickInterval()
+    local FPS = 33
     local messageTimeout = 0
     local messageCounter = 0
     local dataCache = {{},{}}
@@ -136,7 +136,7 @@ if Turbostroi and not TURBOSTROI then
                                 value = value and 1 or 0
                             end
                             if type(value) == "number" then
-                                value = math.Round(value,1)
+                                value = math.Round(value)
                                 if not dataCache[train][sys_name] then dataCache[train][sys_name] = {} end
                                 if dataCache[train][sys_name][name] ~= value then
                                     if SendMessage(train,1,sys_name,name,0,value) then
@@ -152,7 +152,7 @@ if Turbostroi and not TURBOSTROI then
     end
     if Turbostroi then
         concommand.Add("metrostroi_turbostroi_run",function(ply,_,_,cmd)
-            if not IsValid(ply) or not ply:IsSuperAdmin() then return end
+            if not IsValid(ply) then return end
             local train = ply:GetTrain()
             if IsValid(train) then
                 print(cmd:sub(1,2),cmd:sub(3,4))
@@ -178,17 +178,24 @@ if Turbostroi and not TURBOSTROI then
         Turbostroi.SetSimulationFPS(FPS)
         hook.Add("Think", "Turbostroi_Think", function()
             if not Turbostroi then return end
-            updateTrains(turbostroiTrains)
-            --[[
+
+            -- Proceed with the think loop
+            --Turbostroi.SetTargetTime(CurTime()) //depricated! now using engine
+            --Turbostroi.Think() //depricated! now using engine
+
+            -- Update all types of trains
+            --for k,v in ipairs(turbostroiTrains) do
+                updateTrains(turbostroiTrains)
+            --end
             -- HACK
             GLOBAL_SKIP_TRAIN_SYSTEMS = nil
 
             -- Print stats
                 if ((CurTime() - messageTimeout) > 1.0) then
                 messageTimeout = CurTime()
-                RunConsoleCommand("say",Format("Metrostroi: %d messages per second (%d per tick)",messageCounter,messageCounter / FPS))
+                --RunConsoleCommand("say",Format("Metrostroi: %d messages per second (%d per tick)",messageCounter,messageCounter / FPS))
                 messageCounter = 0
-            end]]
+            end
         end)
     end
     return

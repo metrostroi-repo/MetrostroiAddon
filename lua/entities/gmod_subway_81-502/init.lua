@@ -15,7 +15,7 @@ ENT.SyncTable = {
     "ALS","ARS","Headlights","VSOSD","KB","DriverValveBLDisconnect","DriverValveTLDisconnect",
     "GV",
     "R_UPO",
-    "UAVA","UAVAC","EmergencyBrakeValve"
+    "UAVA","EmergencyBrakeValve"
 }
 ENT.SyncFunctions = {
     ""
@@ -72,7 +72,6 @@ function ENT:Initialize()
     end
     self.FrontBogey:SetNWInt("MotorSoundType",0)
     self.RearBogey:SetNWInt("MotorSoundType",0)
-    self.FrontCouple.EKKDisconnected = true
 
     self.LeftAutoCoil = self:AddAutodriveCoil(self.FrontBogey,false)
     self.RightAutoCoil = self:AddAutodriveCoil(self.FrontBogey,true)
@@ -122,7 +121,7 @@ function ENT:Initialize()
             [KEY_L] = "DriverValveDisconnect",
 
             [KEY_7] = "KVWrenchNone",
-            [KEY_9] = "KVWrenchKV9",
+            [KEY_9] = "KVWrenchKV",
             [KEY_0] = "KVWrenchKV",
             [KEY_6] = "KVSetT1A",
             [KEY_SPACE] = "PB",
@@ -185,6 +184,34 @@ function ENT:Initialize()
         },
     }
 
+    self.Lights = {
+        -- Interior
+        [9] = { "dynamiclight",    Vector(200, 0, -5), Angle(0,0,0), Color(255,220,180), brightness = 3, distance = 200},
+        [10] = { "dynamiclight",    Vector(-150, 0, -5), Angle(0,0,0), Color(255,220,180), brightness = 3, distance = 200},
+        [11] = { "dynamiclight",    Vector( 200, 0, -5), Angle(0,0,0), Color(255,220,180), brightness = 4, distance = 260},
+        [12] = { "dynamiclight",    Vector(   0, 0, -5), Angle(0,0,0), Color(255,220,180), brightness = 4, distance = 260},
+        [13] = { "dynamiclight",    Vector(-260, 0, -5), Angle(0,0,0), Color(255,220,180), brightness = 4, distance = 260},
+        -- Cabin
+        [23] = { "dynamiclight",        Vector(425,-10.0,40), Angle(0,0,0), Color(255,255,255), brightness = 0.0001, distance = 300},
+
+
+        [15] = { "light",Vector(414.5,69.4,37+3.25), Angle(0,0,0), Color(254,254,254), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [16] = { "light",Vector(414.5,69.4,37-0.02), Angle(0,0,0), Color(40,240,122), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [17] = { "light",Vector(414.5,69.4,37-3.3), Angle(0,0,0), Color(254,210,18), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [18] = { "light",Vector(414.5,-66.4,37+3.25), Angle(0,0,0), Color(254,254,254), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [19] = { "light",Vector(414.5,-66.4,37-0.02), Angle(0,0,0), Color(40,240,122), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [20] = { "light",Vector(414.5,-66.4,37-3.3), Angle(0,0,0), Color(254,210,18), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+
+        [5] = { "light",Vector(465+5,-32, 48), Angle(0,0,0), Color(255,50,50),     brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02.vmt" },
+        [6] = { "light",Vector(465+5, 32, 48), Angle(0,0,0), Color(255,50,50),     brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02.vmt" },
+        [30]  = { "light",           Vector(465+5  ,   -45, -37), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02.vmt" },
+        [31]  = { "light",           Vector(465+5  ,   45, -37), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02.vmt" },
+        [32]  = { "light",           Vector(465+5  ,   0, 48), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02.vmt" },
+
+        [70] = { "headlight",   Vector( 450, -60, -47), Angle(45,-90,0), Color(255,255,255), brightness = 0.5, distance = 400 , fov=120, shadows = 1 },
+
+    }
+
     -- Cross connections in train wires
     self.TrainWireInverts = {
         [15] = true,
@@ -194,6 +221,14 @@ function ENT:Initialize()
         [30] = 29, -- Reverser F<->B
         [31] = 32, -- Doors L<->R
     }
+
+    -- Setup door positions
+    self.LeftDoorPositions = {}
+    self.RightDoorPositions = {}
+    for i=0,3 do
+        table.insert(self.LeftDoorPositions,Vector(353.0 - 35*0.5 - 231*i,65,-1.8))
+        table.insert(self.RightDoorPositions,Vector(353.0 - 35*0.5 - 231*i,-65,-1.8))
+    end
 
     -- KV wrench mode
     self:OnButtonPress("KVWrenchNone")
@@ -243,45 +278,57 @@ end
 function ENT:Think()
     local RetVal = self.BaseClass.Think(self)
 
-    local Panel = self.Panel
-    local Pneumatic = self.Pneumatic
-
     self:SetPackedBool("PanelLights",self.PanelLamp.Value > 0.5)
-    self:SetPackedBool("RedLight",Panel.RedLights>0)
-    self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
-    self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
+    local redlights = self.Panel.RedLights>0
+    self:SetPackedBool("RedLight",redlights)
+    self:SetLightPower(5,redlights)
+    self:SetLightPower(6,redlights)
 
-    local lightsActive2 = math.min(1,Panel.MainLights2)
-    local lightsActive1 = math.min(1,Panel.MainLights1)^2
-    local emerActive1 = Panel.EmergencyLights1
-    local emerActive2 = Panel.EmergencyLights2
+    local lightsActive2 = math.min(1,self.Panel.MainLights2)^2
+    local lightsActive1 = math.min(1,self.Panel.MainLights1)^2
+    local emerActive1 = self.Panel.EmergencyLights1
+    local emerActive2 = self.Panel.EmergencyLights2
     self:SetPackedBool("Lamps_emer1",emerActive1 > 0)
     self:SetPackedBool("Lamps_emer2",emerActive2 > 0)
     self:SetPackedBool("Lamps_half1",lightsActive1 > 0)
     self:SetPackedBool("Lamps_half2",lightsActive2 > 0)
+    self:SetLightPower(23, emerActive1 > 0)
+    if lightsActive1 == 0 then
+        self:SetLightPower(9,emerActive1 > 0,emerActive1*0.3+emerActive2*0.7)
+        self:SetLightPower(10,emerActive2 > 0)
+        self:SetLightPower(11, false)
+        self:SetLightPower(12, false)
+        self:SetLightPower(13, false)
+    else
+        self:SetLightPower(9,false)
+        self:SetLightPower(10,false)
+        self:SetLightPower(11, lightsActive1 > 0, lightsActive1*0.1+lightsActive2*0.9)
+        self:SetLightPower(12, lightsActive1 > 0, lightsActive1*0.4+lightsActive2*0.6)
+        self:SetLightPower(13, lightsActive1 > 0, lightsActive1*0.9+lightsActive2*0.1)
+    end
     self:SetPackedRatio("LampsStrength",lightsActive1)
 
     -- Signal if doors are open or no to platform simulation
     self.LeftDoorsOpen =
-        (Pneumatic.LeftDoorState[1] > 0.5) or
-        (Pneumatic.LeftDoorState[2] > 0.5) or
-        (Pneumatic.LeftDoorState[3] > 0.5) or
-        (Pneumatic.LeftDoorState[4] > 0.5)
+        (self.Pneumatic.LeftDoorState[1] > 0.5) or
+        (self.Pneumatic.LeftDoorState[2] > 0.5) or
+        (self.Pneumatic.LeftDoorState[3] > 0.5) or
+        (self.Pneumatic.LeftDoorState[4] > 0.5)
     self.RightDoorsOpen =
-        (Pneumatic.RightDoorState[1] > 0.5) or
-        (Pneumatic.RightDoorState[2] > 0.5) or
-        (Pneumatic.RightDoorState[3] > 0.5) or
-        (Pneumatic.RightDoorState[4] > 0.5)
+        (self.Pneumatic.RightDoorState[1] > 0.5) or
+        (self.Pneumatic.RightDoorState[2] > 0.5) or
+        (self.Pneumatic.RightDoorState[3] > 0.5) or
+        (self.Pneumatic.RightDoorState[4] > 0.5)
 
     local TW18 = 0
-    if Panel.SSN > 0 then
+    if self.Panel.SSN > 0 then
         local wags = #self.WagonList
         for _,v in ipairs(self.WagonList) do
             TW18 = TW18+(v.Panel.TW18 or 0)/wags
         end
     end
     if self.EMAType == 1 then
-        self:SetPackedBool("CPS_AV",Panel.SSD > 0)
+        self:SetPackedBool("CPS_AV",self.Panel.SSD > 0)
         self:SetPackedBool("BPSon",self.BPS.PowerLamp > 0)
         self:SetPackedBool("BPSErr",self.BPS.ErrorLamp > 0)
         self:SetPackedBool("BPSFail",self.BPS.FailLamp > 0)
@@ -293,10 +340,11 @@ function ENT:Think()
         self:SetPackedBool("ARS_70",self.MARS.F2 > 0)
         self:SetPackedBool("ARS_80",self.MARS.F1 > 0)
         self:SetPackedBool("KSRing",false)
-        self:SetPackedBool("MRing",Panel.Ring > 0)
+        self:SetPackedBool("MRing",self.Panel.Ring > 0)
         self:SetPackedBool("LKVD",self.MARS.KVD > 0)
-        self:SetPackedBool("NMLow",Panel.NMLow > 0)
-        self:SetPackedBool("UAVATriggered",Panel.UAVATriggered > 0 and CurTime()%0.4>0.2)
+        self:SetPackedBool("NMLow",self.Panel.NMLow > 0)
+        self:SetPackedBool("UAVATriggered",self.Panel.UAVATriggered > 0 and CurTime()%0.4>0.2)
+
 
     else
         self:SetPackedBool("CPS_AV",false)
@@ -307,7 +355,7 @@ function ENT:Think()
         self:SetPackedBool("ARS_60",self.ALSCoil.F3)
         self:SetPackedBool("ARS_70",self.ALSCoil.F2)
         self:SetPackedBool("ARS_80",self.ALSCoil.F1)
-        self:SetPackedBool("KSRing",Panel.Ring > 0)
+        self:SetPackedBool("KSRing",self.Panel.Ring > 0)
         self:SetPackedBool("MRing",false)
         if self.PB.Value > 0 and not self:GetDriver() then self.PB:TriggerInput("Set",0) end
     end
@@ -316,33 +364,39 @@ function ENT:Think()
     --print(self.RRT.Value,self.RUT.Value)--self.Scheme["25A"],self["RRTpod"])
     self:SetPackedRatio("CPS_SN1",math.Clamp(TW18^0.7,0,1))
     self:SetPackedBool("CPS_KS",self.KSAUP.Power > 0)
-    self:SetPackedBool("CPS_4",Panel.S4 > 0)
-    self:SetPackedBool("CPS_5",Panel.S5 > 0)
-    self:SetPackedBool("CPS_20",Panel.S20 > 0)
-    self:SetPackedBool("CPS_6",Panel.S6 > 0)
-    self:SetPackedBool("CPS_1",Panel.S1 > 0)
-    self:SetPackedBool("CPS_1P",Panel.S1P > 0)
-    self:SetPackedBool("CPS_3",Panel.S3 > 0)
-    self:SetPackedBool("CPS_2",Panel.S2 > 0)
-    self:SetPackedBool("CPS_RP",Panel.GreenRP > 0)
-    self:SetPackedBool("CPS_SD",Panel.SSD > 0)
-    self:SetPackedBool("CPS_DT",Panel.SDT > 0)
+    self:SetPackedBool("CPS_4",self.Panel.S4 > 0)
+    self:SetPackedBool("CPS_5",self.Panel.S5 > 0)
+    self:SetPackedBool("CPS_20",self.Panel.S20 > 0)
+    self:SetPackedBool("CPS_6",self.Panel.S6 > 0)
+    self:SetPackedBool("CPS_1",self.Panel.S1 > 0)
+    self:SetPackedBool("CPS_1P",self.Panel.S1P > 0)
+    self:SetPackedBool("CPS_3",self.Panel.S3 > 0)
+    self:SetPackedBool("CPS_2",self.Panel.S2 > 0)
+    self:SetPackedBool("CPS_RP",self.Panel.GreenRP > 0)
+    self:SetPackedBool("CPS_SD",self.Panel.SSD > 0)
+    self:SetPackedBool("CPS_DT",self.Panel.SDT > 0)
     --print(self.Electric.Cosume)
     self:SetPackedRatio("LampsCount",math.Clamp(1-self.Electric.Cosume,0.3,1))
-    self:SetPackedBool("LMK",Panel.LMK > 0)
-    self:SetPackedBool("L16",Panel.L16 > 0)
-    self:SetPackedBool("LRU",Panel.LRU > 0)
-    self:SetPackedBool("LVRD",Panel.RD > 0)
-    self.SOSD = Panel.SOSD > 0
+    self:SetPackedBool("LMK",self.Panel.LMK > 0)
+    self:SetPackedBool("L16",self.Panel.L16 > 0)
+    self:SetPackedBool("LRU",self.Panel.LRU > 0)
+    self:SetPackedBool("LVRD",self.Panel.RD > 0)
+    self.SOSD = self.Panel.SOSD > 0
     self:SetPackedBool("SOSD",self.SOSD)
 
 
-    self:SetPackedBool("DoorsW",Panel.DoorsW > 0)
-    self:SetPackedBool("GRP",Panel.GreenRP > 0)
-    self:SetPackedBool("BrY",Panel.BrY > 0)
-    self:SetPackedBool("DoorsWC",Panel.DoorsWC > 0)
-    self:SetPackedBool("CPS_4",Panel.S4 > 0)
-    self:SetPackedBool("CPS_4",Panel.S4 > 0)
+    self:SetLightPower(15,self.Panel.DoorsW > 0)
+    self:SetLightPower(16,self.Panel.GreenRP > 0)
+    self:SetLightPower(17,self.Panel.BrY > 0)
+    self:SetLightPower(18,self.Panel.DoorsW > 0)
+    self:SetLightPower(19,self.Panel.GreenRP > 0)
+    self:SetLightPower(20,self.Panel.BrY > 0)
+    self:SetPackedBool("DoorsW",self.Panel.DoorsW > 0)
+    self:SetPackedBool("GRP",self.Panel.GreenRP > 0)
+    self:SetPackedBool("BrY",self.Panel.BrY > 0)
+    self:SetPackedBool("DoorsWC",self.Panel.DoorsWC > 0)
+    self:SetPackedBool("CPS_4",self.Panel.S4 > 0)
+    self:SetPackedBool("CPS_4",self.Panel.S4 > 0)
 
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
     if self.ManualBrake < 0.001 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
@@ -352,26 +406,26 @@ function ENT:Think()
 
     self.BD2:TriggerInput("Set",self.PassengerDoor and 1 or 0)
 
-    self:SetPackedBool("Compressor",Pneumatic.Compressor == 1.0)
+    self:SetPackedBool("Compressor",self.Pneumatic.Compressor == 1.0)
     self:SetPackedBool("RK",(self.RheostatController.Velocity ~= 0.0))
 
     self:SetPackedBool("RearDoor",self.RearDoor)
     self:SetPackedBool("FrontDoor",self.FrontDoor)
     self:SetPackedBool("PassengerDoor",self.PassengerDoor)
     self:SetPackedBool("CabinDoor",self.CabinDoor)
-    self:SetPackedBool("AnnPlay",Panel.AnnouncerPlaying > 0)
-    self:SetPackedBool("VPR",Panel.VPR > 0)
-    self:SetPackedBool("LUDS",Panel.V1 > 0)
+    self:SetPackedBool("AnnPlay",self.Panel.AnnouncerPlaying > 0)
+    self:SetPackedBool("VPR",self.Panel.VPR > 0)
+    self:SetPackedBool("LUDS",self.Panel.V1 > 0)
 
 
     self:SetNW2Int("WrenchMode",self.KVWrenchMode)
-    self:SetPackedRatio("CranePosition", Pneumatic.DriverValvePosition/7)
+    self:SetPackedRatio("CranePosition", self.Pneumatic.DriverValvePosition/7)
     self:SetPackedRatio("ControllerPosition", (self.KV.ControllerPosition+3)/7)
     self:SetPackedRatio("ReverserPosition", 1-(self.KV.ReverserPosition+1)/2)
     self:SetPackedBool("RCUPosition", self.KV.RCU > 0)
-    self:SetPackedRatio("BLPressure", Pneumatic.ReservoirPressure/16.0)
-    self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
-    self:SetPackedRatio("BCPressure", Pneumatic.BrakeCylinderPressure/6.0)
+    self:SetPackedRatio("BLPressure", self.Pneumatic.ReservoirPressure/16.0)
+    self:SetPackedRatio("TLPressure", self.Pneumatic.TrainLinePressure/16.0)
+    self:SetPackedRatio("BCPressure", self.Pneumatic.BrakeCylinderPressure/6.0)
     self:SetPackedRatio("BatteryVoltage",self.Panel["V1"]*self.Battery.Voltage/150.0)
     self:SetPackedRatio("EnginesVoltage", self.Engines.E24/2000.0)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
@@ -403,12 +457,12 @@ function ENT:Think()
             add = math.min((math.abs(self:GetAngles().pitch)-4)/2,1)*2
         end
         self.FrontBogey.PneumaticBrakeForce = 50000.0-2000
-        self.FrontBogey.BrakeCylinderPressure = Pneumatic.BrakeCylinderPressure*add
-        self.FrontBogey.BrakeCylinderPressure_dPdT = -Pneumatic.BrakeCylinderPressure_dPdT
+        self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure*add
+        self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
         self.FrontBogey.ParkingBrakePressure = self.ManualBrake
         self.RearBogey.PneumaticBrakeForce = 50000.0-2000
-        self.RearBogey.BrakeCylinderPressure = Pneumatic.BrakeCylinderPressure*add
-        self.RearBogey.BrakeCylinderPressure_dPdT = -Pneumatic.BrakeCylinderPressure_dPdT
+        self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure*add
+        self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
     end
 
     self:GenerateJerks()
@@ -483,22 +537,23 @@ function ENT:OnButtonPress(button,ply)
         end
     end
 
-    if button == "KVWrenchKV" or button == "KVWrenchKV9" then
+    if button == "KVWrenchKV" then
         if self.KVWrenchMode == 0  then
             self:PlayOnce("revers_in","cabin",0.7)
             self.KVWrenchMode = 1
+            self.DriversWrenchMissing = false
             self.KV:TriggerInput("Enabled",1)
-        else
-            self:TriggerInput(button == "KVWrenchKV9" and "KVReverserDown" or "KVReverserUp",1)
         end
     end
     if button == "KVWrenchNone" then
         if self.KVWrenchMode == 0 then
             self:PlayOnce("revers_in","cabin",0.7)
             self.KVWrenchMode = 3
+            self.DriversWrenchMissing = false
         elseif self.KVWrenchMode ~= 0 and self.KV.ReverserPosition == 0 then
             self:PlayOnce("revers_out","cabin",0.7)
             self.KVWrenchMode = 0
+            self.DriversWrenchMissing = true
             self.KV:TriggerInput("Enabled",0)
         end
     end
@@ -631,4 +686,17 @@ function ENT:OnCouple(train,isfront)
         self.RearAutoCouple = false
     end
     self.BaseClass.OnCouple(self,train,isfront)
+end
+
+function ENT:TriggerTurbostroiInput(sys,name,val)
+    self.BaseClass.TriggerTurbostroiInput(self,sys,name,val)
+    if sys == "Panel" then
+        if name == "Headlights1" or name == "Headlights2" then
+            self:SetPackedBool("Headlights1",self.Panel["Headlights1"] > 0)
+            self:SetPackedBool("Headlights2",self.Panel["Headlights2"] > 0)
+            self:SetLightPower(30,self.Panel["Headlights1"] > 0.5)
+            self:SetLightPower(31,self.Panel["Headlights1"] > 0.5)
+            self:SetLightPower(32,self.Panel["Headlights2"] > 0.5)
+        end
+    end
 end

@@ -18,7 +18,6 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("OtklBVK","Relay","Switch", {normally_closed=true,bass = true})
     self.Train:LoadSystem("RezMK","Relay","Switch", {bass = true})
     self.Train:LoadSystem("VMK","Relay","Switch", {bass = true})
-    self.Train:LoadSystem("VA","Relay","Switch", {bass = true})
     self.Train:LoadSystem("VAH","Relay","Switch", {bass = true})
     self.Train:LoadSystem("VAD","Relay","Switch", {bass = true})
     self.Train:LoadSystem("VUS","Relay","Switch", {bass = true})
@@ -209,13 +208,11 @@ function TRAIN_SYSTEM:Initialize()
     self.LhRK = 0
     self.KVC = 0
     self.SD = 0
-    self.LEKK = 0
     self.TW18 = 0
 
     self.KT = 0
     self.LN = 0
     self.RS = 0
-    self.OneFreq = 0
     self.AR04 = 0
     self.AR0 = 0
     self.AR40 = 0
@@ -238,8 +235,8 @@ end
 
 
 function TRAIN_SYSTEM:Outputs()
-    return { "V1","LUDS","RedLight2","RedLight1","Headlights1","Headlights2","EqLights","CabLights","EqLights","PanelLights","CabinLight","EmergencyLights","MainLights","DoorsLeft","DoorsRight","DoorsW","GreenRP","BrW","AVU","LKVP","RZP","KUP","BrT","LSN","Ring","SD","LST","LVD","LhRK","KVC","SD","TW18", "KT","LEKK",
-             "LKVD","LN","RS","OneFreq","AR04","AR0","AR40","AR60","AR70","AR80","L1","M1_3","M4_7","M8",
+    return { "V1","LUDS","RedLight2","RedLight1","Headlights1","Headlights2","EqLights","CabLights","EqLights","PanelLights","CabinLight","EmergencyLights","MainLights","DoorsLeft","DoorsRight","DoorsW","GreenRP","BrW","AVU","LKVP","RZP","KUP","BrT","LSN","Ring","SD","LST","LVD","LhRK","KVC","SD","TW18", "KT",
+             "LKVD","LN","RS","AR04","AR0","AR40","AR60","AR70","AR80","L1","M1_3","M4_7","M8",
              "AnnouncerPlaying","AnnouncerBuzz","VPR",
              "CBKIPower","PCBKPower"}
 end

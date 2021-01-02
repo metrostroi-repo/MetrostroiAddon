@@ -42,7 +42,7 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("R_ZS","Relay","Switch", {bass = true})
     self.Train:LoadSystem("R_G","Relay","Switch", {bass = true})
     self.Train:LoadSystem("R_UPO","Relay","Switch", {bass = true})
-    self.Train:LoadSystem("R_VPR","Relay","Switch", {bass = true, normally_closed = true})
+    self.Train:LoadSystem("R_VPR","Relay","Switch", {bass = true})
     self.Train:LoadSystem("RC1","Relay","Switch",{ bass = true,normally_closed = true })
     self.Train:LoadSystem("VRD","Relay","Switch",{ bass = true})
 

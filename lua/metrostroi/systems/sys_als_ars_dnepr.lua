@@ -18,12 +18,6 @@ function TRAIN_SYSTEM:Initialize()
 
     self.Train:LoadSystem("ALSCoil")
 
-    self.Train:LoadSystem("BIS_R11","Relay","ARS",{bass=true,bass_separate=true})
-    self.Train:LoadSystem("BIS_R12","Relay","ARS",{bass=true,bass_separate=true,open_time=2.7})
-    self.R11 = 0
-    self.R12 = 0
-    self.KRH = 0
-
     self.Train:LoadSystem("BIS200","ALS_ARS_BIS200")
     self.Train:LoadSystem("BLPM","ALS_ARS_BLPM")
     self.Train:LoadSystem("BSM","ALS_ARS_BSM")
@@ -65,32 +59,20 @@ end
 function TRAIN_SYSTEM:Outputs()
     return {
         "2", "8", "20", "48", "33D", "33G", "48",
-        "NoFreq","F1","F2","F3","F4","F5","F6","LN","PD",
+        "NoFreq","F1","F2","F3","F4","F5","F6","LN",
         "EPK",
     }
 end
 
 function TRAIN_SYSTEM:Inputs()
-    return {"KiyvKRH"}
+    return {}
 end
-function TRAIN_SYSTEM:TriggerInput(name,value)
-    if name == "KiyvKRH" then self.KiyvKRH = value > 0 end
-end
-
 local S = {}
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
     local ALS = Train.ALSCoil
     local BLPM = Train.BLPM
     local Panel = Train.Panel
-
-    if self.KiyvKRH then
-        Train.BSM_KRH:TriggerInput("Set",self.KRH + self.R11*Train.BIS_R11.Value*Train.BIS_R12.Value)
-        Train.BIS_R11:TriggerInput("Set",self.R11)
-        Train.BIS_R12:TriggerInput("Set",self.R12*(1-Train.BIS_R11.Value))
-    else
-        Train.BSM_KRH:TriggerInput("Set",self.KRH)
-    end
 
     Train.FMM1:TriggerInput("Set",self.FMM1)
     Train.FMM2:TriggerInput("Set",self.FMM2)
@@ -99,9 +81,7 @@ function TRAIN_SYSTEM:Think(dT)
     --Train.BIS_R0:TriggerInput("NoOpenTime",Train.BIS_R1.Value+(1-Train.BIS_R0.Value))
 
     Train.BIS_R0:TriggerInput("NoOpenTime",(1-Train.BIS_R0.Value)+Train.BIS_R1.Value)
-    --Train.BIS_R0:TriggerInput("Set",(self.GE*(1-Train.BSM_GE.Value)+S["RVZ"]*(Train.BIS_R1.Value+Train.BIS_R0.Value))*Train.BIS200.R0)
-    Train.BIS_R0:TriggerInput("Set",self.GE*(1-Train.BSM_GE.Value)+S["RVZ"]*(Train.BIS_R1.Value+Train.BIS_R0.Value))
-    Train.BSM_PR1:TriggerInput("Set",self.GE*Train.BIS_R1.Value)
+    Train.BIS_R0:TriggerInput("Set",(self.GE*(1-Train.BSM_GE.Value)+S["RVZ"]*(Train.BIS_R1.Value+Train.BIS_R0.Value))*Train.BIS200.R0)
 
     S["RVZ1"] = S["RVZ"]*Train.BIS_R0.Value*(1-Train.BIS_R1.Value)
     S["EK0"] = S["RVZ1"]*(1-Train.BSM_GE.Value)
@@ -256,6 +236,8 @@ function TRAIN_SYSTEM:Think(dT)
     Train.BUM_RET:TriggerInput("Set",self.GE*(1-Train.BUM_TR.Value)*Train.BUM_PTR1.Value)
     Train.BUM_PTR1:TriggerInput("Set",self.GE*Train.BUM_TR.Value)
     Train.BUM_RVZ1:TriggerInput("Set",S["RVZ1"]*(1-Train.BSM_BR2.Value))
+
+
     --EPK
     --
     S["EKR0on"] =
@@ -281,7 +263,7 @@ function TRAIN_SYSTEM:Think(dT)
     Train.BUM_EK:TriggerInput("Set",S["EK"])
     Train.BUM_EK1:TriggerInput("Set",S["EK"])
     Train.BUM_EK:TriggerInput("OpenTime",S["EKt"])
-    Train.BUM_EK1:TriggerInput("OpenTime",S["EKt"])
+    Train.BUM_EK:TriggerInput("OpenTime",S["EKt"])
 
     self.EPK = self.GE*Train.BUM_EK.Value*Train.BUM_EK1.Value
     Train.BUM_PEK:TriggerInput("Set",self.EPK)
@@ -293,7 +275,6 @@ function TRAIN_SYSTEM:Think(dT)
     self["2"] = self.DA*Train.BUM_RVT4.Value
 
     Train:WriteTrainWire(94,(1-Train.KPK2.Value)*bit.bor(ALS.F1*1,ALS.F2*2,ALS.F3*4,ALS.F4*8,ALS.F5*16,ALS.F6*32))
-    Train:WriteTrainWire(78,S["LUDS"]*Train.BLPM_6R3.Value)
     Train:WriteTrainWire(79,S["LUDS"]*(1-Train.BLPM_6R3.Value)*(Train.BLPM_6R2.Value)*(Train.BLPM_6R1.Value))
     Train:WriteTrainWire(85,S["AR80"])
     Train:WriteTrainWire(84,S["AR70"])
@@ -306,7 +287,6 @@ function TRAIN_SYSTEM:Think(dT)
     --Train:WriteTrainWire(89,S["GE"]*(Train.NG.Value*Train.FMM1.Value+Train.NH.Value*(1-Train.FMM1.Value)))
     --LN 1/5 Fix
     Train:WriteTrainWire(89,S["GE"]*(Train.NG.Value*Train.FMM1.Value+Train.NH.Value*(1-Train.FMM1.Value))*Train.PD2.Value)
-    Panel.OneFreq = Train:ReadTrainWire(78)
     Panel.RS = Train:ReadTrainWire(79)
     Panel.AR80 = Train:ReadTrainWire(85)
     Panel.AR70 = Train:ReadTrainWire(84)

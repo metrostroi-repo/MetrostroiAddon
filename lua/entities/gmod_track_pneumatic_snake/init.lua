@@ -25,13 +25,11 @@ function ENT:Touch(ent)
 			self:SetPos(ent:LocalToWorld(ent.SnakePos or Vector(cpos.x+0.13,cpos.y+0,cpos.z+6.5)))
 			self:SetAngles(ent:LocalToWorldAngles(ent.SnakeAng or Angle(0,90,0)))
 			if IsValid(constraint.Weld(ent,self,0,0,0--[[33000]],true,false)) then
-		    	self.CoupledWith = ent
+		    self.CoupledWith = ent
 				ent.DepotPneumo = self
-		    	DropEntityIfHeld(ent)
-
-				--[[if self.LastPickup and self:IsPlayerHolding() then
+				if self.LastPickup and self:IsPlayerHolding() then
 					self.LastPickup:DropObject()
-				end]]
+				end
 				sound.Play("buttons/lever2.wav",self:GetPos())
 			end
 		end

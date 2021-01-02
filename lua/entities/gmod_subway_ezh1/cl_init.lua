@@ -60,7 +60,6 @@ end
 ENT.ClientProps = {}
 ENT.ButtonMap = {}
 ENT.AutoAnims = {}
-ENT.AutoAnimNames = {}
 ENT.ClientSounds = {}
 
 ENT.ButtonMap["PanelLamp"] = {
@@ -71,7 +70,7 @@ ENT.ButtonMap["PanelLamp"] = {
     scale = 0.0588,
 
     buttons = {
-        {ID = "PanelLampToggle", x=0, y=0, w=100, h=200, tooltip="",var="PanelLights"},
+        {ID = "PanelLampToggle", x=0, y=0, w=100, h=200, tooltip=""},
     }
 }
 
@@ -86,16 +85,13 @@ ENT.ButtonMap["Main"] = {
 
     buttons = {
         {ID = "!GRP", x=25+41.7*3,y=29, radius=20, tooltip="", model = {
-            lamp = {model = "models/metrostroi_train/81-703/cabin_lamp_green.mdl",color = Color(98,178,178),z = 10, var="GRP",},
-            sprite = {bright=0.25,size=0.25,scale=0.07,color=Color(40,255,100),z=12,}
+            lamp = {model = "models/metrostroi_train/81-703/cabin_lamp_green.mdl",color = Color(140,255,255),z = 10, var="GRP",}
         }},
         {ID = "!RRP", x=25+41.7*4,y=29, radius=20, tooltip="", model = {
-            lamp = {model = "models/metrostroi_train/81-703/cabin_lamp_red3.mdl",color = Color(178,112,112),z = 10, var="RRP", getfunc = function(ent,min,max) return ent:GetPackedRatio("RRP") end},
-            sprite = {bright=0.25,size=0.25,scale=0.07,color=Color(255,60,60),z=12}
+            lamp = {model = "models/metrostroi_train/81-703/cabin_lamp_red3.mdl",color = Color(255,160,160),z = 10, var="RRP", getfunc = function(ent,min,max) return ent:GetPackedRatio("RRP") end}
         }},
         {ID = "!SD", x=25+41.7*5,y=29, radius=20, tooltip="", model = {
-            lamp = {model = "models/metrostroi_train/81-703/cabin_lamp_white.mdl",color = Color(178,178,178),z = 10, var="SD",},
-            sprite = {bright=0.25,size=0.25,scale=0.07,color=Color(255,255,255),z=12,}
+            lamp = {model = "models/metrostroi_train/81-703/cabin_lamp_white.mdl",color = Color(255,255,255),z = 10, var="SD",}
         }},
         {ID = "KU4Set", x=30+40*0, y=100, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_button_black.mdl",ang = 180-30,z=0,vmin=1,vmax=0,
@@ -146,7 +142,6 @@ ENT.ButtonMap["Main"] = {
             var="KU2",speed=6,
             sndvol = 1, snd = function(val) return val and "vu224_on" or "vu224_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
         }},
     }
 }
@@ -270,8 +265,8 @@ ENT.ButtonMap["ParkingBrake"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "ParkingBrakeLeft",x=0, y=0, w=150, h=400, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.ParkingBrake"),ent:GetPackedRatio("ManualBrake")*100) end},
-        {ID = "ParkingBrakeRight",x=150, y=0, w=150, h=400, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.ParkingBrake"),ent:GetPackedRatio("ManualBrake")*100) end},
+        {ID = "ParkingBrakeLeft",x=0, y=0, w=150, h=400, tooltip=""},
+        {ID = "ParkingBrakeRight",x=150, y=0, w=150, h=400, tooltip=""},
     }
 }
 
@@ -298,7 +293,6 @@ ENT.ButtonMap["HelperPanel"] = {
             var="KU3",speed=6,
             sndvol = 1, snd = function(val) return val and "vu224_on" or "vu224_off" end,
             sndmin=30, sndmax = 1e3, sndang = Angle(-90,0,0),
-            states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
         }},
     }
 }
@@ -313,8 +307,8 @@ ENT.ButtonMap["HVMeters"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!EnginesVoltage", x=0,y=0,w=66,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesVoltage"),ent:GetPackedRatio("EnginesVoltage")*1000) end},
-        {ID = "!EnginesCurrent", x=0,y=69,w=66,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesCurrent"),ent:GetPackedRatio("EnginesCurrent")*1000-500) end},
+        {ID = "!EnginesCurrent", x=0,y=0,w=66,h=60,tooltip=""},
+        {ID = "!EnginesVoltage", x=0,y=69,w=66,h=60,tooltip=""},
     }
 }
 
@@ -327,7 +321,7 @@ ENT.ButtonMap["BLTLPressure"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!BLTLPressure", x=38,y=38,radius=38,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BLTLPressure"),ent:GetPackedRatio("TLPressure")*16,ent:GetPackedRatio("BLPressure")*16) end},
+        {ID = "!BLTLPressure", x=38,y=38,radius=38,tooltip=""},
     }
 }
 ENT.ButtonMap["BCPressure"] = {
@@ -339,7 +333,7 @@ ENT.ButtonMap["BCPressure"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!BCPressure", x=38,y=38,radius=38,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BCPressure"),ent:GetPackedRatio("BCPressure")*6) end},
+        {ID = "!BCPressure", x=38,y=38,radius=38,tooltip=""},
     }
 }
 ENT.ButtonMap["BatteryVoltage"] = {
@@ -350,7 +344,7 @@ ENT.ButtonMap["BatteryVoltage"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!BatteryVoltage", x=0,y=0,w=68,h=68,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*150) end},
+        {ID = "!BatteryVoltage", x=0,y=0,w=68,h=68,tooltip=""},
     }
 }
 ENT.ButtonMap["DriverValveBLDisconnect"] = {
@@ -365,7 +359,6 @@ ENT.ButtonMap["DriverValveBLDisconnect"] = {
             var="DriverValveBLDisconnect",sndid="brake_disconnect",
             sndvol = 1, snd = function(val) return "disconnect_valve" end,
             sndmin=30, sndmax = 1e3, sndang = Angle(-90,0,0),
-            states={"Train.Buttons.Closed","Train.Buttons.Opened"},
         }},
     }
 }
@@ -381,7 +374,6 @@ ENT.ButtonMap["DriverValveTLDisconnect"] = {
             var="DriverValveTLDisconnect",sndid="train_disconnect",
             sndvol = 1, snd = function(val) return val and "pneumo_TL_open" or "pneumo_TL_disconnect" end,
             sndmin=30, sndmax = 1e3, sndang = Angle(-90,0,0),
-            states={"Train.Buttons.Closed","Train.Buttons.Opened"},
         }},
     }
 }
@@ -392,10 +384,13 @@ ENT.ButtonMap["FrontPneumatic"] = {
     width = 900,
     height = 100,
     scale = 0.1,
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
 
     buttons = {
-        {ID = "FrontBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="FbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "FrontTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="FtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
+        {ID = "FrontBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "FrontTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["FrontBrake"] = {--
@@ -418,10 +413,13 @@ ENT.ButtonMap["RearPneumatic"] = {
     width = 900,
     height = 100,
     scale = 0.1,
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
 
     buttons = {
-        {ID = "RearBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="RbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "RearTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="RtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
+        {ID = "RearBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "RearTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["RearTrain"] = {--
@@ -450,7 +448,6 @@ ENT.ButtonMap["GV"] = {
             var="GV",sndid = "gv",
             sndvol = 0.8,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
             snd = function(val) return val and "gv_f" or "gv_b" end,
-            states={"Train.Buttons.Disconnected","Train.Buttons.On"}
         }},
     }
 }
@@ -479,7 +476,7 @@ ENT.ButtonMap["AirDistributor"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "AirDistributorDisconnectToggle",x=0, y=0, w= 170,h = 260, tooltip="",var="AD",states={"Train.Buttons.On","Train.Buttons.Off"}},
+        {ID = "AirDistributorDisconnectToggle",x=0, y=0, w= 170,h = 260, tooltip=""},
     }
 }
 
@@ -518,7 +515,6 @@ ENT.ButtonMap["FrontDoor"] = {
             var="door1",sndid="door1",
             sndvol = 1, snd = function(val) return val and "cab_door_open" or "cab_door_close" end,
             sndmin=90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -534,7 +530,6 @@ ENT.ButtonMap["CabinDoor"] = {
             var="door4",sndid="door4",
             sndvol = 1, snd = function(val) return val and "cab_door_open" or "cab_door_close" end,
             sndmin=90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -550,7 +545,6 @@ ENT.ButtonMap["PassengerDoor"] = {
             var="door3",sndid="door3",
             sndvol = 1, snd = function(val) return val and "cab_door_open" or "cab_door_close" end,
             sndmin=90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -576,7 +570,6 @@ ENT.ButtonMap["RearDoor"] = {
             var="door2",sndid="door2",
             sndvol = 1, snd = function(val) return val and "cab_door_open" or "cab_door_close" end,
             sndmin=90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -855,22 +848,7 @@ ENT.ClientProps["WhiteLights"] = {
 
 ENT.Lights = {
     [1] = { "headlight",        Vector(470,0,-35), Angle(0,0,0), Color(200,130,88), brightness = 4 , fov=100, texture = "models/metrostroi_train/equipment/headlight",shadows = 1,headlight=true},
-    [22] = { "headlight",       Vector(445,-55,41), Angle(75, 70,45), Color(190, 130, 88), fov=110, farz=65, brightness = 3, shadows = 1, texture = "models/metrostroi_train/equipment/headlight", hidden = "Lamps_pult"},
-
-    [9] = { "dynamiclight",    Vector(200, 0, -5), Angle(0,0,0), Color(255, 176, 59), brightness = 3, distance = 200},
-    [10] = { "dynamiclight",    Vector(-150, 0, -5), Angle(0,0,0), Color(255, 176, 59), brightness = 3, distance = 200},
-    [11] = { "dynamiclight",    Vector( 200, 0, -5), Angle(0,0,0), Color(255, 176, 59), brightness = 4, distance = 260},
-    [12] = { "dynamiclight",    Vector(   0, 0, -5), Angle(0,0,0), Color(255, 176, 59), brightness = 4, distance = 260},
-    [13] = { "dynamiclight",    Vector(-260, 0, -5), Angle(0,0,0), Color(255, 176, 59), brightness = 4, distance = 260},
-
-    -- Cabin
-    [23] = { "dynamiclight",        Vector(432,-10.0,20), Angle(0,0,0), Color(252, 157, 77), brightness = 0.0005, distance = 600, hidden = "cabin"},
-
-    [30]  = { "light",           Vector(465+5  ,   -45, -37), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02", size = 2 },
-    [31]  = { "light",           Vector(465+5  ,   45, -37), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02", size = 2 },
-    [32]  = { "light",           Vector(465+5  ,   0, 48), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02", size = 2 },
-    Lamps_pult = {"light", Vector(445.5,-55.5,42), Angle(0,0,0),Color(255,220,180),brightness = 0.35,scale = 0.4, texture = "sprites/light_glow02", hidden = "Lamps_pult"},
-    Lamps_cab = {"light", Vector(404,1.2,56), Angle(0,0,0),Color(255,220,180),brightness = 0.25,scale = 0.3, texture = "sprites/light_glow02", hidden = "Lamps_cab1"},
+    [22] = { "headlight",       Vector(445,-55,41), Angle(75, 70,45), Color(190, 130, 88), fov=110, farz=65, brightness = 3, shadows = 1, texture = "models/metrostroi_train/equipment/headlight"},
 }
 function ENT:Initialize()
     self.BaseClass.Initialize(self)
@@ -924,14 +902,10 @@ function ENT:Think()
 
     self:ShowHideSmooth("WhiteLights",HL1)
     self:ShowHideSmooth("DistantLights",HL2)
-    self:SetLightPower(30,HL1 > 0, HL1)
-    self:SetLightPower(31,HL1 > 0, HL1)
-    self:SetLightPower(32,HL2 > 0, HL2)
 
     local PL = HL1*self:Animate("lamps_pult",self:GetPackedBool("PanelLights") and 1 or 0,0,1,12,false)
-    self:SetLightPower("Lamps_pult",PL>0,PL)
     self:ShowHideSmooth("Lamps_pult",PL)
-    self:SetLightPower(22,PL>0,PL)
+    self:SetLightPower(22,IsValid(self.ClientEnts.Lamps_pult) and PL>0,PL)
 
     local bright = HL1*0.3+HL2*0.7
     self:SetLightPower(1,bright>0,bright)
@@ -947,32 +921,14 @@ function ENT:Think()
 
     local Lamps = self:GetPackedRatio("LampsStrength")
 
-    local emer1 = self:Animate("lamps_emer1",self:GetPackedBool("Lamps_emer1") and 1 or 0,0,1,5,false)
-    local cab = self:Animate("lamps_cab",self:GetPackedBool("Lamps_cab") and 1 or 0,0,1,5,false)
-    local emer2 = self:Animate("lamps_emer2",self:GetPackedBool("Lamps_emer2") and 1 or 0,0,1,5,false)
-    local half1 = self:Animate("lamps_half1",self:GetPackedBool("Lamps_half1") and 0.4+Lamps*0.6 or 0,0,1,5,false)
-    local half2 = self:Animate("lamps_half2",self:GetPackedBool("Lamps_half2") and 0.4+Lamps*0.6 or 0,0,1,5,false)
-
-    self:ShowHideSmooth("Lamps_emer1",emer1)
-    self:ShowHideSmooth("Lamps_cab1",cab)
-    self:ShowHideSmooth("Lamps_emer2",emer2)
-    self:ShowHideSmooth("Lamps_half1",half1,Color(255,105+half1*150,105+half1*150))
-    self:ShowHideSmooth("Lamps_half2",half2,Color(255,105+half2*150,105+half2*150))
-    self:SetLightPower(23, cab > 0,cab)
-    self:SetLightPower("Lamps_cab", cab > 0,cab)
-    if not self:GetPackedBool("Lamps_half1") then
-        self:SetLightPower(9,emer1 > 0,emer1*0.2+emer2*0.8)
-        self:SetLightPower(10,emer2 > 0,emer2)
-        self:SetLightPower(11, false)
-        self:SetLightPower(12, false)
-        self:SetLightPower(13, false)
-    else
-        self:SetLightPower(9,false)
-        self:SetLightPower(10,false)
-        self:SetLightPower(11, half1 > 0, half1*0.1+half2*0.9)
-        self:SetLightPower(12, half1 > 0, half1*0.4+half2*0.6)
-        self:SetLightPower(13, half1 > 0, half1*0.9+half2*0.1)
-    end
+    self:ShowHideSmooth("Lamps_emer1",self:Animate("lamps_emer1",self:GetPackedBool("Lamps_emer1") and 1 or 0,0,1,5,false))
+    self:ShowHideSmooth("Lamps_cab1",self:Animate("Lamps_cab",self:GetPackedBool("Lamps_cab") and 1 or 0,0,1,5,false))
+    self:ShowHideSmooth("Lamps_emer2",self:Animate("lamps_emer2",self:GetPackedBool("Lamps_emer2") and 1 or 0,0,1,5,false))
+    local RedH1 = self.SmoothHide["Lamps_half1"] or 0
+    local RedH2 = self.SmoothHide["Lamps_half2"] or 0
+    self:ShowHideSmooth("Lamps_half1",self:Animate("lamps_half1",self:GetPackedBool("Lamps_half1") and 0.4+Lamps*0.6 or 0,0,1,5,false),Color(255,105+RedH1*150,105+RedH1*150))
+    self:ShowHideSmooth("Lamps_half2",self:Animate("lamps_half2",self:GetPackedBool("Lamps_half2") and 0.4+Lamps*0.6 or 0,0,1,5,false),Color(255,105+RedH2*150,105+RedH2*150))
+    --self:ShowHideSmooth("Lamps_full",self:Animate("lamps_full",self:GetPackedBool("Lamps_full") and Lamps or 0,0,1,5,false))
 
     self:Animate("brake_disconnect",self:GetPackedBool("DriverValveBLDisconnect") and 1 or 0,0.5,0.25,  4,false)
     self:Animate("train_disconnect",self:GetPackedBool("DriverValveTLDisconnect") and 1 or 0,0.5,0.25,  4,false)
@@ -1167,9 +1123,9 @@ function ENT:Think()
     end
 
     local work = self:GetPackedBool("AnnPlay")
-    local noise = self:GetNW2Int("AnnouncerBuzz",-1) > 0
+    local noise = self:GetNW2Bool("AnnouncerBuzz",false)
     self.NoiseVolume = self.NoiseVolume or 0
-    local noisevolume = 1
+    local noisevolume = 0
     if self.Sounds["announcer1"] and IsValid(self.Sounds["announcer1"]) then noisevolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*1 end
     if self.NoiseVolume > noisevolume then
         self.NoiseVolume = math.Clamp(self.NoiseVolume + 8*(noisevolume-self.NoiseVolume)*dT,0.1,1)
@@ -1180,15 +1136,12 @@ function ENT:Think()
         for i=1,2 do
             self:SetSoundState(Format("announcer_noise%d_%d",i,k),noise and self.NoiseVolume*(v[3] or 1) or 0,1)
         end
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and (v[3] or 1) or 0) end
+        if self.Sounds["announcer"..k] and IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and (v[3] or 1) or 0) end
     end
 end
 
-function ENT:OnAnnouncer(volume)
-    return self:GetPackedBool("AnnPlay") and volume  or 0
-end
 
-function ENT:DrawPost()
+function ENT:DrawPost(special)
     self:DrawOnPanel("AirDistributor",function()
         draw.DrawText(self:GetNW2Bool("AD") and "Air Distributor ON" or "Air Distributor OFF","Trebuchet24",0,0,Color(0,0,0,255))
     end)

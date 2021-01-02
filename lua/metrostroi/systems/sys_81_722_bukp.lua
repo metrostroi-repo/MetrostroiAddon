@@ -23,7 +23,6 @@ function TRAIN_SYSTEM:Initialize()
     self.Speed = 0
 
     self.PowerCommand = 0
-    self.PowerPrecent = 0
 
     self.DoorLeft = 0
     self.DoorRight = 0
@@ -106,7 +105,7 @@ function TRAIN_SYSTEM:Think(dT)
             for k,t in pairs(self.UnInitialized) do
                 if k == curr then
                     self.Trains[curr] = table.insert(self.Trains,{Type=t.type,ID=curr})
-                    if i>1 and t.type==0 and (#self.Trains==3 or #self.Trains==6 or #self.Trains==8) then
+                    if i>1 and t.type==0 and (#self.Trains==3 or #self.Trains==6) then
                         builded = true
                         break
                     end
@@ -198,7 +197,7 @@ function TRAIN_SYSTEM:Think(dT)
         local TrainCHalf = TrainCount/2
         if not self.PVU.Sync then
             for i,t in ipairs(self.Trains) do
-                for p=1,7 do
+                for p=1,6 do
                     self.PVU[i][p] = t["PVU"..p]
                 end
                 Train:CANWrite("BUKP",Train:GetWagonNumber(),"BUKV",t.ID,"Orientate",i < #self.Trains/2)
@@ -232,16 +231,15 @@ function TRAIN_SYSTEM:Think(dT)
 
         local errors = {[4]={},[7]={}}
         for i,t in ipairs(self.Trains) do
-            for p=1,7 do
+            for p=1,6 do
                 self:CStateTarget("PVU"..i.."_"..p,"PVU"..p,"BUKV",t.ID,self.PVU[i][p])
             end
             if t.Type<=1 and Train.Compressor.Value == 1 then
                 if i>TrainCHalf then--TrainCount<=3 and i>TrainCHalf or TrainCount>3 and i%2==0 then
                     MK2m = MK2m+1
-                    if not t.MKWork and not t.MKTimeOut then t.MKTimeOut = CurTime() end
-                    if t.MKWork and t.MKTimeOut then t.MKTimeOut = false end
+                    if not t.MKTimeOut then t.MKTimeOut = CurTime() end
                     if t.MKTimeOut~=true or t.MKWork then MK2c = MK2c+1 end
-                    if t.MKTimeOut and t.MKTimeOut ~= true and CurTime()-t.MKTimeOut>(t.PantDisabled and 2 or 0.5) then t.MKTimeOut = true end
+                    if t.MKTimeOut and t.MKTimeOut ~= true and CurTime()-t.MKTimeOut>0.5 then t.MKTimeOut = true end
                 end
                 HVCount = HVCount + 1
                 if t.NoHV then NoHV = NoHV+1 end
@@ -329,16 +327,9 @@ function TRAIN_SYSTEM:Think(dT)
         MFDU:Error(64,1,Train.Electric.LSD==0 and (pos>0 or MFDU:ErrorGet("64_1")))
         --MFDU:Error(64,1,Train.Electric.LSD==0 and self.States.CloseDoors,4)
         MFDU:Error(5,1,not self.LSD and self.States.CloseDoors and (pos>0 or MFDU:ErrorGet("5_1")))
-        local fault = false
-        for k,v in pairs(MFDU.Errors) do
-            if type(k) == "string" and MFDU.ErrorNames[MFDU.Log[v[1]][1]][2] == 1 then
-                fault = true
-                break
-            end
-        end
         if not RR or back or Train.BKCU.Emergency>0 then
             self.PowerCommand = 0
-        elseif  self.PowerCommand>0 and (not self.DoorsClosed and Train.VAD.Value==0 or Train.BARS.MOT==0 and Train.RCARS.Value>0 or Train.RCARS.Value==0 and Train.PB.Value==0 and Train.VAH.Value==0 or self.Blocked) --[[or fault]] then
+        elseif  self.PowerCommand>0 and (not self.DoorsClosed and Train.VAD.Value==0 or Train.BARS.MOT==0 and Train.RCARS.Value>0 or Train.RCARS.Value==0 and Train.PB.Value==0 and Train.VAH.Value==0 or self.Blocked) then
             self.PowerCommand = 0
             self.Blocked = true
         else
@@ -375,7 +366,7 @@ function TRAIN_SYSTEM:Think(dT)
             self.BackDoors = nil
         end
         MFDU:Error(49,1,(Train.DoorBack.Value>0 and Train.DoorSelect.Value==1 or MFDU:ErrorGet("49_1") and self.BackDoors~=nil) and not self.States.CloseDoors)
-        Train:CANWrite("BUKP",Train:GetWagonNumber(),"BUKV",self.Trains[#self.Trains].ID,"OpenRightBack",self.BackDoors and self.BackDoors~=true)
+        self:CState("OpenRightBack",self.BackDoors and self.BackDoors~=true)
 
         if self.CloseRing and (Train.DoorLeft1.Value > 0 or Train.DoorLeft2.Value > 0 or Train.DoorRight.Value > 0 or self.LSD) then self.CloseRing = false end
         if (not self.CloseRing or self.CloseRing and CurTime()-self.CloseRing<0) and Train.DoorClose.Value==2 and not self.LSD then self.CloseRing = CurTime() end
@@ -383,25 +374,9 @@ function TRAIN_SYSTEM:Think(dT)
         self:CState("PassLight",Train.PassLight.Value>0)
         self:CState("PassVent",Train.PassVent.Value-1)
         self:CState("ParkingBrake",Train.ParkingBrake.Value)
-        if BARSPower and Train.BARS.V2 > 0 or not BARSPower and math.abs(self.Speed) < 0.5 and self.PowerCommand < 0 then
-            self.StopV2 = true
-        elseif self.PowerCommand > 0 then
-            if self.StopV2 == true then
-                self.StopV2 = CurTime()
-            elseif self.StopV2 and CurTime()-self.StopV2 > 1 then
-                self.StopV2 = false
-            end
-        end
-        if BARSPower and Electric.Emer == 0 then
-            self:CState("PN1",Train.BARS.V1 > 0)
-            self:CState("PN2",self.StopV2)
-        elseif Electric.Emer == 0 then
-            self:CState("PN1",not not self.StopV2)
-            self:CState("PN2",not not self.StopV2)
-        else
-            self:CState("PN1",false)
-            self:CState("PN2",false)
-        end
+
+        self:CState("PN1",Train.BARS.V1>0)
+        self:CState("PN2",Train.BARS.V2>0)
         self:CState("CloseRing",self.CloseRing and (CurTime()-self.CloseRing)%1<=0.5)
         --[[
         self:CState("RVPB",(1-Train.RV["KRO5-6"])*Train.SF2.Value > 0)

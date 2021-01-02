@@ -392,8 +392,8 @@ function TRAIN_SYSTEM:Think(dT,iter)
     if not self.ResistorBlocksInit then
         self.ResistorBlocksInit  = true
         Train:LoadSystem("ResistorBlocks","Gen_Res_702c")
+        Train.ResistorBlocks.InitializeResistances_81_702(Train)
     end
-    if iter == 1 then Train.ResistorBlocks.InitializeResistances_81_702(Train) end
     ----------------------------------------------------------------------------
     -- Voltages from the third rail
     ----------------------------------------------------------------------------

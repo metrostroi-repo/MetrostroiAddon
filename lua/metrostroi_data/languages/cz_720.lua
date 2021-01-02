@@ -12,13 +12,6 @@ Train.720.CameraVityaz  = SAU "Vityaz"
 Train.720.CameraKRMH    = Ventily KRMSH a UAVA
 Train.720.CameraPVZ     = PVZ
 
-Train.Buttons.Heating   = Heating #NEW
-Train.Buttons.Vent      = Ventilation #NEW
-Train.Buttons.Cooling   = Cooling #NEW
-Train.Buttons.BARS1     = BARS1 #NEW
-Train.Buttons.BARS2     = BARS2 #NEW
-Train.Buttons.BARS12    = BARS1 and BARS2 #NEW
-
 #Common
 Common.720.SF1              = SF1: Hlavní napájení
 Common.720.SF2              = SF2: Hlavní řízení

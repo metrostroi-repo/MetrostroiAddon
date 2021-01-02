@@ -48,7 +48,6 @@ function ENT:Initialize()
     self.NonPassengerSounds = CreateSound(self,Sound( "ambient/levels/canals/tunnel_wind_loop1.wav" ))
     self.ClientModels = {}
     self.CleanupModels = {}
-    self:DrawShadow(false)
 end
 
 function ENT:OnRemove()
@@ -165,11 +164,13 @@ function ENT:Think()
     self.DeltaTime = (CurTime() - self.PrevTime)
     self.PrevTime = CurTime()
     if self:IsDormant() then
-        if self.Pool then
+        if self.PlatformDrawn then
             self:OnRemove()
+            self.PlatformDrawn = false
         end
         return
     end
+    self.PlatformDrawn = true
 
     if self:GetNW2Bool("MustPlayAnnounces") then
         self.PassengerSounds:SetSoundLevel(105)
@@ -214,7 +215,6 @@ function ENT:Think()
         self:PopulatePlatform(platformStart,platformEnd,stationCenter)
     end
 
-    local modelCount = 0
     -- Check if set of models changed
     if (CurTime() - (self.ModelCheckTimer or 0) > 1.0) and poolReady then
         self.ModelCheckTimer = CurTime()
@@ -244,8 +244,6 @@ function ENT:Think()
                     self.ClientModels[i]:SetModelScale(self.Pool[i].scale,0)
                     self.ClientModels[i]:DestroyShadow()
                     self.ClientModels[i]:DrawShadow(false)
-                    modelCount = modelCount + 1
-                    if modelCount > 15 then poolReady = false self.ModelCheckTimer = self.ModelCheckTimer - 0.9 break end
                 end
             else
                 -- Model found that is not in window
@@ -272,7 +270,6 @@ function ENT:Think()
             end
         end
     end
-
     -- Add models for cleanup of people who left trains
     self.PassengersLeft = self.PassengersLeft or self:GetNW2Int("PassengersLeft")
     while poolReady and (self.PassengersLeft < self:GetNW2Int("PassengersLeft")) do
@@ -318,32 +315,19 @@ function ENT:Think()
     -- Animate models for cleanup
     for k,v in pairs(self.CleanupModels) do
     --  if not v or not IsValid(v) then self.CleanupModels[k] = nil return end
-        if not IsValid(v.ent) then
-            self.CleanupModels[k] = nil
-            continue
-        end
+        if not IsValid(v.ent) then continue end
         -- Get pos and target in XY plane
         local pos = v.ent:GetPos()
         local target = v.target
         pos.z = 0
         target.z = 0
 
-        local distance = pos:DistToSqr(target)
-        local count = self:GetNW2Int("TrainDoorCount",0)
-        -- Delete if reached the target point
-        if distance < 2*256--[[threshold]] or math.abs(LocalPlayer():GetPos().z - v.ent:GetPos().z) > 256 or count == 0 then
-            v.ent:Remove()
-            self.CleanupModels[k] = nil
-            continue
-        end
-
-
         -- Find direction in which pedestrians must walk
         local targetDir = (target - pos):GetNormalized()
 
         -- Make it go along the platform if too far
-        local threshold = 16
-        if distance > 36864--[[192]] then
+        local distance = pos:Distance(target)
+        if distance > 192 then
             local platformDir = (platformEnd-platformStart):GetNormalized()
             local projection = targetDir:Dot(platformDir)
             if math.abs(projection) > 0.1 then
@@ -352,19 +336,27 @@ function ENT:Think()
         end
 
         -- Move pedestrian
+        local threshold = 16
         local speed = 1024
-        if distance > 1048576--[[1024]] then speed = 2048 end
+        if distance > 1024 then speed = 256 end
         v.ent:SetPos(v.ent:GetPos() + targetDir*math.min(threshold,speed*self.DeltaTime))
         -- Rotate pedestrian
         v.ent:SetAngles(targetDir:Angle() + Angle(0,180,0))
 
+        -- Delete if reached the target point
+        if distance < 2*threshold or LocalPlayer():GetPos().z - v.ent:GetPos().z > 500 then
+            v.ent:Remove()
+            self.CleanupModels[k] = nil
+        end
 
-        --[[ Check if door can be reached at all (it still exists)
+
+        -- Check if door can be reached at all (it still exists)
+        local count = self:GetNW2Int("TrainDoorCount",0)
         local distance = 1e9
         local new_target = target
         for j=1,count do
             local vec = self:GetNW2Vector("TrainDoor"..j,Vector(0,0,0))
-            local d = vec:DistToSqr(v.target)
+            local d = vec:Distance(v.target)
             if d < distance then
                 new_target = vec
                 distance = d
@@ -374,7 +366,7 @@ function ENT:Think()
         --if distance > 32
         --then v.target = self:GetPos()
         --else v.target = new_target
-        --end]]
+        --end
     end
 end
 

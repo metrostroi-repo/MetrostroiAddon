@@ -49,14 +49,10 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("PanelLamp","Relay","Switch", {bass = true, normally_closed=true})
 
     self.V1 = 0
-    self.TW1 = 0
     self.GRP = 0
     self.RRP = 0
     self.TW18 = 0
     self.SD = 0
-    self.PP1 = 0
-    self.PP6 = 0
-    self.SDW = 0
     self.Headlights1 = 0
     self.Headlights2 = 0
     self.RedLights = 0
@@ -73,13 +69,11 @@ function TRAIN_SYSTEM:Initialize()
     self.AnnouncerPlaying = 0
 
     self.PCBKPower = 0
-
-    self.BrY = 0
 end
 
 function TRAIN_SYSTEM:ClientInitialize()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "V1","GRP","RRP","TW18","SD","PP1","PP6","SDW","BrY","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","PanelLights","AnnouncerPlaying","VPR","Ring","CBKIPower","PCBKPower"}
+    return { "V1","GRP","RRP","TW18","SD","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","PanelLights","AnnouncerPlaying","VPR","Ring","CBKIPower","PCBKPower"}
 end

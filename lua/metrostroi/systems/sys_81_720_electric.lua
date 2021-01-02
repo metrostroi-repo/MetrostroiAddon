@@ -266,8 +266,8 @@ function TRAIN_SYSTEM:Think(dT,iter)
         end
         self.BVKA_KM2 = KM2
     end
-    self.BVKA_KM3 = P*Train.SFV23.Value*(Train.BUV.Vent1)
-    self.BVKA_KM4 = P*Train.SFV24.Value*(Train.BUV.Vent2)
+    self.BVKA_KM3 = P*HV*Train.SFV23.Value*(Train.BUV.Vent1)
+    self.BVKA_KM4 = P*HV*Train.SFV24.Value*(Train.BUV.Vent2)
     self.BVKA_KM5 = P
     self.BSKA = P*Train.SFV6.Value*self.BVKA_KM2
 
@@ -292,7 +292,7 @@ function TRAIN_SYSTEM:Think(dT,iter)
         drive = strength*self.BUTP*bv
     else
         brake = Train.BUV.Brake*self.BUTP
-        drive = Train.BUV.Drive*self.BUTP*bv
+        drive = Train.BUV.Drive*self.BUTP*HV*bv
         strength = Train.BUV.DriveStrength
     end
 
@@ -323,21 +323,20 @@ function TRAIN_SYSTEM:Think(dT,iter)
         Train.K2:TriggerInput("Set",0)
         Train.K3:TriggerInput("Set",self.IT)
     end
-    if bv==0 or 550 >= self.Main750V or self.Main750V >= 975 then
+    if bv==0 then
         self.ISet = 0
         self.BPTIState = 0
     elseif Train.K2.Value > 0 and self.IX > 0 then
         self.BPTIState = 1
         if strength == 1 then
-            self.ISet = 150
+            self.ISet = 100
         elseif strength == 2 then
             self.ISet = 200 + 60*Train.Pneumatic.WeightLoadRatio
         elseif strength == 3 then
-            self.ISet = 260 + 70*Train.Pneumatic.WeightLoadRatio
+            self.ISet = 260 + 60*Train.Pneumatic.WeightLoadRatio
         elseif strength == 4 then
-            self.ISet = 330 + 120*Train.Pneumatic.WeightLoadRatio
+            self.ISet = 330 + 60*Train.Pneumatic.WeightLoadRatio
         end
-        self.BlockRV = strength <= 2
     elseif Train.K3.Value > 0 and self.IT > 0 then
         self.BPTIState = -1
         if strength == 1 then
@@ -484,6 +483,7 @@ function TRAIN_SYSTEM:SolvePP(Train,inTransition)
     -- Total resistance (for induction RL circuit)
     self.R13 = R1
     self.R24 = R2
+    --if inTransition then print("InPP1",self.I13,Format("(%.2f-%.2f)/%.2f=%.2f",V , E1,R1,(V - E1)/R1),Train.K1.Value,Train.K3_4.Value,self.RVState,self.RNState) end
 
     -- Calculate everything else
     self.U13 = self.I13*R1

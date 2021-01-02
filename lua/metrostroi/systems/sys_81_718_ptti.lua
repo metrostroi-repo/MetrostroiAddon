@@ -23,7 +23,6 @@ function TRAIN_SYSTEM:Initialize()
     self.RNState = 0
     self.RNResistance = 1e9
     self.RVState = 0.0
-    self.BlockRV = false
     self.RVResistance = 1e9
     self.SubIterations = 16
 end
@@ -86,7 +85,7 @@ function TRAIN_SYSTEM:Think(dT,iter)
         if BUV.FreqBlock > 0 and T > 0 then
             self.FreqState = 1/3
             self.FreqStart = CurTime()
-            T = 100
+            T = 50
         elseif T > 0 and self.FreqStart and self.FreqStart ~= true then
             self.FreqState = 1/3+(math.max(0,math.floor((CurTime()-self.FreqStart)/2*12)/12))*(2/3)
             --print(math.floor((CurTime()-self.FreqStart)/1.5*12))
@@ -141,15 +140,18 @@ function TRAIN_SYSTEM:Think(dT,iter)
     else
         self.T = self.T+(T*(0.95+math.random()*0.1)-self.T)*dT*1.5--3
     end
-    self:SolveRV(Train,self.T,dT,I,self.State < 0,self.State == 1 and Train.BUV.BlockRV)
-    self:SolveRN(Train,self.T,dT,I,self.State < 0,self.State == 1 and T <= 150)
+    --if I > T then print(self.RNState,self.RVState,I,T,self.PrepareElectric) end
+
+    self:SolveRV(Train,self.T,dT,I,self.State < 0)
+    self:SolveRN(Train,self.T,dT,I,self.State < 0)
 end
 
-function TRAIN_SYSTEM:SolveRN(Train,T,dT,I,brake,start)
+function TRAIN_SYSTEM:SolveRN(Train,T,dT,I,brake)
     -- General state
     local Active = self.RN > 0--and  T > 0
     --local I = math.abs(Train.Electric.I13 + Train.Electric.I24)/2
     self.RNPrevCurrent = Current
+
     local rnd = 30+math.random()*20
     if self.SpeedUp then
         rnd = brake and 25+((Train.Engines.Speed/80)^4)*100 or 25
@@ -164,9 +166,9 @@ function TRAIN_SYSTEM:SolveRN(Train,T,dT,I,brake,start)
         if T == 0 then
             self.RNState = math.max(0,self.RNState-5*dT*sign)
         elseif I > T then
-            self.RNState = math.max(0,math.min(start and 0.1 or 1,self.RNState-dC*1/rnd*dT*sign))
+            self.RNState = math.max(0,math.min(1,self.RNState-dC*1/rnd*dT*sign))
         else
-            self.RNState = math.max(0,math.min(start and 0.1 or 1,self.RNState+dC*1/rnd*dT*sign))
+            self.RNState = math.max(0,math.min(1,self.RNState+dC*1/rnd*dT*sign))
         end
         if (not brake and self.RNState == 1 or brake and self.RNState == 0) and self.RN > 0 and not self.RV then
             self.RV = true
@@ -175,9 +177,9 @@ function TRAIN_SYSTEM:SolveRN(Train,T,dT,I,brake,start)
         end
     end
 end
-function TRAIN_SYSTEM:SolveRV(Train,T,dT,I,brake,block)
+function TRAIN_SYSTEM:SolveRV(Train,T,dT,I,brake)
     -- General state
-    local Active = self.RV and (not block or self.RVState > 0)
+    local Active = self.RV
     --local I = math.abs(Train.Electric.I13 + Train.Electric.I24)/2
     self.RNPrevCurrent = Current
 
@@ -194,9 +196,10 @@ function TRAIN_SYSTEM:SolveRV(Train,T,dT,I,brake,block)
     if Active then
         local sign = brake and -1 or 1
         -- Generate control signal
+
         local dC = math.min(math.max(math.abs(T-I),1,  300))
         if not self.PrepareElectric then
-            if T == 0 or block then
+            if T == 0 then
                 self.RVState = math.max(0,self.RVState-5*dT*sign)
             elseif brake and I<T or not brake and I > T then
                 self.RVState = math.max(0,math.min(1,self.RVState-dC*1/rnd*dT*sign))
@@ -244,6 +247,10 @@ function TRAIN_SYSTEM:SolveRV(Train,T,dT,I,brake,block)
                 self.RNState = brake and 0.01 or 0.99
             end
         end
+        --[[
+        if Train:EntIndex() == 1275 and iter%4 == 0 then
+            print(Format("[%04d]RV:% 3.01f/% 3.01f A % 3d%% %.2f+%.2f=%.2f % 3d km\\h F=%.02f",Train:EntIndex(),Current,T,self.RVState*100,A,B,C,Train.Speed,TargetField))
+        end]]
     end
     -- Set resistance
     self.RVResistance = Resistance + 1e9 * (Active and 0 or 1)

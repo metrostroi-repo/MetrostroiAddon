@@ -41,7 +41,6 @@ include("shared.lua")
 ENT.ClientProps = {}
 ENT.ButtonMap = {}
 ENT.AutoAnims = {}
-ENT.AutoAnimNames = {}
 ENT.ClientSounds = {}
 --------------------------------------------------------------------------------
 ENT.ClientPropsInitialized = false
@@ -104,10 +103,13 @@ ENT.ButtonMap["FrontPneumatic"] = {
     width = 900,
     height = 100,
     scale = 0.1,
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
 
     buttons = {
-        {ID = "FrontBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="FbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "FrontTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="FtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
+        {ID = "FrontBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "FrontTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["FrontBrake"] = {--
@@ -131,10 +133,13 @@ ENT.ButtonMap["RearPneumatic"] = {
     width = 900,
     height = 100,
     scale = 0.1,
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
 
     buttons = {
-        {ID = "RearBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="RbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "RearTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="RtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
+        {ID = "RearBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "RearTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["RearTrain"] = {--
@@ -163,7 +168,6 @@ ENT.ButtonMap["FrontDoor"] = {
             var="FrontDoor",sndid="door_cab_f",
             sndvol = 1, snd = function(val) return val and "door_cab_open" or "door_cab_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -178,7 +182,6 @@ ENT.ButtonMap["RearDoor"] = {
             var="RearDoor",sndid="door_cab_b",
             sndvol = 1, snd = function(val) return val and "door_cab_open" or "door_cab_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -687,22 +690,16 @@ function ENT:Think()
             self:SetSoundState(Format("announcer_noise%d_%d",i,k),(UPO and i==noise) and volume*self.BPSNBuzzVolume*self:GetNW2Float("UPOBuzzVolume",1)*0.7 or 0,1)
         end
 
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*(UPO and volume or 1) or 0) end
+        if self.Sounds["announcer"..k] and IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*(UPO and volume or 1) or 0) end
     end
-end
-
-function ENT:OnAnnouncer(volume)
-    local work = self:GetPackedBool("AnnPlay")
-    local UPO = work and self:GetPackedBool("AnnPlayUPO")
-
-    return work and volume*(UPO and self:GetNW2Float("UPOVolume",1) or 1) or 0
 end
 
 function ENT:Draw()
     self.BaseClass.Draw(self)
 end
 
-function ENT:DrawPost()
+function ENT:DrawPost(special)
+    self.Tickers = self.Tickers or self:CreateRT("721Tickers",1024,128)
     self.RTMaterial:SetTexture("$basetexture", self.Tickers)
     surface.SetMaterial(self.RTMaterial)
     surface.SetDrawColor(255,255,255)

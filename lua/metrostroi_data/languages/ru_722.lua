@@ -11,21 +11,7 @@ Train.722.Vityaz        = Монитор САУ "ВИТЯЗЬ-СП"
 Train.722.SARMAT        = Монитор системы ЦИС
 Train.722.CabLights     = Пульт освещения
 Train.722.Disconnects   = Концевые краны
-Train.722.KRMH          = Краны КРМШ и РВТБ
-
-Train.Buttons.BattOn    = Батарея включена
-Train.Buttons.BattOff   = Батарея выключается
-Train.Buttons.VentEmer  = Аварийное
-Train.Buttons.VentAuto  = Автоматическое
-Train.Buttons.Vent1/2   = Половина вентиляторов
-Train.Buttons.VentAll   = Все вентиляторы
-
-Train.Buttons.VRUAH         = Аварийный ход
-Train.Buttons.VRUOn         = Ручное включение
-Train.Buttons.PantSC        = Включение короткозамыкателя
-Train.Buttons.DoorCloseA    = Автоматическое закрытие (с сигналом)
-Train.Buttons.DoorCloseM    = Ручное закрытие (без сигнала)
-Train.Buttons.AHActive      = Активно резервное управление
+Train.722.KRMH           = Краны КРМШ и РВТБ
 
 #######Buttons###########
 Common.722.MirrorHeating                = Включение отопления зеркал

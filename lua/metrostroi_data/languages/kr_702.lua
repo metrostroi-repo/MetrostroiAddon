@@ -14,14 +14,14 @@ Train.703.RCARS     = RC-1: ARS 회로 차단기
 Train.703.AVU       = AVU 블럭
 
 #Spawner
-Spawner.707.Type    = 운전대 종류
-Spawner.707.Type1   = 구형 + RRI
-Spawner.707.Type2   = 신형 + ASNP
-Spawner.710.RRI     = 무선 중계 안내방송기
+Spawner.707.Type    = 운전대 종류 #FIXME
+Spawner.707.Type1   = 구형 + RRI #FIXME
+Spawner.707.Type2   = 신형 + ASNP #FIXME
+Spawner.710.RRI     = 무선 중계 안내방송기 #FIXME
 
 #######Buttons###########
 #Common
-Common.702.VZ1                  = 공압 밸브 №1
+Common.702.VZ1                  = 공압 밸브 №1 #FIXME!!
 Common.703.ParkingBrakeLeft     = 주차 제동 완해
 Common.703.ParkingBrakeRight    = 주차 제동 체결
 Common.703.KSD                  = KSD: 출입문 연동 제어 버튼

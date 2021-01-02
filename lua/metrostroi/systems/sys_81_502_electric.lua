@@ -195,7 +195,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
         Panel.UAVATriggered = BO*(1-Train.UAVAC.Value+Train.PneumaticNo1.Value*C(Train.Pneumatic.BrakeCylinderPressure < 0.6))
     end
     Panel.UPOPower = BO*KV["10AK-DA"]
-    Train:WriteTrainWire(13,Panel.UPOPower*Train.R_UPO.Value--[[*KV["UPO-13"]]*Train.UPO.LineOut)
+    Train:WriteTrainWire(13,Panel.UPOPower*Train.R_UPO.Value*KV["UPO-13"]*Train.UPO.LineOut)
     Train:WriteTrainWire(29,0)
 
     local RUM = KV.RCU
@@ -685,8 +685,8 @@ function TRAIN_SYSTEM:Think(dT,iter)
         self.ResistorBlocksInit  = true
     	self.Train.YAR_13A.NoRRT = true
         Train:LoadSystem("ResistorBlocks","Gen_Res_703")
+        Train.ResistorBlocks.InitializeResistances_81_703(Train)
     end
-    if iter == 1 then Train.ResistorBlocks.InitializeResistances_81_703(Train) end
     ----------------------------------------------------------------------------
     -- Voltages from the third rail
     ----------------------------------------------------------------------------

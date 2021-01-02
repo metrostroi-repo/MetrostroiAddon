@@ -130,7 +130,7 @@ function TRAIN_SYSTEM:Initialize()
 
     self.RS = 0
     self.AVS = 0
-    self.LRU = 0
+    self.RU = 0
 
     self.EmergencyDriveL = 0
     self.EmergencyBrakeTPlusL = 0
@@ -177,7 +177,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "Controller","BattOn","BattOff","SOSDL","RS","AVS","LRU","EmergencyDriveL","EmergencyBrakeTPlusL","DoorLeftL","DoorRightL","MFDUPowerL","CabLights","PanelLights","Headlights1","Headlights2","RedLights","EmergencyLights","MainLights", "V4","SOSD","UPOPower","AnnouncerPlaying", "PassSchemePowerL", "PassSchemePowerR","DoorsW","BrW","GRP","RC","VPR1","VPR2","BARSPower","ARSPower","ALSPower"}
+    return { "Controller","BattOn","BattOff","SOSDL","RS","AVS","RU","EmergencyDriveL","EmergencyBrakeTPlusL","DoorLeftL","DoorRightL","MFDUPowerL","CabLights","PanelLights","Headlights1","Headlights2","RedLights","EmergencyLights","MainLights", "V4","SOSD","UPOPower","AnnouncerPlaying", "PassSchemePowerL", "PassSchemePowerR","DoorsW","BrW","GRP","RC","VPR1","VPR2","BARSPower","ARSPower","ALSPower"}
 end
 --if not TURBOSTROI then return end
 function TRAIN_SYSTEM:TriggerInput(name,value)

@@ -17,6 +17,11 @@ ENT.SubwayTrain = {
     Manufacturer = "MVM",
 }
 
+local Announcer = {}
+for k,v in pairs(Metrostroi.AnnouncementsASNP or {}) do Announcer[k] = v.name or k end
+local Schemes = {}
+for k,v in pairs(Metrostroi.Skins["717_new_schemes"] or {}) do Schemes[k] = v.name or k end
+
 ENT.Spawner = {
     model = {
         "models/metrostroi_train/81-717/81-717_mvm.mdl",
@@ -49,19 +54,11 @@ ENT.Spawner = {
     end,
     {"Type","Spawner.717.Type","List",{"81-717","81-717.5"}},
     {"BodyType","Spawner.717.BodyType","List",{"Spawner.717.Type.MVM","Spawner.717.Type.LVZ"}},
-    {"Scheme","Spawner.717.Schemes","List",function()
-        local Schemes = {}
-        for k,v in pairs(Metrostroi.Skins["717_new_schemes"] or {}) do Schemes[k] = v.name or k end
-        return Schemes
-    end},
+    {"Scheme","Spawner.717.Schemes","List",Schemes},
     {},
-    {"MaskType","Spawner.717.MaskType","List",{"2-2","2-2 (M)","2-2 Glass","2-2 Glass (M)","2-2-2","2-2-2 (M)","2-2-2 Glass","2-2-2 Glass (M)","1-4-1","1-4-1 (M)"}},
+    {"MaskType","Spawner.717.MaskType","List",{"2-2","2-2-2","1-4-1"}},
     {"Cran","Spawner.717.CranType","List",{"334","013"}},
-    {"Announcer","Spawner.717.Announcer","List",function()
-        local Announcer = {}
-        for k,v in pairs(Metrostroi.AnnouncementsASNP or {}) do Announcer[k] = v.name or k end
-        return Announcer
-    end},
+    {"Announcer","Spawner.717.Announcer","List",Announcer},
     {"LampType","Spawner.717.LampType","List",{"Spawner.717.Common.Random","Spawner.717.Lamp.LPV02","Spawner.717.Lamp.LLV01"}},
     {"SeatType","Spawner.717.SeatType","List",{"Spawner.717.Common.Random","Spawner.717.Common.Old","Spawner.717.Common.New"}},
     {"ARSType","Spawner.717.ARS","List",{"Spawner.717.Common.Random","Spawner.717.ARS.1","Spawner.717.ARS.2","Spawner.717.ARS.3","Spawner.717.ARS.4","Spawner.717.ARS.5"}},

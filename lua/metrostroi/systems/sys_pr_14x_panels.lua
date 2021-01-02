@@ -19,7 +19,7 @@ function TRAIN_SYSTEM:Initialize()
     -- Реле педали бдительности (РПБ)
     self.Train:LoadSystem("RPB","Relay","REV-813T", { bass = true, open_time = 2.5,})
     -- РВ-2
-    self.Train:LoadSystem("RV_2","Relay","REV-813T",{ open_time = 0.2, close_time = 0.6 })
+    self.Train:LoadSystem("RV_2","Relay","REV-813T",{ close_time = 2.5})
 
 
 
@@ -33,7 +33,7 @@ function TRAIN_SYSTEM:Initialize()
     -- Контактор дверей (КД)
     self.Train:LoadSystem("KD","Relay","REV-811T",{ bass = true })
     -- Реле остановки (РО)
-    self.Train:LoadSystem("RO","Relay","KPD-110E",{ bass = true, close_time = 0--[[ , close_time = 0.1--]] })
+    self.Train:LoadSystem("RO","Relay","KPD-110E",{ bass = true--[[ , close_time = 0.1--]] })
 end
 
 function TRAIN_SYSTEM:Think()

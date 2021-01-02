@@ -18,12 +18,6 @@ function TRAIN_SYSTEM:Initialize()
 
     self.Train:LoadSystem("ALSCoil")
 
-    self.Train:LoadSystem("BIS_R11","Relay","ARS",{bass=true,bass_separate=true})
-    self.Train:LoadSystem("BIS_R12","Relay","ARS",{bass=true,bass_separate=true,open_time=2.7})
-    self.R11 = 0
-    self.R12 = 0
-    self.KRH = 0
-
     self.Train:LoadSystem("BIS200","ALS_ARS_BIS200")
     self.Train:LoadSystem("BLPM","ALS_ARS_BLPM")
 
@@ -91,9 +85,7 @@ function TRAIN_SYSTEM:Think(dT)
     --Train.BIS_R0:TriggerInput("NoOpenTime",Train.BIS_R1.Value+(1-Train.BIS_R0.Value))
 
     Train.BIS_R0:TriggerInput("NoOpenTime",(1-Train.BIS_R0.Value)+Train.BIS_R1.Value)
-    --Train.BIS_R0:TriggerInput("Set",(self.GE*(1-Train.BSM_GE.Value)+S["RVZ"]*(Train.BIS_R1.Value+Train.BIS_R0.Value))*Train.BIS200.R0)
-    Train.BIS_R0:TriggerInput("Set",self.GE*(1-Train.BSM_GE.Value)+S["RVZ"]*(Train.BIS_R1.Value+Train.BIS_R0.Value))
-    Train.BSM_PR1:TriggerInput("Set",self.GE*Train.BIS_R1.Value)
+    Train.BIS_R0:TriggerInput("Set",(self.GE*(1-Train.BSM_GE.Value)+S["RVZ"]*(Train.BIS_R1.Value+Train.BIS_R0.Value))*Train.BIS200.R0)
 
     S["RVZ1"] = S["RVZ"]*Train.BIS_R0.Value*(1-Train.BIS_R1.Value)
     S["EK0"] = S["RVZ1"]*(1-Train.BSM_GE.Value)
@@ -117,9 +109,6 @@ function TRAIN_SYSTEM:Think(dT)
     if EnableALS ~= ALS.Enabled then
         ALS:TriggerInput("Enable",EnableALS)
     end
-    Train.BSM_KRH:TriggerInput("Set",self.KRH + self.R11*Train.BIS_R11.Value*Train.BIS_R12.Value)
-    Train.BIS_R11:TriggerInput("Set",self.R11)
-    Train.BIS_R12:TriggerInput("Set",self.R12*(1-Train.BIS_R11.Value))
 
     --FreqProtect
     --SR1,SR2
@@ -278,7 +267,7 @@ function TRAIN_SYSTEM:Think(dT)
     Train.BUM_EK:TriggerInput("Set",S["EK"])
     Train.BUM_EK1:TriggerInput("Set",S["EK"])
     Train.BUM_EK:TriggerInput("OpenTime",S["EKt"])
-    Train.BUM_EK1:TriggerInput("OpenTime",S["EKt"])
+    Train.BUM_EK:TriggerInput("OpenTime",S["EKt"])
 
     self.EPK = self.GE*Train.BUM_EK.Value*Train.BUM_EK1.Value
     Train.BUM_PEK:TriggerInput("Set",self.EPK)

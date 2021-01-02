@@ -45,25 +45,19 @@ if CLIENT then
     })
   end
   createFont("Tickers","Advanced LED Board-7",49,400)
-  local aaaa = surface.GetTextureID("models/metrostroi_train/81-720/a")
-  function TRAIN_SYSTEM:ClientThink(dT)
-        if not self.Train:ShouldDrawPanel("Tickers") then return end
+  function TRAIN_SYSTEM:ClientThink()
         local str = self.Train:GetNW2String("TickerMessage","")
-        local pos = self.Train:GetNW2Float("TickerState",0)
-        local spd = self.Train:GetNW2Float("TickersSpeed",0)
-        self.TargetPosition = self.TargetPosition or 0
-        if self.Text ~= str or math.abs(self.Position-pos) > 50 then
+        local pos = self.Train:GetNW2Int("TickerState",0)
+        if self.Train:ShouldDrawPanel("Tickers") and (self.Text ~= str or self.Position ~= pos) then
+            self.Text = str
             self.Position = pos
-        else
-            self.Position = self.Position - 150*dT
+            render.PushRenderTarget(self.Train.Tickers,0,0,852, 64)
+            render.Clear(0, 0, 0, 0)
+            cam.Start2D()
+                self:Tickers(self.Train)
+            cam.End2D()
+            render.PopRenderTarget()
         end
-        self.Text = str
-        render.PushRenderTarget(self.Train.Tickers,0,0,852, 64)
-        render.Clear(0, 0, 0, 0)
-        cam.Start2D()
-            self:Tickers(self.Train)
-        cam.End2D()
-        render.PopRenderTarget()
   end
   function TRAIN_SYSTEM:PrintText(x, text, inverse)
       local str = {utf8.codepoint(text, 1, -1)}
@@ -75,14 +69,7 @@ if CLIENT then
           --if (i-33)*26.5+x*3.005+20 > 0 then continue end
           if -26.5 < xpos and xpos < 26.5 * 32 then
               local char = utf8.char(str[i + 1])
-              if char == "@" then
-                surface.SetDrawColor(Color(255,255,255))
-                surface.SetTexture(aaaa)
-                surface.DrawTexturedRectRotated(xpos + 20, 24,24,32,0)
-
-              else
-                draw.SimpleText(char, "Metrostroi_Tickers", xpos + 20, 24, Color(50, 160, 150), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-            end
+              draw.SimpleText(char, "Metrostroi_Tickers", xpos + 20, 24, Color(50, 160, 150), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
           end
       end
   end
@@ -90,7 +77,7 @@ if CLIENT then
 
   function TRAIN_SYSTEM:Tickers(Train)
         if self.Text  ~= "" then
-        self:PrintText(math.floor(self.Position/1),self.Text)
+        self:PrintText(self.Position,self.Text)
         end
   end
   return
@@ -120,15 +107,14 @@ function TRAIN_SYSTEM:Think()
     local Power = Train.Panel.TickerPower>0
     local Work = Train.Panel.TickerWork>0 and Metrostroi.TickerAdverts
     if Power and (Work or self.Advert ~= -1) then
-        self.AdvertSymbol = self.AdvertSymbol - 150*Train.DeltaTime
-
+        self.AdvertSymbol = self.AdvertSymbol - 90*Train.DeltaTime
         if self.AdvertSymbol < -utf8.len(self.CurrentAdvert)*10-20 then
             self.AdvertSymbol = 40*(7+math.random(0,3))--40*7
             if Work then
                 if self.NextAdvertStation then
                     self.Advert = 0
                     self.NextAdvertStation = false
-                elseif #Metrostroi.TickerAdverts > 0 then
+                else
                     local rnd
                     repeat rnd = math.random(0,#Metrostroi.TickerAdverts) until rnd ~= self.Advert
                     self.Advert = rnd
@@ -157,7 +143,7 @@ function TRAIN_SYSTEM:Think()
         end
     else
         self.AdvertSymbol = 40*8
-        self.CurrentAdvert = ""
+        self.CurrentAdvert = "НИИ Фабрики SENT БЕГУЩАЯ СТРОКА v1.1 0123456789"
         self.Advert = -1
     end
     --[[
@@ -167,6 +153,5 @@ function TRAIN_SYSTEM:Think()
     end]]
     Train:SetNW2String("TickerMessage",self.CurrentAdvert)
     --Train:SetNW2Int("TickerState",math.ceil(math.min(0,self.AdvertSymbol)))
-    Train:SetNW2Float("TickerState",math.ceil(self.AdvertSymbol))
-    Train:SetNW2Float("TickersSpeed",150*Train.DeltaTime)
+    Train:SetNW2Int("TickerState",math.ceil(self.AdvertSymbol))
 end

@@ -26,24 +26,10 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 ENT.AnnouncerPositions = {
     {Vector(412,-49 ,61),80,0.2},
     {Vector(-3,-60, 62),300,0.3},
     {Vector(-3,60 ,62),300,0.3},
-}
-
-ENT.MirrorCams = {
-    Vector(441,75,9),Angle(1,180,0),15,
-    Vector(441,-75,9),Angle(1,180,0),15,
 }
 
 ENT.Cameras = {
@@ -499,14 +485,10 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(410,20,-45),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
+    self.SoundNames["vdol_loud"] = "subway_trains/common/pneumatic/door_valve/vdo3_on.mp3"
+    self.SoundNames["vdop_loud"] = self.SoundNames["vdol_loud"]
+    self.SoundPositions["vdol_loud"] = {100,1e9,Vector(410,20,-45),1}
+    self.SoundPositions["vdop_loud"] = self.SoundPositions["vdol_loud"]
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",

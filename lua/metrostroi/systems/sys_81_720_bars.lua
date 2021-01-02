@@ -31,11 +31,10 @@ function TRAIN_SYSTEM:Initialize()
     self.BINoFreq = 0
 
     self.BIAccel = 0
-    self.BIDirection = 0
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return {"Active","Ring","Brake","Brake2","Drive","PN1","PN2", "SpeedLimit", "BTB","BINoFreq","BIAccel","BIDirection"}
+    return {"Active","Ring","Brake","Brake2","Drive","PN1","PN2", "SpeedLimit", "BTB","BINoFreq","BIAccel"}
 end
 
 function TRAIN_SYSTEM:Inputs()
@@ -119,35 +118,7 @@ function TRAIN_SYSTEM:Think(dT)
         if self.SpeedLimit < 20 and self.KB then
             self.SpeedLimit = 20
         end
-        local PrepareAO = self.RealF5 and 2 or self.NoFreq and 1 or 0
-        if not self.AOTimer and PrepareAO > 0 then
-            self.AOTimer = CurTime()
-        elseif PrepareAO <= 0 then
-            self.AOTimer = nil
-        end
-        if PrepareAO > 0 and (CurTime()-self.AOTimer < 2 or self.OldPrepareAO ~= PrepareAO) and (not self.AOState or self.AOState%2 ~= PrepareAO%2) then
-            self.AOTimer = CurTime()
-            self.AOState = (self.AOState or 0) + 1
-        elseif PrepareAO == 0 or self.AOTimer and CurTime()-self.AOTimer >= 2 then
-            self.AOState = false
-        end
-
-        self.OldPrepareAO = PrepareAO
-        --self.BIAccel = 0
-        if self.AOState and self.AOState>2 then
-            self.SpeedLimit = 0
-            self.NextLimit = 0
-            self.BINoFreq = 0
-            self.BIAccel = -10
-            self.KB = false
-        else
-            if self.BIAccel == -10 then self.BIAccel = Train.Acceleration end
-            self.BIAccel = 0.8*self.BIAccel + 0.2*Train.Acceleration
-        end
     else
-        self.AOState = false
-        self.AOTimer = false
-        self.BIAccel = 0
         self.SpeedLimit = 0
         self.NextLimit = 0
     end
@@ -260,7 +231,6 @@ function TRAIN_SYSTEM:Think(dT)
                 self.BTB = 0
             end
         end
-        self.BIDirection = speed > 0.2 and 1 or speed < -0.2 and -1 or 0
     else
         if Train.ALS.Value > 0 then
             --[[  Устройства БАРС, или при следовании с отключёнными устройствами БАРС, устройство ограничения скорости (УОС) передают информацию о допустимой скорости и фактической скорости движения поезда в БУП. В зависимости от информации БУП разрешает движение, отключает тяговый режим, выдаёт команду на торможение.]]
@@ -297,7 +267,6 @@ function TRAIN_SYSTEM:Think(dT)
         self.Braking = false
         self.Ringing = false
         self.LN = false
-        self.BIDirection = 0
     end
     if Train.BUKP.State < 5 or not Power then
         self.BTB = (not UOS and Train.ALS.Value == 0)  and 0 or self.BTB
@@ -309,5 +278,6 @@ function TRAIN_SYSTEM:Think(dT)
         self.Ready = true
     end
     self.Active = Active and 1 or 0
-    --self.BIAccel = self.BIAccel + (ALS.Acceleration-self.BIAccel)*dT*2
+    self.BIAccel = self.BIAccel + (ALS.Acceleration-self.BIAccel)*dT*2
+
 end

@@ -2,6 +2,13 @@
 -- Rail network handling and ARS simulation
 --------------------------------------------------------------------------------
 if not Metrostroi.Paths then
+    --List of spawned trains
+    Metrostroi.SpawnedTrains = {}
+    for k,ent in pairs(ents.GetAll()) do
+        if ent.Base == "gmod_subway_base" or ent:GetClass() == "gmod_subway_base" then
+            Metrostroi.SpawnedTrains[ent] = true
+        end
+    end
     -- Definition of paths used in runtime
     Metrostroi.Paths = {}
     -- Spatial lookup for nodes
@@ -841,6 +848,19 @@ function Metrostroi.IsTrackOccupied(src_node,x,dir,t)
 
     return #Trains > 0,Trains[#Trains],Trains[1]
 end
+
+hook.Add("EntityRemoved","MetrostroiRailNetwork",function(ent)
+    if Metrostroi.SpawnedTrains[ent] then
+        Metrostroi.SpawnedTrains[ent] = nil
+    end
+end)
+hook.Add("OnEntityCreated","MetrostroiRailNetwork",function(ent)
+    timer.Simple(0,function()
+        if IsValid(ent) and (ent.Base == "gmod_subway_base" or  ent:GetClass() == "gmod_subway_base") then
+            Metrostroi.SpawnedTrains[ent] = true
+        end
+    end)
+end)
 --------------------------------------------------------------------------------
 -- Update train positions
 --------------------------------------------------------------------------------
@@ -1121,10 +1141,9 @@ local function loadTracks(name)
 end
 local function loadSigns(name,keep)
     if keep then return end
-    print("Metrostroi: Loading signs, signals, switches...")
     local signs = getFile("metrostroi_data/signs_%s",name,"Signal")
 
-    if not signs then print("Metrostroi: Loading canceled, no file found") return end
+    if not signs then return end
 
     local signals_ents = ents.FindByClass("gmod_track_signal")
     for k,v in pairs(signals_ents) do SafeRemoveEntity(v) end
@@ -1133,7 +1152,8 @@ local function loadSigns(name,keep)
     local signs_ents = ents.FindByClass("gmod_track_signs")
     for k,v in pairs(signs_ents) do SafeRemoveEntity(v) end
 
-    --Some compatibility checks
+    -- Create new entities (add a delay so the old entities clean up)
+    print("Metrostroi: Loading signs, signals, switches...")
     local version
     version = signs.Version
     if not version then
@@ -1149,8 +1169,6 @@ local function loadSigns(name,keep)
             TwoToSix = true
         end
     end
-
-    -- Create new entities (add a delay so the old entities clean up)
     for k,v in pairs(signs) do
         local ent = ents.Create(v.Class)
         if IsValid(ent) then
@@ -1333,14 +1351,6 @@ function Metrostroi.Load(name,keep_signs)
         -- Add additional ARS sections
         Metrostroi.UpdateARSSections()
     end)
-
-    -- Load schedules data
-    local sched_data = getFile("metrostroi_data/sched_%s",name,"schedules")
-    if sched_data then
-        Metrostroi.LoadSchedulesData(sched_data)
-    else
-        print("Metrostroi: Could not load schedules configuration!")
-    end
 
     -- Initialize signs
     print("Metrostroi: Initializing signs...")
@@ -1577,6 +1587,11 @@ concommand.Add("metrostroi_cleanup_signals", function(ply, _, args)
     end)
 end)
 
+concommand.Add("metrostroi_load_without_signs", function(ply, _, args)
+    if (ply:IsValid()) and (not ply:IsAdmin()) then return end
+    Metrostroi.Load(nil,true)
+end)
+
 concommand.Add("metrostroi_pos_info", function(ply, _, args)
     if (ply:IsValid()) and (not ply:IsAdmin()) then return end
 
@@ -1629,6 +1644,14 @@ concommand.Add("metrostroi_track_alt", function(ply, _, args)
             switch:SendSignal("alt",tonumber(args[1]) or 1)
         end
     end
+end)
+concommand.Add("metrostroi_updatesignals", function(ply, _, args)
+    if (not ply:IsValid()) then return end
+        Metrostroi.UpdateSignalEntities()
+end)
+concommand.Add("metrostroi_updateswitchs", function(ply, _, args)
+    if (not ply:IsValid()) then return end
+        Metrostroi.UpdateSwitchEntities()
 end)
 
 concommand.Add("metrostroi_track_arstest", function(ply, _, args)

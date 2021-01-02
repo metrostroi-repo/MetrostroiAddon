@@ -8,7 +8,6 @@ function ENT:Initialize()
             break
         end
     end
-    self:DrawShadow(false)
 end
 function ENT:Draw()
     if not self.CanDraw then return end

@@ -172,7 +172,7 @@ function TRAIN_SYSTEM:Think()
             --self:CState("AsyncBroken",  AsyncInverter.Power == 0) --FIXME
             self:CState("AsyncProtection",  AsyncInverter.Power == 0) --FIXME
             self:CState("BVState", not self:Get("PVU5")) --FIXME
-            self:CState("AsyncEDone", AsyncInverter.EDone>0 or AsyncInverter.Mode==-1 and Train.Speed < 3.5) --FIXME
+            self:CState("AsyncEDone", AsyncInverter.EDone>0) --FIXME
 
             self:CState("NoHV", Electric.Main750V < 550)
 
@@ -201,18 +201,12 @@ function TRAIN_SYSTEM:Think()
         --? Состояние петли безопасности
         --? Неисправность вентилятора тормозного реостата
 
-        for i=1,5 do
-            self:CState("PVU"..i, self:Get("PVU"..i))
-        end
-        if self:Get("PVU6") then
-            self.AsyncDisabled = true
-        elseif self.AsyncDisabled == true then
-            self.AsyncDisabled = CurTime()
-        elseif self.AsyncDisabled and CurTime()-self.AsyncDisabled > 1.5 then
-            self.AsyncDisabled = false
-        end
-        self:CState("PVU6", not not self.AsyncDisabled)
-        self:CState("PVU7", self:Get("PVU7"))
+        self:CState("PVU1", self:Get("PVU1"))
+        self:CState("PVU2", self:Get("PVU2"))
+        self:CState("PVU3", self:Get("PVU3"))
+        self:CState("PVU4", self:Get("PVU4"))
+        self:CState("PVU5", self:Get("PVU5"))
+        self:CState("PVU6", self:Get("PVU6"))
         self:CState("BUKVTimer", math.floor((CurTime()*2)%10))
     elseif self.States.BUKVTimer then
         for k,v in pairs(self.Commands) do
@@ -230,7 +224,7 @@ function TRAIN_SYSTEM:Think()
     if self.Emer ~= Train.Electric.Emer then
         self.Emer = Train.Electric.Emer
         if self.Emer > 0 then
-            for i=1,7 do
+            for i=1,6 do
                 self.States["PVU"..i] = false
             end
         end
@@ -248,7 +242,7 @@ function TRAIN_SYSTEM:Think()
     if not PTReplace and self.PTReplace then self.PTReplace = nil end
     local PN =  self.PTReplace and CurTime()-self.PTReplace > 1.2 or self.States.AsyncEDone
     self.PN1 = self:Get("PN1") or PN and (self:Get("DriveStrength") and self:Get("DriveStrength") > 0) or self:Get("ARSBrake") and (Train.Electric.Type>1 or not self.States.AsyncAssembly)
-    self.PN2 = self:Get("PN2") or PN and (self:Get("DriveStrength") and (not self.States.AsyncEDone and not PTReplace and self:Get("DriveStrength") > 0.2 or (PTReplace or self.States.AsyncEDone) and self:Get("DriveStrength") > 0.7 or self:Get("BrakeTPlus")))
+    self.PN2 = self:Get("PN2") or PN and (self:Get("DriveStrength") and (not self.States.AsyncEDone and self:Get("DriveStrength") > 0.2 or self:Get("BrakeTPlus")))
 
     --self.MK = (not self:Get("PVU3") and self:Get("Compressor"))and 1 or 0
 
@@ -260,7 +254,7 @@ function TRAIN_SYSTEM:Think()
     self.Drive = (1-brake)*(strength>0 and 1 or 0)
     self.Brake = brake*(strength>0 and 1 or 0)
     local BCPressure = self.States.BCPressure or 0
-    if self.Brake>0 and BCPressure < 1.5 or self.Drive>0--[[ and BCPressure < 0.5]] then
+    if self.Brake>0 and BCPressure < 1.5 or self.Drive>0 and BCPressure < 0.5 then
         self.Strength = strength*100
     else
         self.Strength = 0
@@ -275,7 +269,7 @@ function TRAIN_SYSTEM:Think()
     self.DisablePSN = self:Get("PVU3") and 1 or 0
     self.EnableMK = (not self:Get("PVU4") and self:Get("Compressor")) and 1 or 0
     self.DisableTP = (self:Get("PVU5") or self:Get("PVU6")) and 1 or 0
-    self.DisablePant = (self:Get("DisablePant") or self:Get("PVU7")) and 1 or 0
+    self.DisablePant = self:Get("DisablePant") and 1 or 0
     self.ParkingBrake = self:Get("ParkingBrake")
     local vent = self:Get("PassVent") or 0
     if vent==1 then

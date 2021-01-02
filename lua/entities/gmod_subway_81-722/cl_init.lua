@@ -41,7 +41,6 @@ include("shared.lua")
 ENT.ClientProps = {}
 ENT.ButtonMap = {}
 ENT.AutoAnims = {}
-ENT.AutoAnimNames = {}
 ENT.ClientSounds = {}
 --------------------------------------------------------------------------------
 ENT.ClientPropsInitialized = false
@@ -57,16 +56,14 @@ ENT.ButtonMap["PU1"] = {
         {ID = "MirrorHeatingSet",x=93.5+36*2, y=100-18*2, radius=15, tooltip = "Отопление зеркал",model = {
             model = "models/metrostroi_train/81-722/button_yellow.mdl", z=2,
             var="MirrorHeating",speed=12, min=0,max=0.6,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_yellow.mdl",var="MirrorHeatingEnabled",z=0,anim=true,
-            lcolor=Color(255,255,60),lz = 12,lbright=3,lfov=140,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_yellow.mdl",var="MirrorHeatingEnabled",z=0,anim=true},
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
         }},
         {ID = "DoorLeft2Set",x=93.5+36*3, y=100-18*3, radius=15, tooltip = "Двери левые",model = {
             model = "models/metrostroi_train/81-722/button_white.mdl", z=2,
             var="DoorLeft2",speed=12, min=0,max=0.6,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="DoorLeftLamp",z=0,anim=true,
-            lcolor=Color(255,255,255),lz = 12,lbright=3,lfov=140,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="DoorLeftLamp",z=0,anim=true},
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
         }},
@@ -85,11 +82,9 @@ ENT.ButtonMap["PU1"] = {
         {ID = "EmergencyDriveSet",x=93.5+36*1, y=100-18*1+58*1, radius=15, tooltip = "Аварийный ход",model = {
             model = "models/metrostroi_train/81-722/button_red.mdl", z=2,
             var="EmergencyDrive",speed=12, min=0,max=0.6,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_red.mdl",var="EmergencyDriveL",z=0,anim=true,
-            lcolor=Color(255,40,20),lz = 12,lbright=3,lfov=140,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_red.mdl",var="EmergencyDriveL",z=0,anim=true},
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
-            tooltipFunc = function(ent) return ent:GetPackedBool("EmergencyDriveL") and Metrostroi.GetPhrase("Train.Buttons.AHActive") end
         }},
         {ID = "MicrophoneSet",x=93.5+36*2, y=100-18*2+58*1, radius=15, tooltip = "Микрофон",model = {
             model = "models/metrostroi_train/81-722/button_blue.mdl", z=2,
@@ -100,8 +95,7 @@ ENT.ButtonMap["PU1"] = {
         {ID = "DoorLeft1Set",x=93.5+36*3, y=100-18*3+58*1, radius=15, tooltip = "Двери левые",model = {
             model = "models/metrostroi_train/81-722/button_white.mdl", z=2,
             var="DoorLeft1",speed=12, min=0,max=0.6,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="DoorLeftLamp",z=0, anim=true,
-            lcolor=Color(255,255,255),lz = 12,lbright=3,lfov=140,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="DoorLeftLamp",z=0, anim=true, },
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
         }},
@@ -142,13 +136,12 @@ ENT.ButtonMap["PU2"] = {
             sndvol = 0.4, snd = function(val,val2) return val2 == 1 and "switch_panel_mid" or val and "switch_panel_up" or "switch_panel_down" end,
             sndmin = 90, sndmax = 1e3,
         }},
-        {ID="GlassCleaner+",x=35+50*4-16, y=45-18*0-20, w=32,h=20, tooltip="Стеклоочиститель(вверх)",tooltipFunc = function(ent) return ent:GetPackedRatio("GlassCleaner") > 0 and math.floor(ent:GetPackedRatio("GlassCleaner")*2) or Metrostroi.GetPhrase("Train.Buttons.Off") end},
-        {ID="GlassCleaner-",x=35+50*4-16, y=45-18*0, w=32,h=20, tooltip="Стеклоочиститель(вниз)",tooltipFunc = function(ent) return ent:GetPackedRatio("GlassCleaner") > 0 and math.floor(ent:GetPackedRatio("GlassCleaner")*2) or Metrostroi.GetPhrase("Train.Buttons.Off") end},
+        {ID="GlassCleaner+",x=35+50*4-16, y=45-18*0-20, w=32,h=20, tooltip="Стеклоочиститель(вверх)"},
+        {ID="GlassCleaner-",x=35+50*4-16, y=45-18*0, w=32,h=20, tooltip="Стеклоочиститель(вниз)"},
         {ID = "EmergencyBrakeTPlusKToggle",         x=35+50*5+4-20, y=45-18*0-4-30, w=40,h=20, tooltip="Крышка кнопки Аварийный тормоз \"Т+\"", model = {
             plomb = {var="EmergencyBrakeTPlusKPl", ID="EmergencyBrakeTPlusKPl",},
             var="EmergencyBrakeTPlusK",speed=8,min=1,max=0, disable="EmergencyBrakeTPlusSet",
-            model = "models/metrostroi_train/81-722/button_krishka.mdl", ang = 180, z = 6, x=14.5,y=20,
-            noTooltip = true,
+            model = "models/metrostroi_train/81-722/button_krishka.mdl", ang = 180, z = 6, x=14.5,y=20
         }},
         {ID = "EmergencyBrakeTPlusSet",x=35+50*5+4, y=45-18*0-4, radius=24, tooltip = "Аварийный тормоз \"Т+\"",model = {
             model = "models/metrostroi_train/81-722/button_red.mdl", z=2, ang=180,
@@ -156,7 +149,6 @@ ENT.ButtonMap["PU2"] = {
             var="EmergencyBrakeTPlus",speed=12,
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
-            tooltipFunc = function(ent) return ent:GetPackedBool("EmergencyBrakeTPlusL") and Metrostroi.GetPhrase("Train.Buttons.AHActive") end
         }},
 
         {ID = "EmergencyBrakeToggle",x=31+51*5+3, y=45+90*0.5, radius=16, tooltip = "Экстренное торможение",model = {
@@ -182,14 +174,13 @@ ENT.ButtonMap["PU2"] = {
             sndvol = 0.4, snd = function(val,val2) return val2 == 1 and "switch_panel_mid" or val and "switch_panel_up" or "switch_panel_down" end,
             sndmin = 90, sndmax = 1e3,
         }},
-        {ID="Headlights+",x=31+51*2-16, y=45+90*1-20, w=32,h=20, tooltip="Фары(вверх)",states={"Train.Buttons.Off","Train.Buttons.LNear","Train.Buttons.LFar"},varTooltip = function(ent) return ent:GetPackedRatio("Headlights") end},
-        {ID="Headlights-",x=31+51*2-16, y=45+90*1, w=32,h=20, tooltip="Фары(вниз)",states={"Train.Buttons.Off","Train.Buttons.LNear","Train.Buttons.LFar"},varTooltip = function(ent) return ent:GetPackedRatio("Headlights") end},
+        {ID="Headlights+",x=31+51*2-16, y=45+90*1-20, w=32,h=20, tooltip="Фары(вверх)"},
+        {ID="Headlights-",x=31+51*2-16, y=45+90*1, w=32,h=20, tooltip="Фары(вниз)"},
         {ID = "DoorSelectToggle",x=31+51*3+1, y=45+90*1, radius=16,tooltip="Закрытие дверей",model = {
             model = "models/metrostroi_train/81-722/tumbler.mdl", z=2, ang=90,
             var="DoorSelect",speed=16, min=0.0, max=1.0,
             sndvol = 0.4, snd = function(val,val2) return val and "switch_panel_up" or "switch_panel_down" end,
             sndmin = 90, sndmax = 1e3,
-            states={"Train.Buttons.Left","Train.Buttons.Right"}
         }},
         {ID = "DoorClose",x=31+51*4, y=45+90*1, radius=0,model = {
             model = "models/metrostroi_train/81-722/tumbler.mdl", z=2, ang=180,
@@ -198,13 +189,12 @@ ENT.ButtonMap["PU2"] = {
             sndvol = 0.4, snd = function(val,val2) return val2 == 1 and "switch_panel_mid" or val and "switch_panel_up" or "switch_panel_down" end,
             sndmin = 90, sndmax = 1e3,
         }},
-        {ID="DoorClose+",x=31+51*4-16, y=45+90*1-20, w=32,h=20, tooltip="Закрытие дверей(вверх)",states={"Train.Buttons.DoorCloseM","Train.Buttons.Off","Train.Buttons.DoorCloseA"},varTooltip = function(ent) return ent:GetPackedRatio("DoorClose") end},
-        {ID="DoorClose-",x=31+51*4-16, y=45+90*1, w=32,h=20, tooltip="Закрытие дверей(вниз)",states={"Train.Buttons.DoorCloseM","Train.Buttons.Off","Train.Buttons.DoorCloseA"},varTooltip = function(ent) return ent:GetPackedRatio("DoorClose") end},
+        {ID="DoorClose+",x=31+51*4-16, y=45+90*1-20, w=32,h=20, tooltip="Закрытие дверей(вверх)"},
+        {ID="DoorClose-",x=31+51*4-16, y=45+90*1, w=32,h=20, tooltip="Закрытие дверей(вниз)"},
         {ID = "DoorRightSet",x=31+51*5+3, y=45+90*1, radius=16, tooltip = "Открытие правых дверей",model = {
             model = "models/metrostroi_train/81-722/button_white.mdl", z=2, ang=180,
             var="DoorRight",speed=12,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="DoorRightLamp",z=0, anim=true,
-            lcolor=Color(255,255,255),lz = 12,lbright=3,lfov=140,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="DoorRightLamp",z=0, anim=true},
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
         }},
@@ -228,8 +218,8 @@ ENT.ButtonMap["BI3"] = {
             sndvol = 0.4, snd = function(val,val2) return val2 == 1 and "multiswitch_panel_mid" or val and "multiswitch_panel_min" or "multiswitch_panel_max" end,
             sndmin = 90, sndmax = 1e3,
         }},
-        {ID="KRO+",x=53-16, y=128-16, w=32,h=16, tooltip="Направление движения(вверх)",states = {"Train.Buttons.Back","Train.Buttons.0","Train.Buttons.Forward"},varTooltip = function(ent) return ent:GetPackedRatio("ReverserPosition") end,},
-        {ID="KRO-",x=53-16, y=128, w=32,h=16, tooltip="Направление движения(вниз)",states = {"Train.Buttons.Back","Train.Buttons.0","Train.Buttons.Forward"},varTooltip = function(ent) return ent:GetPackedRatio("ReverserPosition") end,},
+        {ID="KRO+",x=53-16, y=128-16, w=32,h=16, tooltip="Направление движения(вверх)"},
+        {ID="KRO-",x=53-16, y=128, w=32,h=16, tooltip="Направление движения(вниз)"},
         {ID = "RingSet",x=127, y=65, radius=16, tooltip = "Звонок",model = {
             model = "models/metrostroi_train/81-722/button_black.mdl", z=2,
             var="Ring",speed=12,
@@ -243,11 +233,11 @@ ENT.ButtonMap["BI3"] = {
             sndvol = 0.4, snd = function(val,val2) return val2 == 4 and "multiswitch_panel_max" or not val and "multiswitch_panel_min" or "multiswitch_panel_mid" end,
             sndmin = 90, sndmax = 1e3,
         }},
-        {ID="Compressor-",x=78-20, y=170-16, w=20,h=32, tooltip="Компрессоры(-)",states = {"Train.Buttons.Off","Train.Buttons.Auto","Train.Buttons.VTRH1","Train.Buttons.VTRH2","Train.Buttons.VTRAll"},varTooltip = function(ent) return ent:GetPackedRatio("CompressorPosition")/4 end,},
-        {ID="Compressor+",x=78, y=170-16, w=20,h=32, tooltip="Компрессоры(+)",states = {"Train.Buttons.Off","Train.Buttons.Auto","Train.Buttons.VTRH1","Train.Buttons.VTRH2","Train.Buttons.VTRAll"},varTooltip = function(ent) return ent:GetPackedRatio("CompressorPosition")/4 end,},
+        {ID="Compressor-",x=78-20, y=170-16, w=20,h=32, tooltip="Компрессоры(-)"},
+        {ID="Compressor+",x=78, y=170-16, w=20,h=32, tooltip="Компрессоры(+)"},
 
-        {ID="!BrakeCylinder",x=65, y=55,radius=35, tooltip="Тормозной цилиндр",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BCPressure"),ent:GetPackedRatio("BCPressure")*6) end},
-        {ID="!BrakeTrainLine",x=126, y=128,radius=35, tooltip="Красная - тормозная, чёрная - напорная магистраль",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BLTLPressure"),ent:GetPackedRatio("TLPressure")*16,ent:GetPackedRatio("BLPressure")*16) end},
+        {ID="!BrakeCylinder",x=65, y=55,radius=35, tooltip="Тормозной цилиндр"},
+        {ID="!BrakeTrainLine",x=126, y=128,radius=35, tooltip="Красная - тормозная, чёрная - напорная магистраль"},
     }
 }
 
@@ -377,20 +367,16 @@ ENT.ButtonMap["PPZB"] = {
         {ID = "BattOnSet", x=24+40*1 , y=26 + 60*0, radius=20, tooltip="Включение источника питания бортовой сети", model = {
             model = "models/metrostroi_train/81-722/button_green.mdl",
             var="BattOn",speed=12, min=0,max=0.6,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_green.mdl",var="BattOnL",z=0,anim=true,
-            lcolor=Color(60,255,40),lz = 12,lbright=3,lfov=130,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_green.mdl",var="BattOnL",z=0,anim=true},
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
-            tooltipFunc = function(ent) return ent:GetPackedBool("BattOnL") and Metrostroi.GetPhrase("Train.Buttons.BattOn") end
         }},
         {ID = "BattOffSet", x=24+40*2 , y=26 + 60*0, radius=20, tooltip="Отключение источника питания бортовой сети", model = {
             model = "models/metrostroi_train/81-722/button_yellow.mdl",
             var="BattOff",speed=12, min=0,max=0.6,
-            lamp = {model = "models/metrostroi_train/81-722/lamp_yellow.mdl",var="BattOffL",z=0,anim=true,
-            lcolor=Color(255,255,60),lz = 12,lbright=3,lfov=130,lfar=16,lnear=8,lshadows=0,},
+            lamp = {model = "models/metrostroi_train/81-722/lamp_yellow.mdl",var="BattOffL",z=0,anim=true},
             sndvol = 0.2, snd = function(val) return val and "button_on" or "button_off" end,
             sndmin = 90, sndmax = 1e3,
-            tooltipFunc = function(ent) return ent:GetPackedBool("BattOffL") and Metrostroi.GetPhrase("Train.Buttons.BattOff") end
         }},
         {ID = "TorecDoorUnlockSet", x=24+40*0 , y=26 + 60*1, radius=20, tooltip="Разблокировка торцевых дверей", model = {
             model = "models/metrostroi_train/81-722/button_black.mdl",
@@ -400,13 +386,11 @@ ENT.ButtonMap["PPZB"] = {
         }},
         {ID = "SCEnable", x=24+40*1 , y=26 + 60*1, radius=20, tooltip="Короткозамыкатель", model = {
             model = "models/metrostroi_train/81-722/button_yellow.mdl",
-            lamp = {model = "models/metrostroi_train/81-722/lamp_yellow.mdl",var="SCEnable",
-            lcolor=Color(255,255,60),lz = 12,lbright=3,lfov=130,lfar=16,lnear=8,lshadows=0}
+            lamp = {model = "models/metrostroi_train/81-722/lamp_yellow.mdl",var="SCEnable"}
         }},
         {ID = "SOSD", x=24+40*2 , y=26 + 60*1, radius=20, tooltip="СОСД", model = {
             model = "models/metrostroi_train/81-722/button_white.mdl",
-            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="SOSDLamp",
-            lcolor=Color(255,255,255),lz = 12,lbright=3,lfov=130,lfar=16,lnear=8,lshadows=0}
+            lamp = {model = "models/metrostroi_train/81-722/lamp_black.mdl",var="SOSDLamp"}
         }},
 
     }
@@ -423,8 +407,8 @@ ENT.ButtonMap["PVM"] = {
     buttons = {
         {ID = "PassLightToggle", x=20+47*0,  y=34+65*0, radius=14, tooltip="Освещение салона"},
         {ID = "PassVent", x=20+47*1,  y=34+65*0, radius=0},
-        {ID="PassVent-",x=20+47*1-16, y=34+65*0-16, w=16,h=32, tooltip="Вентиляция салона(-)",varTooltip = function(ent) return ent:GetPackedRatio("PassVent") end,states = {"Train.Buttons.VentEmer","Train.Buttons.Off","Train.Buttons.VentAuto","Train.Buttons.Vent1/2","Train.Buttons.VentAll"}},
-        {ID="PassVent+",x=20+47*1, y=34+65*0-16, w=16,h=32, tooltip="Вентиляция салона(+)",varTooltip = function(ent) return ent:GetPackedRatio("PassVent") end,states = {"Train.Buttons.VentEmer","Train.Buttons.Off","Train.Buttons.VentAuto","Train.Buttons.Vent1/2","Train.Buttons.VentAll"}},
+        {ID="PassVent-",x=20+47*1-16, y=34+65*0-16, w=16,h=32, tooltip="Вентиляция салона(-)"},
+        {ID="PassVent+",x=20+47*1, y=34+65*0-16, w=16,h=32, tooltip="Вентиляция салона(+)"},
         --{ID = "Switch3", x=20+48*2,  y=15+70*0, radius=15, tooltip="SF1:"},
         {ID = "VKFToggle", x=20+47*3,  y=34+65*0, radius=14, tooltip="ВКФ"},
         {ID = "ParkingBrakeToggle", x=20+47*4,  y=34+65*0, radius=14, tooltip="Стояночный тормоз"},
@@ -432,17 +416,17 @@ ENT.ButtonMap["PVM"] = {
         {ID = "SOSDEnableToggle", x=20+47*6,  y=34+65*0, radius=14, tooltip="СОСД"},
 
         {ID = "VRU", x=20+47*0,  y=34+65*1, radius=0},
-        {ID="VRU-",x=20+47*0-16, y=34+65*1-16, w=16,h=32, tooltip="ВРУ(-)",varTooltip = function(ent) return ent:GetPackedRatio("VRU") end,states = {"Train.Buttons.VRUAH","Train.Buttons.0","Train.Buttons.VRUOn"}},
-        {ID="VRU+",x=20+47*0, y=34+65*1-16, w=16,h=32, tooltip="ВРУ(+)",varTooltip = function(ent) return ent:GetPackedRatio("VRU") end,states = {"Train.Buttons.VRUAH","Train.Buttons.0","Train.Buttons.VRUOn"}},
+        {ID="VRU-",x=20+47*0-16, y=34+65*1-16, w=16,h=32, tooltip="ВРУ(-)"},
+        {ID="VRU+",x=20+47*0, y=34+65*1-16, w=16,h=32, tooltip="ВРУ(+)"},
         {ID = "VADToggle", x=20+47*1,  y=34+65*1, radius=15, tooltip="Движение без контроля дверей"},
         {ID = "VAHToggle", x=20+47*2,  y=34+65*1, radius=15, tooltip="Движение без педали бдительности"},
         {ID = "EmergencyRadioPowerToggle", x=20+47*3,  y=34+65*1, radius=15, tooltip="Аварийное питание радиостанции"},
         {ID = "BARSMode", x=20+47*4,  y=34+65*1, radius=0},
-        {ID="BARSMode-",x=20+47*4-16, y=34+65*1-16, w=16,h=32, tooltip="Режимы БАРС(влево)",varTooltip = function(ent) return ent:GetPackedRatio("BARSMode") end,states = {"Train.Buttons.BARS1","Train.Buttons.0","Train.Buttons.BARS2"}},
-        {ID="BARSMode+",x=20+47*4, y=34+65*1-16, w=16,h=32, tooltip="Режимы БАРС(вправо)",varTooltip = function(ent) return ent:GetPackedRatio("BARSMode") end,states = {"Train.Buttons.BARS1","Train.Buttons.0","Train.Buttons.BARS2"}},
+        {ID="BARSMode-",x=20+47*4-16, y=34+65*1-16, w=16,h=32, tooltip="Режимы БАРС(влево)"},
+        {ID="BARSMode+",x=20+47*4, y=34+65*1-16, w=16,h=32, tooltip="Режимы БАРС(вправо)"},
         {ID = "PantSC", x=20+47*5,  y=34+65*1, radius=0},
-        {ID="PantSC-",x=20+47*5-16, y=34+65*1-16, w=16,h=32, tooltip="Токоприёмники и короткозамыкатель(-)",varTooltip = function(ent) return ent:GetPackedRatio("PantSC") end,states = {"Train.Buttons.PantSC","Train.Buttons.VTRAll","Train.Buttons.VTRH1","Train.Buttons.VTRH2","Train.Buttons.Off"}},
-        {ID="PantSC+",x=20+47*5, y=34+65*1-16, w=16,h=32, tooltip="Токоприёмники и короткозамыкатель(+)",varTooltip = function(ent) return ent:GetPackedRatio("PantSC") end,states = {"Train.Buttons.PantSC","Train.Buttons.VTRAll","Train.Buttons.VTRH1","Train.Buttons.VTRH2","Train.Buttons.Off"}},
+        {ID="PantSC-",x=20+47*5-16, y=34+65*1-16, w=16,h=32, tooltip="Токоприёмники и короткозамыкатель(-)"},
+        {ID="PantSC+",x=20+47*5, y=34+65*1-16, w=16,h=32, tooltip="Токоприёмники и короткозамыкатель(+)"},
         {ID = "RCARSToggle", x=20+47*6,  y=34+65*1, radius=15, tooltip="РЦ АРС"},
 
     }
@@ -526,14 +510,12 @@ ENT.ButtonMap["BTO"] = {
     buttons = {
         {ID = "K29Toggle", x=24,  y=26, radius=25, tooltip="КРМШ", model = {
             model = "models/metrostroi_train/81-722/81-722_kran_krmh.mdl", ang=Angle(0,0,180),
-            var="K29",speed=4, max=0.5,
-            states={"Train.Buttons.Closed","Train.Buttons.Opened"}
+            var="K29",speed=4, max=0.5
         }},
         {ID = "K9Toggle", x=240,  y=15, radius=25, tooltip="РВТБ", model = {
             model = "models/metrostroi_train/81-722/81-722_kran_krmh.mdl", ang=Angle(0,0,180),
             plomb = {var="K9Pl", ID="K9Pl", },
-            var="K9",speed=4, min=0.5,max=0,
-            states={"Train.Buttons.Closed","Train.Buttons.Opened"}
+            var="K9",speed=4, min=0.5,max=0
         }},
 
     }
@@ -551,13 +533,11 @@ ENT.ButtonMap["Isolations"] = {
     buttons = {
         {ID = "FrontBrakeLineIsolationToggle", x=21,  y=28, radius=25, tooltip="Концевой кран тормозной магистрали", model = {
             model = "models/metrostroi_train/81-722/81-722_kran_tm.mdl", ang=Angle(0,0,180),
-            var="FrontBrakeLineIsolation",speed=4, min=0.25,max=0,
-            states={"Train.Buttons.Opened","Train.Buttons.Closed"}
+            var="FrontBrakeLineIsolation",speed=4, min=0.25,max=0
         }},
         {ID = "FrontTrainLineIsolationToggle", x=219,  y=23, radius=25, tooltip="Концевой кран напорной магистрали", model = {
             model = "models/metrostroi_train/81-722/81-722_kran_nm.mdl", ang=Angle(0,0,180),
-            var="FrontTrainLineIsolation",speed=4, min=0.25,max=0,
-            states={"Train.Buttons.Opened","Train.Buttons.Closed"}
+            var="FrontTrainLineIsolation",speed=4, min=0.25,max=0
         }},
 
     }
@@ -568,10 +548,13 @@ ENT.ButtonMap["RearPneumatic"] = {
     width = 900,
     height = 100,
     scale = 0.1,
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
 
     buttons = {
-        {ID = "RearBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="RbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "RearTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="RtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
+        {ID = "RearBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "RearTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["RearTrain"] = {--
@@ -600,7 +583,7 @@ ENT.ButtonMap["StopKran"] = {
         {ID = "UAVAToggle", x=0,  y=0, w=95,h=200, tooltip="Выключатель автостопа",model = {
             plomb = {var="UAVAPl", ID="UAVAPl", },
         }},
-        {ID = "EmergencyBrakeValveToggle", x=95,  y=0, w=95,h=200, tooltip="Стопкран", tooltip="",tooltip="",states={"Train.Buttons.Closed","Train.Buttons.Opened"},var="EmergencyBrakeValve"},
+        {ID = "EmergencyBrakeValveToggle", x=95,  y=0, w=95,h=200, tooltip="Стопкран"},
 
     }
 }
@@ -678,7 +661,6 @@ ENT.ButtonMap["PassengerDoor"] = {
             var="PassengerDoor",sndid="door_cab_m",
             sndvol = 1, snd = function(val) return val and "door_cab_open" or "door_cab_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -703,7 +685,6 @@ ENT.ButtonMap["CabinDoorL"] = {
             var="CabinDoorLeft",sndid="door_cab_l",
             sndvol = 1, snd = function(val) return val and "door_cab_open" or "door_cab_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -718,7 +699,6 @@ ENT.ButtonMap["CabinDoorR"] = {
             var="CabinDoorRight",sndid="door_cab_r",
             sndvol = 1, snd = function(val) return val and "door_cab_open" or "door_cab_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -733,7 +713,6 @@ ENT.ButtonMap["RearDoor"] = {
             var="RearDoor",sndid="door_cab_t",
             sndvol = 1, snd = function(val) return val and "door_cab_open" or "door_cab_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -1651,15 +1630,8 @@ function ENT:Think()
             self:SetSoundState(Format("announcer_noise%d_%d",i,k),(UPO and i==noise) and volume*self.BPSNBuzzVolume*self:GetNW2Float("UPOBuzzVolume",1)*0.7 or 0,1)
         end
 
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*(UPO and volume or 1) or 0) end
+        if self.Sounds["announcer"..k] and IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*(UPO and volume or 1) or 0) end
     end
-end
-
-function ENT:OnAnnouncer(volume)
-    local work = self:GetPackedBool("AnnPlay")
-    local UPO = work and self:GetPackedBool("AnnPlayUPO")
-
-    return work and volume*(UPO and self:GetNW2Float("UPOVolume",1) or 1) or 0
 end
 
 function ENT:Draw()
@@ -1667,7 +1639,7 @@ function ENT:Draw()
 end
 
 local CamRTM = Material( "pp/rt" )
-function ENT:DrawPost()
+function ENT:DrawPost(special)
     self.RTMaterial:SetTexture("$basetexture", self.Vityaz)
     self:DrawOnPanel("Vityaz",function(...)
         surface.SetMaterial(self.RTMaterial)
@@ -1699,6 +1671,7 @@ function ENT:DrawPost()
         surface.SetDrawColor(255,255,255)
         surface.DrawTexturedRectRotated(256,32,512,64,0)
     end)
+    self.Tickers = self.Tickers or self:CreateRT("721Tickers",1024,128)
     self.RTMaterial:SetTexture("$basetexture", self.Tickers)
     self:DrawOnPanel("Tickers",function(...)
         surface.SetMaterial(self.RTMaterial)

@@ -69,8 +69,12 @@ function TRAIN_SYSTEM:Think(dT)
         self.NoFreq = 0
         self.NoFreqTimer = 0
     end
+    -- Speed check and update speed data
+    if CurTime() - (self.LastSpeedCheck or 0) > 0.5 then
+        self.LastSpeedCheck = CurTime()
+    end
     self.Speed = (Train.Speed or 0)
-    self.Acceleration = math.Round(Train.Acceleration or 0,1)
+    self.Acceleration = math.Round(Train.Acceleration,1)
     self.SpeedSign = Train.SpeedSign or 1
 
     local autostop = haveautostop and Train.SpeedSign > 0 and Train.Speed > 0.1
@@ -109,8 +113,6 @@ function TRAIN_SYSTEM:Think(dT)
                     end
                 end
             end
-
-            self.Signal = ars
 
             if self.Enabled > 0 and IsValid(ars) then
                 if not ars:GetARS(1,Train) then
@@ -159,13 +161,10 @@ function TRAIN_SYSTEM:Think(dT)
                 self.F5 = CurTime()%2 < 1 and 1 or 0
             end
         end
-    else
-        self.Signal = nil
     end
     local freqCount = self.F6+self.F5+self.F4+self.F3+self.F2+self.F1
     self.NoneFreq =freqCount==0 and 1 or 0
     self.OneFreq = freqCount==1 and 1 or 0
     self.TwoFreq = freqCount==2 and 1 or 0
     self.BadFreq = freqCount>2 and 1 or 0
-    self.NoFreq = math.min(1,self.NoFreq+self.NoneFreq*self.Enabled)
 end

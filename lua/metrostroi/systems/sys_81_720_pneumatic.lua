@@ -87,8 +87,6 @@ function TRAIN_SYSTEM:Initialize()
         self.RightDoorDir = { 0,0,0,0 }
         self.LeftDoorSpeed = {0,0,0,0}
         self.RightDoorSpeed = {0,0,0,0}
-        self.LeftDoorStuck = {false, false, false, false}
-        self.RightDoorStuck = {false, false, false, false}
         local start = math.Rand(0.4,0.7)
         self.DoorSpeedMain = math.Rand(start,math.Rand(start+0.1,start+0.3))
         for i=1,#self.LeftDoorSpeed do
@@ -374,7 +372,7 @@ function TRAIN_SYSTEM:Think(dT)
     if self.EmergencyBrakeActive then
         PMPressure = self.AirDistributorPressure
         if self.BrakeCylinderPressure < self.AirDistributorPressure and self.AirDistributorPressure-self.BrakeCylinderPressure > 0.1 then
-            self:equalizePressure(dT,"AirDistributorPressure",0, math.min(self.TrainLinePressure,self.AirDistributorPressure-self.BrakeCylinderPressure)*1, (self.AirDistributorPressure-self.BrakeCylinderPressure)*1, nil, 2)
+            self:equalizePressure(dT,"AirDistributorPressure",0, (self.AirDistributorPressure-self.BrakeCylinderPressure)*1, (self.AirDistributorPressure-self.BrakeCylinderPressure)*1, nil, 2)
         end
     end
     if Train:ReadTrainWire(28) > 0 then
@@ -409,7 +407,7 @@ function TRAIN_SYSTEM:Think(dT)
         local pneumaticValveConsumption_dPdT = 0
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,pneumaticValveConsumption_dPdT)
         if self.BrakeCylinderValve == 1 then
-            self:equalizePressure(dT,"BrakeCylinderPressure", math.min(3.3,self.TrainLinePressure,targetPressure), 2.50, 2.50, nil, self.BrakeCylinderPressure > targetPressure and 0.3+math.Clamp((self.BrakeCylinderPressure-0.4)/3.3,0,0.6) or 0.9)
+            self:equalizePressure(dT,"BrakeCylinderPressure", math.min(3.3,targetPressure), 2.50, 2.50, nil, self.BrakeCylinderPressure > targetPressure and 0.3+math.Clamp((self.BrakeCylinderPressure-0.4)/3.3,0,0.6) or 0.9)
         end
     else
         self:equalizePressure(dT,"BrakeCylinderPressure", 0.0, 2.00)
@@ -420,7 +418,7 @@ function TRAIN_SYSTEM:Think(dT)
     else
         self:equalizePressure(dT,"ParkingBrakePressure", 0, 0.4,1,nil,0.5)
     end
-    Train:SetPackedRatio("ParkingBrakePressure_dPdT",self.ParkingBrakePressure_dPdT+0.02)
+    Train:SetPackedRatio("ParkingBrakePressure_dPdT",self.ParkingBrakePressure_dPdT)
     trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeCylinderPressure_dPdT + self.ParkingBrakePressure_dPdT)
     self.Train:SetPackedRatio("BrakeCylinderPressure_dPdT", self.BrakeCylinderPressure_dPdT)
 
@@ -504,28 +502,14 @@ function TRAIN_SYSTEM:Think(dT)
         self.DoorRight = false
     elseif commandLeft then self.DoorLeft = true
     elseif commandRight then self.DoorRight = true end
-
-    if Train.CanStuckPassengerLeft then
-        for i in ipairs(self.LeftDoorStuck) do
-            self.LeftDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerLeft*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
-        end
-        Train.CanStuckPassengerLeft = false
-    end
-    if Train.CanStuckPassengerRight then
-        for i in ipairs(self.RightDoorStuck) do
-            self.RightDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerRight*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
-        end
-        Train.CanStuckPassengerRight = false
-    end
-
     Train.LeftDoorsOpen = false
     Train.RightDoorsOpen = false
     for i=1,4 do
         self.LeftDoorDir[i] = math.Clamp(self.LeftDoorDir[i]+dT/(self.DoorLeft and 2*self.LeftDoorSpeed[i] or -self.LeftDoorSpeed[i]),-1.5,1)
         self.RightDoorDir[i] = math.Clamp(self.RightDoorDir[i]+dT/(self.DoorRight and 2*self.RightDoorSpeed[i] or -self.RightDoorSpeed[i]),-1.5,1)
-        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + (self.LeftDoorDir[i]/self.LeftDoorSpeed[i]*dT),self.LeftDoorStuck[i] and 0.3 or 0,1)
+        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + (self.LeftDoorDir[i]/self.LeftDoorSpeed[i]*dT),0,1)
         if self.LeftDoorState[i] == 0 or self.LeftDoorState[i] == 1 then self.LeftDoorDir[i] = 0 end
-        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + (self.RightDoorDir[i]/self.RightDoorSpeed[i]*dT),self.RightDoorStuck[i] and 0.3 or 0,1)
+        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + (self.RightDoorDir[i]/self.RightDoorSpeed[i]*dT),0,1)
         if self.RightDoorState[i] == 0 or self.RightDoorState[i] == 1 then self.RightDoorDir[i] = 0 end
         if not Train.BUV.LeftDoorsOpen and self.LeftDoorState[i] > 0 then
             Train.LeftDoorsOpen = true
@@ -536,14 +520,11 @@ function TRAIN_SYSTEM:Think(dT)
         Train.BUV.DoorsOpened = Train.LeftDoorsOpen or Train.RightDoorsOpen
         Train:SetPackedRatio("DoorL"..i,self.LeftDoorState[i])
         Train:SetPackedRatio("DoorR"..i,self.RightDoorState[i])
-        if self.LeftDoorStuck[i] and (self.DoorLeft or type(self.LeftDoorStuck[i]) == "number" and CurTime()-self.LeftDoorStuck[i] > 0) then
-            self.LeftDoorStuck[i] = false
-        end
-        if self.RightDoorStuck[i] and (self.DoorRight or type(self.RightDoorStuck[i]) == "number" and CurTime()-self.RightDoorStuck[i] > 0) then
-            self.RightDoorStuck[i] = false
-        end
-        Train:SetPackedBool("DoorLS"..i,self.LeftDoorStuck[i])
-        Train:SetPackedBool("DoorRS"..i,self.RightDoorStuck[i])
+        --[[
+        self.DoorSpeedMain = math.Rand(1.1,1.3)
+        for i=1,#self.LeftDoorSpeed do
+            self.LeftDoorSpeed[i] = math.Rand(self.DoorSpeedMain,self.DoorSpeedMain+0.2)
+        end--]]
     end
     Train:SetPackedBool("DoorL",self.DoorLeft)
     Train:SetPackedBool("DoorR",self.DoorRight)

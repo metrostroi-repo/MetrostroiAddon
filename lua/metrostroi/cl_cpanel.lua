@@ -2,12 +2,8 @@
 local function AddBox(panel,cmd,str)
     panel:AddControl("CheckBox",{Label=str, Command=cmd})
 end
---Helper function for common use
-local function AddTextBox(panel,cmd,str)
-    panel:AddControl("TextBox",{Label=str, Command=cmd})
-end
-local function AddSlider(panel,cmd,str,min,max,fl)
-    panel:AddControl("Slider",{Label=str, Command=cmd,min=min,max=max,type=fl and "float"})
+local function AddSlider(panel,cmd,str,min,max)
+    panel:AddControl("Slider",{Label=str, Command=cmd,min=min,max=max})
 end
 -- Build admin panel
 local function AdminPanel(panel)
@@ -42,30 +38,14 @@ local function ClientPanel(panel)
     AddBox(panel,"metrostroi_disablehud",Metrostroi.GetPhrase("Panel.DisableHUD"))
     AddBox(panel,"metrostroi_disablecamaccel",Metrostroi.GetPhrase("Panel.DisableCamAccel"))
     AddBox(panel,"metrostroi_disablehovertext",Metrostroi.GetPhrase("Panel.DisableHoverText"))
-    AddBox(panel,"metrostroi_disablehovertextpos",Metrostroi.GetPhrase("Panel.DisableHoverTextP"))
     AddBox(panel,"metrostroi_screenshotmode",Metrostroi.GetPhrase("Panel.ScreenshotMode"))
     AddBox(panel,"metrostroi_shadows1",Metrostroi.GetPhrase("Panel.ShadowsHeadlight"))
     AddBox(panel,"metrostroi_shadows3",Metrostroi.GetPhrase("Panel.RedLights"))
     AddBox(panel,"metrostroi_shadows2",Metrostroi.GetPhrase("Panel.ShadowsOther"))
-    AddBox(panel,"metrostroi_shadows4",Metrostroi.GetPhrase("Panel.PanelLights"))
-    AddBox(panel,"metrostroi_sprites",Metrostroi.GetPhrase("Panel.PanelSprites"))
-    local DRouteNumber = panel:TextEntry(Metrostroi.GetPhrase("Panel.RouteNumber"),"metrostroi_route_number")
     AddBox(panel,"metrostroi_minimizedshow",Metrostroi.GetPhrase("Panel.MinimizedShow"))
     AddSlider(panel,"metrostroi_cabfov",Metrostroi.GetPhrase("Panel.FOV"),65,100)
-    AddSlider(panel,"metrostroi_cabz",Metrostroi.GetPhrase("Panel.Z"),-10,10,true)
     AddSlider(panel,"metrostroi_renderdistance",Metrostroi.GetPhrase("Panel.RenderDistance"),960,3072)
     panel:Button(Metrostroi.GetPhrase("Panel.ReloadClient"),"metrostroi_reload_client",true)
-
-    function DRouteNumber:OnChange()
-        local oldval = self:GetValue()
-        local NewValue = ""
-        for i = 1,math.min(3,#oldval) do
-            NewValue = NewValue..((oldval[i] or ""):upper():match("[%d]+") or "")
-        end
-        local oldpos = self:GetCaretPos()
-        self:SetText(NewValue)
-        self:SetCaretPos(math.min(#NewValue,oldpos,3))
-    end
 end
 local function ClientAdvanced(panel)
     panel:ClearControls()

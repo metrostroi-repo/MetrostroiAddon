@@ -171,12 +171,11 @@ function ENT:Think()
         -- Apply brakes
         self.FrontBogey.PneumaticBrakeForce = 50000.0--3000 --40000
         self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
+        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)
         self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
         self.RearBogey.PneumaticBrakeForce = 50000.0--3000 --40000
         self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
         self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.RearBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
     end
     return retVal
 end

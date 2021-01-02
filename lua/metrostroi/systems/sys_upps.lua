@@ -26,7 +26,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:TriggerSensor(coil,plate)
-    if self.Power == true and not self.Controlling and plate.DistanceToOPV and plate.PlateType==METROSTROI_UPPSSENSOR then
+    if self.Power == true and not self.Controlling and plate.DistanceToOPV then
         self.Controlling = plate.DistanceToOPV
         self.Train:PlayOnce("upps","cabin",1)
         self.KBTimer = CurTime()

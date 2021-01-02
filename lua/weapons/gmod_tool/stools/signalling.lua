@@ -16,47 +16,7 @@ local TypesOfSignal = {"Inside","Outside big","Outside small"}
 local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street","STOP Street","Dangerous","Deadlock",
     "Stop marker","!(stop)","X","T Start","T End","T Sbor(engage)","Engines off","Engines on","C(horn)","T stop emer","Shod",
     "Left doors","Phone▲","Phone▼","1up","STOP Street cyka","NF outside","35 outside","40 outside","60 outside","70 outside","80 outside",
-    "T Sbor(engage) outside","35","Dangerous 200","CR End","CR End(inv)","2up","3up","4up","5up","6up","X outside", "Metal","50","50 outside",
-    "Forward x2",
-    "Ted Off kn",
-    "Ted Off p1",
-    "Ted Off p2",
-    "Ted Off pn",
-    "Ted Off t1",
-    "Ted Off t2",
-    "Ted Off t3",
-    "Ted Off t4",
-    "Ted On kn",
-    "Ted On p1",
-    "Ted On p2",
-    "Ted On pn",
-    "Ted On t1",
-    "Ted On t2",
-    "Ted On t3",
-    "Ted On t4",
-    "Ted Off 722 10%",
-    "Ted Off 722 20%",
-    "Ted Off 722 30%",
-    "Ted Off 722 40%",
-    "Ted Off 722 50%",
-    "Ted Off 722 60%",
-    "Ted Off 722 70%",
-    "Ted Off 722 80%",
-    "Ted Off 722 90%",
-    "Ted Off 722 100%",
-    "Ted Off Outside",
-    "Ted On 722 10%",
-    "Ted On 722 20%",
-    "Ted On 722 30%",
-    "Ted On 722 40%",
-    "Ted On 722 50%",
-    "Ted On 722 60%",
-    "Ted On 722 70%",
-    "Ted On 722 80%",
-    "Ted On 722 90%",
-    "Ted On 722 100%",
-    "Ted On Outside",
-    }
+    "T Sbor(engage) outside","35","Dangerous 200","CR End","CR End(inv)","2up","3up","4up","5up","6up","X outside", "Metal","50","50 outside"}
 local RouteTypes = {"Auto", "Manual","Repeater","Emerg"}
 
 local TypesOfAuto = {
@@ -261,14 +221,14 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
                 self.Auto.PAStationHorlift = ent.PAStationHorlift
             end
         elseif self.Auto.Type == METROSTROI_SBPPSENSOR and not ent.Linked then
-            self.Auto.SBPPType = ent.SBPPType
+            self.Auto.SBPPType = ent.Type
             self.Auto.SBPPDeadlock = ent.IsDeadlock
             self.Auto.SBPPStationPath = ent.StationPath
             self.Auto.SBPPStationID = ent.StationID
             self.Auto.SBPPDriveMode = ent.DriveMode
             self.Auto.SBPPRightDoors = ent.RightDoors
-            self.Auto.SBPPWTime = ent.WTime or 0
-            self.Auto.SBPPRK = ent.RKPos or 1
+            self.Auto.SBPPWTime = ent.WTime
+            self.Auto.SBPPRK = ent.RKPos
             self.Auto.LXp = ent.DistanceToOPV
         end
         self.Auto.LXp = ent.DistanceToOPV or ent.LXp or self.Auto.LXp
@@ -402,11 +362,11 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
                 ent.PAType = self.Auto.PAType
                 ent.PAStationPath = tonumber(self.Auto.PAStationPath)
                 ent.PAStationID = tonumber(self.Auto.PAStationID)
-                ent.PAStationName = self.Auto.PAStationName or "N/A"
+                ent.PAStationName = self.Auto.PAStationName
                 ent.PALastStation = self.Auto.PALastStation
                 ent.PAWrongPath = self.Auto.PAWrongPath
-                ent.PADeadlockStart = self.Auto.PADeadlockStart or 128
-                ent.PADeadlockEnd = self.Auto.PADeadlockEnd or 512
+                ent.PADeadlockStart = self.Auto.PADeadlockStart
+                ent.PADeadlockEnd = self.Auto.PADeadlockEnd
                 ent.PALineChange = self.Auto.PALineChange
                 ent.PALineChangeStationPath = self.Auto.PALineChangeStationPath
                 ent.PALineChangeStationID = self.Auto.PALineChangeStationID
@@ -861,7 +821,7 @@ function TOOL:BuildCPanelCustom()
                         tool:SendSettings()
                     end
                 local VEnRouC = CollCat:CheckBox("Enable route number")
-                        VEnRouC:SetTooltip("Enable route number(when disabled route number enables only with invitation signal)")
+                        VEnRouC:SetTooltip("Enable route number(when disabled route number enables only with invation signal)")
                         VEnRouC:SetValue(tool.Signal.Routes[i].EnRou or false)
                         function VEnRouC:OnChange()
                             tool.Signal.Routes[i].EnRou = self:GetChecked()
@@ -1243,7 +1203,7 @@ function TOOL:BuildCPanelCustom()
             end
             if SBPPType==7  then
                 local SRK = CPanel:NumSlider("RK Pos:",nil,1,18,0)
-                SRK:SetValue(tool.Auto.SBPPRK or 1)
+                SRK:SetValue(tool.Auto.SBPPRK or 0)
                 SRK.OnValueChanged = function(num)
                     tool.Auto.SBPPRK = SRK:GetValue()
                     tool:SendSettings()

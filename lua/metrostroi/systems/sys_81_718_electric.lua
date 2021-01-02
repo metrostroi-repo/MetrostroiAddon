@@ -356,7 +356,7 @@ function TRAIN_SYSTEM:SolveControlCircuits(Train,dT)
 
     --352-353-354
     S[354] =(1-BKVA.KM4)
-    Train.U1:TriggerInput("Set", T[32]*Train.SF17.Value*S[354])
+    Train.U1:TriggerInput("Set", T[32]*S[354])
 
     --8.2.2
     --[[ S[533] = S[369]*Train.SB3.Value
@@ -509,11 +509,8 @@ function TRAIN_SYSTEM:SolveControlCircuits(Train,dT)
     Train:WriteTrainWire(1,S[501])
 
     Train.BSM_KRT:TriggerInput("Set",(T[2]+T[12])*RC)
-    --Train.BSM_KRH:TriggerInput("Set",(T[1]+T[55])*RC)
-    BKBD.KRH = (T[1]+T[55])*RC
-    BKBD.R11 = T[35]
-    BKBD.R12 = (T[45]+T[54])*RC
-    Train.BSM_KRO:TriggerInput("Set",BKBD.R12)--(T[87]+S["7Ga"]*KV["7GA-RC27"]+S["14a"]*Train.A42.Value*(1-Train.KRP.Value))*(1-Train.BSM_KRH.Value))
+    Train.BSM_KRH:TriggerInput("Set",(T[1]+T[55])*RC)
+    Train.BSM_KRO:TriggerInput("Set",(T[45]+T[54])*RC)--(T[87]+S["7Ga"]*KV["7GA-RC27"]+S["14a"]*Train.A42.Value*(1-Train.KRP.Value))*(1-Train.BSM_KRH.Value))
 
     --S[649] = S[326]*(1-Train.SP2.Value)
     Panel.AVU = S[326]*(1-Train.SP2.Value)--S[649]
@@ -559,8 +556,8 @@ function TRAIN_SYSTEM:SolveControlCircuits(Train,dT)
     --14.1. Ходовые режимы основного управления. Страница 32-33
     Train.KMR1:TriggerInput("Set",BUV.OVP*(1-Train.KMR2.Value)*S[314])
     Train.KMR2:TriggerInput("Set",BUV.ONZ*(1-Train.KMR1.Value)*S[314])
-    --BUV.IRV = S[314]*Train.KMR1.Value
-    --BUV.IRN = S[314]*Train.KMR2.Value
+    BUV.IRV = S[314]*Train.KMR1.Value
+    BUV.IRN = S[314]*Train.KMR2.Value
 
     BUV.IRV = S[314]*Train.KMR1.Value
     BUV.IRN = S[314]*Train.KMR2.Value

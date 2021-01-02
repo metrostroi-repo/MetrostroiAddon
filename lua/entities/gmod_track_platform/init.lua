@@ -37,7 +37,7 @@ function ENT:Initialize()
     -- Get platform parameters
     self.VMF = self.VMF or {}
     self.PlatformStart      = ents.FindByName(self.VMF.PlatformStart or "")[1]
-    self.SignOff        = tonumber(self.VMF.Sign or self.VMF.NoSign or "0") == 1
+    self.SignOff        = tonumber(self.VMF.Sign or "0") == 1
     self.PlatformEnd        = ents.FindByName(self.VMF.PlatformEnd or "")[1]
     self.StationIndex       = tonumber(self.VMF.StationIndex) or 100
     self.PlatformIndex      = tonumber(self.VMF.PlatformIndex) or 1
@@ -136,7 +136,6 @@ function ENT:Initialize()
         self.NoEntry.specarr = Sound(Metrostroi.StationAnnouncesTo[self.StationIndex][3])
         self.NoEntry.specdep = Sound(Metrostroi.StationAnnouncesTo[self.StationIndex][4])
     end]]
-    self:DrawShadow(false)
 end
 
 function ENT:OnRemove()
@@ -150,6 +149,7 @@ function ENT:KeyValue(key, value)
     self.VMF = self.VMF or {}
     self.VMF[key] = value
 end
+
 
 --------------------------------------------------------------------------------
 -- Process platform logic
@@ -224,14 +224,6 @@ function ENT:GetDoorState()
         if v:GetSaveTable().m_toggle_state ~= 1 then return true end
     end
     return false
-end
-
-local function getPassengerRate(passCount)
-    if passCount < 80 then
-        return 1-((passCount/80)^3)*0.2
-    else
-        return 1-math.min(1, (((passCount-80)/220)^0.6)*0.85+0.2)
-    end
 end
 
 ENT.TESTTEST = false
@@ -315,8 +307,7 @@ function ENT:Think()
             end
 
             -- Open doors on station
-            if stopped_fine and (v.SOSD or self.OldOpened and not self.OpenedBySOSD)  then
-                self.OpenedBySOSD = v.SOSD
+            if stopped_fine and v.SOSD  then
                 self.HorliftTimer1 = self.HorliftTimer1 or CurTime()
                 if ((CurTime() - self.HorliftTimer1) > 0.5) then
                     if not self.HorliftTimer2 then self:FireHorliftDoors("Open") end
@@ -362,38 +353,17 @@ function ENT:Think()
             if not left_side then door_count = #v.RightDoorPositions end
 
             -- Get maximum boarding rate for normal russian subway train doors
-            local max_boarding_rate = getPassengerRate(v:GetNW2Int("PassengerCount")) * 1.4 * door_count * dT
-            --print(Format("R:%.2f\tS:%.2f\tP:% 3d",max_boarding_rate,getPassengerRate(v:GetNW2Int("PassengerCount")),v:GetNW2Int("PassengerCount")))
+            local max_boarding_rate = 1.4 * door_count * dT
             -- Get boarding rate based on passenger density
             local boarding_rate = math.min(max_boarding_rate,passenger_count)
             if self.PlatformLast then boarding_rate = 0 end
             -- Get rate of leaving
             local leaving_rate = 1.4 * door_count * dT
             if v.PassengersToLeave == 0 and not v.AnnouncementToLeaveWagonAcknowledged then leaving_rate = 0 end
+            if v.AnnouncementToLeaveWagonAcknowledged then leaving_rate = leaving_rate*1.5 end
             -- Board these passengers into train
-            local speedLimit =  math.max(0,1-math.abs(v.Speed/5))
-            local boarded,left,count
-            --if v.AnnouncementToLeaveWagonAcknowledged then
-            if v.AnnouncementToLeaveWagonAcknowledged then
-                boarded   = 0
-                left      = math.ceil(math.min(math.max(2,leaving_rate + 0.5),v:GetNW2Int("PassengerCount"))*speedLimit*1.5)
-                count = v:GetNW2Int("PassengerCount")
-            else
-                count = self:PopulationCount() + v.PassengersToLeave
-                boarded   = math.ceil(math.min(math.max(2,boarding_rate+0.5),self:PopulationCount())*speedLimit)
-                left      = math.ceil(math.min(math.max(2,leaving_rate +0.5),v.PassengersToLeave)*speedLimit)
-            end
-            if (v.PrevLeftDoorsOpening ~= v.LeftDoorsOpening) then
-                v.CanStuckPassengerLeft = not v.LeftDoorsOpening and ((boarded > 0 or left > 0) and math.min(1,count/100) or math.min(1,count/400))
-                v.PrevLeftDoorsOpening = v.LeftDoorsOpening
-                if v.LeftDoorsOpening then v.LastPlatform = nil end
-            end
-            if (v.PrevRightDoorsOpening ~= v.RightDoorsOpening) then
-                v.CanStuckPassengerRight = not v.RightDoorsOpening and ((boarded > 0 or left > 0) and math.min(1,count/100) or math.min(1,count/400))
-                v.PrevRightDoorsOpening = v.RightDoorsOpening
-                if v.RightDoorsOpening then v.LastPlatform = nil end
-            end
-
+            local boarded   = math.min(math.max(2,math.floor(boarding_rate+0.5)),v.AnnouncementToLeaveWagonAcknowledged and 0 or self:PopulationCount())
+            local left      = math.min(math.max(2,math.floor(leaving_rate +0.5)),v.AnnouncementToLeaveWagonAcknowledged and v:GetNW2Int("PassengerCount") or v.PassengersToLeave)
             if math.random() <= math.Clamp(17-passenger_count,0,17)/17*0.5 then boarded = 0 end
             if math.random() <= math.Clamp(17-v.PassengersToLeave,0,17)/17*0.5 then left = 0 end
             local passenger_delta = boarded - left
@@ -432,11 +402,11 @@ function ENT:Think()
 
             -- Keep list of door positions
             if left_side then
-                for k, vec in ipairs(v.LeftDoorPositions) do
+                for k, vec in pairs(v.LeftDoorPositions) do
                     table.insert(boardingDoorList, v:LocalToWorld(vec))
                 end
             else
-                for k, vec in ipairs(v.RightDoorPositions) do
+                for k, vec in pairs(v.RightDoorPositions) do
                     table.insert(boardingDoorList, v:LocalToWorld(vec))
                 end
             end
@@ -548,7 +518,7 @@ function ENT:Think()
     end]]
     -- Add passengers
     if (not self.PlatformLast) and (#boardingDoorList == 0) then
-        local target = (Metrostroi.PassengersScale or 50)*self.PopularityIndex --300
+        local target = GetConVarNumber("metrostroi_passengers_scale",50)*self.PopularityIndex --300
         -- then target = target*0.1 end
 
         if target <= 0 then
@@ -583,7 +553,6 @@ function ENT:Think()
         self.ARSOverride = true
         self.OldOpened = self:GetDoorState()
         self.OldPeopleGoing = PeopleGoing
-        if not self.OldOpened then self.OpenedBySOSD = false end
     end
     -- Block local ARS sections
     if self.ARSOverride ~= nil then

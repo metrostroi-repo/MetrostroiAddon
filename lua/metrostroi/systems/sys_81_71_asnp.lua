@@ -101,11 +101,6 @@ if CLIENT then
         render.PopRenderTarget()
     end
     function TRAIN_SYSTEM:PrintText(x,y,text,inverse)
-        if text == "II" then
-            self:PrintText(x-0.2,y,"I",inverse)
-            self:PrintText(x+0.2,y,"I",inverse)
-            return
-        end
         local str = {utf8.codepoint(text,1,-1)}
         for i=1,#str do
             local char = utf8.char(str[i])
@@ -135,7 +130,7 @@ if CLIENT then
 
 
         if State == -2 then
-            self:PrintText(0,0,"Map not supported")
+            self:PrintText(0,0,"Ошибка памяти")
             self:PrintText(0,1,"Карта не поддерживается")
             return
         end
@@ -146,7 +141,7 @@ if CLIENT then
         end
         if State > 1 and not Metrostroi.ASNPSetup then
             self:PrintText(0,0,"Client error")
-            self:PrintText(0,1,"No announcer at client")
+            self:PrintText(0,1,"ASNPSetup nil")
             return
         end
         if State == 2 then
@@ -154,19 +149,29 @@ if CLIENT then
             local sel = Train:GetNW2Int("ASNP:Selected",0)
             self:PrintText(0,0,"Номер маршрута:")
             if sel == 2 then
-                self:PrintText(4,1,"\"+-\" отм \"MENU\" ввод")
+                local timer = math.ceil(RealTime()%7.5/1.5)
+                if timer == 1 then self:PrintText(4,1,"Для подтверждения")
+                elseif timer == 2 then self:PrintText(6,1,"нажмите \"МЕНЮ\"")
+                elseif timer == 3 then self:PrintText(6,1,"Для возврата к")
+                elseif timer == 4 then self:PrintText(5,1,"предыдущей цифре")
+                elseif timer == 5 then self:PrintText(4,1,"нажмите \"+\" или \"-\"") end
             else
-                self:PrintText(4,1,"\"+-\" выб \"MENU\" след")
+                local timer = math.ceil(RealTime()%7.5/1.5)
+                if timer == 1 then self:PrintText(5,1,"Для ввода номера")
+                elseif timer == 2 then self:PrintText(4,1,"нажмите \"+\" или \"-\"")
+                elseif timer == 3 then self:PrintText(6,1,"Для перехода к")
+                elseif timer == 4 then self:PrintText(5,1,"следующей цифре")
+                elseif timer == 5 then self:PrintText(6,1,"нажмите \"МЕНЮ\"") end
             end
 
-            if sel~=0 or RealTime()%1 > 0.5 then self:PrintText(0,1,RouteNumber[1]) end
-            if sel~=1 or RealTime()%1 > 0.5 then self:PrintText(1,1,RouteNumber[2]) end
+            self:PrintText(0,1,RouteNumber[1],sel==0 and  RealTime()%1 > 0.5)
+            self:PrintText(1,1,RouteNumber[2],sel==1 and  RealTime()%1 > 0.5)
         end
 
         local stbl = Metrostroi.ASNPSetup and Metrostroi.ASNPSetup[Train:GetNW2Int("Announcer",1)]
         if State > 2 and not stbl then
             self:PrintText(0,0,"Client error")
-            self:PrintText(0,1,"No line at client")
+            self:PrintText(0,1,"ASNPSetup[ann] nil")
             return
         end
 
@@ -174,17 +179,13 @@ if CLIENT then
             local Line = self.Train:GetNW2Int("ASNP:Line",1)
             local ltbl = stbl[Line]
             local St,En = ltbl[1],ltbl[#ltbl]
-            self:PrintText(0,0,ltbl.Loop and "Маршрут (кол)" or "Маршрут")
-            self:PrintText(20,0,"-")
-            if RealTime()%0.8 > 0.4 then
-                self:PrintText(17,0,Format("%03d",St[1]))
-                self:PrintText(21,0,Format("%03d",En[1]))
-            end
-            local timer = math.ceil(RealTime()%6/1.5)
+            self:PrintText(0,0,"Маршрут"..(ltbl.Loop and " ()" or ""))
+            local timer = math.ceil(RealTime()%7.5/1.5)
             if timer == 1 then self:PrintText(0,1,(ltbl.Name or "Нет названия"))
-            elseif timer == 2 then self:PrintText(0,1,"От:") self:PrintText(3,1,St[2])
-            elseif timer == 3 then self:PrintText(0,1,"До:") self:PrintText(3,1,En[2])
-            elseif timer == 4 then self:PrintText(0,1,"\"+-\" выбор   \"MENU\" ввод") end
+            elseif timer == 2 then self:PrintText(0,1,"От:");self:PrintText(3,1,St[2]);self:PrintText(21,1,tostring(St[1]))
+            elseif timer == 3 then self:PrintText(0,1,"До:");self:PrintText(3,1,En[2]);self:PrintText(21,1,tostring(En[1]))
+            elseif timer == 4 then self:PrintText(4,1,"Для подтверждения")
+            elseif timer == 5 then self:PrintText(6,1,"нажмите \"МЕНЮ\"") end
         end
 
         if State == 4 then
@@ -193,18 +194,11 @@ if CLIENT then
             if ltbl.Loop then
                 local Path = Train:GetNW2Bool("ASNP:Path")
                 self:PrintText(0,0,"Путь")
-                self:PrintText(0,1,Path and "II" or "I")
-                self:PrintText(2,1,Path and "(второй)" or "(первый)")
-                if RealTime()%0.8 > 0.4 then self:PrintText(18,0,Train:GetNW2Bool("ASNP:Path") and "II" or "I") end
-                self:PrintText(20,0,"-")
+                self:PrintText(0,1,Path and "II (второй)" or " I (первый)")
             else
                 local St = ltbl[Train:GetNW2Int("ASNP:FirstStation",1)]
-                self:PrintText(0,0,"Начальная ст.")
+                self:PrintText(0,0,"Начальная станция")
                 self:PrintText(0,1,St[1]..":"..St[2])
-                self:PrintText(20,0,"-")
-                if RealTime()%0.8 > 0.4 then
-                    self:PrintText(17,0,Format("%03d",St[1]))
-                end
             end
         end
 
@@ -214,32 +208,16 @@ if CLIENT then
             if ltbl.Loop then
                 local station = Train:GetNW2Int("ASNP:LastStation",1)
                 local En = ltbl[station]
-                self:PrintText(0,0,"Конечная ст.")
+                self:PrintText(0,0,"Конечная станция")
                 if station == 0 then
                     self:PrintText(0,1," ():".."Кольцевой")
                 else
                     self:PrintText(0,1,En[1]..":"..En[2])
                 end
-                local Path = Train:GetNW2Bool("ASNP:Path") and "II" or "I"
-                self:PrintText(18,0,Path)
-                self:PrintText(20,0,"-")
-                if RealTime()%0.8 > 0.4 then
-                    if En then
-                        self:PrintText(21,0,Format("%03d",En[1]))
-                    else
-                        self:PrintText(22,0,Path)
-                    end
-                end
             else
-                local St = ltbl[Train:GetNW2Int("ASNP:FirstStation",1)]
                 local En = ltbl[Train:GetNW2Int("ASNP:LastStation",1)]
                 self:PrintText(0,0,"Конечная станция")
                 self:PrintText(0,1,En[1]..":"..En[2])
-                self:PrintText(20,0,"-")
-                self:PrintText(17,0,Format("%03d",St[1]))
-                if RealTime()%0.8 > 0.4 then
-                    self:PrintText(21,0,Format("%03d",En[1]))
-                end
             end
         end
 
@@ -248,29 +226,36 @@ if CLIENT then
             local ltbl = stbl[Line]
             local Path = Train:GetNW2Bool("ASNP:Path")
             self:PrintText(0,0,"Проверьте данные")
-            self:PrintText(17,0,Format("%02d",Line))
-            self:PrintText(20,0,Format("%02d",Train:GetNW2Int("ASNP:RouteNumber",0)))
-            self:PrintText(23,0,Path and "II" or "I")
+            self:PrintText(18,0,Format("%02d",Line))
+            self:PrintText(22,0,Path and "II" or "I")
+            self:PrintText(22,1,Format("%02d",Train:GetNW2Int("ASNP:RouteNumber",0)))
             if ltbl.Loop then
                 local station = Train:GetNW2Int("ASNP:LastStation",1)
                 local En = ltbl[station]
-                --self:PrintText(20,0,"()")
-                local timer = math.ceil(RealTime()%4.5/1.5)
-                if timer == 1 then self:PrintText(0,1,"(кол) "..(ltbl.Name or "Нет названия"))
+                self:PrintText(20,0,"()")
+                local timer = math.ceil(RealTime()%9/1.5)
+                if timer == 1 then self:PrintText(0,1,"()"..(ltbl.Name or "Нет названия"))
                 elseif timer == 2 and station > 0 then self:PrintText(0,1,"До:");self:PrintText(3,1,En[2]);self:PrintText(21,1,tostring(En[1]))
-                elseif timer == 2 and station == 0 then self:PrintText(0,1,"Без конечной")
-                elseif timer == 3 then self:PrintText(0,1,"\"+-\" отмена    \"MENU\" ок") end
+                elseif timer == 2 and station == 0 then self:PrintText(0,1,"До:Кольцевой")
+                --elseif timer == 3 then self:PrintText(0,1,"До:");self:PrintText(3,1,En[2]);self:PrintText(21,1,tostring(En[1]))
+                elseif timer == 3 then self:PrintText(2,1,"Для подтверждения")
+                elseif timer == 4 then self:PrintText(4,1,"нажмите \"МЕНЮ\"")
+                elseif timer == 5 then self:PrintText(6,1,"Для отмены")
+                elseif timer == 6 then self:PrintText(1,1,"нажмите \"+\" или \"-\"") end
             else
                 local St = ltbl[Train:GetNW2Int("ASNP:FirstStation",1)]
                 local En = ltbl[Train:GetNW2Int("ASNP:LastStation",1)]
                 if Path then
                     local StT = En;En=St;St=StT
                 end
-                local timer = math.ceil(RealTime()%6/1.5)
+                local timer = math.ceil(RealTime()%10.5/1.5)
                 if timer == 1 then self:PrintText(0,1,(ltbl.Name or "Нет названия"))
                 elseif timer == 2 then self:PrintText(0,1,"От:");self:PrintText(3,1,St[2]);self:PrintText(21,1,tostring(St[1]))
                 elseif timer == 3 then self:PrintText(0,1,"До:");self:PrintText(3,1,En[2]);self:PrintText(21,1,tostring(En[1]))
-                elseif timer == 4 then self:PrintText(0,1,"\"+-\" выб     \"MENU\" ввод") end
+                elseif timer == 4 then self:PrintText(2,1,"Для подтверждения")
+                elseif timer == 5 then self:PrintText(4,1,"нажмите \"МЕНЮ\"")
+                elseif timer == 6 then self:PrintText(6,1,"Для отмены")
+                elseif timer == 7 then self:PrintText(1,1,"нажмите \"+\" или \"-\"") end
             end
         end
         if State == 7 then
@@ -300,13 +285,7 @@ if CLIENT then
             --  self:PrintText(0,1,"<<<      КОНЕЧАЯ      >>>")
             else
                 --self:PrintText(0,1,string.rep("I",Path and 2 or 1))
-                if Path then
-                    self:PrintText(-0.2,1,"I")
-                    self:PrintText( 0.2,1,"I")
-                else
-                    self:PrintText(0,1,"I")
-                end
-                self:PrintText(2,1,string.format("% 2d.",Train:GetNW2Int("ASNP:RouteNumber",0)))
+                self:PrintText(0,1,string.format("%02d",Train:GetNW2Int("ASNP:RouteNumber",0)))
                 if ltbl.Loop and Train:GetNW2Int("ASNP:LastStation",1) == 0 then
                     self:PrintText(6,1,"Кольцевой")
                 else
@@ -432,7 +411,7 @@ function TRAIN_SYSTEM:Play(dep,not_last)
 
 
     self:AnnQueue(message)
-    --local stbl = Metrostroi.ASNPSetup[self.Train:GetNW2Int("Announcer",1)][self.Line][self.Station]
+    local stbl = Metrostroi.ASNPSetup[self.Train:GetNW2Int("Announcer",1)][self.Line][self.Station]
     if self.LastStation > 0 and not dep and self.Station ~= last and tbl[last].not_last and (stbl.have_inrerchange or math.abs(last-self.Station) <= 3) then
         local ltbl = tbl[last]
         if stbl.not_last_c then
@@ -512,16 +491,14 @@ end
 
 function TRAIN_SYSTEM:Trigger(name,value)
     local tbl = Metrostroi.ASNPSetup[self.Train:GetNW2Int("Announcer",1)]
-    if (name == "R_Program2" or name == "R_Program2H") and value then
+    if (name == "R_Program2" or name == "R_Program2H") and value and self.LineOut==0 then
         if self.State ~= 7 and tbl[self.Line] and tbl[self.Line].spec_last then
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
             self:AnnQueue{"click1","buzz_start"}
             self:AnnQueue(-1)
             self:AnnQueue(tbl[self.Line].spec_last)
             self:AnnQueue{"buzz_end","click2"}
         elseif self.State == 7 then
             local ltbl = Metrostroi.ASNPSetup[self.Train:GetNW2Int("Announcer",1)][self.Line]
-            local stbl = ltbl[self.Station]
             local last,lastst
             if self.Arrived then
                 if tbl.Loop then
@@ -532,26 +509,15 @@ function TRAIN_SYSTEM:Trigger(name,value)
                     lastst = self.Station == last and ltbl[last].arrlast
                 end
             end
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
             if lastst and not ltbl[last].ignorelast then
                 self:AnnQueue{"click1","buzz_start"}
                 self:AnnQueue(-1)
-                if stbl.spec_last_c then
-                    local patt = stbl.spec_last_c[self.Path and 2 or 1]
-                    self:AnnQueue(ltbl[patt] or ltbl.spec_last)
-                else
-                    self:AnnQueue(ltbl.spec_last)
-                end
+                self:AnnQueue(ltbl.spec_last)
                 self:AnnQueue{"buzz_end","click2"}
             else
                 self.StopMessage = not self.StopMessage
                 self:AnnQueue{"click1","buzz_start"}
-                if stbl.spec_wait_c then
-                    local patt = stbl.spec_wait_c[self.Path and 2 or 1]
-                    self:AnnQueue((ltbl[patt] or ltbl.spec_wait)[self.StopMessage and 1 or 2])
-                else
-                    self:AnnQueue(ltbl.spec_wait[self.StopMessage and 1 or 2])
-                end
+                self:AnnQueue(ltbl.spec_wait[self.StopMessage and 1 or 2])
                 self:AnnQueue{"buzz_end","click2"}
             end
         end
@@ -615,10 +581,8 @@ function TRAIN_SYSTEM:Trigger(name,value)
         end
         if name == "R_ASNPMenu" then
             self.State = 5
-            self.LastStation = 1
-            while stbl[self.LastStation] and not stbl[self.LastStation].arrlast or self.LastStation == self.FirstStation do
-                self.LastStation = self.LastStation - 1
-                if self.LastStation < 1 then self.LastStation = #stbl end
+            for i=#stbl,1,-1 do
+                if i ~= self.FirstStation and stbl[i].arrlast then self.LastStation = i;break end
             end
         end
     elseif self.State == 4 and value and tbl[self.Line].Loop then --Кольцевой
@@ -704,11 +668,10 @@ function TRAIN_SYSTEM:Trigger(name,value)
         end
         if name == "R_ASNPMenu" then
             if self.FirstStation ~= 0 then
-                if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
                 if self.Path then
-                    self:AnnQueue{"click1","buzz_start","announcer_ready",stbl[self.LastStation].arrlast[3],stbl[self.FirstStation].arrlast[3],"buzz_end","click2"}
+                    self.Train.Announcer:Queue{"click1","buzz_start","announcer_ready",stbl[self.LastStation].arrlast[3],stbl[self.FirstStation].arrlast[3],"buzz_end","click2"}
                 else
-                    self:AnnQueue{"click1","buzz_start","announcer_ready",stbl[self.FirstStation].arrlast[3],stbl[self.LastStation].arrlast[3],"buzz_end","click2"}
+                    self.Train.Announcer:Queue{"click1","buzz_start","announcer_ready",stbl[self.FirstStation].arrlast[3],stbl[self.LastStation].arrlast[3],"buzz_end","click2"}
                 end
             end
             self.State = 7
@@ -724,8 +687,7 @@ function TRAIN_SYSTEM:Trigger(name,value)
         end
         if name == "R_ASNPDown" and value then self:Next() end
         if name == "R_ASNPUp" and value then self:Prev() end
-        if (name == "R_Program1" or name == "R_Program1H") and value then
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
+        if (name == "R_Program1" or name == "R_Program1H") and value and self.LineOut==0 then
             if self.Arrived and self.Station == (self.Path and self.FirstStation or self.LastStation) then
                 self:Zero()
             end
@@ -752,10 +714,9 @@ function TRAIN_SYSTEM:Think()
     local Train = self.Train
     local VV = Train.ASNP_VV
     local Power = VV.Power > 0.5
-    if not Power and self.State ~= 0 then
+    if not Power and self.ASNPState ~= 0 then
         self.State = 0
         self.ASNPTimer = nil
-        if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
     end
     if Power and self.State == 0 then
         self.State = -1
@@ -782,10 +743,7 @@ function TRAIN_SYSTEM:Think()
     end
 
     if self.ReturnTimer and CurTime()-self.ReturnTimer > 0.7 then
-        if self.State == 7 then
-            self.State = 6
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
-        end
+        if self.State == 7 then self.State = 6 end
         self.ReturnTimer = nil
     end
     Train:SetNW2Int("ASNP:State",self.State)

@@ -29,8 +29,6 @@ end
 --------------------------------------------------------------------------------
 function Metrostroi.AddStationSign(ent)
 	if ent.SignOff then return end
-	if not Metrostroi.StationNamesConfiguration[ent.StationIndex] then return end
-
 	local platformStart	= ent.PlatformStart
 	local platformEnd	= ent.PlatformEnd
 	local platformDir   = platformEnd-platformStart

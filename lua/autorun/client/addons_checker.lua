@@ -1,8 +1,6 @@
 --[[-------------------------------------------------------------------------
 Addons checker for metrostroi addon
 ---------------------------------------------------------------------------]]
-CreateClientConVar("metrostroi_addons_check_skip_error",0,true)
-CreateClientConVar("metrostroi_addons_check_ignore",0,true)
 
 if SERVER then return end
 local RequiredAddons = {
@@ -178,16 +176,6 @@ local RequiredAddons = {
         single = true,
     },
     {
-        --Old content
-        additional = {
-            "materials/models/metrostroi_train/81-702/apparats.vmt",
-            "materials/models/metrostroi_train/81-702/apparats_n.vtf",
-            "materials/models/metrostroi_train/81-702/body.vtf",
-            "models/metrostroi_train/81-717/81-717.mdl",
-        },
-        reason="Workshop.ErrorOld",
-    },
-    {
         --Some effects enhancers
         wsid = 259517980,
         reason="Workshop.ErrorEnhancers",
@@ -200,12 +188,6 @@ local RequiredAddons = {
     {
         --Driveable trams
         wsid = 707998439,
-        reason="Workshop.Error1",
-        single = true,
-    },
-    {
-        --Train bogey entity
-        wsid = 1434772621,
         reason="Workshop.Error1",
         single = true,
     },
@@ -288,7 +270,7 @@ local function showAddons(ply)
                 else
                     v.message = "Workshop.FilesMissingLocaly"
                 end
-            elseif installed>=#v.additional and not v.mounted then
+            elseif installed>=#v.additional and not v.filename then
                 v.error = v.reason~=nil
                 v.message = v.reason or "Workshop.InstalledLocaly"
             end
@@ -413,7 +395,6 @@ local function showAddons(ply)
 end
 
 local function checkAddons(ply)
-    if not Metrostroi then return end
     for kr,v in ipairs(RequiredAddons) do
         if v.single and not game.SinglePlayer() then continue end
         v.filename = nil; v.downloaded = nil; v.downloaded = nil; v.mounted = nil; v.error = nil; v.message = nil
@@ -439,7 +420,6 @@ local function checkAddons(ply)
                 WaitAddons = WaitAddons-1
                 if WaitAddons<=0 then
                     showAddons(ply)
-                    return
                 end
             end)
         end

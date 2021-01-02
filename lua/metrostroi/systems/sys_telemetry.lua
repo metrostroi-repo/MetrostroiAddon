@@ -4,7 +4,6 @@
 Metrostroi.DefineSystem("Telemetry")
 
 function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
-	local extra_parameters = {"Electric","Engines","RheostatController","PositionSwitch"}
 	if extra_parameters then
 		self.SystemsList = extra_parameters
 		table.sort(self.SystemsList)
@@ -23,7 +22,7 @@ end
 function TRAIN_SYSTEM:Think(dT)
 	-- Generate file name
 	if not self.DataName then
-		self.DataName = "D:\\metrostroi_telemetry\\telemetry_"..os.date("%Y%m%d_%H%M%S").."_"..string.format("%04d",1000*math.random())..".txt"
+		self.DataName = "F:\\f\\subway\\metrostroi_telemetry\\telemetry_"..os.date("%Y%m%d_%H%M%S").."_"..string.format("%04d",1000*math.random())..".txt"
 		self.Time = 0
 
 		if not self.SystemsList then

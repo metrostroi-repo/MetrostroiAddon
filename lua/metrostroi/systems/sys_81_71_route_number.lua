@@ -10,11 +10,7 @@ if TURBOSTROI then return end
 
 function TRAIN_SYSTEM:Initialize(parameter)
     self.Max = parameter or 2
-    if not TURBOSTROI then
-        local num = IsValid(self.Train.Owner) and (tonumber(self.Train.Owner:GetInfo("metrostroi_route_number","61")) or 0)
-        self.RouteNumber =  Format("%03d",num*(10^(3-self.Max))%1000)
-        self.Train:SetNW2String("RouteNumber",self.RouteNumber)
-    end
+    self.RouteNumber = "000"
 end
 
 function TRAIN_SYSTEM:Outputs()

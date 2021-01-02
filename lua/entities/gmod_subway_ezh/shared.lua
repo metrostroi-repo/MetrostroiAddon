@@ -25,25 +25,11 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
-ENT.MirrorCams = {
-    Vector(441,72,15),Angle(1,180,0),15,
-    Vector(441,-72,15),Angle(1,180,0),15,
-}
-
 ENT.AnnouncerPositions = {
     {Vector(420,-38.2 ,35),80,0.33},
     {Vector(-3,-60, 62),300,0.2},
     {Vector(-3,60 ,62),300,0.2},
 }
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
 
 ENT.Cameras = {
     {Vector(407.5+18,32,21),Angle(0,180,0),"Train.703.Breakers1"},
@@ -471,14 +457,10 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(410,20,-45),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
+    self.SoundNames["vdol_loud"] = "subway_trains/common/pneumatic/door_valve/vdo3_on.mp3"
+    self.SoundNames["vdop_loud"] = self.SoundNames["vdol_loud"]
+    self.SoundPositions["vdol_loud"] = {100,1e9,Vector(410,20,-45),1}
+    self.SoundPositions["vdop_loud"] = self.SoundPositions["vdol_loud"]
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",
@@ -613,11 +595,8 @@ ENT.Spawner = {
     },
     spawnfunc = function(i,tbls,tblt)
         local WagNum = tbls.WagNum
-        if tbls.EWagons and i==1 then
-            tbls.EID = 2+math.floor(math.random()*(WagNum-2))
-        end
         if 1<i and i<WagNum  then
-            return (tbls.EID==i or math.random()>0.9) and "gmod_subway_81-703_int" or "gmod_subway_ezh1"
+            return (tbls.EWagons and math.random()>0.75) and "gmod_subway_81-703_int" or "gmod_subway_ezh1"
         else
             return "gmod_subway_ezh"
         end
@@ -670,7 +649,6 @@ ENT.Spawner = {
                 ent.PassengerDoor = val==4
                 ent.RearDoor = val==4
             else
-                ent.VU2:TriggerInput("Set",0)
                 ent.FrontDoor = val==4
                 ent.RearDoor = val==4
             end

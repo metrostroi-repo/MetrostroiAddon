@@ -5,19 +5,12 @@ return [[
 
 #######Buttons###########
 #Cameras
-Train.720.CameraCond    = Air-conditioner, IGLA
+Train.720.CameraCond    = Air conditioner, IGLA #FIXME
 Train.720.CameraPPZ     = PPZ #FIXME
 Train.720.CameraPV      = VPU #FIXME
-Train.720.CameraVityaz  = SAU "Vityaz"
-Train.720.CameraKRMH    = KRMSH and UAVA valves
-Train.720.CameraPVZ     = PVZ
-
-Train.Buttons.Heating   = Heating #NEW (air-conditioner mode)
-Train.Buttons.Vent      = Ventilation #NEW (air-conditioner mode)
-Train.Buttons.Cooling   = Cooling #NEW (air-conditione mode)
-Train.Buttons.BARS1     = BARS1 #NEW
-Train.Buttons.BARS2     = BARS2 #NEW
-Train.Buttons.BARS12    = BARS1 and BARS2 #NEW
+Train.720.CameraVityaz  = SAU "Vityaz" #FIXME
+Train.720.CameraKRMH    = KRMSH and UAVA valves #FIXME
+Train.720.CameraPVZ     = PVZ #FIXME
 
 #Common
 Common.720.SF1              = SF1: Main power
@@ -262,7 +255,7 @@ Entities.gmod_subway_81-720.Buttons.PUU.WiperToggle                 = @[Common.7
 Entities.gmod_subway_81-720.Buttons.PUU.!VDop                       = @[Common.ALL.SpeedAccept]
 Entities.gmod_subway_81-720.Buttons.PUU.!VFact                      = @[Common.ALL.SpeedCurr]
 Entities.gmod_subway_81-720.Buttons.PUU.!VPred                      = @[Common.ALL.SpeedAttent]
-Entities.gmod_subway_81-720.Buttons.PUU.!VFact2                     = @[Common.ALL.SpeedCurr]
+Entities.gmod_subway_81-720.Buttons.PUU.!VDop2                      = @[Common.ALL.SpeedAccept]
 Entities.gmod_subway_81-720.Buttons.PUU.!Acc                        = @[Common.720.Accel]
 Entities.gmod_subway_81-720.Buttons.PUU.!Forw                       = @[Common.720.Forward]
 Entities.gmod_subway_81-720.Buttons.PUU.!Back                       = @[Common.720.Backward]

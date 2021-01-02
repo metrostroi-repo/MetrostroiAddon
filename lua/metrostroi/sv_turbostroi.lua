@@ -51,19 +51,15 @@ if not TURBOSTROI then
 					end
 				end
 			end
-			local systems = train.Systems
-			local twWritersID = train.TrainWireWritersID
-			local twTurbostroi = train.TrainWireTurbostroi
-			local tti = train.TriggerTurbostroiInput
 			while true do
 				id,system,name,index,value = Turbostroi.RecvMessage(train)
 				--print(id,system,name,index,value)
 			--while true do --OLDTURBOSTROI
 				--id,system,name,index,value = Turbostroi.RecvMessage(train)
 				if id == 1 then
-					if systems[system] then
-						systems[system][name] = value
-						if tti then tti(train,system,name,value) end
+					if train.Systems[system] then
+						train.Systems[system][name] = value
+						if train.TriggerTurbostroiInput then train:TriggerTurbostroiInput(system,name,value) end
 					end
 				end
 				if id == 2 then
@@ -78,54 +74,54 @@ if not TURBOSTROI then
 						--print("[!]Wire "..index.." starts update! Value "..value)
 						dataCache[train]["wiresW"][index] = value
 						--train:WriteTrainWire(index,value)
-						if not twWritersID[index] then twWritersID[index] = true end
-						twTurbostroi[index] = value
-						if tti then tti(train,"TrainWire",index,value) end
+						if not train.TrainWireWritersID[index] then train.TrainWireWritersID[index] = true end
+						train.TrainWireTurbostroi[index] = value
+						if train.TriggerTurbostroiInput then train:TriggerTurbostroiInput("TrainWire",index,value) end
 					else
 						--print("[!]Wire "..index.." stop update!")
 						dataCache[train]["wiresW"][index] = nil
 					end
 				end
 				if id == 4 then
-					if systems[system] then
-						systems[system]:TriggerInput(name,value)
+					if train.Systems[system] then
+						train.Systems[system]:TriggerInput(name,value)
 					end
 				end
-				--[[if id == 5 then
+				if id == 5 then
 					for twid,value in pairs(dataCache[train]["wiresW"]) do
 						--train:WriteTrainWire(twid,value)
 					end
-				end]]
+				end
 
 				if not id then break end
 				messageCounter = messageCounter + 1
 			end
-		--[[
 		end
 		-- Send train wire values
 		-- Output all system values
 		for train in pairs(trains) do
-		]]
-			for i in pairs(train.TrainWires) do
-				if not dataCache[train]["wires"] then dataCache[train]["wires"] = {} end
-				if dataCache[train]["wires"][i] ~= train:ReadTrainWire(i) then
-					Turbostroi.SendMessage(train,3,"","",i,train:ReadTrainWire(i))
-					dataCache[train]["wires"][i] = train:ReadTrainWire(i)
+			if train.ReadTrainWire then
+				for i in pairs(train.TrainWires) do
+					if not dataCache[train]["wires"] then dataCache[train]["wires"] = {} end
+					if dataCache[train]["wires"][i] ~= train:ReadTrainWire(i) then
+						Turbostroi.SendMessage(train,3,"","",i,train:ReadTrainWire(i))
+						dataCache[train]["wires"][i] = train:ReadTrainWire(i)
+					end
 				end
-			end
-			for sys_name,system in pairs(train.Systems) do
-				if system.OutputsList and system.DontAccelerateSimulation then
-					for _,name in pairs(system.OutputsList) do
-						local value = system[name] or 0
-						if type(value) == "boolean" then
-							value = value and 1 or 0
-						end
-						if type(value) == "number" then
-							value = math.Round(value)
-							if not dataCache[train][sys_name] then dataCache[train][sys_name] = {} end
-							if dataCache[train][sys_name][name] ~= value then
-								Turbostroi.SendMessage(train,1,sys_name,name,0,value)
-								dataCache[train][sys_name][name] = value
+				for sys_name,system in pairs(train.Systems) do
+					if system.OutputsList and system.DontAccelerateSimulation then
+						for _,name in pairs(system.OutputsList) do
+							local value = system[name] or 0
+							if type(value) == "boolean" then
+								value = value and 1 or 0
+							end
+							if type(value) == "number" then
+								value = math.Round(value)
+								if not dataCache[train][sys_name] then dataCache[train][sys_name] = {} end
+								if dataCache[train][sys_name][name] ~= value then
+									Turbostroi.SendMessage(train,1,sys_name,name,0,value)
+									dataCache[train][sys_name][name] = value
+								end
 							end
 						end
 					end

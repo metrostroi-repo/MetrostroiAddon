@@ -3,6 +3,7 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 util.AddNetworkString "metrostroi-signal"
 util.AddNetworkString "metrostroi-signal-state"
+CreateConVar("metrostroi_ars_independent",0,{FCVAR_ARCHIVE},"Enable independent ARS codes")
 function ENT:SetSprite(index,active,model,scale,brightness,pos,color)
 	if active and self.Sprites[index] then return end
 	if not active and not self.Sprites[index] then return end
@@ -77,110 +78,107 @@ function ENT:CloseRoute(route)
 	end
 end
 
-function MSignalSayHook(ply, comm, fromULX)
-	if ulx and not fromULX then return end
-	for i,sig in pairs(ents.FindByClass("gmod_track_signal")) do
-		local comm = comm
-		if comm:sub(1,8) == "!sactiv " then
-			comm = comm:sub(9,-1):upper()
+function ENT:SayHook(ply, comm)
+	if comm:sub(1,8) == "!sactiv " then
+		comm = comm:sub(9,-1):upper()
 
-			comm = string.Explode(":",comm)
-			if sig.Routes then
-				for k,v in pairs(sig.Routes) do
-					if (v.RouteName and v.RouteName:upper() == comm[1] or comm[1] == "*") and v.Emer then
-						if sig.LastOpenedRoute and k ~= sig.LastOpenedRoute then sig:CloseRoute(sig.LastOpenedRoute) end
-						v.IsOpened = true
-						break
-					end
+		comm = string.Explode(":",comm)
+		if self.Routes then
+			for k,v in pairs(self.Routes) do
+				if (v.RouteName and v.RouteName:upper() == comm[1] or comm[1] == "*") and v.Emer then
+					if self.LastOpenedRoute and k ~= self.LastOpenedRoute then self:CloseRoute(self.LastOpenedRoute) end
+					v.IsOpened = true
+					break
 				end
 			end
-		elseif comm:sub(1,10) == "!sdeactiv " then
-			comm = comm:sub(11,-1):upper()
+		end
+	elseif comm:sub(1,10) == "!sdeactiv " then
+		comm = comm:sub(11,-1):upper()
 
-			comm = string.Explode(":",comm)
-			if sig.Routes then
-				for k,v in pairs(sig.Routes) do
-					if (v.RouteName and v.RouteName:upper() == comm[1] or comm[1] == "*") and v.Emer then
-						v.IsOpened = false
-						break
-					end
+		comm = string.Explode(":",comm)
+		if self.Routes then
+			for k,v in pairs(self.Routes) do
+				if (v.RouteName and v.RouteName:upper() == comm[1] or comm[1] == "*") and v.Emer then
+					v.IsOpened = false
+					break
 				end
 			end
-		elseif comm:sub(1,8) == "!sclose " then
-			comm = comm:sub(9,-1):upper()
+		end
+	elseif comm:sub(1,8) == "!sclose " then
+		comm = comm:sub(9,-1):upper()
 
-			comm = string.Explode(":",comm)
-			if comm[1] == sig.Name then
-				if sig.Routes[1] and sig.Routes[1].Manual then
-					sig:CloseRoute(1)
+		comm = string.Explode(":",comm)
+		if comm[1] == self.Name then
+			if self.Routes[1] and self.Routes[1].Manual then
+				self:CloseRoute(1)
+			else
+				if not self.Close then
+					self.Close = true
+				end
+				if self.InvationSignal then
+					self.InvationSignal = false
+				end
+				if (self.LastOpenedRoute and self.LastOpenedRoute == 1) or self.Routes[1].Repeater then
+					self:CloseRoute(1)
 				else
-					if not sig.Close then
-						sig.Close = true
-					end
-					if sig.InvationSignal then
-						sig.InvationSignal = false
-					end
-					if (sig.LastOpenedRoute and sig.LastOpenedRoute == 1) or sig.Routes[1].Repeater then
-						sig:CloseRoute(1)
-					else
-						sig:OpenRoute(1)
-					end
-				end
-			elseif sig.Routes then
-				for k,v in pairs(sig.Routes) do
-					if v.RouteName and v.RouteName:upper() == comm[1] then
-						if sig.LastOpenedRoute and k ~= sig.LastOpenedRoute then sig:CloseRoute(sig.LastOpenedRoute) end
-						sig:CloseRoute(k)
-					end
+					self:OpenRoute(1)
 				end
 			end
-		elseif comm:sub(1,7) == "!sopen " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
-			if comm[1] == sig.Name then
-				if comm[2] then
-					if sig.NextSignals[comm[2]] then
-						local Route
-						for k,v in pairs(sig.Routes) do
-							if v.NextSignal == comm[2] then Route = k break end
-						end
-						sig:OpenRoute(Route)
-					end
-				else
-					if sig.Routes[1] and sig.Routes[1].Manual then
-						sig:OpenRoute(1)
-					elseif sig.Close then
-						sig.Close = false
-					end
-				end
-			elseif sig.Routes then
-				for k,v in pairs(sig.Routes) do
-					if v.RouteName and v.RouteName:upper() == comm[1] then
-						if sig.LastOpenedRoute and k ~= sig.LastOpenedRoute then sig:CloseRoute(sig.LastOpenedRoute) end
-						sig:OpenRoute(k)
-					end
+		elseif self.Routes then
+			for k,v in pairs(self.Routes) do
+				if v.RouteName and v.RouteName:upper() == comm[1] then
+					if self.LastOpenedRoute and k ~= self.LastOpenedRoute then self:CloseRoute(self.LastOpenedRoute) end
+					self:CloseRoute(k)
 				end
 			end
-		elseif comm:sub(1,7) == "!sopps " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
-			if comm[1] == sig.Name then
-				sig.InvationSignal = true
+		end
+	elseif comm:sub(1,7) == "!sopen " then
+		comm = comm:sub(8,-1):upper()
+		comm = string.Explode(":",comm)
+		if comm[1] == self.Name then
+			RunConsoleCommand("say",comm)
+			if comm[2] then
+				if self.NextSignals[comm[2]] then
+					local Route
+					for k,v in pairs(self.Routes) do
+						if v.NextSignal == comm[2] then Route = k break end
+					end
+					self:OpenRoute(Route)
+				end
+			else
+				if self.Routes[1] and self.Routes[1].Manual then
+					self:OpenRoute(1)
+				elseif self.Close then
+					self.Close = false
+				end
 			end
-		elseif comm:sub(1,7) == "!sclps " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
-			if comm[1] == sig.Name then
-				sig.InvationSignal = false
+		elseif self.Routes then
+			for k,v in pairs(self.Routes) do
+				if v.RouteName and v.RouteName:upper() == comm[1] then
+					if self.LastOpenedRoute and k ~= self.LastOpenedRoute then self:CloseRoute(self.LastOpenedRoute) end
+					self:OpenRoute(k)
+				end
 			end
+		end
+	elseif comm:sub(1,7) == "!sopps " then
+		comm = comm:sub(8,-1):upper()
+		comm = string.Explode(":",comm)
+		if comm[1] == self.Name then
+			self.InvationSignal = true
+		end
+	elseif comm:sub(1,7) == "!sclps " then
+		comm = comm:sub(8,-1):upper()
+		comm = string.Explode(":",comm)
+		if comm[1] == self.Name then
+			self.InvationSignal = false
 		end
 	end
 end
-hook.Add("PlayerSay","metrostroi-signal-say", function(ply, comm) MSignalSayHook(ply,comm) end)
 function ENT:Initialize()
 	self:SetModel("models/metrostroi/signals/mus/ars_box.mdl")
 	self.Sprites = {}
 	self.Sig = ""
+	hook.Add("PlayerSay","metrostroi-signal-say"..self:EntIndex(), function(ply, comm) self:SayHook(ply,comm) end)
 	self.FreeBS = 1
 	self.OldBSState = 1
 	self.OutputARS = 1
@@ -313,11 +311,12 @@ end
 
 function ENT:OnRemove()
 	Metrostroi.UpdateSignalEntities()
+	hook.Remove("PlayerSay","metrostroi-signal-say"..self:EntIndex())
 	Metrostroi.PostSignalInitialize()
 end
 
 function ENT:GetARS(ARSID,Force1_5,Force2_6)
-	if self.OverrideTrackOccupied then return ARSID == 2 end
+	if self.OverrideTrackOccupied then return ARSID == 0 end
 	if not self.ARSSpeedLimit then return false end
 	local nxt = self.ARSNextSpeedLimit == 2 and 0 or self.ARSNextSpeedLimit ~= 1 and self.ARSNextSpeedLimit
 	return self.ARSSpeedLimit == ARSID or ((self.TwoToSix and not Force1_5 or Force2_6) and nxt and nxt == ARSID and self.ARSSpeedLimit > nxt)
@@ -330,7 +329,7 @@ end
 end--]]
 
 function ENT:GetRS()
-	if self.OverrideTrackOccupied or not self.TwoToSix or not self.ARSSpeedLimit then return false end
+	if not self.TwoToSix or not self.ARSSpeedLimit then return false end
 	--if self.ARSSpeedLimit == 1 or self.ARSSpeedLimit == 2 then return false end
 	if self.ARSSpeedLimit ~= 0 and self.ARSSpeedLimit== 2 then return false end
 	return (self.ARSSpeedLimit > 4 or self.ARSSpeedLimit == 4 and self.Approve0) and (not self.ARSNextSpeedLimit or self.ARSNextSpeedLimit >= self.ARSSpeedLimit)
@@ -468,8 +467,25 @@ function ENT:ARSLogic(tim)
 		elseif self.Routes[self.Route].ARSCodes then
 			local ARSCodes = self.Routes[self.Route].ARSCodes
 			self.ARSNextSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSSpeedLimit or tonumber(ARSCodes[1])
-			self.ARSSpeedLimit = tonumber(ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
-			if self.InvationSignal and self.ARSSpeedLimit == 2 then self.ARSSpeedLimit = 1 end
+			--[[ if GetConVarNumber("metrostroi_ars_independent") > 0 then
+				self.ARSSpeedLimit = tonumber(ARSCodes[#ARSCodes] or "1")
+			elseif self.TwoToSix then
+				local curr = ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]
+				local max = tonumber(ARSCodes[#ARSCodes])--FIXME
+				if curr == "1" or curr == "0" or curr == "2" or self.ARSNextSpeedLimit == nil or not max then
+					self.ARSSpeedLimit = IsValid(self.NextSignalLink) and tonumber(curr) or tonumber(ARSCodes[1] or "1")
+				else
+					if self.ARSNextSpeedLimit == 4 and max >= 6 then
+						self.ARSSpeedLimit = 6
+					elseif  self.ARSNextSpeedLimit == 0 or self.ARSNextSpeedLimit == 2 or self.ARSNextSpeedLimit == 1 and max >= 4 then
+						self.ARSSpeedLimit = 4
+					else
+						self.ARSSpeedLimit = math.min(max,self.ARSNextSpeedLimit + 1)
+					end
+				end
+			else--]]
+				self.ARSSpeedLimit = tonumber(ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
+			--end
 		end
 	end
 	if self.NextSignalLink ~= false and (self.Occupied or not self.NextSignalLink or not self.NextSignalLink.FreeBS) then
@@ -553,12 +569,12 @@ function ENT:Think()
 		local number = ""
 		if self.MU or self.ARSOnly or self.RouteNumberSetup and self.RouteNumberSetup ~= "" or self.RouteNumber and self.RouteNumber ~= "" then
 			if self.NextSignalLink then
-				if not self.NextSignalLink.Red and not self.Red then
+				if not self.NextSignalLink.AutoEnabled and not self.AutoEnabled then
 					self.RouteNumberOverrite = self.NextSignalLink.RouteNumberOverrite ~= "" and self.NextSignalLink.RouteNumberOverrite or self.NextSignalLink.RouteNumber
 				else
 					self.RouteNumberOverrite = self.RouteNumber
 				end
-				if self.NextSignalLink.RouteNumberOverrite and (not self.Red or self.InvationSignal) and self.Routes[self.Route or 1].EnRou then
+				if self.NextSignalLink.RouteNumberOverrite and not self.AutoEnabled and (self.Routes[self.Route or 1].EnRou or self.InvationSignal) then
 					number = number..self.NextSignalLink.RouteNumberOverrite
 				end
 				if self.NextSignalLink.RouteNumber and (self.Routes[self.Route or 1].EnRou and not self.AutoEnabled or self.InvationSignal) then
@@ -720,5 +736,3 @@ net.Receive("metrostroi-signal", function(_, ply)
 	if not IsValid(ent) or not ent.SendUpdate then return end
 	ent:SendUpdate(ply)
 end)
-
-Metrostroi.OptimisationPatch()

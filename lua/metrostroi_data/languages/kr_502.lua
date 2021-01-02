@@ -22,10 +22,10 @@ Common.502.VAK                  = AK: 비상 주행 모드 회로 연결
 Common.502.LRU                  = 비상 주행 모드 회로 작동 중
 
 #Spawner
-Spawner.502.TypeNVL         = NVL 사양 차량
-Spawner.502.TypeKVLO        = KVL 사양 구형 차량
-Spawner.502.TypeKVLN        = KVL 사양 신형 차량
-Spawner.502.EWagons         = "E" 형식 객차 추가
+Spawner.502.TypeNVL         = NVL 사양 차량 #FIXME
+Spawner.502.TypeKVLO        = KVL 사양 구형 차량#FIXME
+Spawner.502.TypeKVLN        = KVL 사양 신형 차량#FIXME
+Spawner.502.EWagons         = "E" 형식 객차 추가 #FIXME
 
 #gmod_subway_81-502
 Entities.gmod_subway_81-502.Buttons.VBA.VBAToggle = 자동 운전 배터리 투입/차단
@@ -208,8 +208,8 @@ Entities.gmod_subway_81-501.Buttons.AV1.VU3Toggle               = @[Common.703.V
 
 Entities.gmod_subway_81-501.Buttons.VU.VUToggle                 = @[Common.ALL.VU]
 
-Entities.gmod_subway_81-501.Buttons.Main.!GRP                   = @[Common.ALL.GRP]
-Entities.gmod_subway_81-501.Buttons.Main.!RRP                   = @[Common.ALL.RRP]
+Entities.gmod_subway_81-501.Buttons.Main.!GRP                   = @[Common.ALL.RRP]
+Entities.gmod_subway_81-501.Buttons.Main.!RRP                   = @[Common.ALL.GRP]
 Entities.gmod_subway_81-501.Buttons.Main.!SD                    = @[Common.703.SD]
 Entities.gmod_subway_81-501.Buttons.Main.LOnSet                 = @[Common.703.LOn]
 Entities.gmod_subway_81-501.Buttons.Main.LOffSet                = @[Common.703.LOff]

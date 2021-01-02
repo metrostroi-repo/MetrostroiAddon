@@ -536,7 +536,6 @@ if SERVER then
         if not Power and self.SarmatState ~= 0 then
             self.SarmatState = 0
             self.SarmatTimer = nil
-            if self.LineOut>0 then self:AnnQueue(-2) end
         end
         if Power and self.SarmatState == 0 then
             self.SarmatState = -1

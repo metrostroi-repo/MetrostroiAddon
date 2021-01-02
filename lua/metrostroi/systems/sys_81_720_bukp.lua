@@ -106,11 +106,11 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
 end
 if SERVER then
     function TRAIN_SYSTEM:CANReceive(source,sourceid,target,targetid,textdata,numdata)
-        if not self.Trains[-sourceid] then return end
+        if not self.Trains[sourceid] then return end
         if textdata == "Get" then
             self.Reset = 1
         else
-            self.Trains[-sourceid][textdata] = numdata
+            self.Trains[sourceid][textdata] = numdata
         end
     end
     function TRAIN_SYSTEM:CState(name,value,target,bypass)
@@ -215,9 +215,9 @@ if SERVER then
                 if name == "VityazF8" and value then
                     if self.Entering and #self.Entering == 4 then
                         local wagnum = tonumber(self.Entering)
-                        self.Trains[-wagnum] = {}
+                        self.Trains[wagnum] = {}
                         if not wagnum or wagnum == 0 then
-                            self.Trains[-wagnum] = nil
+                            self.Trains[wagnum] = nil
                             wagnum = nil
                         end
                         self.Trains[self.Selected+1] = wagnum
@@ -366,7 +366,7 @@ if SERVER then
             self.States = {}
             self.PVU = {}
             for k,v in ipairs(self.Trains) do
-                if self.Trains[-v] then self.Trains[-v] = {} end
+                if self.Trains[v] then self.Trains[v] = {} end
             end
 
             self.PTEnabled = nil
@@ -401,7 +401,7 @@ if SERVER then
             if self.State == 3 then
                 local initialized = true
                 for i=1,self.WagNum do
-                    local train = self.Trains[-self.Trains[i]]
+                    local train = self.Trains[self.Trains[i]]
                     if train then
                         if not train.WagNOrientated and train.BUVWork and not train.BadCombination then--and train.PTEnabled then
                             Train:SetNW2Bool("VityazWagI"..i,true)
@@ -448,7 +448,7 @@ if SERVER then
                 local err3,err4,err6,err7,err10,err11,err12,err17
                 local HVBad = false
                 for i=1,self.WagNum do
-                    local train = self.Trains[-self.Trains[i]] or {}
+                    local train = self.Trains[self.Trains[i]] or {}
                     if train.DriveStrength then EnginesStrength = EnginesStrength + train.DriveStrength end
                     if train.BrakeStrength then EnginesStrength = EnginesStrength + train.BrakeStrength end
 
@@ -481,7 +481,7 @@ if SERVER then
                     self.DoorClosed = true
                     for i=1,self.WagNum do
                         local trainid = self.Trains[i]
-                        local train = self.Trains[-trainid]
+                        local train = self.Trains[trainid]
                         if train then
                             if not min or train.BCPressure < min then min = train.BCPressure end
                             if not max or train.BCPressure > max then max = train.BCPressure end
@@ -551,25 +551,25 @@ if SERVER then
                         end
                     elseif self.State2 == 21 then
                         for i=1,self.WagNum do
-                            local train = self.Trains[-self.Trains[i]]
+                            local train = self.Trains[self.Trains[i]]
                             Train:SetNW2Int("VityazIMK"..i,train.MKVoltage*10)
                         end
                     elseif self.State2 == 22 then
                         for i=1,self.WagNum do
-                            Train:SetNW2Int("VityazIVO"..i,self.Trains[-self.Trains[i]].VagEqConsumption*10)
+                            Train:SetNW2Int("VityazIVO"..i,self.Trains[self.Trains[i]].VagEqConsumption*10)
                         end
                     elseif self.State2 == 23 then
                         for i=1,self.WagNum do
-                            Train:SetNW2Int("VityazI13"..i,self.Trains[-self.Trains[i]].I13*10)
+                            Train:SetNW2Int("VityazI13"..i,self.Trains[self.Trains[i]].I13*10)
                         end
                     elseif self.State2 == 24 then
                         for i=1,self.WagNum do
-                            Train:SetNW2Int("VityazI24"..i,self.Trains[-self.Trains[i]].I24*10)
+                            Train:SetNW2Int("VityazI24"..i,self.Trains[self.Trains[i]].I24*10)
                         end
                     elseif self.State2 == 3 then
                         if self.Selected == 0 then
                             for i=1,self.WagNum do
-                                local train = self.Trains[-self.Trains[i]]
+                                local train = self.Trains[self.Trains[i]]
                                 Train:SetNW2Bool("VityazBUVState"..i,train.BUVWork) --"БУВ"
                                 Train:SetNW2Bool("VityazBTBReady"..i,train.BTBReady) --"БТБ ГОТ"
                                 Train:SetNW2Bool("VityazPTGood"..i,train.PTEnabled) --"ПТ ЭФФ"
@@ -580,7 +580,7 @@ if SERVER then
                             end
                         elseif self.Selected == 1 then
                             for i=1,self.WagNum do
-                                local train = self.Trains[-self.Trains[i]]
+                                local train = self.Trains[self.Trains[i]]
                                 Train:SetNW2Bool("VityazPTApply"..i,not train.PTEnabled) --"ПТ ВКЛ"
                                 Train:SetNW2Bool("VityazEDTBroken"..i,not train.EnginesBrakeBroke) --"ОТКАЗ ЭТ" FIXME
                                 Train:SetNW2Bool("VityazEDTDone"..i,not train.EnginesDone) --"ИСТОЩ ЭТ" FIXME
@@ -591,7 +591,7 @@ if SERVER then
                             end
                         elseif self.Selected == 2 then
                             for i=1,self.WagNum do
-                                local train = self.Trains[-self.Trains[i]]
+                                local train = self.Trains[self.Trains[i]]
                                 Train:SetNW2Bool("VityazLVGood"..i,not train.LVBad) --"НАПР БС"
                                 Train:SetNW2Bool("VityazMKWork"..i,train.MKWork) --"МК"
                                 Train:SetNW2Bool("VityazBVEnabled"..i,train.BVEnabled) --"ЗАЩИТ ТП"
@@ -602,7 +602,7 @@ if SERVER then
                             end
                         elseif self.Selected == 3 then
                             for i=1,self.WagNum do
-                                local train = self.Trains[-self.Trains[i]]
+                                local train = self.Trains[self.Trains[i]]
                                 Train:SetNW2Bool("VityazVent1Work"..i,train.Vent1Enabled) --"ВЕНТИЛ 1"
                                 Train:SetNW2Bool("VityazVent2Work"..i,train.Vent2Enabled) --"ВЕНТИЛ 2"
                                 Train:SetNW2Bool("VityazHVGood"..i,not train.HVBad) --"НАПР КС"
@@ -611,12 +611,12 @@ if SERVER then
                         end
                     elseif self.State2 == 4 then
                         for i=1,self.WagNum do
-                            local train = self.Trains[-self.Trains[i]]
+                            local train = self.Trains[self.Trains[i]]
                             Train:SetNW2Bool("VityazWagOr"..i,train.Orientation)
                         end
                     elseif self.State2 == 5 then
                         for i=1,self.WagNum do
-                            local train = self.Trains[-self.Trains[i]]
+                            local train = self.Trains[self.Trains[i]]
                             local orientation = train.Orientation
                             Train:SetNW2Bool("VityazWagOr"..i,orientation)
                             for d=1,4 do
@@ -695,7 +695,7 @@ if SERVER then
             end
             local ring = false
             for i=1,self.WagNum do
-                local train = self.Trains[-self.Trains[i]]
+                local train = self.Trains[self.Trains[i]]
                 if train and train.Ring then
                     ring = true
                 end

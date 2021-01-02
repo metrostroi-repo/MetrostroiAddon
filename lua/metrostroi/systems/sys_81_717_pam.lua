@@ -140,7 +140,6 @@ function TRAIN_SYSTEM:Initialize()
     self["3"] = 0 --Ход 3
     self["8"] = 0 --Замещение электрического торможения
     self["16"] = 0 --Закрытие дверей
-    self["68"] = 0 --Открытие правых дверей хвостового вагона
     self["17"] = 0  -- Разрешение восстановления реле перегрузки
     self["19"] = 0 -- Разрешение замещения электрического торможения
     self["20"] = 0 -- Включение двигателей
@@ -175,7 +174,6 @@ function TRAIN_SYSTEM:Initialize()
     self.Speed = 0
     self.SpeedLimit = 0
     self.Acceleration = 0
-    self.Brightness = 0.6
     self.ErrorTimers = {}
     self.Timers = {}
 end
@@ -187,7 +185,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 function TRAIN_SYSTEM:Outputs()
     return {
-        "2","3","8","16","68","17","19","20","20X","025","25","31","32","33","033","33G","39","7GA","48","EPK",
+        "2","3","8","16","17","19","20","20X","025","25","31","32","33","033","33G","39","7GA","48","EPK",
         "Ring", "NoFreq", "F5", "F4", "F3", "F2", "F1"
     }
 end
@@ -227,6 +225,7 @@ if CLIENT then
     createFont("PAM35","Arial",35)
     createFont("PAM45","Arial",45)
     createFont("PAM60","Arial",60)
+
     function TRAIN_SYSTEM:ClientThink()
         if not self.Train:ShouldDrawPanel("PAMScreen") then return end
         if self.FilterMag then
@@ -765,7 +764,7 @@ if CLIENT then
         "Открой двери станции",
         "Перейди в КС",
         "Нет питания на 34 проводе(ЛКТ)",
-        "Есть питание на 34 проводе",
+        "Есть притание на 34 проводе",
 
         [51]={"Контроль дверей отменён"},
         [52]={"Контроль дверей восстановлен"},
@@ -795,7 +794,6 @@ if CLIENT then
     local state5b = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/state5b_main")
     local state5kb = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/state5kb_main")
     local question = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/question")
-    local slider = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/buttons/slider")
     local function State5(Train,isARS)
         local speed = Train:GetNW2Int("PAM:Vf")
         local mode = Train:GetNW2Int("PAM:Mode",0)
@@ -806,10 +804,10 @@ if CLIENT then
         local driveMode = Train:GetNW2Int("PAM:DriveMode",0)
         local KVMode = Train:GetNW2Int("PAM:KVMode",0)
 
-        local state = Train:GetNW2Int("PAM:State5",-100)
+        local state = Train:GetNW2Int("PAM:State5",-1)
         local stateAcc = Train:GetNW2Int("PAM:State5Accept",0)
         local sel = Train:GetNW2Int("PAM:Selected",1)
-        local block = state~=-100 or stateAcc~=0
+        local block = state~=-1 or stateAcc~=0
 
         local ksd = Train:GetNW2Bool("PAM:KSD")
 
@@ -872,6 +870,7 @@ if CLIENT then
             draw.SimpleText(speedLimit,"Metrostroi_PAM24",5+5.42*speedLimit,122, Color(246,242,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
             Metrostroi.DrawLine(6+5.42*speedLimit,68,6+5.42*speedLimit,107,Color(246,242,0),3)
         end
+
         local mess = Train:GetNW2Int("PAM:CurrentMessage",0)
         if mode == 6 then
             if mess==0 then mess = 21 end
@@ -925,10 +924,10 @@ if CLIENT then
         if mess>0 then
             local mess = errors[50+mess]
             if #mess == 1 or #mess==2 and mess[2]==true then
-                draw.SimpleText(mess[1],"Metrostroi_PAM35",320,isARS and 280 or 240, mess[2] and Color(238,129,31) or Color(20,239,32),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                draw.SimpleText(mess[1],"Metrostroi_PAM35",320,240, mess[2] and Color(238,129,31) or Color(20,239,32),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
             else
-                draw.SimpleText(mess[1],"Metrostroi_PAM35",320,isARS and 262 or 222, mess[3] and Color(238,129,31) or Color(20,239,32),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                draw.SimpleText(mess[2],"Metrostroi_PAM35",320,isARS and 298 or 258, mess[3] and Color(238,129,31) or Color(20,239,32),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                draw.SimpleText(mess[1],"Metrostroi_PAM35",320,222, mess[3] and Color(238,129,31) or Color(20,239,32),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                draw.SimpleText(mess[2],"Metrostroi_PAM35",320,258, mess[3] and Color(238,129,31) or Color(20,239,32),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
             end
         end
         local err = Train:GetNW2Int("PAM:CurrentError",0)
@@ -1023,21 +1022,6 @@ if CLIENT then
                     Metrostroi.DrawLine(x+10,y+48,x+24,y+48,color,3)
                 end
             end
-        elseif state==-1 then
-            drawWindow(146,146, 357,201,"Регулировка яркости")
-            buttonWTextC(161,192,75,34,"<","Metrostroi_PAM25",Color(0,0,0),Train:GetNW2Bool("PAM:KeyLeft") and button_p or button)
-            buttonWTextC(413,192,75,34,">","Metrostroi_PAM25",Color(0,0,0),Train:GetNW2Bool("PAM:KeyRight") and button_p or button)
-            buttonWTextC(277,277,95,50,"Закрыть","Metrostroi_PAM25",Color(0,0,0),(Train:GetNW2Bool("PAM:KeyEsc") or Train:GetNW2Bool("PAM:KeyEnter")) and button_p or button)
-            Metrostroi.DrawRectOL(246,203,157,4,Color(113,113,113),1,Color(200,200,200))
-            for i=0,10 do
-                Metrostroi.DrawLine(251+i*15,216,251+i*15,220,Color(113,113,113),2)
-            end
-            draw.SimpleText("Яркость:","Metrostroi_PAM25",246,251, Color(0,0,0),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-            drawTextBox(340,237,63,29,Format("%d%%",Train:GetNW2Float("PAM:Brightness",1)*100),"Metrostroi_PAM25")
-            surface.SetDrawColor(255,255,255)
-            surface.SetTexture(slider)
-            surface.DrawTexturedRect(251-5+Train:GetNW2Float("PAM:Brightness",1)*150,216-17,16,16)
-
         elseif state==8 then
             drawWindow(0,120, 640,241,"Зонный оборот")
             local count = Train:GetNW2Int("PAM:ElemCount",0)
@@ -1224,34 +1208,6 @@ if CLIENT then
     local bios_splash = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/bios_splash")
     local splash = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/splash")
     local splash_egg = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/splash_egg")
-    local snds = {
-        [-3] = "http://pollitto.ru/other/files/NEW/shit/apdisco.wav",
-        [-2] = "http://pollitto.ru/other/files/NEW/shit/master_warning.wav",
-        [-1] = "http://pollitto.ru/other/files/NEW/shit/terrain_n.wav",
-        [-0.01] = "http://pollitto.ru/other/files/NEW/shit/mini.wav",
-        [1.02] = "http://pollitto.ru/other/files/NEW/shit/5ft.wav",
-        [3.05] = "http://pollitto.ru/other/files/NEW/shit/10ft.wav",
-        [6.10] = "http://pollitto.ru/other/files/NEW/shit/20ft.wav",
-        [9.14] = "http://pollitto.ru/other/files/NEW/shit/30ft.wav",
-        [12.19] = "http://pollitto.ru/other/files/NEW/shit/40ft.wav",
-        [15.24] = "http://pollitto.ru/other/files/NEW/shit/50ft.wav",
-        [30.48] = "http://pollitto.ru/other/files/NEW/shit/100ft.wav",
-        [60.96] = "http://pollitto.ru/other/files/NEW/shit/200ft.wav",
-        [91.44] = "http://pollitto.ru/other/files/NEW/shit/300ft.wav",
-        [100] = "http://pollitto.ru/other/files/NEW/shit/alt_alert.wav",
-        [121.92] = "http://pollitto.ru/other/files/NEW/shit/400ft.wav",
-        [152.40] = "http://pollitto.ru/other/files/NEW/shit/500ft.wav",
-        [304.80] = "http://pollitto.ru/other/files/NEW/shit/1000ft.wav",
-        [762] = "http://pollitto.ru/other/files/NEW/shit/2500ft.wav",
-        ["caution"] = "http://pollitto.ru/other/files/NEW/shit/toconfigwarn.wav",
-        ["belts"] = "http://pollitto.ru/other/files/NEW/shit/belts.wav",
-        ["smoking"] = "http://pollitto.ru/other/files/NEW/shit/smoking.wav",
-        ["pullup"] = "http://pollitto.ru/other/files/NEW/shit/whoopwhoop.wav",
-        ["tl_flaps"] = "http://pollitto.ru/other/files/NEW/shit/too_low_flaps.wav",
-        ["tl_terrain"] = "http://pollitto.ru/other/files/NEW/shit/too_low_terrain.wav",
-    }
-
-    local UPD = 10
     function TRAIN_SYSTEM:PAMScreen(Train)
         --surface.SetTexture(splash_egg)
         --surface.SetDrawColor(255,255,255)
@@ -1281,91 +1237,10 @@ if CLIENT then
             if state == 3 then State3(Train) end
             if state == 3.5 then State35(Train) end
             if state == 4 then State4(Train) end
-            if state == 5 then
-                --[[
-                if LocalPlayer():GetName() ~= "MrMeowpestMan" then
-                    if not self.Sounds or self.SoundsTemp ~= UPD then
-                        if self.Sounds then for i,snd in pairs(self.Sounds) do snd:Stop() end end
-                        self.Sounds = {}
-                        for i, sndU in pairs(snds) do
-                            sound.PlayURL ( sndU, "3d noplay noblock", function( snd )
-                                if ( IsValid( snd ) ) then
-                                    self.Sounds[i] = snd
-                                    print(snd)
-                                else
-                                    print("???")
-                                end
-                            end )
-                        end
-                        self.SoundsTemp = UPD
-                    end
-                    for i,snd in pairs(self.Sounds) do
-                        if IsValid(snd) then
-                            snd:SetPos(self.Train:LocalToWorld(Vector(450,22,0)))
-                        end
-                    end
-                    local sndId
-                    local s = Train:GetNW2Float("PAM:S")--/0.3048
-                    for i,snd in pairs(self.Sounds) do
-                        if type(i) == "number" and s <= i and (not sndId or sndId > i) then sndId = i end
-                    end
-                    if self.CurrentSound ~= sndId then
-                        if sndId then
-                            print(self.Sounds[sndId])
-                            self.Sounds[sndId]:SetTime(0)
-                            self.Sounds[sndId]:Play()
-                        end
-                        self.CurrentSound = sndId
-                    end
-                    if self.Sounds.caution and not self.Caution and self.Train:GetNW2Bool("PAM:OXT") then
-                        self.Sounds.caution:SetTime(0)
-                        self.Sounds.caution:Play()
-                        self.Caution = CurTime()
-                    elseif self.Caution and CurTime()-self.Caution > 2 then
-                        self.Caution = false
-                    end
-
-                    if self.Sounds.pullup and not self.PullUp and Train:GetNW2Int("PAM:Vf") > 1 then
-                        self.Sounds.pullup:SetTime(0)
-                        self.Sounds.pullup:Play()
-                        self.PullUp = true
-                    elseif self.PullUp and Train:GetNW2Int("PAM:Vf") == 0 then
-                        self.PullUp = false
-                    end
-                    self.SpeedLimitSmoking = self.SpeedLimitSmoking or Train:GetNW2Int("PAM:SpeedLimit")
-                    if self.Sounds.smoking and Train:GetNW2Int("PAM:SpeedLimit") ~= self.SpeedLimitSmoking then
-                        if Train:GetNW2Int("PAM:SpeedLimit") > self.SpeedLimitSmoking then
-                            self.Sounds.smoking:SetTime(0)
-                            self.Sounds.smoking:Play()
-                        else
-                            self.Sounds.belts:SetTime(0)
-                            self.Sounds.belts:Play()
-                        end
-                        self.SpeedLimitSmoking = Train:GetNW2Int("PAM:SpeedLimit")
-                    end
-                    local canPlayTLFlaps = Train:GetNW2Int("PAM:KVMode") >= -1 and Train:GetNW2Int("PAM:Vf") > 0 and not Train:GetNW2Bool("PAM:LPT")
-                    if self.Sounds.tl_flaps and not self.TLFlaps and (50 <= s and s <= 100) and canPlayTLFlaps  then
-                        self.Sounds.tl_flaps:SetTime(0)
-                        self.Sounds.tl_flaps:Play()
-                        self.TLFlaps = CurTime()
-                    elseif self.Sounds.tl_terrain and not self.TLFlaps and s < 50 and canPlayTLFlaps then
-                        self.Sounds.tl_terrain:SetTime(0)
-                        self.Sounds.tl_terrain:Play()
-                        self.TLFlaps = CurTime()
-                    elseif self.TLFlaps and CurTime()-self.TLFlaps > 1.5 then
-                        self.TLFlaps = false
-                    end
-                end
-                --]]
-
-                State5(Train)
-            end
+            if state == 5 then State5(Train) end
             if state == 6 then State5(Train,true) end
-            --surface.SetDrawColor(0,0,0,150)
-            surface.SetAlphaMultiplier(0.9-Train:GetNW2Float("PAM:Brightness",0)*0.5)
-            surface.SetDrawColor(Color(20,20,20))
+            surface.SetDrawColor(0,0,0,150)
             surface.DrawRect(0,0,640,480,0)
-            surface.SetAlphaMultiplier(1)
         end
     end
     return
@@ -1461,13 +1336,7 @@ end
 function TRAIN_SYSTEM:Trigger(name,value,press)
     local Train = self.Train
     Train:SetNW2Bool("PAM:Key"..name,value)
-    if name == "F" and value and not self.SoundTimer then self.SoundTimer = CurTime() end
-    if name == "F" and not value and self.SoundTimer ~= nil then
-        local oldST = self.SoundTimer
-        self.SoundTimer = nil
-        if not oldST then return end
-    end
-    if press and value and self.Sound then
+    if press and value then
         self.Train:PlayOnce("pa_"..name:lower(),"bass",1)
     end
     if name == "KeyB" and not value then self.Keyboard = not self.Keyboard end
@@ -1706,10 +1575,6 @@ function TRAIN_SYSTEM:Trigger(name,value,press)
             end
             if name == "Esc" and value then self.Selected = 11 end
             if name == "Esc" and not value and self.Selected == 11 then self.State5 = nil end
-        elseif self.State5 == -1 then
-            if name == "Left" and value then self.Brightness = math.max(0,self.Brightness-0.1) end
-            if name == "Right" and value then self.Brightness = math.min(1,self.Brightness+0.1) end
-            if (name == "Esc" or name == "Enter") and not value then self.State5 = nil end
         elseif self.State5 == 1 then
             if name == "Esc" and not value then
                 self.State5 = nil
@@ -1784,7 +1649,7 @@ function TRAIN_SYSTEM:Trigger(name,value,press)
                 end
             end
         else
-            if name == "F" and not value then
+            if name == "F" and value then
                 self.State5 = 0
                 self.Selected = 1
             end
@@ -1792,15 +1657,6 @@ function TRAIN_SYSTEM:Trigger(name,value,press)
             --if name == "1" and value then self.State5Accept=-1 end
             if name == "2" and value then self.State5Accept=-2 end
             if name == "3" and self.PAKSD and value then self.State5Accept=-3 end
-            if name == "8" and value then self.State5=-8 self.Selected = 0 end
-            if name == "Left" or name == "Right" and value then
-                if name == "Right" then
-                    self.Brightness = math.min(1,self.Brightness+0.1)
-                else
-                    self.Brightness = math.max(0,self.Brightness-0.1)
-                end
-                self.State5 = -1
-            end
             if self.State==5 then
                 if name == "P" and value then
                     self.State5 = -5
@@ -1813,6 +1669,7 @@ function TRAIN_SYSTEM:Trigger(name,value,press)
                 if name == "4" and value then self.State5Accept=-4 end
                 if name == "6" and value then self.State5Accept=-6 end
                 --if name == "7" and value then self.State5Accept=-7 end
+                if name == "8" and value then self.State5=-8 self.Selected = 0 end
                 if name == "9" and value then
                     self.State5=9
                     self.Selected = 1
@@ -1941,11 +1798,6 @@ function TRAIN_SYSTEM:Touch(value,x,y)
                     end
                 end
             end
-        elseif self.State5 == -1 then
-            if math.InRangeXYR(x,y,161,192,75,34) then self.Touches["Left"] = true return end
-            if math.InRangeXYR(x,y,413,192,75,34) then self.Touches["Right"] = true return end
-            if math.InRangeXYR(x,y,277,277,95,50) then self.Touches["Enter"] = true return end
-            if math.InRangeXYR(x,y,246,196,157,25) then self.Brightness = math.Clamp(math.Round((x-251)/147,2),0,1) return end
         elseif self.State5==-8 then
             for i=1,9 do
                 if i==9 then i=11 end
@@ -2073,12 +1925,11 @@ function TRAIN_SYSTEM:SetDoorMode(curMode,override)
     self.DoorMode = curMode
 end
 TRAIN_SYSTEM.DoorModes = {
-    --    16  31  32  68
-    ZD = {1,  0,  0,  0,},
-    DL = {0,  1,  0,  0,},
-    DP = {0,  0,  1,  0,},
-    DB = {0,  0,  0,  1,},
-    DO = {0,  0,  0,  0,},
+    --    16  31  32
+    ZD = {1,  0,  0,},
+    DL = {0,  1,  0,},
+    DP = {0,  0,  1,},
+    DO = {0,  0,  0,},
 }
 function TRAIN_SYSTEM:SetPneumoMode(curMode,override)
     if self.CurrentPneumoModePriority==2 and curMode=="V2" then
@@ -2284,7 +2135,7 @@ function TRAIN_SYSTEM:SetState(state,time)
         self.RouteNumberS = self.RouteNumber or self.RouteNumberS
         self.DriverNumberS = self.DriverNumber or self.DriverNumberS
 
-        self.HaveRestart =  self.DriverNumber and #self.DriverNumber == 4 and self.RouteNumber and #self.RouteNumber == 3
+        self.HaveRestart =  #self.DriverNumber == 4 and #self.RouteNumber == 3
             and Metrostroi.PAMConfTest[self.LineS]
             and Metrostroi.PAMConfTest[self.LineS][tonumber(self.PathS)]
             and Metrostroi.PAMStations[self.LineS][tonumber(self.StationS)]
@@ -2301,9 +2152,9 @@ function TRAIN_SYSTEM:SetState(state,time)
 
         self:UpdateStationList(self.StationS)
         self.Train:SetNW2String("PAM:EnterError","")
-    elseif (state == 4 or state == 5) and self.LineS then
-        if state == 4 then self.CheckRing = true end
-    --elseif state == 5 then
+    elseif state == 4 then
+        self.CheckRing = true
+    elseif state == 5 then
         self.Line = tonumber(self.LineS)
         self.Station = tonumber(self.StationS)
         self.Path = tonumber(self.PathS)
@@ -2319,13 +2170,11 @@ function TRAIN_SYSTEM:SetState(state,time)
         self.EPKActive = true
         self.ControlMode = 2
         self.State5 = nil
-        self.CloseDoors = true
     elseif state == 6 then
         self:SetMode(0)
         self.EPKActive = true
         self.ControlMode = 2
         self.State5 = nil
-        self.CloseDoors = true
     end
     self.State = state
     if time then self.ChangeTimer = CurTime()+time end
@@ -2393,21 +2242,11 @@ function TRAIN_SYSTEM:CANReceive(source,sourceid,target,targetid,textdata,numdat
         end
         local back = self.BackPA and self.BackPA.state
         if back and back.RR and self.State>0 then
-            local tbl = Metrostroi.PAMConfTest and Metrostroi.PAMConfTest[back.Line] and Metrostroi.PAMConfTest[back.Line][(back.Path=="2" or back.Path==2) and 1 or 2]
-            if not tbl then return end
-            if self.State<4 and back.State==4 then
-                self.LineS = back.Line
-                self.PathS = (back.Path=="2" or back.Path==2) and "1" or "2"
-                self.RouteNumberS = back.RouteNumber
-                self.DriverNumberS = back.DriverNumber
-                self.StationS = back.Station
-
-                self:SetState(4)
-            end
+            if self.State<4 and back.State==4 then self.State = 4 end
             if self.State<5 and back.State==5 then self.EPKActive = true self.State = 5 self.ControlMode = 2 end
             if self.State==5 then
                 self.Line = back.Line
-                self.Path = (back.Path=="2" or back.Path==2) and "1" or "2"
+                self.Path = back.Path=="2" and "1" or "2"
                 self.RouteNumber = back.RouteNumber
                 self.DriverNumber = back.DriverNumber
                 self.Deadlock = self.Mode==4 and self.Deadlock or nil
@@ -2415,6 +2254,7 @@ function TRAIN_SYSTEM:CANReceive(source,sourceid,target,targetid,textdata,numdat
                 if self.Station ~= back.Station or not self.BackRR or self.BackMode~=back.Mode then
                     local line = self.Line
                     local path = tonumber(self.Path)
+                    local tbl = Metrostroi.PAMConfTest and Metrostroi.PAMConfTest[line] and Metrostroi.PAMConfTest[line][path]
                     for k,v in ipairs(tbl[1].stations) do
                         if v.id == tonumber(back.Station) then
                             self.Station = back.Station
@@ -2495,9 +2335,6 @@ function TRAIN_SYSTEM:Think(dT)
         end
         self.BackCheckTimer = false
         self.BackPA = nil
-        self.Brightness = 0.6
-        self.Sound = true
-        self.SoundTimer = false
     end
     if self.State == -0.5 and CurTime()-self.StartTimer > 0.05 then self.State = -1 self.StartTimer = CurTime() end
     if self.State == -1 and CurTime()-self.StartTimer > 5 then self.State = -2 self.StartTimer = CurTime()  self:SetWaitTimer(0.2) end
@@ -2519,7 +2356,7 @@ function TRAIN_SYSTEM:Think(dT)
     end
     if self.ChangeTimer and CurTime()-self.ChangeTimer > 0 then self.ChangeTimer = nil end
 
-    local ALSOn = (self.State>0) and 1 or 0
+    local ALSOn = (self.State>0 and RR) and 1 or 0
     if self.PAKSD and ALSOn ~= ALS.Enabled then
         ALS:TriggerInput("Enable",ALSOn)
     end
@@ -2529,23 +2366,13 @@ function TRAIN_SYSTEM:Think(dT)
     local speedMpS = speed/3600*1000
     local speedMpSSigned = speedMpS*ALS.SpeedSign
     local accel = ALS.Acceleration
-    if ALSOn>0--[[self.State > 0 or self.State<-3]] then
+    if self.State > 0 or self.State<-3 then
         for k,v in pairs(self.TriggerNames) do
             local name = v:sub(4,-1)
             local val = Train[v].Value > 0.5
             if (self.Touches[name] or val) ~= self.Triggers[v] then
                 self.Triggers[v] = self.Touches[name] or val
                 self:Trigger(name,self.Triggers[v],val == self.Triggers[v])
-            end
-
-            if self.SoundTimer and self.SoundTimer > 0 and CurTime()-self.SoundTimer > 0.5 then
-                self.SoundTimer = -CurTime()
-                self.Sound = not self.Sound
-                Train:PlayOnce("pa_f","bass",1)
-            end
-            if self.SoundTimer and self.SoundTimer < 0 and CurTime()+self.SoundTimer > 0.25 then
-                self.SoundTimer = false
-                Train:PlayOnce("pa_f","bass",1)
             end
         end
         if (not self.BackCheckTimer or CurTime()-self.BackCheckTimer > 1) then
@@ -2556,7 +2383,7 @@ function TRAIN_SYSTEM:Think(dT)
             self.BackPA = nil
         end
 
-        local ALSSh = self.PAKSD and 0 or (1-Train.ALS.Value)*Train.VRD.Value --ALS Shunt
+        local ALSSh = (1-Train.ALS.Value)*Train.VRD.Value --ALS Shunt
         local Vd = -1
         if ALS.F5*(1-ALSSh) > 0 then Vd = 0 end
         if ALS.F4*(1-ALSSh) > 0 then Vd = 40 end
@@ -2599,7 +2426,6 @@ function TRAIN_SYSTEM:Think(dT)
         self.F1 = 0
     end
     Train:SetNW2Float("PAM:State",self.ChangeTimer and -10 or self.State)
-    Train:SetNW2Float("PAM:Brightness",self.Brightness)
     if self.StartTimer then Train:SetNW2Float("PAM:StartTimer",CurTime()-self.StartTimer) end
 
     --if self.WorkTimer and CurTime()- self.WorkTimer < 0.1 then return end
@@ -2621,7 +2447,6 @@ function TRAIN_SYSTEM:Think(dT)
         self["16"] = 0
         self["31"] = 0
         self["32"] = 0
-        self["68"] = 0
         self["39"] = 0
         self["7GA"] = 0
         self["48"] = 0
@@ -2720,7 +2545,6 @@ function TRAIN_SYSTEM:Think(dT)
         local opv = false
         --Distance count
         if not self.Distance and self.State == 5 then self.Distance = self.StationTable and self.StationTable.pos or 0 end
-
         if self.Mode~=6 and self.Distance then
             local pos = Metrostroi.TrainPositions[Train];pos = pos and pos[1]
             local delta = speedMpS*dT
@@ -2735,7 +2559,8 @@ function TRAIN_SYSTEM:Think(dT)
             end
             self.Distance = self.Distance + delta
         end
-        if self.Mode == 1 or (0 < self.Mode and self.Mode < 6) and not self.StationTable then
+
+        if self.Mode == 1 then
             stationLast = "выход на линию"
             if self.StationTable then station = self.StationTable.name end
             dist = 3072-self.Distance
@@ -2828,7 +2653,8 @@ function TRAIN_SYSTEM:Think(dT)
             elseif self.StationBrakeRing==false or self.StationBrakeRing and CurTime()-self.StationBrakeRing > 0.5 then
                 self.StationBrakeRing = nil
             end
-            local CanOpen = not self.CloseDoors and PAM_VV.KRH==0 and (PAM_VV.LPT > 0 or self.NoLPT and PAM_VV.V1>0)
+
+            local CanOpen = PAM_VV.KRH==0 and (PAM_VV.LPT > 0 or self.NoLPT and PAM_VV.V1>0)
             if ((opv or self.Mode==5) and speed < 0.5 or (self.OpenDoors and speed < 2.5 or not self.GoodSetup)) and CanOpen then
                 self:SetDoorMode((not self.OpenControl and (PAM_VV.ZD>0 or self.DoorMode=="ZD")) and "ZD" or "DO")
                 local err
@@ -2848,10 +2674,10 @@ function TRAIN_SYSTEM:Think(dT)
                     --TODO: При нажатии на кнопку>2.5с и не пропадании КД подсказка "Нет контроля открытия дверей
                 elseif self.Mode<=3 then
                     local stationTable = dist>10 and self.PrevStationTable or self.StationTable
-                    local Open = PAM_VV.KDL > 0 or PAM_VV.KDP > 0 or PAM_VV.OPD > 0
-                    local CanOpen = not self.Transit and (PAM_VV.KDL > 0 and not stationTable.rightDoors or (PAM_VV.KDP > 0 or PAM_VV.OPD > 0) and stationTable.rightDoors)
+                    local Open = PAM_VV.KDL > 0 or PAM_VV.KDP > 0
+                    local CanOpen = not self.Transit and (PAM_VV.KDL > 0 and not stationTable.rightDoors or PAM_VV.KDP > 0 and stationTable.rightDoors)
                     if PAM_VV.ZD==0 and CanOpen then
-                        self:SetDoorMode(stationTable.rightDoors and (PAM_VV.OPD > 0 and "DB" or "DP")or "DL")
+                        self:SetDoorMode(stationTable.rightDoors and "DP"or "DL")
                         if opv and (stationTable==self.StationTable or self.FireBack) then
                             self:SetMode(3)
                         end
@@ -2859,8 +2685,8 @@ function TRAIN_SYSTEM:Think(dT)
                         if not self.OpeningTimer and PAM_VV.KD>0 then self.OpeningTimer = CurTime() end
                     else
                         self.OpeningTimer = false
-                        self:Error(1,Open and not CanOpen and not self.Transit and stationTable.rightDoors and PAM_VV.OPD == 0)
-                        self:Error(2,Open and not CanOpen and not self.Transit and not stationTable.rightDoors and PAM_VV.OPD == 0)
+                        self:Error(1,Open and not CanOpen and not self.Transit and stationTable.rightDoors)
+                        self:Error(2,Open and not CanOpen and not self.Transit and not stationTable.rightDoors)
                         self:Error(23,Open and not CanOpen and self.Transit)
                     end
                     if CanOpen and PAM_VV.ZD>0 and not self.OpenTimer then
@@ -2880,10 +2706,6 @@ function TRAIN_SYSTEM:Think(dT)
                 self.OpenDoors = false
                 self.OpenTimer = false
                 self.OpeningTimer = false
-            end
-            if self.CloseDoors then
-                if self.DoorMode=="ZD" then self.CloseDoors = false end
-                self:SetDoorMode("ZD")
             end
 
             if self.OpenControl and  self.Mode==3 and self.StationTable.isHorlift and self.SpeedLimit~=0 then
@@ -2920,9 +2742,9 @@ function TRAIN_SYSTEM:Think(dT)
 
 
             local speedLimit = math.max(21,self.SpeedLimit+1)
-            --[[if self.SpeedLimit == -1 and (self.Mode == 1 or self.Mode == 5)  then
+            if self.SpeedLimit == -1 and (self.Mode == 1 or self.Mode == 5)  then
                 speedLimit = 16
-            else]]if self.ControlMode == 1 then
+            elseif self.ControlMode == 1 then
                 speedLimit =  (self.SpeedLimit > 40 and 36 or 21)*PAM_VV.KB
             elseif PAM_VV.KB>0 then
                 speedLimit=21
@@ -2989,7 +2811,7 @@ function TRAIN_SYSTEM:Think(dT)
                 end
                 if speed < speedLimit-2 and not self.RingArmed then self.STTimer = false end
 
-                if (AT or ST) and (accel>-0.7 and PAM_VV.KET == 0) then
+                if (AT or ST) and accel>-0.7 then
                     if not self.EKTimer then self.EKTimer = CurTime() end
                 elseif self.EKTimer then
                     self.EKTimer = false
@@ -3031,7 +2853,7 @@ function TRAIN_SYSTEM:Think(dT)
             if not self.Stopped then self.V1Stop = nil end
             self:Error(13,self.Starting and CurTime()-self.Starting>=4.5)
 
-            if speedMpSSigned < -0.01 and not self.Rolling and not self.FireBack and self.GoodSetup then self.Rolling = 0 end
+            if speedMpSSigned < -0.01 and not self.Rolling and not self.FireBack then self.Rolling = 0 end
             if self.Rolling and self.Rolling < 0 then self.Rolling = false end
             if self.Rolling then
                 local rolled = -speedMpSSigned*dT
@@ -3079,7 +2901,7 @@ function TRAIN_SYSTEM:Think(dT)
                         _SCHTime = (
                             (
                                 math.Clamp(((18-PAM_VV.KPRK)/17)^1.5*(55-(speed-5))/55,0,1)^1.1
-f                            )*2.2-math.Clamp(PAM_VV.KPRK-14,0,4)/4*3.3*math.Clamp((16-(speed-3))/16,0,1)^2.2
+                            )*2.2-math.Clamp(PAM_VV.KPRK-14,0,4)/4*3.3*math.Clamp((16-(speed-3))/16,0,1)^2.2
                         )*math.Clamp((0.5-currA),0,1)
                         --_SCHTime = ((math.Clamp((PAM_VV.KPRK-1)/17*(55-(10-5))/55,0,1)^1.1)*2.2-math.Clamp(PAM_VV.KPRK-12,0,6)/6*3-3.5*math.Clamp((16-(10-3))/16,0,1)^2.2)*math.Clamp((0.8-currA)/0.8,0.2,1)
                         SchemeEngageDistance = speedMpS*_SCHTime+(_ACCEL*(_SCHTime^2))/2-(2.0)*math.Clamp((7-(speed-3))/7,0,1)
@@ -3256,7 +3078,7 @@ f                            )*2.2-math.Clamp(PAM_VV.KPRK-14,0,4)/4*3.3*math.Cla
 
         self:Error(24,false,7,true)
 
-        local BlockBack = self.State==6 and self.GoodSetup or not self.FireBack and self.Mode>2 and (not self.StationTable.isHorlift or dist > -.45 or dist < -6 or speed>=3.6)
+        local BlockBack = self.State==6 or not self.FireBack and self.Mode>2 and (not self.StationTable.isHorlift or dist > -.45 or dist < -6 or speed>=3.6)
         if (driveModeKV>=0 or PAM_VV.KRU > 0) and (
                 --TODO аппаратура отменяет ходвоой режим и назначает ВЗ№1 при подезде к рейке
                 not RR or
@@ -3396,7 +3218,6 @@ f                            )*2.2-math.Clamp(PAM_VV.KPRK-14,0,4)/4*3.3*math.Cla
         self["16"] = self.CurrentDoorMode[1]
         self["31"] = self.CurrentDoorMode[2]
         self["32"] = self.CurrentDoorMode[3]
-        self["68"] = self.CurrentDoorMode[4]
     end
     if self.CurrentPneumoMode then
         self["39"] = self.CurrentPneumoMode[2]

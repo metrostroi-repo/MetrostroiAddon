@@ -209,7 +209,9 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         if self.pneumatic  and self.Train.Pneumatic.TrainLinePressure < 3 then return end
         if (not self.ChangeTime) or (self.TargetValue ~= 1.0) then
             self.ChangeTime = self.Time + FailSim.Value(self,"CloseTime")
+            --if self.rvt then print(FailSim.Value(self,"CloseTime")) end
         end
+        --if self.rpb and
         if self.Value == 1.0 then self.ChangeTime = nil end
         self.TargetValue = 1.0
         if self.ChangeTime==self.Time and self.Train.DeltaTime then self:Think(self.Train.DeltaTime) end
@@ -269,6 +271,9 @@ end
 function TRAIN_SYSTEM:Think(dT)
     --print(self.relay_type)
     self.Time = self.Time + dT
+    --if self.relay_type == "VA21-29" then
+        --if self.Value
+    --if self.Value == -1 then print(self.Name) end
     -- Short-circuited relay
     if FailSim.Value(self,"ShortCircuit") > 0.5 then
         self.Value = 1.0

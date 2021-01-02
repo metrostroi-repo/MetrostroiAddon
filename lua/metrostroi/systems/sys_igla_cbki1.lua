@@ -184,24 +184,8 @@ if CLIENT then
                 local w = Train:GetNW2Int("IGLA:WagNumber")
                 local m = Train:GetNW2String("IGLA:ErrorID")
                 if messages[m] then m = messages[m] end
-                if m == "PTROverheat" then
-                    if CurTime()%2 > 1 then
-                        self:PrintText(1,0,"!! PIZDA POEZDU !!",colorf)
-                    else
-                        self:PrintText(0,0,Format("%05d",w),colorf)
-                            self:PrintText(6,0,"ПТР",colorf)
-                            self:PrintText(10,0,Format ("% 3dC",Train:GetNW2Int("IGLA:Temp",0)),colorf)
-                            self:PrintText(15,0,"пожар",colorf)
-                    end
-                elseif m == "PTROverheating" then
-                    self:PrintText(0,0,Format("%05d",w),colorf)
-                        self:PrintText(6,0,"ПТР",colorf)
-                        self:PrintText(9,0,Format ("% 3dC",Train:GetNW2Int("IGLA:Temp",0)),colorf)
-                        self:PrintText(15,0,"перег",colorf)
-                else
-                    self:PrintText(0,0,Format("%05d",w),colorf)
-                        self:PrintText(6,0,m,colorf)
-                end
+                self:PrintText(0,0,Format("%05d",w),colorf)
+                    self:PrintText(6,0,m,colorf)
                 self:PrintText(0,1,"^",colorf)
                     if Train:GetNW2Bool("IGLA:ButtonL2") then self:PrintText(6,1,"<-",colorf) end
                     if Train:GetNW2Bool("IGLA:ButtonL3") then self:PrintText(11,1,"->",colorf) end
@@ -214,19 +198,7 @@ if CLIENT then
                 if messages[m] then m = messages[m] end
                 if w > 0 then
                     self:PrintText(0,0,Format("%05d",w),colorf)
-                    if m == "PTROverheat" then
-                        if CurTime()%2 > 1 then
-                            self:PrintText(6,0,"PIZDA POEZDU",colorf)
-                        else
-                            self:PrintText(6,0,"ПТР",colorf)
-                            self:PrintText(10,0,"пожар",colorf)
-                        end
-                    elseif m == "PTROverheating" then
-                            self:PrintText(6,0,"ПТР",colorf)
-                            self:PrintText(10,0,"перегрев",colorf)
-                    else
                         self:PrintText(6,0,m,colorf)
-                    end
                 else
                     self:PrintText(0,0,m,colorf)
                 end
@@ -304,8 +276,6 @@ else
         end
     end
     local Logging = {
-        PTROverheat = true,
-        PTROverheating = true,
         SCHEME = false,
         RP = true,
         DOORS = true,
@@ -323,7 +293,7 @@ else
     function TRAIN_SYSTEM:CError(WagID,ErrID,status)
         local ID = WagID..ErrID
         if not self.Messages[ID] and status then
-            self.Messages[ID] = table.insert(self.Messages,{ErrID,WagID,Metrostroi.GetSyncTime(),ID,status})
+            self.Messages[ID] = table.insert(self.Messages,{ErrID,WagID,Metrostroi.GetSyncTime(),ID})
             if Logging[ErrID] then
                 table.insert(self.Log,self.Messages[self.Messages[ID]])
             end
@@ -402,10 +372,6 @@ else
                 self.StandbyTimer = CurTime()
                 self.ShowTimeTimer = nil
                 self.ShowTime = false
-                self.FireAlarm = false
-                self.OverhAlarm = false
-                self.FireState = false
-                self.OverhState = false
 
                 Train:PlayOnce("igla_start2","cabin",nil,1)
 
@@ -486,9 +452,6 @@ else
                 local err = self.Messages[self.Selected]
                 Train:SetNW2String("IGLA:ErrorID",err[1])
                 Train:SetNW2Int("IGLA:WagNumber",err[2])
-                if err[1] == "PTROverheating" or err[1] == "PTROverheat" then
-                    Train:SetNW2Int("IGLA:Temp",math.floor(self.States[err[2]][err[1]]))
-                end
 
 
                 self.ButtonL1 = true
@@ -522,31 +485,6 @@ else
             Train:SetNW2Bool("IGLA:Standby",Standby)
             Train:SetNW2Bool("IGLA:ShowTime",self.ShowTime)
             self.Fire = false
-            local overh = false
-            for i,v in ipairs(self.Messages) do
-                if v[1] == "PTROverheat" then
-                    if not self.FireAlarm then self.FireAlarm = CurTime() end
-                    self.Fire = CurTime()%0.5>0.25
-                    self.OverhAlarm = true
-                elseif v[1] == "PTROverheating" and self.OverhAlarm ~= true then
-                    overh = true
-                end
-            end
-            if overh and not self.OverhAlarm then
-                self.OverhAlarm = CurTime()
-            elseif not overh and self.OverhAlarm then
-                self.OverhAlarm = false
-                self.OverhState = false
-            end
-
-            if self.OverhAlarm and self.OverhAlarm ~= true and self.OverhState ~= math.floor((CurTime()-self.OverhAlarm)*2) and (not self.OverhState or self.OverhState < 5) then
-                Train:PlayOnce("igla_alarm2","cabin",nil,1)
-                self.OverhState = math.floor((CurTime()-self.OverhAlarm)*2)
-            end
-            if self.FireAlarm and self.FireState ~= math.floor((CurTime()-self.FireAlarm)*1.5) and (not self.FireState or self.FireState < 10) then
-                Train:PlayOnce("igla_alarm3","cabin",nil,1)
-                self.FireState = math.floor((CurTime()-self.FireAlarm)*1.5)
-            end
             self.Error = false
         end
         Train:SetNW2Bool("IGLA:Messages",self.MessagesCount)

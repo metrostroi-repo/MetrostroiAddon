@@ -23,9 +23,9 @@ function ENT:Think()
         self:EmitSound("mus/clock_click"..math.random(1,8)..".wav",65,math.random(95,105),0.5)
         self.OldSec = d.sec
         self.SecPull = RealTime()+0.05
-        self.Arrows[1]:SetPoseParameter("position",(0.5+d.hour/24+d.min/1440)%1)
-        self.Arrows[2]:SetPoseParameter("position",d.min/60+d.sec/3600)
-    end
+    self.Arrows[1]:SetPoseParameter("position",(0.5+d.hour/24+d.min/1440)%1)
+    self.Arrows[2]:SetPoseParameter("position",d.min/60+d.sec/3600)
+  end
     if RealTime()-self.SecPull > 0 or d.sec < 30 then
         self.Arrows[3]:SetPoseParameter("position",d.sec/60)
     else

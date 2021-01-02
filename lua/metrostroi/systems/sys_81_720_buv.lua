@@ -188,17 +188,14 @@ function TRAIN_SYSTEM:Think()
     if self.Reset and self.Reset ~= CurTime() then
         self.Reset = nil
     end
-
-    local NoHV = Train.Electric.Main750V < 650 or Train.Electric.Main750V > 975
-
-    self.BBE = ((not self:Get("PVU8") and self:Get("BBE")) and 1 or (Train.BBER and Train.BBER.Value or 0))*Train.SFV7.Value
-    if NoHV then self.BBE = 0 end
+    self.BBE = not self:Get("PVU8") and self:Get("BBE") and Train.SFV7.Value or 0
+    if Train.Electric.Main750V < 650 or Train.Electric.Main750V > 975 then self.BBE = 0 end
     if self.BBE == 0 and self.MainLights and not self.MainLightsTimer then self.MainLightsTimer = CurTime() end
-    if self.BBE > 0 or not self.MainLights or self.MainLightsTimer and CurTime()-self.MainLightsTimer > 27 then self.MainLightsTimer = nil end
+    if self.BBE > 0 or not self.MainLights or self.MainLightsTimer and CurTime()-self.MainLightsTimer > 20 then self.MainLightsTimer = nil end
     if (self:Get("BVOn") or Train:ReadTrainWire(2) > 0) then
         Train.BV:TriggerInput("Close",Train.SFV8.Value*Train.SFV9.Value)
     end
-    if self:Get("BVOff") and Train.SFV8.Value > 0 or self:Get("PVU1") then
+    if self:Get("BVOff") and Train.SFV8.Value > 0 then
         Train.BV:TriggerInput("Open",1)
     end
     self.MainLights = not self:Get("PVU5") and (self.BBE > 0 or self.MainLightsTimer) and Train.SFV19.Value > 0.5 and self:Get("PassLight")
@@ -240,6 +237,7 @@ function TRAIN_SYSTEM:Think()
 
     local PN =  self.PTReplace and CurTime()-self.PTReplace > 1.2 or self.States.EnginesDone
     self.PN1 = (self:Get("PN1") and self:Get("PN1") > 0) or PN and (self:Get("DriveStrength") and self:Get("DriveStrength") > 0)
+    --print(self:Get("DriveStrength"),Train.K1.Value,Train.Electric.Itotal,Train.Electric.Drive,Train.BUV.Brake)
     self.PN2 = (self:Get("PN2") and self:Get("PN2") > 0) or PN and (self:Get("DriveStrength") and self:Get("DriveStrength") > 2)
 
     self.MK = not self:Get("PVU3") and self:Get("Compressor") and 1 or 0
@@ -249,12 +247,15 @@ function TRAIN_SYSTEM:Think()
     self.CloseDoors = self:Get("PVU2") or self:Get("CloseDoors")
 
     self.Vent1 = not self:Get("PVU7") and self:Get("Vent1") and 1 or 0
-    self.Vent2 =  not self:Get("PVU7") and self:Get("Vent1") and self:Get("Vent2") and not NoHV and 1 or 0
+    self.Vent2 =  not self:Get("PVU7") and self:Get("Vent1") and self:Get("Vent2") and 1 or 0
     self.Orientation = Train:ReadTrainWire(3) > 0
     self.RevOrientation = Train:ReadTrainWire(4) > 0
+    --print(Train:ReadTrainWire(3),Train:ReadTrainWire(4))
+    --if self.Orientation == self.RevOrientation then print(Train:ReadTrainWire(3),Train:ReadTrainWire(4)) end
     local BadOrientation = self.Orientation and self.Orientation  == self.RevOrientation
     if self.State and self.Orientation ~= self.RevOrientation then
         if not self.BadOrientation and self.OrientateBUP and (not self.Commands[self.OrientateBUP] or self.Orientation and self.Commands.Forward ~= self.OrientateBUP or self.RevOrientation and self.Commands.Back ~= self.OrientateBUP) then
+            --print(Train:GetWagonNumber(),"New BUP",self.Orientation and "Forward" or "Back",self.OrientateBUP)
             if self.Orientation then self.Commands.Forward = self.OrientateBUP else self.Commands.Back = self.OrientateBUP end
             self.OrientateBUP = nil
         end
@@ -263,6 +264,7 @@ function TRAIN_SYSTEM:Think()
     local ReOrientation = self.State and (self.Orientation or self.RevOrientation) and (self.Orientation ~= self.PrevOrientation or self.RevOrientation ~= self.PrevRevOrientation or self.CurrentBUP ~= (self.Orientation and self.Commands.Forward or self.Commands.Back))
     if ReOrientation then
         self.CurrentBUP = self.Orientation and self.Commands.Forward or self.Commands.Back
+        --print(Train:GetWagonNumber(),"Reorientate",self.Orientation and "Forward" or "Back",self.CurrentBUP)
         self.Reset = CurTime()
         if self.CurrentBUP then
             self.Commands[self.CurrentBUP]  = {}

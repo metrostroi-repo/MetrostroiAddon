@@ -19,7 +19,7 @@ function ENT:Initialize()
     self:SetPos(self:GetPos() + Vector(0,0,140))
 
     -- Create seat entities
-    self.DriverSeat = self:CreateSeat("driver",Vector(-415-16,0,-48+2.5+6),Angle(0,-90,0),"models/vehicles/prisoner_pod_inner.mdl")
+    self.DriverSeat = self:CreateSeat("driver",Vector(415+16,0,-48+2.5+6),Angle(0,90,0),"models/vehicles/prisoner_pod_inner.mdl")
 
     -- Hide seats
     self.DriverSeat:SetColor(Color(0,0,0,0))
@@ -106,6 +106,20 @@ function ENT:Initialize()
         },
     }
 
+    self.Lights = {
+        [11] = { "dynamiclight",    Vector( 200, 0, -20), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128 },
+        [12] = { "dynamiclight",    Vector(   0, 0, -20), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400, fov=180,farz = 128 },
+        [13] = { "dynamiclight",    Vector(-200, 0, -20), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128 },
+
+        -- Side lights
+        [15] = { "light",Vector(-52,67,45.5)+Vector(0,0.9,3.25), Angle(0,0,0), Color(254,254,254), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [16] = { "light",Vector(-52,67,45.5)+Vector(0,0.9,-0.02), Angle(0,0,0), Color(40,240,122), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [17] = { "light",Vector(-52,67,45.5)+Vector(0,0.9,-3.3), Angle(0,0,0), Color(254,210,18), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [18] = { "light",Vector(39,-67,45.5)+Vector(0,-0.9,3.25), Angle(0,0,0), Color(254,254,254), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [19] = { "light",Vector(39,-67,45.5)+Vector(0,-0.9,-0.02), Angle(0,0,0), Color(40,240,122), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+        [20] = { "light",Vector(39,-67,45.5)+Vector(0,-0.9,-3.3), Angle(0,0,0), Color(254,210,18), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02.vmt" },
+    }
+
     -- Cross connections in train wires
     self.TrainWireInverts = {
         [11] = true,
@@ -117,6 +131,14 @@ function ENT:Initialize()
         [36] = 37, -- Doors L<->R
         [57] = 58, -- ReverserR F<->B
     }
+
+    -- Setup door positions
+    self.LeftDoorPositions = {}
+    self.RightDoorPositions = {}
+    for i=0,3 do
+        table.insert(self.LeftDoorPositions,Vector(353.0 - 35*0.5 - 231*i,65,-1.8))
+        table.insert(self.RightDoorPositions,Vector(353.0 - 35*0.5 - 231*i,-65,-1.8))
+    end
 
     -- KV wrench mode
     self.KVWrenchMode = 0
@@ -169,10 +191,10 @@ function ENT:UpdateLampsColors()
         lCount = lCount + 1
         if i%9.3<1 then
             local id = 9+math.ceil(i/9.3)
+            self:SetLightPower(id,false)
 
             local tcol = (lCol/lCount)/255
-            --self.Lights[id][4] = Vector(tcol.r,tcol.g^3,tcol.b^3)*255
-            self:SetNW2Vector("lampD"..id,Vector(tcol.r,tcol.g^3,tcol.b^3)*255)
+            self.Lights[id][4] = Vector(tcol.r,tcol.g^3,tcol.b^3)*255
             lCol = Vector() lCount = 0
         end
         self:SetNW2Vector("lamp"..i,col)
@@ -180,8 +202,6 @@ function ENT:UpdateLampsColors()
 end
 function ENT:TrainSpawnerUpdate()
     self:UpdateLampsColors()
-    self.Pneumatic.VDLoud = math.random()<0.06 and 0.9+math.random()*0.2
-    if self.Pneumatic.VDLoud then self.Pneumatic.VDLoudID = math.random(1,5) end
 end
 
 --------------------------------------------------------------------------------
@@ -194,6 +214,7 @@ function ENT:Think()
 
     local lightsActive1 = self.Panel.EL3_6 > 0
     local lightsActive2 = self.Panel.EL7_30 > 0
+    local mul = 0
     for i = 1,30 do
         if (lightsActive2 or (lightsActive1 and math.ceil((i+5)%8)==math.ceil(i/7)%2)) then
             if not self.Lamps[i] and not self.Lamps.broken[i] then self.Lamps[i] = CurTime() + math.Rand(0.1,math.Rand(0.5,2)) end
@@ -201,11 +222,16 @@ function ENT:Think()
             self.Lamps[i] = nil
         end
         if (self.Lamps[i] and CurTime() - self.Lamps[i] > 0) then
+            mul = mul + 1
             self:SetPackedBool("lightsActive"..i,true)
         else
             self:SetPackedBool("lightsActive"..i,false)
         end
     end
+    self:SetLightPower(11,mul > 0, mul/30)
+    self:SetLightPower(12,mul > 0, mul/30)
+    self:SetLightPower(13,mul > 0, mul/30)
+
 
     self:SetPackedBool("AnnBuzz",Panel.AnnouncerBuzz > 0)
     self:SetPackedBool("AnnPlay",Panel.AnnouncerPlaying > 0)
@@ -302,6 +328,13 @@ function ENT:Think()
         self:SetPackedBool("VSS",self.BUV.SS > 0)
     end
 
+
+    self:SetLightPower(15, self.Panel.HL13 > 0.5)
+    self:SetLightPower(18, self.Panel.HL13 > 0.5)
+    self:SetLightPower(16, self.Panel.HL25 > 0.5)
+    self:SetLightPower(19, self.Panel.HL25 > 0.5)
+    self:SetLightPower(17, self.Panel.HL46 > 0.5)
+    self:SetLightPower(20, self.Panel.HL46 > 0.5)
     self:SetPackedBool("DoorsW",self.Panel.HL13 > 0)
     self:SetPackedBool("GRP",self.Panel.HL25 > 0)
     self:SetPackedBool("BrW",self.Panel.HL46 > 0)
@@ -313,15 +346,14 @@ function ENT:Think()
 
     self:SetPackedRatio("Speed", self.Speed/100)
 
-    self:SetPackedBool("Vent1Work",self.BUVS.KV1>0)
-    self:SetPackedBool("Vent2Work",self.BUVS.KV2>0)
+    self:SetPackedBool("Vent1Work",self.BUVS.KM1>0)
+    self:SetPackedBool("Vent2Work",self.BUVS.KM2>0)
 
     self:SetPackedRatio("BLPressure", self.Pneumatic.BrakeLinePressure/16.0)
     self:SetPackedRatio("TLPressure", self.Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure", math.min(3.2,self.Pneumatic.BrakeCylinderPressure)/6.0)
 
     self:SetPackedRatio("BatteryVoltage",self.Panel["V1"]*self.Battery.Voltage/150.0)
-    self:SetPackedRatio("BatteryCurrent",self.Panel["V1"]*math.Clamp((self.Battery.Voltage-75)*0.01,-0.01,1))
 
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
@@ -349,14 +381,11 @@ function ENT:Think()
         -- Apply brakes
         self.FrontBogey.PneumaticBrakeForce = 50000.0-2000
         self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.FrontBogey.ParkingBrakePressure = math.max(0,(2.6-self.Pneumatic.ParkingBrakePressure)/2.6)/2
+        self.FrontBogey.ParkingBrakePressure = math.max(0,(2.6-self.Pneumatic.ParkingBrakePressure)/2.6)
         self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.FrontBogey.DisableContacts = self.U5.Value>0
         self.RearBogey.PneumaticBrakeForce = 50000.0-2000
         self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
         self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.RearBogey.ParkingBrakePressure = math.max(0,(2.6-self.Pneumatic.ParkingBrakePressure)/2.6)/2
-        self.RearBogey.DisableContacts = self.U5.Value>0
         --self.RearBogey.ParkingBrake = self.ParkingBrake.Value > 0.5
     end
     self:GenerateJerks()

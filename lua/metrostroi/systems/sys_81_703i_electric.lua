@@ -79,13 +79,13 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
     Train:WriteTrainWire(5,S["U2"]*KV["U2-5ZH"]*(Train.UAVAC.Value+KV["5ZH-5"]))
     Panel.AnnouncerPlaying = T[13]
     Train:WriteTrainWire(24,S["U2"]*Train.KU8.Value)
+    Train:WriteTrainWire(14,BO*KV["10-14B"]*KV["14-14B"])
     if isKVL then
         Train:WriteTrainWire(1,S["10AK"]*Train.R1_5.Value+(BO*Train.RO1.Value))
         Train:WriteTrainWire(2,S["U2"]*KV["U2-2"]+(BO*Train.RO1.Value))
         Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+(BO*Train.RO2.Value))
         Train:WriteTrainWire(20,S["U2"]*KV["U2-20"]+(BO*Train.RO2.Value))
     else
-        Train:WriteTrainWire(14,BO*KV["10-14B"]*KV["14-14B"])
         Train:WriteTrainWire(1,S["10AK"]*Train.R1_5.Value)
         Train:WriteTrainWire(2,S["U2"]*KV["U2-2"])
         Train:WriteTrainWire(3,S["U2"]*KV["U2-3"])
@@ -131,9 +131,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train:WriteTrainWire(48,S["48A"])
         Train.PneumaticNo1:TriggerInput("Set",(S["2A"]*Train.PR.Value)*(T[48]*RUM+S["48A"]))
 
-        S["DT"] = BO*Train.BPT.Value
-        Panel.BrY = S["DT"]
-        Train:WriteTrainWire(34,S["DT"])
+        Train:WriteTrainWire(34,BO*Train.BPT.Value)
     elseif isE then
         Train.PneumaticNo1:TriggerInput("Set",T[8]*C(P == 4 and 1 <= RK and RK <= 5))
         Train.PneumaticNo2:TriggerInput("Set",T[8]*(1-Train.RV3.Value)*(1-Train.LK4.Value))
@@ -288,13 +286,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train:WriteTrainWire(12,S["F7"]*Train.KU12.Value)
     else
         Train.RRP:TriggerInput("Set",T[14])
-        if isKVL then
-            Train:WriteTrainWire(31,S["D1"]*(Train.KU6.Value+Train.KU13.Value))
-            Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value)
-        else
-            Train:WriteTrainWire(31,S["D1"]*(Train.KU6.Value+Train.KU13.Value)+T[12])
-            Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value+T[12])
-        end
+        Train:WriteTrainWire(31,S["D1"]*(Train.KU6.Value+Train.KU13.Value))
+        Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value)
         Train:WriteTrainWire(12,S["D1"]*Train.KU10.Value)
     end
     Train:WriteTrainWire(16,S["D1"]*Train.KU2.Value*Train.KU3.Value)

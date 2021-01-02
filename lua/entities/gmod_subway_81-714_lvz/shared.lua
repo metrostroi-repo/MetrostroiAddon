@@ -24,20 +24,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
-ENT.MirrorCams = {
-    Vector(-441,75,15),Angle(1,0,0),75,
-    Vector(-441,-75,15),Angle(1,0,0),75,
-}
-
 ENT.AnnouncerPositions = {
     {Vector(-3,-60, 62),300,0.2},
     {Vector(-3,60 ,62),300,0.2},
@@ -88,26 +74,23 @@ function ENT:InitializeSounds()
     self.SoundNames["bpsn2"] = {"subway_trains/717/bpsn/bpsn_spb.wav", loop=true}
     self.SoundNames["bpsn3"] = {"subway_trains/717/bpsn/bpsn_nnov.wav", loop=true}
     self.SoundNames["bpsn4"] = {"subway_trains/717/bpsn/bpsn_1.wav", loop=true}
-    self.SoundPositions["bpsn1"] = {600,1e9,Vector(0,45,-448),0.04}
-    self.SoundPositions["bpsn2"] = {600,1e9,Vector(0,45,-448),0.025}
-    self.SoundPositions["bpsn3"] = {600,1e9,Vector(0,45,-448),0.03}
-    self.SoundPositions["bpsn4"] = {600,1e9,Vector(0,45,-448),0.02}
+    self.SoundPositions["bpsn1"] = {500,1e9,Vector(0,45,-448),0.04}
+    self.SoundPositions["bpsn2"] = {500,1e9,Vector(0,45,-448),0.025}
+    self.SoundPositions["bpsn3"] = {500,1e9,Vector(0,45,-448),0.03}
+    self.SoundPositions["bpsn4"] = {500,1e9,Vector(0,45,-448),0.02}
 
     --Подвагонка
     self.SoundNames["lk2_on"] = "subway_trains/717/pneumo/lk2_on.mp3"
     self.SoundNames["lk5_on"] = "subway_trains/717/pneumo/lk1_on.mp3"
     self.SoundNames["lk2_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
-    self.SoundNames["lk2c"] = "subway_trains/717/pneumo/ksh1.mp3"
     self.SoundNames["lk3_on"] = "subway_trains/717/pneumo/lk3_on.mp3"
     self.SoundNames["lk3_off"] = "subway_trains/717/pneumo/lk3_off.mp3"
     --self.SoundNames["ksh1_off"] = "subway_trains/717/pneumo/ksh1.mp3"
     self.SoundPositions["lk2_on"] = {440,1e9,Vector(-60,-40,-66),0.22}
     self.SoundPositions["lk5_on"] = {440,1e9,Vector(-60,-40,-66),0.30}
     self.SoundPositions["lk2_off"] = self.SoundPositions["lk2_on"]
-    self.SoundPositions["lk2c"] = {440,1e9,Vector(-60,-40,-66),0.6}
     self.SoundPositions["lk3_on"] = self.SoundPositions["lk2_on"]
     self.SoundPositions["lk3_off"] = self.SoundPositions["lk2_on"]
-    --self.SoundPositions["ksh1_off"] = self.SoundPositions["lk1_on"]
 
     self.SoundNames["compressor"] = {loop=2.0,"subway_trains/d/pneumatic/compressor/compessor_d_start.wav","subway_trains/d/pneumatic/compressor/compessor_d_loop.wav", "subway_trains/d/pneumatic/compressor/compessor_d_end.wav"}
     self.SoundNames["compressor2"] = {loop=1.79,"subway_trains/717/compressor/compressor_717_start2.wav","subway_trains/717/compressor/compressor_717_loop2.wav", "subway_trains/717/compressor/compressor_717_stop2.wav"}
@@ -279,9 +262,9 @@ function ENT:InitializeSounds()
         for k=0,1 do
             self.SoundNames["door"..i.."x"..k.."r"] = {"subway_trains/common/door/door_roll.wav",loop=true}
             self.SoundPositions["door"..i.."x"..k.."r"] = {150,1e9,GetDoorPosition(i,k),0.11}
-            self.SoundNames["door"..i.."x"..k.."o"] = {"subway_trains/common/door/door_open_end1.mp3","subway_trains/common/door/door_open_end2.mp3","subway_trains/common/door/door_open_end3.mp3","subway_trains/common/door/door_open_end4.mp3"}
+            self.SoundNames["door"..i.."x"..k.."o"] = {"subway_trains/common/door/door_open_end5.mp3","subway_trains/common/door/door_open_end6.mp3","subway_trains/common/door/door_open_end7.mp3"}
             self.SoundPositions["door"..i.."x"..k.."o"] = {350,1e9,GetDoorPosition(i,k),2}
-            self.SoundNames["door"..i.."x"..k.."c"] = {"subway_trains/common/door/door_close_end.mp3","subway_trains/common/door/door_close_end3.mp3","subway_trains/common/door/door_close_end4.mp3"}
+            self.SoundNames["door"..i.."x"..k.."c"] = {"subway_trains/common/door/door_close_end.mp3","subway_trains/common/door/door_close_end2.mp3","subway_trains/common/door/door_close_end3.mp3","subway_trains/common/door/door_close_end4.mp3","subway_trains/common/door/door_close_end5.mp3"}
             self.SoundPositions["door"..i.."x"..k.."c"] = {400,1e9,GetDoorPosition(i,k),2}
         end
     end
@@ -362,15 +345,6 @@ ENT.SubwayTrain = {
     EKKType = 717,
 }
 
---[[
-7874-8189 (белый пластик с синими\зелеными вставками, преимущественно старые сидухи, либо синие)
-8190-8202 (пластик под дерево, преимущественно старые сидухи, либо коричневые)
-8308-8319 (зеленый пластик, старые сидухи)
-8320-8399 (пластик под дерево, преимущественно страые сидухи, либо синие)
-8868-8964 (.5 - светлый пластик под дерево, преимущественно старые сидухи, либо коричневые)
-11000-11306 (белый пластик с зелеными вставками, преимущественно старые сидухи, либо синие)
-11322-11378 (пластик под дерево с белыми вставками, коричневые сидухи)
-]]
 ENT.NumberRanges = {
     {
         true,

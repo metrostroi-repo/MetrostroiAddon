@@ -1,124 +1,135 @@
-return [[
+﻿return [[
 #81-720
+
 [de]
+
 #######Buttons###########
 #Cameras
-Train.720.CameraCond    = Klimaanlage, Störungsanzeige
-Train.720.CameraPPZ     = PPZ
-Train.720.CameraPV      = VPU
-Train.720.CameraVityaz  = SAU "Vityaz"
-Train.720.CameraKRMH    = KRMSH- und UAVA-Ventile
-Train.720.CameraPVZ     = PVZ
+Train.720.CameraCond    = Air conditioner, IGLA #FIXME
+Train.720.CameraPPZ     = PPZ #FIXME
+Train.720.CameraPV      = VPU #FIXME
+Train.720.CameraVityaz  = SAU "Vityaz" #FIXME
+Train.720.CameraKRMH    = KRMSH and UAVA valves #FIXME
+Train.720.CameraPVZ     = PVZ #FIXME
+
 #Common
-Common.720.SF1              = SF1: Hauptstrom
+Common.720.SF1              = SF1: Hauptschalter
 Common.720.SF2              = SF2: Hauptsteuerung
 Common.720.SF3              = SF3: Notsteuerung
 Common.720.SF4              = SF4: BARS
-Common.720.SF5              = SF5: BUP (Zugsteuergerät)
-Common.720.SF6              = SF6: BKCU (Steuerkreiskommutierungseinheit)
+Common.720.SF5              = SF5: BUP (Zugsteuerung)
+Common.720.SF6              = SF6: BKCU (Kontrollkreise Kommunikation)
 Common.720.SF7              = SF7: PPO (ASOTP)
 Common.720.SF8              = SF8: Ansager
-Common.720.SF9              = SF9: Funk
-Common.720.SF10             = SF10: Wagenorientierung
-Common.720.SF11             = SF11: Bewegungsrichtung
+Common.720.SF9              = SF9: Radiostation
+Common.720.SF10             = SF10: Wagen orientation
+Common.720.SF11             = SF11: Fahrtrichtung
 Common.720.SF12             = SF12: 1. Scheinwerfergruppe
 Common.720.SF13             = SF13: 2. Scheinwerfergruppe
-Common.720.SF14             = SF14: Schlusslicht
+Common.720.SF14             = SF14: Schlusslichter
 Common.720.SF15             = SF15: @[Common.703.VU3]
 Common.720.SF16             = SF16: @[Common.703.VU1]
-Common.720.SF17             = SF17: Klimaanlage in der Kabine
+Common.720.SF17             = SF17: Kabinenlüftung
 Common.720.SF18             = SF18: Spurkranzschmierung
-Common.720.SF19             = SF19: Hauptbremshebel
-Common.720.SF20             = SF20: Bremshebel Notstrom
+Common.720.SF19             = SF19: Bremshebel Hauptsteuerung
+Common.720.SF20             = SF20: Bremshebel Notsteuerung
 Common.720.SF21             = SF21: Türen öffnen
 Common.720.SF22             = SF22: Türen schließen
-Common.720.SFV1             = SF1: Spannung der Wagensteuerkreise
-Common.720.SFV2             = SF2: Spannung der Wagensteuerung
-Common.720.SFV3             = SF3: Spannung Traktionsmotoren-Steuergerät
-Common.720.SFV4             = SF4: Steuergerät für Fahrmotoren
-Common.720.SFV5             = SF5: Steuergerät für Notfahrmotoren
-Common.720.SFV6             = SF6: BUTP
-Common.720.SFV7             = SF7: Stromversorgung
+
+Common.720.SFV1             = SF1: Wagensteuerung Stromzufuhr
+Common.720.SFV2             = SF2: Wagensteuerung Stromzufuhr
+Common.720.SFV3             = SF3: Steuerung der Fahrmotoren
+Common.720.SFV4             = SF4: Steuerung der Fahrmotoren
+Common.720.SFV5             = SF5: Notsteuerung der Fahrmotoren
+Common.720.SFV6             = SF6: BUTP power
+Common.720.SFV7             = SF7: Stromzufuhr
 Common.720.SFV8             = SF8: BV Steuerung
-Common.720.SFV9             = SF9: BV Spannung
+Common.720.SFV9             = SF9: BV Strom
 Common.720.SFV10            = SF10: PPO (ASOTP PCBK)
 Common.720.SFV11            = SF11: Luftpresser
 Common.720.SFV12            = SF12: Türen schließen
 Common.720.SFV13            = SF13: Linke Türen öffnen
 Common.720.SFV14            = SF14: Rechte Türen öffnen
-Common.720.SFV15            = SF15: letzte Türen
+Common.720.SFV15            = SF15: Türen am Zugschluss
 Common.720.SFV16            = SF16: Ansager
-Common.720.SFV17            = SF17: Notruf-Gegensprechanlage
+Common.720.SFV17            = SF17: Notruf
 Common.720.SFV18            = SF18: @[Common.ALL.Unsused1]
-Common.720.SFV19            = SF19: Spannung Innenbeleuchtung
-Common.720.SFV20            = SF20: Innenbeleuchtung für Notfälle
-Common.720.SFV21            = SF21: Geschwindigkeitsmesser
+Common.720.SFV19            = SF19: Stromzufuhr für Innenbeleuchtung
+Common.720.SFV20            = SF20: Notbeleuchtung Innenraum
+Common.720.SFV21            = SF21: Geschwindigkeits Sensor
 Common.720.SFV22            = SF22: Federspeicherbremse
-Common.720.SFV23            = SF23: 1. Lüftungsgruppensteuerung
-Common.720.SFV24            = SF24: 2. Lüftungsgruppensteuerung
-Common.720.SFV25            = SF25: 1. Lüftungsgruppenspannung
-Common.720.SFV26            = SF26: 2. Lüftungsgruppenspannung
-Common.720.SFV27            = SF27: Erregerleistung
-Common.720.SFV28            = SF28: Ladekondensatorleistung
+Common.720.SFV23            = SF23: 1. Lüftergruppe
+Common.720.SFV24            = SF24: 2. Lüftergruppe
+Common.720.SFV25            = SF25: 1. Lüftergruppe Stromzufuhr
+Common.720.SFV26            = SF26: 2. Lüftergruppe Stromzufuhr
+Common.720.SFV27            = SF27: Umformer Stromzufuhr 
+Common.720.SFV28            = SF28: Strom für Batterieladen
 Common.720.SFV29            = SF29: Spannungssammler
-Common.720.SFV30            = SF30: Linienschema & Innenanzeige
+Common.720.SFV30            = SF30: Linienpläne & Innenanzeigen
 Common.720.SFV31            = SF31: @[Common.ALL.Unsused1]
 Common.720.SFV32            = SF32: @[Common.ALL.Unsused1]
 Common.720.SFV33            = SF33: @[Common.ALL.Unsused1]
-Common.720.VentCMode       = Lüftungsmodus
-Common.720.VentHMode+       = Heizleistung erhöhen
-Common.720.VentHMode-       = Heizleistung verringern
-Common.720.VentSMode-       = Lüftungsleistung erhöhen
-Common.720.VentSMode+       = Lüftungsleistung verringern
-Common.720.Pant1            = Freigabe der ersten Sammlergruppe
-Common.720.Pant2            = Freigabe der zweiten Sammlergruppe
-Common.720.Vent1            = 1. Lüftungsgruppe
-Common.720.Vent2            = 2. Lüftungsgruppe
-Common.720.TorecDoors       = letzte Türen
+
+Common.720.VentCMode       = Ventilation mode #FIXME
+Common.720.VentHMode+       = Increase heater power #FIXME
+Common.720.VentHMode-       = Decrease heater power #FIXME
+Common.720.VentSMode-       = Increase ventilation power #FIXME
+Common.720.VentSMode+       = Decrease ventilation power #FIXME
+
+Common.720.Pant1            = 1. Spannungssammler entladen
+Common.720.Pant2            = 2. Spannungssammler entladen
+Common.720.Vent1            = 1. Lüftergruppe
+Common.720.Vent2            = 2. Lüftergruppe
+Common.720.TorecDoors       = Türen am Zugschluss
 Common.720.BBER             = Notfall BBE
-Common.720.BBE              = BBE: Stromversorgung
+Common.720.BBE              = BBE: Stromzufuhr
 Common.720.CabLightStrength = Helligkeit der Kabinenbeleuchtung
-Common.720.AppLights        = Beleuchtung der Wagenausstattung
-Common.720.BARSBlock       = Störung Blockierung der BARS (ARS-Einheit)
+Common.720.AppLights        = Beleuchtung Schaltschrank
+Common.720.BARSBlock       = Faulty BARS (ARS unit) blocking #FIXME
+
 Common.720.Accel                = Beschleunigung
-Common.720.Forward              = Vorwärtsbewegung
-Common.720.Backward             = Rückwärtsbewegung
+Common.720.Forward              = Fährt vorwärts
+Common.720.Backward             = Fährt rückwärts
 Common.720.Stand                = Steht
-Common.720.Ticker               = Innenanzeige
-Common.720.KAH                  = KAH: Notfall-BARS-Fahrmodus
+Common.720.Ticker               = Innenanzeigen
+Common.720.KAH                  = KAH: BARS überbrücken
 Common.720.KAHK                 = @[Common.ALL.KAHK]
-Common.720.ALS                  = ALS: ARS in den Signalisierungsmodus schalten (ARS deaktivieren)
-Common.720.ALSK                 = ALS-Tastenabdeckung
-Common.720.FDepot               = Abfahrt vom Depot
-Common.720.HVoltage             = keine Hochspannung
-Common.720.PassScheme           = Informationsanzeige
-Common.720.EmergencyCompressor  = Notstarttaste für Kompressor
-Common.720.EnableBV             = aktiviere BV
-Common.720.DisableBV            = deaktiviere BV
-Common.720.Ring                 = Übertragung der Kontrolle (Alarm)
-Common.720.R_Announcer          = Aktivieren des Ansagetons im Fahrgastraum
-Common.720.R_Line               = Fahrermikrofon aktivieren
-Common.720.R_Emer               = Notruf-Gegensprechanlage
-Common.720.R_Program1           = Ansage starten (Programm 1)
-Common.720.EnableBVEmer         = Notfall BV aktivieren
-Common.720.EmergencyControls    = Disable emergency enable of circuit control
-Common.720.Wiper                = Scheibenwischer einschalten (Platzhalter)
-Common.720.AccelRate            = Aktivieren des "Steigungsmodus"
-Common.720.EBrakeAdd            = Hilfsbremskraft erhöhen
-Common.720.EBrakeRelease        = Hilfsbremskraft verringern
-Common.720.EBrakeToggle         = Hilfsbremse aktivieren
-Common.720.EmergencyBrake       = Hilfsbremse deaktivieren
+Common.720.ALS                  = ALS: ALS abschalten
+Common.720.ALSK                 = ALS Verdeckung
+Common.720.FDepot               = Ausrücken vom Depot
+Common.720.HVoltage             = Keine Hochspannung
+Common.720.PassScheme           = Position auf der Route #alte Übersetzung: "Linienpläne"
+Common.720.EmergencyCompressor  = Luftpresser Zwangsstart
+Common.720.EnableBV             = BV einschalten
+Common.720.DisableBV            = BV abschalten
+Common.720.Ring                 = Steuerung übertragen (Klingel)
+Common.720.R_Announcer          = Ansager im Innenraum anschalten
+Common.720.R_Line               = Fahrermikrofon einschalten
+Common.720.R_Emer               = Notruf
+Common.720.R_Program1           = Ansage starten (programm 1)
+Common.720.EnableBVEmer         = Notstrom einschalten
+Common.720.EmergencyControls    = Notsteuerung der Stromkreise
+Common.720.Wiper                = Scheibenwischer
+
+Common.720.AccelRate            = Steigungsmodus einschalten
+Common.720.EBrakeAdd            = Zusatzbremse stärken
+Common.720.EBrakeRelease        = Zusatzbremse schwächer
+Common.720.EBrakeToggle         = Zusatzbremse aktivieren
+Common.720.EmergencyBrake       = Notbremse aktivieren
 Common.720.DoorClose            = Türen schließen
-Common.720.AttentionMessage     = Nachrichtenwahrnehmungstaster
-Common.720.DoorSelectL          = linke Türen vorwählen
-Common.720.DoorSelectR          = rechte Türen vorwählen
-Common.720.DoorBlock            = Fahren ohne Grünschleife
-Common.720.KDL                  = öffne rechte Türen
-Common.720.KDP                  = öffne rechte Türen
+Common.720.AttentionMessage     = Nachricht bestätigen
+
+
+Common.720.DoorSelectL          = Linke Türen wählen
+Common.720.DoorSelectR          = Rechte Türen wählen
+Common.720.DoorBlock            = Fahren ohne Türsteuerung
+Common.720.KDL                  = Türen links öffnen
+Common.720.KDP                  = Türen rechts öffnen
+
 Common.Vityaz.F1             = Vityaz: F1
-Common.Vityaz.F2             = Vityaz: nächste Seite
-Common.Vityaz.F3             = Vityaz: vorherige Seite
-Common.Vityaz.F4             = Vityaz: Hauptmodus
+Common.Vityaz.F2             = Vityaz: Nächste Seite
+Common.Vityaz.F3             = Vityaz: Vorherige Seite
+Common.Vityaz.F4             = Vityaz: Hauptseite
 Common.Vityaz.1              = Vityaz: 1
 Common.Vityaz.4              = Vityaz: 4
 Common.Vityaz.7              = Vityaz: 7
@@ -130,27 +141,32 @@ Common.Vityaz.3              = Vityaz: 3
 Common.Vityaz.6              = Vityaz: 6
 Common.Vityaz.9              = Vityaz: 9
 Common.Vityaz.F5             = Vityaz: ZV
-Common.Vityaz.F6             = Vityaz: Hoch/Geschwindigkeit
-Common.Vityaz.F7             = Vityaz: Runter/Spannung
-Common.Vityaz.F8             = Vityaz: Enter\Wagenausstattung
-Common.Vityaz.F9             = Vityaz: Select\Wagenausstattungssteuerung
-Common.720.EmerX1           = Notfall X1 Fahrmodus
-Common.720.EmerX2           = Notfall X2 Fahrmodus
+Common.Vityaz.F6             = Vityaz: Hoch\Geschwindigkeit
+Common.Vityaz.F7             = Vityaz: Runter\Spannung
+Common.Vityaz.F8             = Vityaz: Enter\Wagensteuerung - Status
+Common.Vityaz.F9             = Vityaz: Auswählen\Wagensteuerung
+
+Common.720.EmerX1           = Emergency X1 Fahrmodus
+Common.720.EmerX2           = Emergency X2 Fahrmodus
 Common.720.EmerCloseDoors   = Zwangsschließen
-Common.720.EmergencyDoors   = Aktivieren Sie die Nottürsteuerung
-Common.720.BRU              = BRU: Hochspannungstrennschalter
+Common.720.EmergencyDoors   = Notsteuerung der Türen
+Common.720.BRU              = BRU: Hochspannungs Trennschalter
+
 #gmod_subway_81-720
 #Buttons:
+
 Entities.gmod_subway_81-720.Buttons.BackVent.VentCondMode-      = @[Common.720.VentCMode] @[Common.ALL.CCW]
 Entities.gmod_subway_81-720.Buttons.BackVent.VentCondMode+      = @[Common.720.VentCMode] @[Common.ALL.CW]
 Entities.gmod_subway_81-720.Buttons.BackVent.VentHeatMode+      = @[Common.720.VentHMode+]
 Entities.gmod_subway_81-720.Buttons.BackVent.VentHeatMode-      = @[Common.720.VentHMode-]
 Entities.gmod_subway_81-720.Buttons.BackVent.VentStrengthMode-  = @[Common.720.VentSMode-]
 Entities.gmod_subway_81-720.Buttons.BackVent.VentStrengthMode+  = @[Common.720.VentSMode+]
+
 Entities.gmod_subway_81-720.Buttons.RV.EmerX1Set                = @[Common.720.EmerX1]
 Entities.gmod_subway_81-720.Buttons.RV.EmerX2Set                = @[Common.720.EmerX2]
 Entities.gmod_subway_81-720.Buttons.RV.EmerCloseDoorsSet        = @[Common.720.EmerCloseDoors]
 Entities.gmod_subway_81-720.Buttons.RV.EmergencyDoorsToggle     = @[Common.720.EmergencyDoors]
+
 Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF1Set = @[Common.Vityaz.F1]
 Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF2Set = @[Common.Vityaz.F2]
 Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF3Set = @[Common.Vityaz.F3]
@@ -170,6 +186,7 @@ Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF6Set = @[Common.Vityaz.
 Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF7Set = @[Common.Vityaz.F7]
 Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF8Set = @[Common.Vityaz.F8]
 Entities.gmod_subway_81-720.Buttons.VityazButtons.VityazF9Set = @[Common.Vityaz.F9]
+
 Entities.gmod_subway_81-720.Buttons.BackPPZ.SF1Toggle           = @[Common.720.SF1]
 Entities.gmod_subway_81-720.Buttons.BackPPZ.SF2Toggle           = @[Common.720.SF2]
 Entities.gmod_subway_81-720.Buttons.BackPPZ.SF3Toggle           = @[Common.720.SF3]
@@ -192,6 +209,7 @@ Entities.gmod_subway_81-720.Buttons.BackPPZ.SF19Toggle          = @[Common.720.S
 Entities.gmod_subway_81-720.Buttons.BackPPZ.SF20Toggle          = @[Common.720.SF20]
 Entities.gmod_subway_81-720.Buttons.BackPPZ.SF21Toggle          = @[Common.720.SF21]
 Entities.gmod_subway_81-720.Buttons.BackPPZ.SF22Toggle          = @[Common.720.SF22]
+
 Entities.gmod_subway_81-720.Buttons.BackDown.Pant1Toggle            = @[Common.720.Pant1]
 Entities.gmod_subway_81-720.Buttons.BackDown.Pant2Toggle            = @[Common.720.Pant2]
 Entities.gmod_subway_81-720.Buttons.BackDown.Vent1Toggle            = @[Common.720.Vent1]
@@ -211,6 +229,7 @@ Entities.gmod_subway_81-720.Buttons.BackDown.BARSBlock-             = @[Common.7
 Entities.gmod_subway_81-720.Buttons.BackDown.BARSBlock+             = @[Common.720.BARSBlock] @[Common.ALL.CW]
 Entities.gmod_subway_81-720.Buttons.BackDown.BatteryToggle          = @[Common.ALL.VB]
 Entities.gmod_subway_81-720.Buttons.BackDown.ALSFreqToggle          = @[Common.ARS.Freq]
+
 Entities.gmod_subway_81-720.Buttons.PUU.!DoorsClosed                = @[Common.ALL.LSD]
 Entities.gmod_subway_81-720.Buttons.PUU.StandToggle                 = @[Common.720.Stand] @[Common.ALL.Unsused2]
 Entities.gmod_subway_81-720.Buttons.PUU.TickerToggle                = @[Common.720.Ticker]
@@ -240,6 +259,7 @@ Entities.gmod_subway_81-720.Buttons.PUU.!VDop2                      = @[Common.A
 Entities.gmod_subway_81-720.Buttons.PUU.!Acc                        = @[Common.720.Accel]
 Entities.gmod_subway_81-720.Buttons.PUU.!Forw                       = @[Common.720.Forward]
 Entities.gmod_subway_81-720.Buttons.PUU.!Back                       = @[Common.720.Backward]
+
 Entities.gmod_subway_81-720.Buttons.PUR.AccelRateSet                = @[Common.720.AccelRate]
 Entities.gmod_subway_81-720.Buttons.PUR.EmerBrakeAddSet             = @[Common.720.EBrakeAdd]
 Entities.gmod_subway_81-720.Buttons.PUR.EmerBrakeReleaseSet         = @[Common.720.EBrakeRelease]
@@ -252,11 +272,13 @@ Entities.gmod_subway_81-720.Buttons.PUR.AttentionBrakeSet           = @[Common.A
 Entities.gmod_subway_81-720.Buttons.PUR.HornBSet                    = @[Common.ALL.Horn]
 Entities.gmod_subway_81-720.Buttons.PUR.DoorRightSet                = @[Common.720.KDP]
 Entities.gmod_subway_81-720.Buttons.PUR.!DoorRightLamp              = @[Common.ALL.KDPL]
+
 Entities.gmod_subway_81-720.Buttons.PUL.DoorSelectLToggle           = @[Common.720.DoorSelectL]
 Entities.gmod_subway_81-720.Buttons.PUL.DoorSelectRToggle           = @[Common.720.DoorSelectR]
 Entities.gmod_subway_81-720.Buttons.PUL.DoorBlockToggle             = @[Common.720.DoorBlock]
 Entities.gmod_subway_81-720.Buttons.PUL.!DoorLeftLamp               = @[Common.ALL.KDLL]
 Entities.gmod_subway_81-720.Buttons.PUL.DoorLeftSet                 = @[Common.720.KDL]
+
 Entities.gmod_subway_81-720.Buttons.PVZ.SFV1Toggle          = @[Common.720.SFV1]
 Entities.gmod_subway_81-720.Buttons.PVZ.SFV2Toggle          = @[Common.720.SFV2]
 Entities.gmod_subway_81-720.Buttons.PVZ.SFV3Toggle          = @[Common.720.SFV3]
@@ -290,10 +312,12 @@ Entities.gmod_subway_81-720.Buttons.PVZ.SFV30Toggle         = @[Common.720.SFV30
 Entities.gmod_subway_81-720.Buttons.PVZ.SFV31Toggle         = @[Common.720.SFV31]
 Entities.gmod_subway_81-720.Buttons.PVZ.SFV32Toggle         = @[Common.720.SFV32]
 Entities.gmod_subway_81-720.Buttons.PVZ.SFV33Toggle         = @[Common.720.SFV33]
+
 Entities.gmod_subway_81-720.Buttons.ASNP.R_ASNPMenuSet      = @[Common.ASNP.ASNPMenu]
 Entities.gmod_subway_81-720.Buttons.ASNP.R_ASNPUpSet        = @[Common.ASNP.ASNPUp]
 Entities.gmod_subway_81-720.Buttons.ASNP.R_ASNPDownSet      = @[Common.ASNP.ASNPDown]
 Entities.gmod_subway_81-720.Buttons.ASNP.R_ASNPOnToggle     = @[Common.ASNP.ASNPOn]
+
 Entities.gmod_subway_81-720.Buttons.IGLAButtons.IGLA1USet   = @[Common.IGLA.Button1Up]
 Entities.gmod_subway_81-720.Buttons.IGLAButtons.IGLA1Set    = @[Common.IGLA.Button1]
 Entities.gmod_subway_81-720.Buttons.IGLAButtons.IGLA1DSet   = @[Common.IGLA.Button1Down]
@@ -306,18 +330,22 @@ Entities.gmod_subway_81-720.Buttons.IGLAButtons.!IGLAErr    = @[Common.IGLA.IGLA
 Entities.gmod_subway_81-720.Buttons.IGLAButtons.!IGLAOSP    = @[Common.IGLA.IGLAOSP]
 Entities.gmod_subway_81-720.Buttons.IGLAButtons.!IGLAPI     = @[Common.IGLA.IGLAPI]
 Entities.gmod_subway_81-720.Buttons.IGLAButtons.!IGLAOff    = @[Common.IGLA.IGLAOff]
+
 Entities.gmod_subway_81-720.Buttons.BTO.K29Toggle           = @[Common.ALL.KRMH]
 Entities.gmod_subway_81-720.Buttons.BTO.UAVAToggle          = @[Common.ALL.UAVA2]
+
 Entities.gmod_subway_81-720.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle    = @[Common.ALL.FrontBrakeLineIsolationToggle]
 Entities.gmod_subway_81-720.Buttons.FrontPneumatic.FrontTrainLineIsolationToggle    = @[Common.ALL.FrontTrainLineIsolationToggle]
 Entities.gmod_subway_81-720.Buttons.RearPneumatic.RearTrainLineIsolationToggle      = @[Common.ALL.RearTrainLineIsolationToggle]
 Entities.gmod_subway_81-720.Buttons.RearPneumatic.RearBrakeLineIsolationToggle      = @[Common.ALL.RearBrakeLineIsolationToggle]
+
 Entities.gmod_subway_81-720.Buttons.RearDoor.RearDoor               = @[Common.ALL.RearDoor]
 Entities.gmod_subway_81-720.Buttons.RearDoor1.RearDoor              = @[Common.ALL.RearDoor]
 Entities.gmod_subway_81-720.Buttons.CabinDoorR.CabinDoorRight       = @[Common.ALL.CabinDoor]
 Entities.gmod_subway_81-720.Buttons.CabinDoorL.CabinDoorLeft        = @[Common.ALL.CabinDoor]
 Entities.gmod_subway_81-720.Buttons.PassengerDoor.PassengerDoor     = @[Common.ALL.PassDoor]
 Entities.gmod_subway_81-720.Buttons.PassengerDoor2.PassengerDoor    = @[Common.ALL.PassDoor]
+
 Entities.gmod_subway_81-720.Buttons.VoltHelper2.!HV                 = @[Common.ALL.HighVoltage]
 Entities.gmod_subway_81-720.Buttons.VoltHelper2.!I1_3               = @[Common.ALL.EnginesCurrent1]
 Entities.gmod_subway_81-720.Buttons.VoltHelper2.!I2_4               = @[Common.ALL.EnginesCurrent2]
@@ -325,12 +353,14 @@ Entities.gmod_subway_81-720.Buttons.PneumoHelper2.!BrakeTrainLine   = @[Common.A
 Entities.gmod_subway_81-720.Buttons.PneumoHelper1.!BrakeCylinder    = @[Common.ALL.BCPressure]
 Entities.gmod_subway_81-720.Buttons.VoltHelper1.!Battery            = @[Common.ALL.BatteryVoltage]
 Entities.gmod_subway_81-720.Buttons.GV.GVToggle                     = @[Common.720.BRU]
+
 Entities.gmod_subway_81-720.Buttons.Route.RouteNumber1+         = @[Common.ALL.RouteNumber1+]
 Entities.gmod_subway_81-720.Buttons.Route.RouteNumber2+         = @[Common.ALL.RouteNumber2+]
 Entities.gmod_subway_81-720.Buttons.Route.RouteNumber1-         = @[Common.ALL.RouteNumber1-]
 Entities.gmod_subway_81-720.Buttons.Route.RouteNumber2-         = @[Common.ALL.RouteNumber2-]
 Entities.gmod_subway_81-720.Buttons.LastStation.LastStation+    = @[Common.ALL.LastStation+]
 Entities.gmod_subway_81-720.Buttons.LastStation.LastStation-    = @[Common.ALL.LastStation-]
+
 #gmod_subway_81-721
 Entities.gmod_subway_81-721.Buttons.Battery.BatteryToggle   = @[Common.ALL.VB]
 Entities.gmod_subway_81-721.Buttons.GV.GVToggle             = @[Common.720.BRU]
@@ -367,13 +397,16 @@ Entities.gmod_subway_81-721.Buttons.PVZ.SFV30Toggle         = @[Common.720.SFV30
 Entities.gmod_subway_81-721.Buttons.PVZ.SFV31Toggle         = @[Common.720.SFV31]
 Entities.gmod_subway_81-721.Buttons.PVZ.SFV32Toggle         = @[Common.720.SFV32]
 Entities.gmod_subway_81-721.Buttons.PVZ.SFV33Toggle         = @[Common.720.SFV33]
+
 Entities.gmod_subway_81-721.Buttons.FrontDoor.FrontDoor     = @[Common.ALL.FrontDoor]
 Entities.gmod_subway_81-721.Buttons.RearDoor.RearDoor       = @[Common.ALL.RearDoor]
 Entities.gmod_subway_81-721.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle    = @[Common.ALL.FrontBrakeLineIsolationToggle]
 Entities.gmod_subway_81-721.Buttons.FrontPneumatic.FrontTrainLineIsolationToggle    = @[Common.ALL.FrontTrainLineIsolationToggle]
 Entities.gmod_subway_81-721.Buttons.RearPneumatic.RearTrainLineIsolationToggle      = @[Common.ALL.RearTrainLineIsolationToggle]
 Entities.gmod_subway_81-721.Buttons.RearPneumatic.RearBrakeLineIsolationToggle      = @[Common.ALL.RearBrakeLineIsolationToggle]
+
 #Spawner:
+
 Entities.gmod_subway_81-720.Spawner.Texture.Name            = @[Common.Spawner.Texture]
 Entities.gmod_subway_81-720.Spawner.PassTexture.Name        = @[Common.Spawner.PassTexture]
 Entities.gmod_subway_81-720.Spawner.CabTexture.Name         = @[Common.Spawner.CabTexture]

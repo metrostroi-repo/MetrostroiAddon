@@ -25,12 +25,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
-ENT.MirrorCams = {
-    Vector(441,72,15),Angle(1,0 or 180,0),90 or 15,
-    Vector(441,-72,15),Angle(1,0 or 180,0),90 or 15,
-}
-
 ENT.AnnouncerPositions = {
     {Vector(412,-49 ,61),80,0.4},
     {Vector(-3,-60, 62),300,0.3},
@@ -44,14 +38,6 @@ ENT.Cameras = {
     {Vector(407.5+30,40,5) ,Angle(30,10,0),"Train.703.Parking"},
     {Vector(450+13,0,26),Angle(60,0,0),"Train.Common.CouplerCamera"},
 }
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
 
 function ENT:InitializeSounds()
      self.BaseClass.InitializeSounds(self)
@@ -500,14 +486,10 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(410,20,-45),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
+    self.SoundNames["vdol_loud"] = "subway_trains/common/pneumatic/door_valve/vdo3_on.mp3"
+    self.SoundNames["vdop_loud"] = self.SoundNames["vdol_loud"]
+    self.SoundPositions["vdol_loud"] = {100,1e9,Vector(410,20,-45),1}
+    self.SoundPositions["vdop_loud"] = self.SoundPositions["vdol_loud"]
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",
@@ -580,7 +562,7 @@ function ENT:InitializeSystems()
     -- Ящики с реле и контакторами
     self:LoadSystem("LK_755A")
     self:LoadSystem("YAR_15A")
-    self:LoadSystem("YAR_27")
+    self:LoadSystem("YAR_27",nil,"Ezh3")
     self:LoadSystem("YAK_37A")
     self:LoadSystem("YAK_36")
     self:LoadSystem("YAS_44V")
@@ -602,7 +584,6 @@ function ENT:InitializeSystems()
     self:LoadSystem("IGLA_PCBK")
 end
 function ENT:PostInitializeSystems()
-    self.YAR_27:TriggerInput("NoRKTT",1)
 end
 
 ENT.SubwayTrain = {

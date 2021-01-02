@@ -84,8 +84,7 @@ TRAIN_SYSTEM.xF = {
             {30, 40.60},
             {40, 54.15},
             {60, 81.20},
-            {80, 108.30},
-            {100*1.2, 120*1.5},
+            {80, 108.30}
         },{
             {0, 0.35},
             {1, 1.43},
@@ -104,8 +103,7 @@ TRAIN_SYSTEM.xF = {
             {30, 38.44},
             {40, 51.25},
             {60, 76.87},
-            {80, 102.50},
-            {100*1.2, 115*1.5},
+            {80, 102.50}
         },{
             {300.374, 0}, {308.958, 0.05}, {318.122, 0.1}, {327.922, 0.15},
             {338.424, 0.2}, {349.703, 0.25}, {361.842, 0.3}, {374.937, 0.35},
@@ -116,10 +114,9 @@ TRAIN_SYSTEM.xF = {
         }
    },{
          {
-            {0, 3.5*0.05},
-            {1.5, 1.5},
-            {4.5, 4.5*1.1},
-            {5.0, 4.73*1.1},
+            {0, 3.5},
+            {4.5, 3.50},
+            {5.0, 4.73},
             {7.5, 7.5},
             {10, 10.3},
             {15, 15.95},
@@ -135,10 +132,9 @@ TRAIN_SYSTEM.xF = {
             {80, 92.6},
             {100, 115.8}
          },{
-            {0, 4.5*0.05},
-            {1.5, 1.7},
-            {4.5, 5*1.1},
-            {5.0, 5.625*1.1},
+            {0, 4.5},
+            {4.5, 4.50},
+            {5.0, 5.625},
             {7.5, 8.66},
             {10, 11.71},
             {15, 17.80},
@@ -176,32 +172,24 @@ function TRAIN_SYSTEM:Think(dT)
     elseif self.Drive*self.Power > 0.5 then
         TargetMode = 1
     end
-    self.EDone = self.Brake*((self.Speed<=4 or self.Speed<=10 and (self.Mode>=0 or self.EDone > 0) or self.Mode>=0 and self.Voltage<550) and 1 or 0)
+    self.EDone = self.Brake*((self.Speed<=5 or self.Speed<=10 and (self.Mode>=0 or self.EDone > 0) or self.Mode>=0 and self.Voltage<550) and 1 or 0)
     -- Check correct mode
     if TargetMode ~= self.Mode then
          if self.State < 0.01 then
-            if (TargetMode == 0 or self.Timer and CurTime()-self.Timer>0.6) then
-                self.Mode = TargetMode
-                self.Timer = nil
-                if TargetMode then self.BrakeTimer = CurTime() end
-            elseif not self.Timer then
-                self.Timer = CurTime()
-            end
+             self.Mode = TargetMode
          end
-    else
-        if self.Mode ~= -1 then self.BrakeTimer = nil end
-        self.Timer = false
-    end
+     end
     if self.Power == 0 or (self.Voltage < 550 and self.Mode > 0) then
         self.Mode = 0
     end
 
-    local Inverter_PWM0 = self.Mode == -1 and math.max(0.02,math.min(1,(CurTime()-self.BrakeTimer)/0.1))*1 or 1.5     -- PWM On
+    local Inverter_PWM0 = 1.5     -- PWM On
     local Inverter_PWM1 = 2--TargetMode==0 and 0.5 or 1.5     -- PWM Off
     -- PWM target command
     -- Adjust state as defined by mode
     if self.Mode == TargetMode and TargetMode ~= 0 and self.EDone ==0 then
         local torque = math.abs(self.Torque)
+        --print(self.State,torque,self.TargetTorque,(self.TargetTorque-torque))
         self.State = math.max(0, math.min(1, self.State + (self.TargetTorque-torque)*Inverter_PWM0*dT))
         --[[ if torque < self.TargetTorque then
         self.State = math.max(0, math.min(1, self.State + (self.TargetTorque-torque)*Inverter_PWM0*dT))
@@ -302,4 +290,7 @@ function TRAIN_SYSTEM:Think(dT)
     -- Output torque
     self.Current = Is_total
     self.Torque = T_total
+    --[[print(string.format("V=%.1f km/h  Torque=%.2f m/s2  I=%.1f A  s=%.4f | Inverter S=%.0f%% V=%.0f V  F=%.1f Hz (%.1f Hz)  %s",
+        self.Speed, T_total, Is_total, s, self.State*100, V, f, self.InverterGenFrequency, ((self.Mode == 1) and "Drive" or ((self.Mode == -1) and "Brake" or "Coast"))
+        ))]]
 end

@@ -9,17 +9,6 @@ ENT.Category        = "Metrostroi (utility)"
 ENT.Spawnable       = true
 ENT.AdminSpawnable  = false
 
-
-ENT.CustomThinks = ENT.CustomThinks or {}
-ENT.CustomSpawnerUpdates = ENT.CustomSpawnerUpdates or {}
-
-local function destroySound(snd,nogc)
-	if IsValid(snd) then snd:Stop() end
-	if not nogc and snd and snd.__gc then snd:__gc() end
-end
-function ENT:DestroySound(snd,nogc)
-	destroySound(snd,nogc)
-end
 --------------------------------------------------------------------------------
 -- Default initializer only loads up DURA
 --------------------------------------------------------------------------------
@@ -42,13 +31,6 @@ end
 function ENT:BoardPassengers(delta)
 	self:SetNW2Float("PassengerCount", math.max(0,math.min(self:PassengerCapacity(),self:GetNW2Float("PassengerCount") + delta)))
 end
-
-ENT.LeftDoorPositions = { Vector(0,0,0) }
-ENT.RightDoorPositions = { Vector(0,0,0) }
-ENT.MirrorCams = {
-	Vector(450,71,24),Angle(1,180,0),15,
-	Vector(450,-71,24),Angle(1,180,0),15,
-}
 --------------------------------------------------------------------------------
 -- Load/define basic sounds
 --------------------------------------------------------------------------------
@@ -217,28 +199,39 @@ local function PauseBASS(snd)
 	snd:Pause()
 	snd:SetTime(0)
 end
-function ENT:CreateBASSSound(name,callback,noblock,onerr)
-	if self.StopSounds or not self.ClientPropsInitialized or self.CreatingCSEnts then return end
+function ENT:CreateBASSSound(name,callback)
+	if self.StopSounds then return end
 	--if self.SoundSpawned and name:find(".wav") then return end
 	--self.SoundSpawned = true
-	sound.PlayFile(Sound("sound/"..name), "3d noplay mono"..(noblock and " noblock" or ""), function( snd,err,errName )
-		if not IsValid(self) then destroySound(snd) return end
+	sound.PlayFile(Sound("sound/"..name), "3d noplay mono", function( snd,err,errName )
 		if err then
-			self:DestroySound(snd)
-			if err == 4 or err == 37 then self.StopSounds = true end
-			if err ~= 41 then
-				MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s\n",name,err,errName))
-				if onerr then callback(false) end
-			elseif GetConVarNumber("metrostroi_drawdebug") ~= 0 then
-				MsgC(Color(255,255,0),Format("Sound:%s\n\tBASS_ERROR_UNKNOWN (it's normal),ErrCode:%s, ErrName:%s\n",name,err,errName))
-				self:CreateBASSSound(name,callback)
+			if snd then
+				--if snd and snd.Remove then snd:Remove() end
 			end
+			if err == 4 or err == 37 then self.StopSounds = true end
+			MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s,\n",name,err,errName))
 			return
-		elseif not self.Sounds then
-			self:DestroySound(snd)
-			if onerr then callback(false) end
-		else
+		end
+		if self.Sounds and not err and ( IsValid( snd ) ) then
 			callback(snd)
+			--[[snd:SetPos(self:GetNW2Entity("seat_driver"):GetPos())
+			snd:SetPlaybackRate(pitch)
+			snd:SetVolume(volume)
+			if looptbl then
+				snd:EnableLooping(looptbl.loop == true or looptbl.loop == looptbl.state)
+				if #looptbl > 2 then
+					self.Sounds[snd] = looptbl
+					looptbl.state = (looptbl.state or 1)+1
+					looptbl.callback = function()
+						self:SetSoundState(soundid,volume,pitch)
+					end
+					if looptbl.state > #looptbl-1 then looptbl.state = nil end
+				end
+			end
+			--if esnd[5] then
+				snd:Set3DFadeDistance(200,1e9)
+			--end
+			snd:Play()]]
 		end
 	end )
 end
@@ -287,9 +280,7 @@ function ENT:SetBassParameters(snd,pitch,volume,tbl,looping,spec)
 	--debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
 end
 function ENT:SetSoundState(soundid,volume,pitch,time)
-	--volume = (input.IsKeyDown( KEY_LALT ) and soundid == "horn") and 0 or 1+math.sin(CurTime()*3)*0.2
-	--pitch = (input.IsKeyDown( KEY_LALT ) and soundid == "horn") and 1 or 1+math.sin(CurTime()*3)*0.2
-	if self.StopSounds or not self.ClientPropsInitialized or self.CreatingCSEnts then return end
+	if self.StopSounds then return end
 	local name = self.SoundNames and self.SoundNames[soundid]
 	local tbl = self.SoundPositions[soundid]
 	local looptbl = type(name) == "table" and name
@@ -300,20 +291,17 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 		if pitch > 0 then sndtbl.pitch = pitch end
 		for i,v in ipairs(name) do
 			if not sndtbl[i] then sndtbl[i] = {} end
-			if not IsValid(sndtbl[i].sound) and sndtbl[i].sound ~= false then
+			if not IsValid(sndtbl[i].sound) then
+				if not IsValid(sndtbl[i].sound) and sndtbl[i].sound and sndtbl[i].sound.Remove then
+					sndtbl[i].sound:Remove()
+				end
 				self:CreateBASSSound(v,function(snd)
-					if not snd then
-						destroySound(sndtbl[i].sound)
-						sndtbl[i].sound = nil
-						return
-					end
-
-					snd:SetPos(self:LocalToWorld(tbl[3]),self:GetAngles():Forward())
+					if not IsValid(self) then return end
+                    snd:SetPos(self:LocalToWorld(tbl[3]),self:GetAngles():Forward())
 					sndtbl[i].sound = snd
 					sndtbl[i].volume = volume > 0 and sndtbl.volume or volume or 0
 					self:SetBassParameters(snd,pitch,sndtbl[i].volume,tbl,i==2)
-				end,true,true)
-				sndtbl[i].sound = false
+				end)
 			end
 		end
 		local state = volume > 0
@@ -326,23 +314,18 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 		end
 	else
 		if looptbl then name = name[1] end
-		local snd = self.Sounds[soundid]
-		if not IsValid(snd) and name and snd ~= false then
+		local oldsnd = self.Sounds[soundid]
+		if not IsValid(oldsnd) and name then
+			if not IsValid(oldsnd) and oldsnd and oldsnd.Remove then
+				oldsnd:Remove()
+			end
 			self:CreateBASSSound(name,function(snd)
-				if not snd then
-					destroySound(self.Sounds[soundid])
-					self.Sounds[soundid] = nil
-					return
-				end
-
 				self.Sounds[soundid] = snd
-				self.Sounds.isloop[soundid] = true
 				self:SetBassParameters(snd,pitch,volume,tbl,looptbl and looptbl.loop)
-			end,true,true)
-			self.Sounds[soundid] = false
+			end)
 			return
 		end
-
+		local snd = self.Sounds[soundid]
 		if not IsValid(snd) then return end
 		local default_range = 0.80
 		if ((volume <= 0) or (pitch <= 0)) then
@@ -352,10 +335,10 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 			return
 		end
 		if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
-			if timeout then
+			snd:Play()
+			if time then
 				snd:SetTime(time)
 			end
-			snd:Play()
 		end
 		snd:SetPlaybackRate(pitch)
 		if tbl and tbl[4] then
@@ -427,8 +410,9 @@ if SERVER then
 	end
 else
 	function ENT:PlayOnceFromPos(id,sndname,volume,pitch,min,max,location)
-		if self.StopSounds or not self.ClientPropsInitialized or self.CreatingCSEnts then return end
-		self:DestroySound(self.Sounds[id],true)
+		if self.StopSounds then return end
+		if IsValid(self.Sounds[id]) then self.Sounds[id]:Stop() end
+		if self.Sounds[id] and self.Sounds[id].Remove then self.Sounds[id]:Remove() end
 		self.Sounds[id] = nil
 		if sndname == "_STOP" then return end
 		self.SoundPositions[id] = {min,max,location}
@@ -439,7 +423,7 @@ else
 		end)
 	end
 	function ENT:PlayOnce(soundid,location,range,pitch,randoff)
-		if self.StopSounds or not self.ClientPropsInitialized or self.CreatingCSEnts then return end
+		if self.StopSounds then return end
 		if not soundid then
 			ErrorNoHalt(debug.Trace())
 		end
@@ -452,23 +436,15 @@ else
 				local soundname = self.SoundNames[soundid]
 				if not soundname then print("NO SOUND",soundname,soundid) continue end
 				if type(soundname) == "table" then soundname = table.Random(soundname) end
+				if not soundname then ErrorNoHalt(Format("WTF loop sound nil %s %s\n",soundid)) end
 				if IsValid(self.ClientEnts[esnd[1]]) and not self.ClientEnts[esnd[1]].snd then
 					local ent = self.ClientEnts[esnd[1]]
-					sound.PlayFile( "sound/"..soundname, "3d noplay mono", function( snd,err,errName )
-						if not IsValid(self) then destroySound(snd) return end
-						if err then
-							self:DestroySound(snd)
-							if err == 4 or err == 37 then self.StopSounds = true end
-							if err ~= 41 then
-								MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s\n",name,err,errName))
-							elseif GetConVarNumber("metrostroi_drawdebug") ~= 0 then
-								MsgC(Color(255,255,0),Format("Sound:%s\n\tBASS_ERROR_UNKNOWN (it's normal),ErrCode:%s, ErrName:%s\n",name,err,errName))
-								--self:PlayOnce(soundid,location,range,pitch,randoff)
+					sound.PlayFile( "sound/"..soundname, "3d noplay mono noblock", function( snd,err,errName )
+						if not err and IsValid(ent) and IsValid( snd ) then
+							if err then
+								MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s,\n",name,err,errName))
+								if err == 4 then self.StopSounds = true end
 							end
-							return
-						elseif not IsValid(ent) then
-							self:DestroySound(snd)
-						else
 							snd:SetPos(ent:GetPos(),ent:LocalToWorldAngles(esnd[7]):Forward())
 							snd:SetPlaybackRate(esnd[4])
 							snd:SetVolume(esnd[3])
@@ -497,9 +473,9 @@ else
 			return
 		end
 
-		if IsValid(self.Sounds[soundid]) then
-			self:DestroySound(self.Sounds[soundid])
-			self.Sounds[soundid] = nil
+		if IsValid(self.Sounds[soundid]) then self.Sounds[soundid]:Stop() end
+		if not IsValid(self.Sounds[soundid]) and self.Sounds[soundid] and self.Sounds[soundid].Remove then
+			self.Sounds[soundid]:Remove()
 		end
 		self:CreateBASSSound(soundname,function(snd)
 			self.Sounds[soundid] = snd
@@ -612,13 +588,13 @@ end
 
 
 ENT.SubwayTrain = {
-	Type = "Base",
-	Name = "Base",
-	WagType = 2,
-	ALS = {
-		HaveAutostop = false,
-		TwoToSix = true,
-		RSAs325Hz = true,
-		Aproove0As325Hz = false,
-	},
+    Type = "Base",
+    Name = "Base",
+    WagType = 2,
+    ALS = {
+        HaveAutostop = false,
+        TwoToSix = true,
+        RSAs325Hz = true,
+        Aproove0As325Hz = false,
+    },
 }

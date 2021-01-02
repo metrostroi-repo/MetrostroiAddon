@@ -190,8 +190,8 @@ function TRAIN_SYSTEM:Think(dT)
         self.FreqCode = 0
     end
     if Power then
-        self.ABReady = (1-self.AB)*(FreqCount*self.ALS == 0 and 1 or 0)
-        local ABAccept = self.ABReady > 0 --self.NoFreq--[[ *ALS.Enabled--]]  > 0
+        self.ABReady = self.NoFreq*(1-self.AB)
+        local ABAccept = self.NoFreq--[[ *ALS.Enabled--]]  > 0
         if ABAccept and not self.ABPressed1 and Train.AB1.Value > 0 then self.ABPressed1 = CurTime() end
         if ABAccept and not self.ABPressed2 and Train.AB2.Value > 0 then self.ABPressed2 = CurTime() end
         if not ABAccept or Train.AB1.Value == 0 then self.ABPressed1 = nil end

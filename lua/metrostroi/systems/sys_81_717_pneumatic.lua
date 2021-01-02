@@ -75,6 +75,7 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("AirDistributorDisconnect","Relay","Switch")
     --УАВА
     self.Train:LoadSystem("UAVA","Relay","Switch",{ bass = true})
+    self.Train:LoadSystem("UAVAContact","Relay","Switch")
     self.Train:LoadSystem("UAVAC","Relay","",{normally_closed=true,bass=true})
     --Стояночный тормоз
     self.Train:LoadSystem("ParkingBrake","Relay","Switch",{bass = true})
@@ -109,8 +110,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
         self.RightDoorDir = { 0,0,0,0 }
         self.LeftDoorSpeed = {0,0,0,0}
         self.RightDoorSpeed = {0,0,0,0}
-        self.LeftDoorStuck = {false, false, false, false}
-        self.RightDoorStuck = {false, false, false, false}
         local start = math.Rand(0.6,0.8)
         -- 0.6-1
         self.DoorSpeedMain = -math.Rand(start,math.Rand(start+0.1,start+0.2))
@@ -164,6 +163,7 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         local HaveUAVA = not self.Train.SubwayTrain or not self.Train.SubwayTrain.ARS or not self.Train.SubwayTrain.ARS.NoUAVA
         if HaveUAVA and self.Train.UAVA.Value == 0 then
             self.EmergencyValve = true
+            self.Train.UAVAC:TriggerInput("Set",0)
             if value > 0 then RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName()) end
         end
     end
@@ -399,7 +399,7 @@ function TRAIN_SYSTEM:Think(dT)
         end
 
         -- 013: 7 0.0 Atm
-        if (self.RealDriverValvePosition == 7) and BLDisconnect then
+        if (self.RealDriverValvePosition == 7) and BLDisconnect and TLDisconnect then
             self:equalizePressure(dT,"BrakeLinePressure", 0.0, pr_speed)
         end
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeLinePressure_dPdT)
@@ -449,17 +449,10 @@ function TRAIN_SYSTEM:Think(dT)
         end
         self.Leak = true
     end
-
     local UAVABlocked = (self.BrakeLinePressure>3.5 and Train.UAVA.Value==0)
     if (Train.UAVA.Blocked>0) ~= UAVABlocked then
         Train.UAVA:TriggerInput("Block",UAVABlocked and 1 or 0)
     end
-
-    local UAVACBlocked = self.EmergencyValve and not self.EmergencyValveDisable
-    if (Train.UAVAC.Blocked>0) ~= UAVACBlocked then
-        Train.UAVAC:TriggerInput("Block",UAVACBlocked and 1 or 0)
-    end
-
     Train:SetPackedRatio("EmergencyValve_dPdT", -leak/wagc)
 
     local leak = 0
@@ -473,7 +466,7 @@ function TRAIN_SYSTEM:Think(dT)
     -- Fill brake cylinders
     if Train.AirDistributorDisconnect.Value == 0 then
         -- Valve #1
-        self.BrakeCylinderRegulationError = self.BrakeCylinderRegulationError or (math.random()*0.05 - 0.025)
+        self.BrakeCylinderRegulationError = self.BrakeCylinderRegulationError or (math.random()*0.20 - 0.10)
         local error = self.BrakeCylinderRegulationError
         if (Train.PneumaticNo1.Value == 1.0) and (Train.PneumaticNo2.Value == 0.0) then
             if self.PN1 == 0 then
@@ -537,6 +530,11 @@ function TRAIN_SYSTEM:Think(dT)
         Train:PlayOnce("PN2end","stop")
     end
 
+    if Train.UAVAContact.Value > 0.5 and Train.UAVAC.Value < 0.5 then
+        Train.UAVAC:TriggerInput("Set",1)
+        Train:PlayOnce("uava_reset","bass",1)
+    end
+
     --Parking brake simulation
     local PBPressure = math.Clamp(self.TrainLinePressure/5,0,1)*2.7
     if Train.ParkingBrake.Value == 0 then
@@ -583,9 +581,11 @@ function TRAIN_SYSTEM:Think(dT)
     if self.DoorLinePressure > 3.5 then
         if (Train.VDOL.Value == 1.0) and (Train.VDOP.Value == 0.0) and not self.DoorLeft then
             self.DoorLeft = true
+            if self.VDOLLoud then Train:PlayOnce("vdol_loud","cabin",0.8+math.random()*0.2,self.VDOLLoud) end
         end
         if (Train.VDOL.Value == 0.0) and (Train.VDOP.Value == 1.0) and not self.DoorRight then
             self.DoorRight = true
+            if self.VDORLoud then Train:PlayOnce("vdop_loud","cabin",0.8+math.random()*0.2,self.VDORLoud) end
         end
         if (Train.VDZ.Value == 1.0 or Train.VDOL.Value == 1.0 and Train.VDOP.Value == 1.0 or self.RZDTimer) and (self.DoorLeft or self.DoorRight) then
             if not self.OpenWaitL or CurTime()-self.OpenWaitL < 0.2 then
@@ -606,30 +606,16 @@ function TRAIN_SYSTEM:Think(dT)
     if self.VDOL ~= Train.VDOL.Value then
         self.VDOL = Train.VDOL.Value
         self:equalizePressure(dT,"TrainLinePressure", 0.0, 0.3)
-        if self.VDLoud and self.VDOL > 0 and not Train.LeftDoorsOpen then Train:PlayOnce("vdol_loud"..self.VDLoudID,"bass",self.VDLoud) end
     end
     if self.VDOP ~= Train.VDOP.Value then
         self.VDOP = Train.VDOP.Value
         self:equalizePressure(dT,"TrainLinePressure", 0.0, 0.3)
-        if self.VDLoud and self.VDOP > 0 and not Train.RightDoorsOpen then Train:PlayOnce("vdop_loud"..self.VDLoudID,"bass",self.VDLoud) end
     end
     if self.VDZ ~= Train.VDZ.Value then
         self.VDZ = Train.VDZ.Value
         self:equalizePressure(dT,"TrainLinePressure", 0.0, 0.3)
-        if self.VDLoud and self.VDZ > 0 and (Train.RightDoorsOpen or Train.LeftDoorsOpen) then Train:PlayOnce("vzd_loud"..self.VDLoudID,"bass",self.VDLoud) end
     end
-    if Train.CanStuckPassengerLeft then
-        for i in ipairs(self.LeftDoorStuck) do
-            self.LeftDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerLeft*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
-        end
-        Train.CanStuckPassengerLeft = false
-    end
-    if Train.CanStuckPassengerRight then
-        for i in ipairs(self.RightDoorStuck) do
-            self.RightDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerRight*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
-        end
-        Train.CanStuckPassengerRight = false
-    end
+
 
     Train.LeftDoorsOpen = false
     Train.RightDoorsOpen = false
@@ -638,9 +624,9 @@ function TRAIN_SYSTEM:Think(dT)
     for i=1,4 do
         self.LeftDoorDir[i] = math.Clamp(self.LeftDoorDir[i]+dT/(self.DoorLeft and self.LeftDoorSpeed[i] or -self.LeftDoorSpeed[i]),-1,1)
         self.RightDoorDir[i] = math.Clamp(self.RightDoorDir[i]+dT/(self.DoorRight and self.RightDoorSpeed[i] or -self.RightDoorSpeed[i]),-1,1)
-        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + ((self.LeftDoorDir[i]/self.LeftDoorSpeed[i])*dT),self.LeftDoorStuck[i] and 0.3 or 0,1)
+        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + ((self.LeftDoorDir[i]/self.LeftDoorSpeed[i])*dT),0,1)
         if self.LeftDoorState[i] == 0 or self.LeftDoorState[i] == 1 then self.LeftDoorDir[i] = 0 end
-        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + ((self.RightDoorDir[i]/self.RightDoorSpeed[i])*dT),self.RightDoorStuck[i] and 0.3 or 0,1)
+        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + ((self.RightDoorDir[i]/self.RightDoorSpeed[i])*dT),0,1)
         if self.RightDoorState[i] == 0 or self.RightDoorState[i] == 1 then self.RightDoorDir[i] = 0 end
         if not Train.LeftDoorsOpen and self.LeftDoorState[i] > 0 then
             Train.LeftDoorsOpen = true
@@ -654,22 +640,12 @@ function TRAIN_SYSTEM:Think(dT)
         end
         Train:SetPackedRatio("DoorL"..i,self.LeftDoorState[i])
         Train:SetPackedRatio("DoorR"..i,self.RightDoorState[i])
-        if self.LeftDoorStuck[i] and (self.DoorLeft or type(self.LeftDoorStuck[i]) == "number" and CurTime()-self.LeftDoorStuck[i] > 0) then
-            self.LeftDoorStuck[i] = false
-        end
-        if self.RightDoorStuck[i] and (self.DoorRight or type(self.RightDoorStuck[i]) == "number" and CurTime()-self.RightDoorStuck[i] > 0) then
-            self.RightDoorStuck[i] = false
-        end
-        Train:SetPackedBool("DoorLS"..i,self.LeftDoorStuck[i])
-        Train:SetPackedBool("DoorRS"..i,self.RightDoorStuck[i])
     end
     if openL and not self.OpenWaitL then self.OpenWaitL = CurTime() end
     if openR and not self.OpenWaitR then self.OpenWaitR = CurTime() end
     Train:SetPackedBool("DoorL",self.DoorLeft)
     Train:SetPackedBool("DoorR",self.DoorRight)
     Train.BD:TriggerInput("Set",not Train.RightDoorsOpen and not Train.LeftDoorsOpen)
-    Train.LeftDoorsOpening = self.DoorLeft
-    Train.RightDoorsOpening = self.DoorRight
 
     ----------------------------------------------------------------------------
     if self.DriverValveDisconnectPrevious ~= Train.DriverValveDisconnect.Value then

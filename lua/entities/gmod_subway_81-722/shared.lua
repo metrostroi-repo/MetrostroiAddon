@@ -21,23 +21,6 @@ function ENT:GetStandingArea()
     return Vector(-450,-30,-62),Vector(380,30,-62)
 end
 
-local function GetDoorPosition(i,k)
-    return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
-end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
-ENT.MirrorCams = {
-    Vector(441,72,15),Angle(1,180,0),15,
-    Vector(441,-72,15),Angle(1,180,0),15,
-}
-
 ENT.AnnouncerPositions = {
 }
 for i=1,4 do
@@ -77,7 +60,7 @@ function ENT:InitializeSounds()
     self.SoundNames["engine_loud"]   = {"subway_trains/722/engines/engine_loud.wav",loop = true}
     self.SoundPositions["engine_loud"] = {400,1e9,Vector(0,0,0),0.2}
     self.SoundNames["chopper"]   = {"subway_trains/722/chopper.wav",loop = true}
-    self.SoundPositions["chopper"] = {200,1e9,Vector(0,0,0),0.03}
+    self.SoundPositions["chopper"] = {400,1e9,Vector(0,0,0),0.03}
 
     self.SoundNames["battery_on_1"]   = "subway_trains/722/battery/battery_off_1.mp3"
     self.SoundPositions["battery_on_1"] = {100,1e9,Vector(182,50,-75),0.5}
@@ -93,9 +76,9 @@ function ENT:InitializeSounds()
     self.SoundPositions["battery_off_loop"] = {100,1e9,Vector(182,50,-75),0.02}
 
     self.SoundNames["compressor"] = {loop=true,"subway_trains/722/compressol_loop.wav"}
-    self.SoundPositions["compressor"] = {485,1e9,Vector(-118,-40,-66),0.4} --FIXME: Pos
+    self.SoundPositions["compressor"] = {485,1e9,Vector(-118,-40,-66),0.75} --FIXME: Pos
     self.SoundNames["compressor_pn"] = "subway_trains/722/compressor_pssh.mp3"
-    self.SoundPositions["compressor_pn"] = {485,1e9,Vector(-118,-40,-66),0.4} --FIXME: Pos
+    self.SoundPositions["compressor_pn"] = {485,1e9,Vector(-118,-40,-66),0.75} --FIXME: Pos
 
     self.SoundNames["release"] = {loop=true,"subway_trains/722/pneumo_release2.wav"}
     self.SoundPositions["release"] = {320,1e9,Vector(-183,0,-70),0.1} --FIXME: Pos
@@ -205,6 +188,12 @@ function ENT:InitializeSounds()
     self.SoundNames["door_alarm"] = "subway_trains/722/door_alarm.mp3"
     self.SoundPositions["door_alarm"] = {485,1e9,Vector(0,0,0),0.2}
 
+    local function GetDoorPosition(i,k,j)
+        if j == 0
+        then return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
+        else return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
+        end
+    end
     self.SoundNames["doors"] = "subway_trains/722/door_start.mp3"
     self.SoundNames["doorl"] = {loop=true,"subway_trains/722/door_loop.wav"}
     self.SoundPositions["doors"] = {300,1e9,Vector(0,0,0),0.2}
@@ -212,7 +201,7 @@ function ENT:InitializeSounds()
     for i=0,3 do
         for k=0,1 do
             self.SoundNames["door"..i.."x"..k.."c"] = "subway_trains/722/door_close.mp3"
-            self.SoundPositions["door"..i.."x"..k.."c"] = {485,1e9,GetDoorPosition(i,k),0.2}
+            self.SoundPositions["door"..i.."x"..k.."c"] = {485,1e9,GetDoorPosition(i,k,0),0.2}
         end
     end
     self.SoundNames["door_alarm"] = {"subway_trains/722/door_alarm.mp3"}
@@ -220,7 +209,7 @@ function ENT:InitializeSounds()
 
 
     self.SoundNames["epk_brake"] = {loop=true,"subway_trains/common/pneumatic/epv_loop.wav"}
-    self.SoundPositions["epk_brake"] = {40,1e9,Vector(458,56.5,-61),0.65}
+    self.SoundPositions["epk_brake"] = {80,1e9,Vector(458,56.5,-61),0.65}
 
     self.SoundNames["valve_brake"] = {loop=true,"subway_trains/common/pneumatic/epv_loop.wav"}
     self.SoundPositions["valve_brake"] = {400,1e9,Vector(418.25,-49.2,1.3),1}

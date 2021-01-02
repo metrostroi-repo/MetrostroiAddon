@@ -23,15 +23,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 ENT.AnnouncerPositions = {
     {Vector(420,-49 ,61),120,0.4},
     {Vector(-3,-60, 62),300,0.3},
@@ -65,7 +56,7 @@ function ENT:InitializeSounds()
     self.SoundNames["tisu"]   = {"subway_trains/718/tisu.wav",loop = true}
     self.SoundPositions["tisu"] = {400,1e9,Vector(0,0,-448),0.7} --FIXME: Pos
 
-    --[[self.SoundNames["rolling_5"] = {loop=true,"subway_trains/common/junk/junk_background3.wav"}
+    self.SoundNames["rolling_5"] = {loop=true,"subway_trains/common/junk/junk_background3.wav"}
     self.SoundNames["rolling_10"] = {loop=true,"subway_trains/717/rolling/10_rolling.wav"}
     self.SoundNames["rolling_40"] = {loop=true,"subway_trains/717/rolling/40_rolling.wav"}
     self.SoundNames["rolling_70"] = {loop=true,"subway_trains/717/rolling/70_rolling.wav"}
@@ -74,25 +65,7 @@ function ENT:InitializeSounds()
     self.SoundPositions["rolling_10"] = {480,1e12,Vector(0,0,0),0.20}
     self.SoundPositions["rolling_40"] = {480,1e12,Vector(0,0,0),0.55}
     self.SoundPositions["rolling_70"] = {480,1e12,Vector(0,0,0),0.60}
-    self.SoundPositions["rolling_80"] = {480,1e12,Vector(0,0,0),0.75}]]
-    self.SoundNames["rolling_5"] = {loop=true,"subway_trains/common/junk/junk_background3.wav"}
-    self.SoundNames["rolling_10"] = {loop=true,"subway_trains/717/rolling/10_rolling.wav"}
-    self.SoundNames["rolling_40"] = {loop=true,"subway_trains/717/rolling/40_rolling.wav"}
-    self.SoundNames["rolling_70"] = {loop=true,"subway_trains/717/rolling/70_rolling.wav"}
-    self.SoundNames["rolling_80"] = {loop=true,"subway_trains/717/rolling/80_rolling.wav"}
-    self.SoundPositions["rolling_5"] = {480,1e12,Vector(0,0,0),0.05}
-    self.SoundPositions["rolling_10"] = {480,1e12,Vector(0,0,0),0.1}
-    self.SoundPositions["rolling_40"] = {480,1e12,Vector(0,0,0),0.55}
-    self.SoundPositions["rolling_70"] = {480,1e12,Vector(0,0,0),0.60}
     self.SoundPositions["rolling_80"] = {480,1e12,Vector(0,0,0),0.75}
-
-
-    self.SoundNames["rolling_32"] = {loop=true,"subway_trains/717/rolling/rolling_32.wav"}
-    self.SoundNames["rolling_68"] = {loop=true,"subway_trains/717/rolling/rolling_68.wav"}
-    self.SoundNames["rolling_75"] = {loop=true,"subway_trains/717/rolling/rolling_75.wav"}
-    self.SoundPositions["rolling_32"] = {480,1e12,Vector(0,0,0),0.2}
-    self.SoundPositions["rolling_68"] = {480,1e12,Vector(0,0,0),0.4}
-    self.SoundPositions["rolling_75"] = {480,1e12,Vector(0,0,0),0.8}
 
     self.SoundNames["rolling_motors"] = {loop=true,"subway_trains/common/junk/wind_background1.wav"}
     self.SoundNames["rolling_motors2"] = {loop=true,"subway_trains/common/junk/wind_background1.wav"}
@@ -324,26 +297,26 @@ function ENT:InitializeSounds()
     self.SoundPositions["vent_cabh"] = self.SoundPositions["vent_cabl"]
 
     self.SoundNames["k2_on"] = "subway_trains/717/pneumo/lk2_on.mp3"
-    self.SoundNames["k2_off"] = "subway_trains/717/pneumatic/lk/lk2_off.mp3"
+    self.SoundNames["k2_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
     self.SoundNames["k1_on"] = "subway_trains/717/pneumo/lk1_on.mp3"
     self.SoundNames["k3_on"] = self.SoundNames["k2_on"]
     self.SoundNames["kmr1_on"] = self.SoundNames["k1_on"]
-    self.SoundNames["kmr2_on"] = self.SoundNames["kmr1_on"]
+    self.SoundNames["kmr2_on"] = self.SoundNames["k1_on"]
     self.SoundNames["k1_off"] = self.SoundNames["k2_off"]
     self.SoundNames["k3_off"] = self.SoundNames["k2_off"]
-    self.SoundNames["kmr1_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
-    self.SoundNames["kmr2_off"] = self.SoundNames["kmr1_off"]
+    self.SoundNames["kmr1_off"] = self.SoundNames["k2_off"]
+    self.SoundNames["kmr2_off"] = self.SoundNames["k2_off"]
     --self.SoundNames["ksh1_off"] = "subway_trains/717/pneumo/ksh1.mp3"
     self.SoundPositions["k2_on"] = {440,1e9,Vector(-60,-40,-66),0.22}
     self.SoundPositions["k1_on"] = {440,1e9,Vector(-60,-40,-66),0.3}
-    self.SoundPositions["k2_off"] = {440,1e9,Vector(-60,-40,-66),0.1}
-    self.SoundPositions["k3_off"] = self.SoundPositions["k2_off"]
+    self.SoundPositions["k2_off"] = self.SoundPositions["k2_on"]
+    self.SoundPositions["k3_off"] = self.SoundPositions["k2_on"]
     self.SoundPositions["k3_on"] = self.SoundPositions["k2_on"]
-    self.SoundPositions["k3_off"] = self.SoundPositions["k2_off"]
+    self.SoundPositions["k3_off"] = self.SoundPositions["k2_on"]
     self.SoundPositions["kmr1_on"] = self.SoundPositions["k2_on"]
-    self.SoundPositions["kmr1_off"] = {440,1e9,Vector(-60,-40,-66),0.3}
+    self.SoundPositions["kmr1_off"] = self.SoundPositions["k2_on"]
     self.SoundPositions["kmr2_on"] = self.SoundPositions["k2_on"]
-    self.SoundPositions["kmr2_off"] = {440,1e9,Vector(-60,-40,-66),0.3}
+    self.SoundPositions["kmr2_off"] = self.SoundPositions["k2_on"]
     --self.SoundPositions["ksh1_off"] = self.SoundPositions["lk1_on"]
 
     self.SoundNames["qf1_on"] = "subway_trains/717/pneumo/ksh1.mp3"
@@ -380,14 +353,6 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(-420,45,-30),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",
@@ -463,11 +428,6 @@ function ENT:InitializeSystems()
 
     self:LoadSystem("RouteNumber","81_718_RouteNumber")
     self:LoadSystem("LastStation","81_71_LastStation","717","destination")
-end
-
-function ENT:PostInitializeSystems()
-    if CLIENT then return end
-    self.BIS200:TriggerInput("SpeedDec",1)
 end
 
 ---------------------------------------------------

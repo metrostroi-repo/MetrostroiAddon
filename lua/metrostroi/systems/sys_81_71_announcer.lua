@@ -38,9 +38,9 @@ if SERVER then
         if not Metrostroi[self.AnnTable] then return end
 
         for k, v in pairs(tbl) do
-            local tbl = Metrostroi[self.AnnTable][self.Train:GetNW2Int("Announcer", 1)] or Metrostroi[self.AnnTable][1]
+            local tbl = Metrostroi[self.AnnTable][self.Train:GetNW2Int("Announcer", 1)]
             if v~=-2 then
-                table.insert(self.Schedule, tbl and tbl[v] or v)
+                table.insert(self.Schedule, tbl[v] or v)
             else
                 self:Reset()
             end
@@ -115,14 +115,13 @@ if SERVER then
                     self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", -1)
                 end
             elseif tbl == "buzz_start" then
-                local bpsn = self.Train:GetNW2Int("BPSNType",13)
                 for i = 1, #self.Train.WagonList do
-                    self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", (bpsn == 1 or bpsn == 2 or bpsn == 8) and 2 or 1)
+                    self.Train.WagonList[i]:SetNW2Bool("AnnouncerBuzz", true)
                 end
                 self.BuzzWork = true
             elseif tbl == "buzz_end" then
                 for i = 1, #self.Train.WagonList do
-                    self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", -1)
+                    self.Train.WagonList[i]:SetNW2Bool("AnnouncerBuzz", false)
                 end
                 self.BuzzWork = false
             elseif type(tbl) == "table" then
@@ -148,10 +147,10 @@ else
 
         if train.AnnouncerPositions then
             for k, v in ipairs(train.AnnouncerPositions) do
-                train:PlayOnceFromPos("announcer" .. k, snd, train.OnAnnouncer and train:OnAnnouncer(v[3],k) or v[3] or 1, 1, v[2] or 400, 1e9, v[1])
+                train:PlayOnceFromPos("announcer" .. k, snd, v[3] or 1, 1, v[2] or 400, 1e9, v[1])
             end
         else
-            train:PlayOnceFromPos("announcer", snd, train.OnAnnouncer and train:OnAnnouncer(1) or 1, 1, 600, 1e9, Vector(0, 0, 0))
+            train:PlayOnceFromPos("announcer", snd, 1, 1, 600, 1e9, Vector(0, 0, 0))
         end
     end)
 

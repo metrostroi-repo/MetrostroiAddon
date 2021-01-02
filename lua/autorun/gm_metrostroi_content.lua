@@ -10,8 +10,6 @@ local workshopid = {
     1095105863, -- Pack 4
     1095109617, -- Pack 5
     1095111608, -- Pack 6
-    674649096,
-    348429431,
 }
 print("-Starting adding metrostroi workshop addons...")
 print("-Workshop addons in base:"..#workshopid)

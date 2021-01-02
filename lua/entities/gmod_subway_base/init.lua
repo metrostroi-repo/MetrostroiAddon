@@ -84,7 +84,6 @@ function ENT:PostEntityPaste(ply,ent,createdEntities)
     end
     self.Owner = ply
 end
-
 --------------------------------------------------------------------------------
 function ENT:Initialize()
     self.Joints = {}
@@ -134,12 +133,12 @@ function ENT:Initialize()
     self:LoadSystem("FailSim")
 
 
+    -- Initialize wire interface
+    self.WireIOSystems = self.WireIOSystems or { "KV", "ALSCoil", "Pneumatic"}
+    self.WireIOIgnoreList = self.WireIOIgnoreList or {
+        "ALSCoilEnabled", "ALSCoilRealF5"
+    }
     if Wire_CreateInputs then
-        -- Initialize wire interface
-        self.WireIOSystems = self.WireIOSystems or { "KV", "ALSCoil", "Pneumatic"}
-        self.WireIOIgnoreList = self.WireIOIgnoreList or {
-            "ALSCoilEnabled", "ALSCoilRealF5"
-        }
         local inputs = {}
         local outputs = {}
         local inputTypes = {}
@@ -213,9 +212,6 @@ function ENT:Initialize()
 
         self.Inputs = WireLib.CreateSpecialInputs(self,inputs,inputTypes)
         self.Outputs = WireLib.CreateSpecialOutputs(self,outputs,outputTypes)
-    else
-        self.WireIOSystems = {}
-        self.WireIOIgnoreList = {}
     end
 
     -- Setup drivers controls
@@ -264,8 +260,10 @@ function ENT:Initialize()
     -- Passenger related data (must be set by derived trains to allow boarding)
     self.LeftDoorsOpen = false
     --self.LeftDoorsBlocked = false
+    self.LeftDoorPositions = { Vector(0,0,0) }
     self.RightDoorsOpen = false
     --self.RightDoorsBlocked = false
+    self.RightDoorPositions = { Vector(0,0,0) }
 
     -- Get default train mass
     if IsValid(self:GetPhysicsObject()) then
@@ -287,7 +285,6 @@ function ENT:Initialize()
     self:FindFineSkin()
     -- Initialize train systems
     self:PostInitializeSystems()
-    for k,v in pairs(self.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(self) end end
 end
 function ENT:GetWagonNumber()
     return self.WagonNumber or self:EntIndex()
@@ -337,7 +334,7 @@ function ENT:Use(ply)
     local tr = ply:GetEyeTrace()
     if not tr.Hit then return end
     local hitpos = self:WorldToLocal(tr.HitPos)
-    --print(hitpos)
+    print(hitpos)
     if self.InteractionZones and ply:GetPos():Distance(tr.HitPos) < 100 then
         for k,v in pairs(self.InteractionZones) do
             if hitpos:Distance(v.Pos) < v.Radius then
@@ -479,9 +476,7 @@ function ENT:ElectricConnected(train,isRear)
         if rTIsFront and rC and rC.NoFrontEKK then return end
         if rC and conf and conf.EKKType ~= rC.EKKType then return end
         if rTIsFront and rT.FrontCoupledBogeyDisconnect or not rTIsFront and rT.RearCoupledBogeyDisconnect or self.RearCoupledBogeyDisconnect then return end
-        if not IsValid(self.RearCouple) or self.RearCouple:ElectricDisconnected() or (
-            rT.FrontTrain == self and (not IsValid(rT.FrontCouple) or rT.FrontCouple:ElectricDisconnected())
-            or rT.RearTrain == self and (not IsValid(rT.RearCouple) or rT.RearCouple:ElectricDisconnected())) then return end
+        if IsValid(self.RearCouple) and self.RearCouple:ElectricDisconnected() then return end
     else
         local fT = self.FrontTrain
         local fC = fT.SubwayTrain
@@ -492,9 +487,7 @@ function ENT:ElectricConnected(train,isRear)
         if conf.NoFrontEKK or fTIsFront and fC and fC.NoFrontEKK then return end
         if fC and conf and conf.EKKType ~= fC.EKKType then return end
         if fTIsFront and fT.FrontCoupledBogeyDisconnect or not fTIsFront and fT.RearCoupledBogeyDisconnect or self.FrontCoupledBogeyDisconnect then return end
-        if IsValid(self.FrontCouple) and self.FrontCouple:ElectricDisconnected() or (
-            fT.FrontTrain == self and (not IsValid(fT.FrontCouple) or fT.FrontCouple:ElectricDisconnected())
-            or fT.RearTrain == self and (not IsValid(fT.RearCouple) or fT.RearCouple:ElectricDisconnected())) then return end
+        if IsValid(self.FrontCouple) and self.FrontCouple:ElectricDisconnected() then return end
     end
     return true
 end
@@ -1491,7 +1484,7 @@ function ENT:OnKeyEvent(key,state,ply,helper)
         end
     end
     if self:IsModifier(key) then
-        if keyT.helper and (helper or keyT[1]) then
+        if keyT.helper then
             self:ButtonEvent(helper and keyT.helper or keyT[1],state,ply)
         elseif not helper then
             if state and keyT.def and not helper then
@@ -1862,7 +1855,7 @@ function ENT:Think()
                         end
                     end
                     local twVal = train:LeaderReadTrainWire(target)
-                    if train.TrainWireInverts[twID] or wires[twID] == true then
+                    if train.TrainWireInverts[twID] then
                         if twVal <= 0 then
                             wires[twID] = true
                         elseif not wires[twID] or wires[twID] ~= true then
@@ -1896,14 +1889,12 @@ function ENT:Think()
             end
         end
     end
-    if Wire_CreateInputs then
-        local readTrainWire = self.ReadTrainWire
-        for i=1,32 do
-            self.TriggerOutput(self,"TrainWire"..i,readTrainWire(self,i))
-        end
-        self.TriggerOutput(self,"TrainWire35",readTrainWire(self,35))
-        self.TriggerOutput(self,"TrainWire36",readTrainWire(self,36))
+    local readTrainWire = self.ReadTrainWire
+    for i=1,32 do
+        self.TriggerOutput(self,"TrainWire"..i,readTrainWire(self,i))
     end
+    self.TriggerOutput(self,"TrainWire35",readTrainWire(self,35))
+    self.TriggerOutput(self,"TrainWire36",readTrainWire(self,36))
 
     -- Calculate own speed and acceleration
     local speed,acceleration = 0,0
@@ -1931,32 +1922,7 @@ function ENT:Think()
         end
         self.Plombs.Init = nil
     end
-    if self.Electric and self.Electric.Overheat1 then
-        -- Draw overheat of the engines FIXME
-        local smoke_intensity =
-            self.Electric.Overheat1*((self.Electric.T1-200)/400) or
-            self.Electric.Overheat2*((self.Electric.T2-200)/400) or 0
 
-        -- Generate smoke
-        self.PrevSmokeTime = self.PrevSmokeTime or CurTime()
-        if (smoke_intensity > 0.0) and (CurTime() - self.PrevSmokeTime > 0.5+4.0*(1-smoke_intensity)) then
-            self.PrevSmokeTime = CurTime()
-
-            ParticleEffect("generic_smoke",
-                self:LocalToWorld(Vector(100*math.random(),40,-80)),
-                Angle(0,0,0),self)
-        end
-    end
-
-    if (not self.SpritesTimer or CurTime()-self.SpritesTimer > 1) and self.GlowingLights then
-        for _,ply in ipairs(player.GetAll()) do
-            local inPVS =  self:TestPVS(ply)
-            for _,light in pairs(self.GlowingLights) do
-                light:SetPreventTransmit(ply,not inPVS)
-            end
-        end
-        self.SpritesTimer = CurTime()
-    end
     --[[
     -- Update speed and acceleration
     self.Speed = speed
@@ -1978,8 +1944,6 @@ function ENT:Think()
     self:SetNW2Float("Accel",math.Round((self.OldSpeed or 0) - (self.Speed or 0)*(self.SpeedSign or 0),2))
     self:SetNW2Float("TrainSpeed",self.Speed)
     self.OldSpeed = (self.Speed or 0)*(self.SpeedSign or 0)
-
-    for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
     self:NextThink(CurTime()+0.05)
     return true
 end
@@ -1998,7 +1962,7 @@ end
 --------------------------------------------------------------------------------
 -- Default spawn function
 --------------------------------------------------------------------------------
-function ENT:SpawnFunction(ply, tr,className,rotate,func)
+function ENT:SpawnFunction(ply, tr,className,rotate)
     --MaxTrains limit
     if self.ClassName ~= "gmod_subway_base" and not self.NoTrain then
         local Limit1 = math.min(2,GetConVarNumber("metrostroi_maxwagons"))*GetConVarNumber("metrostroi_maxtrains_onplayer")-1
@@ -2034,10 +1998,9 @@ function ENT:SpawnFunction(ply, tr,className,rotate,func)
     local pos, ang = nil
     local inhibitrerail = false
 
-    if func then
-        pos,ang = func(ply)
     --TODO: Make this work better for raw base ent
-    elseif tr.Hit and self.NoTrain then
+
+    if tr.Hit and self.NoTrain then
         -- Regular spawn
         if tr.HitPos:Distance(tr.StartPos) > distancecap then
             -- Spawnpos is far away, put it at distancecap instead
@@ -2109,15 +2072,11 @@ function ENT:OnButtonRelease(button)
 end
 
 -- Clears the serverside keybuffer and fires events
-function ENT:ClearKeyBuffer(helper)
+function ENT:ClearKeyBuffer()
     for k,v in pairs(self.KeyBuffer) do
         local button = self.KeyMap[k]
         if button ~= nil then
-            if helper then
-                if type(button) == "table" and button.helper then
-                    self:ButtonEvent(button.helper,false)
-                end
-            elseif type(button) == "string" then
+            if type(button) == "string" then
                 self:ButtonEvent(button,false)
             else
                 --Check modifiers as well
@@ -2147,9 +2106,11 @@ end
 
 function ENT:ButtonEvent(button,state,ply)
     if ShouldFireEvents(self.ButtonBuffer[button],state) then
-        if state == false and not self:OnButtonRelease(button,ply) then
+        if state == false then
+            if self:OnButtonRelease(button,ply) then return end
             self:TriggerInput(button,0.0)
-        elseif state ~= false and not self:OnButtonPress(button,ply) then
+        else
+            if self:OnButtonPress(button,ply) then return end
             self:TriggerInput(button,1.0)
             if self.Plombs and button:sub(-2,-1) == "Pl" and self.Plombs[button:sub(1,-3)]  then
                 local plomb = self.Plombs[button:sub(1,-3)]
@@ -2219,7 +2180,7 @@ net.Receive("metrostroi-panel-touch", function(len, ply)
         -- Player currently driving
         train = seat:GetNW2Entity("TrainEntity")
         if (not train) or (not train:IsValid()) then return end
-        if (seat != train.DriverSeat) and (seat != train.InstructorsSeat) and (not train.CPPICanPhysgun or not train:CPPICanPhysgun(ply)) then return end
+        if (seat != train.DriverSeat) and (seat != train.InstructorsSeat) and not train:CPPICanPhysgun(ply) then return end
     else
         -- Player not driving, check recent train
         train = IsValid(ply.lastVehicleDriven) and ply.lastVehicleDriven:GetNW2Entity("TrainEntity") or NULL
@@ -2260,8 +2221,7 @@ local function HandleExitingPlayer(ply, vehicle)
 
     local train = vehicle:GetNW2Entity("TrainEntity")
     if IsValid(train) then
-        ply.lastTrain = train
-        ply.lastTrainSeat = vehicle
+
         -- Move exiting player
         local seattype = vehicle:GetNW2String("SeatType")
         local offset
@@ -2280,7 +2240,7 @@ local function HandleExitingPlayer(ply, vehicle)
         ply:SetEyeAngles(vehicle:GetForward():Angle())
 
         -- Server
-        train:ClearKeyBuffer(seattype)
+        train:ClearKeyBuffer()
         -- Client
         net.Start("metrostroi-cabin-reset")
         net.WriteEntity(train)
@@ -2321,6 +2281,14 @@ hook.Add("JoystickInitialize","metroistroi_cabin",JoystickRegister)
 hook.Add("PlayerLeaveVehicle", "gmod_subway_81-717-cabin-exit", HandleExitingPlayer )
 hook.Add("CanPlayerEnterVehicle","gmod_subway_81-717-cabin-entry", CanPlayerEnter )
 
+net.Receive("MetrostroiBindPress",function()
+    local ent = net.ReadEntity()
+    local bind = net.ReadString()
+    if IsValid(ent) and ent.OnKeyEvent then
+        ent:OnKeyEvent(bind,true)
+        ent:OnKeyEvent(bind,false)
+    end
+end)
 function ENT:BrokePlomb(but,ply,nosnd)
     if ply then
         local nomsg,noplomb = hook.Run("MetrostroiPlombBroken",self,but,ply)
@@ -2421,7 +2389,6 @@ function ENT:UpdateWagonNumber() end
 -- Common functions for RKSU(81-71) trains
 --------------------------------------------------------------------------------
 function ENT:GenerateJerks()
-    if not IsValid(self.FrontBogey) or not IsValid(self.RearBogey) then return end
     local jerk = math.abs((self.Acceleration - (self.PrevAcceleration or 0)) / self.DeltaTime)
 
     local roll = self:GetLocalAngles().roll
@@ -2485,99 +2452,3 @@ if game.SinglePlayer() then
         net.Send(ply)
     end)
 end
-
-
-    --[[
-    if self:GetWagonNumber() == 0000 or self:EntIndex()==1531 then --DEBUG
-        local accel = 0
-        for i=1,#self.WagonList do
-            accel=accel+self.WagonList[i].Acceleration
-        end
-        local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
-        if math.abs(accel) > 0.1 then
-            for k,v in pairs(drivers) do
-                if IsValid(v) and IsValid(v:GetDriver()) then
-                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/#self.WagonList))--(accel/#self.WagonList)))
-                end
-            end
-        end
-    end
-    self.TestA = self.TestA or nil
-    self.TestV = self.TestV or nil
-    local accel = self.Acceleration
-    if (self.Speed > 75 or self.Speed > 20 and self.Speed < 60) and accel < -0.5 and not self.TestA then
-        self.TestA = CurTime()
-        self.TestV = self.Speed/3600*1000
-        self.TestTyp = self.Speed > 55 and 2 or 1
-        self.TestS = 0
-    end
-    if accel > -0.5 and self.TestA then
-        self.TestA = nil
-        self.TestV = nil
-        self.TestS = nil
-    end
-
-    if self:GetWagonNumber() == 0000 or self:EntIndex()==0065 then --DEBUG
-        local accel = 0
-        for i=1,#self.WagonList do
-            accel=accel+self.WagonList[i].Acceleration
-        end
-        local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
-        if math.abs(accel) > 0.1 then
-            for k,v in pairs(drivers) do
-                if IsValid(v) and IsValid(v:GetDriver()) then
-                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/#self.WagonList))--(accel/#self.WagonList)))
-                end
-            end
-        end
-    end
-    if self.TestS then self.TestS=self.TestS+self.Speed*self.SpeedSign/3600*1000*self.DeltaTime end
-    if (self.Speed<2 and self.TestTyp ==2 or self.Speed<2 and self.TestTyp ==1) and self.TestA then
-        local curSpeed = self.Speed/3600*1000
-        local a = (curSpeed-self.TestV)/(CurTime()-self.TestA)
-        RunConsoleCommand("say",Format("[%05d]V0= %.1f V1=%.1f t=%.2f a=%.2f s=%.1f",self:GetWagonNumber(),self.TestV*3600/1000,curSpeed*3600/1000,CurTime()-self.TestA,a,self.TestS))
-
-
-        self.TestA = nil
-        self.TestV = nil
-        self.TestS = nil
-    end--]]
-    --[[
-    if (self.Speed < 20 or self.Speed < 70) and accel > 0.1 and not self.TestA then
-        self.TestA = CurTime()
-        self.TestV = self.Speed/3600*1000
-        self.TestTyp = self.Speed > 60 and 2 or self.Speed > 30 and 1 or 0
-        print("!!!",self.TestTyp)
-        self.TestS = 0
-    end
-    if self.TestA and self.KV.ControllerPosition<=0 and (self.Speed<0.1 or self.Speed<1 and self.TestA>0) then
-        self.TestA = nil
-        self.TestV = nil
-        self.TestS = nil
-    end
-    if self.TestS then self.TestS=self.TestS+self.Speed*self.SpeedSign/3600*1000*dT end
-    if (self.Speed>=30 and self.TestTyp ==0 or self.Speed>=60 and self.TestTyp ==1 or self.Speed>=80 and self.TestTyp ==2) and self.TestA then
-        local curSpeed = self.Speed/3600*1000
-        local a = (curSpeed-self.TestV)/(CurTime()-self.TestA)
-        RunConsoleCommand("say",Format("[%05d]V0= %.1f V1=%.1f t=%.2f a=%.2f",self:GetWagonNumber(),self.TestV*3600/1000,curSpeed*3600/1000,CurTime()-self.TestA,a))
-
-
-        self.TestA = nil
-        self.TestV = nil
-        self.TestS = nil
-    end
-    if self:GetWagonNumber() == 0000 then --DEBUG
-        local accel = 0
-        for i=1,#self.WagonList do
-            accel=accel+self.WagonList[i].Acceleration
-        end
-
-        if math.abs(accel) > 0.1 then
-            Player(6):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/#self.WagonList)))
-            Player(7):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/#self.WagonList)))
-            Player(9):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/#self.WagonList)))
-        end
-    end--]]
-
-
-Metrostroi.OptimisationPatch()

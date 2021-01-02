@@ -43,6 +43,7 @@ function ENT:Think()
     local dT = Metrostroi.GetTimedT()
     --local interval = -dT + os.time() - (self:GetIntervalResetTime()+GetGlobalFloat("MetrostroiTY"))
     local interval = Metrostroi.GetSyncTime() - (self:GetIntervalResetTime() + GetGlobalFloat("MetrostroiTY"))
+
     if (interval <= (9 * 60 + 59)) and (interval >= 0) then
         if IsValid(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(interval / 60)) end
         if IsValid(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor((interval % 60) / 10)) end

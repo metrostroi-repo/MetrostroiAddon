@@ -446,30 +446,27 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
         Name = "Индустриал.-Синеозёрн.",
         Loop = false,
         spec_last = {"last_m",0.5,"things_m"},
-        spec_last_f = {"last_f",0.5,"things_f"},
         spec_wait = {{"train_stop_m"},{"train_depeat_m"}},
-        spec_wait_f = {{"train_stop_f"},{"train_depeat_f"}},
         BlockDoors = true,
         {
             108,
             "Автозаводская",
             arrlast = {nil, {"arr_avtozavodskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "avtozavodskaya_m"},
-            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}}
         },
         {
             109,
             "Индустриальная",
             arr = {{"station_m","industrialnaya_m"}, "arr_industrialnaya_f"},
             dep = {{"doors_closing_m", "moskovskaya_m"}, {"doors_closing_f", "next_avtozavodskaya_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             110,
             "Московская",
             arr = {{"station_m","moskovskaya_m",0.1,"politeness_m"}, "arr_moskovskaya_f"},
             dep = {{"doors_closing_m", "oktyabrskaya_m",0.1,"objects_m"}, {"doors_closing_f", "next_industrialnaya_f",0.1,"handrails_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"},
             right_doors=true,
         },
         {
@@ -480,7 +477,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"station_m","oktyabrskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_oktyabrskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "oktyabrskaya_m"},
             not_last = {3, "train_goes_to_m", "oktyabrskaya_m"},
             not_last_f = {3, "to_oktyabrskaya_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             112,
@@ -490,14 +487,14 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"station_m","ploschad_myra_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_ploschad_myra_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "ploschad_myra_m"},
             not_last = {3, "train_goes_to_m", "ploschad_myra_m"},
             not_last_f = {3, "to_ploschad_myra_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             113,
             "Новоармейская",
             arr = {{"station_m","novoarmeyskaya_m",0.1,"skip_vokzalnaya_m"}, {"arr_novoarmeyskaya_f",0.1,"exit_f"}},
             dep = {{"doors_closing_m", "komsomolskaya_next_m",0.1,"handrails_m"}, {"doors_closing_f", "next_ploschad_myra_f",0.1,"objects_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             115,
@@ -507,7 +504,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"arr_komsomolskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","komsomolskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "komsomolskaya_m"},
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             have_inrerchange = true,
             right_doors=true,
         },
@@ -516,21 +513,21 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             "Электросила",
             arr = {"arr_elektrosila_f", {"station_m","elektrosila_m"}},
             dep = {{"doors_closing_f", "next_tetralnaya_ploschad_f"}, {"doors_closing_m", "komsomolskaya_next_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             117,
             "Театр. площадь",
             arr = {{"arr_tetralnaya_ploschad_f",0.1,"handrails_f"}, {"station_m","teatralnaya_ploschad_m"}},
             dep = {{"doors_closing_f", "next_park_pobedy_f",0.1,"exit_f"}, {"doors_closing_m", "elektrosila_m",0.1,"exit_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             118,
             "Парк победы",
             arr = {"arr_park_pobedy_f", {"station_m","park_pobedy_m",0.1,"politeness_m"}},
             dep = {{"doors_closing_f", "next_sineozernaya_f"}, {"doors_closing_m", "teatralnaya_ploschad_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             right_doors=true,
         },
         {
@@ -538,7 +535,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             "Синеозёрная",
             arr = {"arr_sineozernaya_f", {"station_m","sineozernaya_m"}},
             dep = {{"doors_closing_f", "next_minskaya_f",0.1,"things_f"}, {"doors_closing_m", "park_pobedy_m",0.1,"objects_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             121,
@@ -548,14 +545,14 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"arr_minskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","minskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "minskaya_m"},
             not_last = {3, "train_goes_to_m", "minskaya_m"},
             not_last_f = {3, "to_minskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             122,
             "Царские ворота",
             arr = {{"arr_tsarskiye_vorota_f", 3, "to_mejdustroyskaya_f"}, {"station_m","tsarskiye_vorota_m"}},
             dep = {{"doors_closing_f", "next_mejdustroyskaya_f"}, {"doors_closing_m", "minskaya_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
         },
         {
             123,
@@ -563,7 +560,6 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arr = {"arr_mejdustroyskaya_f"},
             arrlast = {{"arr_mejdustroyskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, nil, "mejdustroyskaya_m"},
             dep = {nil, {"doors_closing_m", "tsarskiye_vorota_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
             right_doors=true,
         }
     },
@@ -578,22 +574,21 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             108,
             "Автозаводская",
             arrlast = {nil, {"arr_avtozavodskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "avtozavodskaya_m"},
-            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}}
         },
         {
             109,
             "Индустриальная",
             arr = {{"station_m","industrialnaya_m"}, "arr_industrialnaya_f"},
             dep = {{"doors_closing_m", "moskovskaya_m"}, {"doors_closing_f", "next_avtozavodskaya_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             110,
             "Московская",
             arr = {{"station_m","moskovskaya_m",0.1,"politeness_m"}, "arr_moskovskaya_f"},
             dep = {{"doors_closing_m", "oktyabrskaya_m",0.1,"objects_m"}, {"doors_closing_f", "next_industrialnaya_f",0.1,"handrails_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"},
             right_doors=true,
         },
         {
@@ -604,7 +599,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"station_m","oktyabrskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_oktyabrskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "oktyabrskaya_m"},
             not_last = {3, "train_goes_to_m", "oktyabrskaya_m"},
             not_last_f = {3, "to_oktyabrskaya_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             112,
@@ -614,14 +609,14 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"station_m","ploschad_myra_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_ploschad_myra_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "ploschad_myra_m"},
             not_last = {3, "train_goes_to_m", "ploschad_myra_m"},
             not_last_f = {3, "to_ploschad_myra_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             113,
             "Новоармейская",
             arr = {{"station_m","novoarmeyskaya_m",0.1,"skip_vokzalnaya_m"}, {"arr_novoarmeyskaya_f",0.1,"exit_f"}},
             dep = {{"doors_closing_m", "komsomolskaya_next_m",0.1,"handrails_m"}, {"doors_closing_f", "next_ploschad_myra_f",0.1,"objects_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             115,
@@ -631,7 +626,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"arr_komsomolskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","komsomolskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "komsomolskaya_m"},
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             have_inrerchange = true,
             right_doors=true,
         },
@@ -640,21 +635,21 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             "Электросила",
             arr = {"arr_elektrosila_f", {"station_m","elektrosila_m"}},
             dep = {{"doors_closing_f", "next_tetralnaya_ploschad_f"}, {"doors_closing_m", "komsomolskaya_next_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             117,
             "Театр. площадь",
             arr = {{"arr_tetralnaya_ploschad_f",0.1,"handrails_f"}, {"station_m","teatralnaya_ploschad_m"}},
             dep = {{"doors_closing_f", "next_park_pobedy_f",0.1,"exit_f"}, {"doors_closing_m", "elektrosila_m",0.1,"exit_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             118,
             "Парк победы",
             arr = {"arr_park_pobedy_f", {"station_m","park_pobedy_m",0.1,"politeness_m"}},
             dep = {{"doors_closing_f", "next_sineozernaya_f"}, {"doors_closing_m", "teatralnaya_ploschad_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             right_doors=true,
         },
         {
@@ -662,7 +657,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             "Синеозёрная",
             arr = {"arr_sineozernaya_f", {"station_m","sineozernaya_m"}},
             dep = {{"doors_closing_f", "next_minskaya_f",0.1,"things_f"}, {"doors_closing_m", "park_pobedy_m",0.1,"objects_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             121,
@@ -672,29 +667,28 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arrlast = {{"arr_minskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","minskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "minskaya_m"},
             not_last = {3, "train_goes_to_m", "minskaya_m"},
             not_last_f = {3, "to_minskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             122,
             "Царские ворота",
             arr = {{"arr_tsarskiye_vorota_f", 3, "to_avtostanciya_yujnaya_f"}, {"station_m","tsarskiye_vorota_m"}},
             dep = {{"doors_closing_f", "next_muzey_skulptur_f"}, {"doors_closing_m", "minskaya_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
         },
         {
             321,
             "Музей скульптур",
             arr = {"arr_muzey_skulptur_f", {"station_m","muzey_skulptur_m"}},
             dep = {{"doors_closing_f", "next_avtostanciya_yujnaya_f"}, {"doors_closing_m", "tsarskiye_vorota_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
         },
         {
             322,
             "Автостанция южная",
             arr = {"arr_avtostanciya_yujnaya_f"},
             arrlast = {{"arr_avtostanciya_yujnaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, nil, "avtostanciya_yujnaya_m"},
-            dep = {nil, {"doors_closing_m", "muzey_skulptur_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            dep = {nil, {"doors_closing_m", "muzey_skulptur_m",0.1,"politeness_m"}}
         },
     },
 })
@@ -816,29 +810,26 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
         Loop = false,
         BlockDoors = true,
         spec_last = {"last_m",0.5,"things_m"},
-        spec_last_f = {"last_f",0.5,"things_f"},
         spec_wait = {{"train_stop_m"},{"train_depeat_m"}},
-        spec_wait_f = {{"train_stop_f"},{"train_depeat_f"}},
         {
             108,
             "Автозаводская","Avtozavodskaya",
             arrlast = {nil, {"arr_avtozavodskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "avtozavodskaya_m"},
-            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}}
         },
         {
             109,
             "Индустриальная","Industrialnaya",
             arr = {{"station_m","industrialnaya_m"}, "arr_industrialnaya_f"},
             dep = {{"doors_closing_m", "moskovskaya_m"}, {"doors_closing_f", "next_avtozavodskaya_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             110,
             "Московская","Moskovskaya",
             arr = {{"station_m","moskovskaya_m",0.1,"politeness_m"}, "arr_moskovskaya_f"},
             dep = {{"doors_closing_m", "oktyabrskaya_m",0.1,"objects_m"}, {"doors_closing_f", "next_industrialnaya_f",0.1,"handrails_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"},
             right_doors=true,
         },
         {
@@ -849,7 +840,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"station_m","oktyabrskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_oktyabrskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "oktyabrskaya_m"},
             not_last = {3, "train_goes_to_m", "oktyabrskaya_m"},
             not_last_f = {3, "to_oktyabrskaya_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             112,
@@ -859,14 +850,14 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"station_m","ploschad_myra_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_ploschad_myra_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "ploschad_myra_m"},
             not_last = {3, "train_goes_to_m", "ploschad_myra_m"},
             not_last_f = {3, "to_ploschad_myra_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             113,
             "Новоармейская","Novoarmeyskaya",
             arr = {{"station_m","novoarmeyskaya_m",0.1,"skip_vokzalnaya_m"}, {"arr_novoarmeyskaya_f",0.1,"exit_f"}},
             dep = {{"doors_closing_m", "komsomolskaya_next_m",0.1,"handrails_m"}, {"doors_closing_f", "next_ploschad_myra_f",0.1,"objects_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             115,
@@ -876,7 +867,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"arr_komsomolskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","komsomolskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "komsomolskaya_m"},
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             have_inrerchange = true,
             right_doors=true,
         },
@@ -885,21 +876,21 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             "Электросила","Elektrosila",
             arr = {"arr_elektrosila_f", {"station_m","elektrosila_m"}},
             dep = {{"doors_closing_f", "next_tetralnaya_ploschad_f"}, {"doors_closing_m", "komsomolskaya_next_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             117,
             "Театр. площадь","Teatr. ploschad",
             arr = {{"arr_tetralnaya_ploschad_f",0.1,"handrails_f"}, {"station_m","teatralnaya_ploschad_m"}},
             dep = {{"doors_closing_f", "next_park_pobedy_f",0.1,"exit_f"}, {"doors_closing_m", "elektrosila_m",0.1,"exit_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             118,
             "Парк победы","Park pobedy",
             arr = {"arr_park_pobedy_f", {"station_m","park_pobedy_m",0.1,"politeness_m"}},
             dep = {{"doors_closing_f", "next_sineozernaya_f"}, {"doors_closing_m", "teatralnaya_ploschad_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             right_doors=true,
         },
         {
@@ -907,7 +898,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             "Синеозёрная","Sineozernaya",
             arr = {"arr_sineozernaya_f", {"station_m","sineozernaya_m"}},
             dep = {{"doors_closing_f", "next_minskaya_f",0.1,"things_f"}, {"doors_closing_m", "park_pobedy_m",0.1,"objects_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             121,
@@ -917,14 +908,14 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"arr_minskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","minskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "minskaya_m"},
             not_last = {3, "train_goes_to_m", "minskaya_m"},
             not_last_f = {3, "to_minskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             122,
             "Царские ворота","Tsarskiye vorota",
             arr = {{"arr_tsarskiye_vorota_f", 3, "to_mejdustroyskaya_f"}, {"station_m","tsarskiye_vorota_m"}},
             dep = {{"doors_closing_f", "next_mejdustroyskaya_f"}, {"doors_closing_m", "minskaya_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
         },
         {
             123,
@@ -932,7 +923,6 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arr = {"arr_mejdustroyskaya_f"},
             arrlast = {{"arr_mejdustroyskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, nil, "mejdustroyskaya_m"},
             dep = {nil, {"doors_closing_m", "tsarskiye_vorota_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
             right_doors=true,
         }
     },
@@ -947,22 +937,21 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             108,
             "Автозаводская","Avtozavodskaya",
             arrlast = {nil, {"arr_avtozavodskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "avtozavodskaya_m"},
-            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            dep = {{"doors_closing_m", "industrialnaya_m",0.1,"politeness_m"}}
         },
         {
             109,
             "Индустриальная","Industrialnaya",
             arr = {{"station_m","industrialnaya_m"}, "arr_industrialnaya_f"},
             dep = {{"doors_closing_m", "moskovskaya_m"}, {"doors_closing_f", "next_avtozavodskaya_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             110,
             "Московская","Moskovskaya",
             arr = {{"station_m","moskovskaya_m",0.1,"politeness_m"}, "arr_moskovskaya_f"},
             dep = {{"doors_closing_m", "oktyabrskaya_m",0.1,"objects_m"}, {"doors_closing_f", "next_industrialnaya_f",0.1,"handrails_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"},
             right_doors=true,
         },
         {
@@ -973,7 +962,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"station_m","oktyabrskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_oktyabrskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "oktyabrskaya_m"},
             not_last = {3, "train_goes_to_m", "oktyabrskaya_m"},
             not_last_f = {3, "to_oktyabrskaya_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             112,
@@ -983,14 +972,14 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"station_m","ploschad_myra_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, {"arr_ploschad_myra_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, "ploschad_myra_m"},
             not_last = {3, "train_goes_to_m", "ploschad_myra_m"},
             not_last_f = {3, "to_ploschad_myra_f"},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             113,
             "Новоармейская","Novoarmeyskaya",
             arr = {{"station_m","novoarmeyskaya_m",0.1,"skip_vokzalnaya_m"}, {"arr_novoarmeyskaya_f",0.1,"exit_f"}},
             dep = {{"doors_closing_m", "komsomolskaya_next_m",0.1,"handrails_m"}, {"doors_closing_f", "next_ploschad_myra_f",0.1,"objects_f"}},
-            not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
+            not_last_c = {nil,"not_last_f"}
         },
         {
             115,
@@ -1000,7 +989,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"arr_komsomolskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","komsomolskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "komsomolskaya_m"},
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             have_inrerchange = true,
             right_doors=true,
         },
@@ -1009,21 +998,21 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             "Электросила","Elektrosila",
             arr = {"arr_elektrosila_f", {"station_m","elektrosila_m"}},
             dep = {{"doors_closing_f", "next_tetralnaya_ploschad_f"}, {"doors_closing_m", "komsomolskaya_next_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             117,
             "Театр. площадь","Teatr. ploschad",
             arr = {{"arr_tetralnaya_ploschad_f",0.1,"handrails_f"}, {"station_m","teatralnaya_ploschad_m"}},
             dep = {{"doors_closing_f", "next_park_pobedy_f",0.1,"exit_f"}, {"doors_closing_m", "elektrosila_m",0.1,"exit_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             118,
             "Парк победы","Park pobedy",
             arr = {"arr_park_pobedy_f", {"station_m","park_pobedy_m",0.1,"politeness_m"}},
             dep = {{"doors_closing_f", "next_sineozernaya_f"}, {"doors_closing_m", "teatralnaya_ploschad_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
             right_doors=true,
         },
         {
@@ -1031,7 +1020,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             "Синеозёрная","Sineozernaya",
             arr = {"arr_sineozernaya_f", {"station_m","sineozernaya_m"}},
             dep = {{"doors_closing_f", "next_minskaya_f",0.1,"things_f"}, {"doors_closing_m", "park_pobedy_m",0.1,"objects_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             121,
@@ -1041,29 +1030,28 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arrlast = {{"arr_minskaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, {"station_m","minskaya_m", 0.5, "last_m",2,"things_m",2,"deadlock_m"}, "minskaya_m"},
             not_last = {3, "train_goes_to_m", "minskaya_m"},
             not_last_f = {3, "to_minskaya_f"},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"}
         },
         {
             122,
             "Царские ворота","Tsarskiye vorota",
             arr = {{"arr_tsarskiye_vorota_f", 3, "to_avtostanciya_yujnaya_f"}, {"station_m","tsarskiye_vorota_m"}},
             dep = {{"doors_closing_f", "next_muzey_skulptur_f"}, {"doors_closing_m", "minskaya_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
         },
         {
             321,
             "Музей скульптур","Muzey skulptur",
             arr = {"arr_muzey_skulptur_f", {"station_m","muzey_skulptur_m"}},
             dep = {{"doors_closing_f", "next_avtostanciya_yujnaya_f"}, {"doors_closing_m", "tsarskiye_vorota_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            not_last_c = {"not_last_f"},
         },
         {
             322,
             "Автостанция южная","Avtostanciya yujnaya",
             arr = {"arr_avtostanciya_yujnaya_f"},
             arrlast = {{"arr_avtostanciya_yujnaya_f", 0.5, "last_f",2,"things_f",2,"deadlock_f"}, nil, "avtostanciya_yujnaya_m"},
-            dep = {nil, {"doors_closing_m", "muzey_skulptur_m",0.1,"politeness_m"}},
-            not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
+            dep = {nil, {"doors_closing_m", "muzey_skulptur_m",0.1,"politeness_m"}}
         },
     },
 })

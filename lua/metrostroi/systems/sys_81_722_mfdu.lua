@@ -86,7 +86,7 @@ TRAIN_SYSTEM.ErrorNames = {
     --[46] = {"нет связи с БТБУ",1},
     --[47] = {"Не открывается Х левая дверь на %d вагоне",2},
     --[48] = {"Не открывается Х правая дверь на %d вагоне",2},
-    [49] = {"Открытие левых дверей на хвостовом вагоне",3},
+    [49] = {"Открытие левых дверей на хвостовом вагоне подтверждено",3},
     --[50] = {"Отказ системы внутреннего видеонаблюдения на вагоне",3},
     --[51] = {"Вызов связи «Пассажир-Машинист» на вагоне",3},
     --[52] = {"Неисправность ключей КПД",1},
@@ -342,27 +342,24 @@ if SERVER then
                 local i = i-self.Page-1
                 local pvu = BUKP.PVU[i+1]
 
-                if 13+i*131 < x and x < 130+i*131 and 110+61*0 < y and y < 160+61*0 then
+                if 13+i*131 < x and x < 130+i*131 and 110+71*0 < y and y < 168+71*0 then
                     pvu[1] = not pvu[1]
                 end
-                if 13+i*131 < x and x < 130+i*131 and 110+61*1 < y and y < 160+61*1 then
+                if 13+i*131 < x and x < 130+i*131 and 110+71*1 < y and y < 168+71*1 then
                     pvu[2] = not pvu[2]
                 end
                 if BUKP.Trains[i+1].Type < 2 then
-                    if 13+i*131 < x and x < 130+i*131 and 110+61*2 < y and y < 160+61*2 then
+                    if 13+i*131 < x and x < 130+i*131 and 110+71*2 < y and y < 168+71*2 then
                         pvu[3] = not pvu[3]
                     end
-                    if 13+i*131 < x and x < 130+i*131 and 110+61*3 < y and y < 160+61*3 then
+                    if 13+i*131 < x and x < 130+i*131 and 110+71*3 < y and y < 168+71*3 then
                         pvu[4] = not pvu[4]
                     end
-                    --[[ if 13+i*131 < x and x < 130+i*131 and 110+61*4 < y and y < 160+61*4 then
+                    --[[ if 13+i*131 < x and x < 130+i*131 and 110+71*4 < y and y < 168+71*4 then
                         pvu[5] = not pvu[5]
                     end--]]
-                    if 13+i*131 < x and x < 130+i*131 and 110+61*5 < y and y < 160+61*5 then
+                    if 13+i*131 < x and x < 130+i*131 and 110+71*5 < y and y < 168+71*5 then
                         pvu[6] = not pvu[6]
-                    end
-                    if 13+i*131 < x and x < 130+i*131 and 110+61*6 < y and y < 160+61*6 then
-                        pvu[7] = not pvu[7]
                     end
                 end
             end
@@ -408,30 +405,54 @@ if SERVER then
         if Power and self.State == 0 then
             self.State = -1
             self.MFDUTimer = CurTime()-math.Rand(-0.5,1)
+            self.Windows95 = math.random() > 0.9
+            Train:SetNW2Bool("MFDUWin95Egg",self.Windows95)
         end
 
-        if self.State == -1 and self.MFDUTimer and CurTime()-self.MFDUTimer > 7 then
+        if self.State == -1 and self.MFDUTimer and CurTime()-self.MFDUTimer > 2 then
             self.State = -2
-            self.MFDUTimer = CurTime()-math.Rand(-0.5,1)
-        end
-        if self.State == -2 then
-            if self.MFDUTimer and CurTime()-self.MFDUTimer > 4 then
-                self.State = -3
-                self.MFDUTimer = CurTime()-math.Rand(-0.3,0.5)
-                self.Windows95 = math.random() >= 0.98
-                Train:SetNW2Bool("MFDUWin95Egg",self.Windows95)
+            if self.Windows95 then
+                self.MFDUTimer = CurTime()-math.Rand(-0.5,1)
+            else
+                self.MFDUTimer = {0,0,0}--CurTime()-math.Rand(-0.5,1)
+                for i=1,3 do
+                    Train:SetNW2Int("MFDULoadState"..i,0)
+                end
             end
         end
-        if self.State == -3 and self.Windows95 and self.MFDUTimer and CurTime()-self.MFDUTimer > 6 then
-            self.State = -4
-            self.MFDUTimer = CurTime()-math.Rand(-0.3,0.5)
+        if self.State == -2 then
+            if self.Windows95 then
+                if self.MFDUTimer and CurTime()-self.MFDUTimer > 10 then
+                    self.State = -3
+                    self.MFDUTimer = CurTime()-math.Rand(-0.3,0.5)
+                end
+            else
+                local done = true
+                for i=1,3 do
+                    if self.MFDUTimer[i] < 1 then
+                        if math.random() > 0.1+(i*0.06-i*0.022) then
+                            self.MFDUTimer[i] = math.min(1,self.MFDUTimer[i] + math.Rand(0.08-i*0.02,0.2-(i*0.03-i*0.015))*dT)
+                        end
+                        done = false
+                        Train:SetNW2Int("MFDULoadState"..i,self.MFDUTimer[i]*100)
+                    end
+                end
+                if done then
+                    for i=1,3 do
+                        Train:SetNW2Int("MFDULoadState"..i,0)
+                    end
+                    self.State = -3
+                    self.MFDUTimer = CurTime()-math.Rand(-0.3,0.5)
+                end
+            end
         end
-        if self.State == -3 and not self.Windows95 and self.MFDUTimer and CurTime()-self.MFDUTimer > 3 or self.State == -4 and self.Windows95 and self.MFDUTimer and CurTime()-self.MFDUTimer > 0.5 then
+        if self.State == -3 and self.MFDUTimer and CurTime()-self.MFDUTimer > 1 then
             self.State = 1
             self.MFDUL2State = 0
             self.MFDUL3State = 0
             self.MFDUL4State = 0
         end
+
 
         local Active = Train.Electric.CabActive>0
         local trains = BUKP.Trains
@@ -446,13 +467,13 @@ if SERVER then
                     Train:SetPackedRatio("MFDUPowerCommand",BUKP.States.DriveStrength or 0)
                 end
                 Train:SetNW2Bool("MFDUARSBrake",BUKP.Braking)
-                Train:SetNW2Int("MFDUSpeed",BUKP.Speed)
-                Train:SetNW2Bool("MFDUBARSActive",Train.Panel.ARSPower>0)
 
                 if self.MFDUL2State == 0 then
+                    Train:SetNW2Int("MFDUSpeed",BUKP.Speed)
                     local BARS = Train.BARS
                     Train:SetNW2Int("MFDUSpeedLimit",BARS.F1>0 and 80 or BARS.F2>0 and 70 or BARS.F3>0 and 60 or BARS.F4>0 and 40 or BARS.F5>0 and 0 or -1)
-                    Train:SetNW2Bool("MFDUALSActive",Train.Panel.ARSPower>0)
+                    Train:SetNW2Bool("MFDUBARSActive",Train.Panel.ARSPower>0)
+                    Train:SetNW2Bool("MFDUALSActive",Train.Panel.ALSPower>0)
 
                 end
             elseif not Active then
@@ -575,7 +596,7 @@ if SERVER then
                     end
                 elseif self.MFDUL2State == 5 then
                     for i,train in ipairs(trains) do
-                        for p=1,train.Type<2 and 7 or 2 do
+                        for p=1,train.Type<2 and 6 or 2 do
                             Train:SetPackedBool("MFDUDPVUC"..i.."_"..p,BUKP.PVU[i][p])
                             Train:SetPackedBool("MFDUDPVUB"..i.."_"..p,train["PVU"..p])
                         end
@@ -649,7 +670,7 @@ if SERVER then
             end
 
             --ErrorConfirm
-            Train:SetNW2Bool("MFDUIdent",BUKP.Prepared ~= true or not Active)
+            Train:SetNW2Bool("MFDUIdent",BUKP.Prepared ~= true)
             Train:SetPackedBool("MFDUActive",Active)
             Train:SetPackedBool("MFDUBackCab",BUKP.Back>0)
 
@@ -692,8 +713,6 @@ else
     createFont("Calibri23","Calibri",23,800)
     createFont("FixedSys35","FixedsysTTF",35)
     createFont("722LastStation","soviet font",59,800)
-    local kontron_logo = surface.GetTextureID("models/metrostroi_train/81-722/screens/kontron_logo")
-
     local win95_splash = surface.GetTextureID("models/metrostroi_train/81-722/screens/windows95_splash")
     local windows95_load = surface.GetTextureID("models/metrostroi_train/81-722/screens/windows95_load")
 
@@ -729,19 +748,10 @@ else
     function TRAIN_SYSTEM:ClientThink(dT)
         if not self.Train:ShouldDrawPanel("Vityaz") then return end
         render.PushRenderTarget(self.Train.Vityaz,0,0,1024, 1024)
-        if self.PrepareLoad then
-            render.Clear(0, 0, 0, 0)
-        end
+        render.Clear(0, 0, 0, 0)
         cam.Start2D()
-            if self.Train:GetNW2Int("MFDUState",0) ~= -1 then
-                surface.SetDrawColor(0,0,0)
-                surface.DrawRect(0,0,800,600)
-                self.PrepareLoad = true
-            elseif self.PrepareLoad then
-                surface.SetDrawColor(200,200,200)
-                surface.DrawRect(1,0,799,600)
-                self.PrepareLoad = false
-            end
+            surface.SetDrawColor(0,0,0)
+            surface.DrawRect(0,0,800,600)
             self:BUKPMonitor(self.Train,dT)
         cam.End2D()
         render.PopRenderTarget()
@@ -756,7 +766,7 @@ else
         "Двери",
         "Вагон.\nоборуд.",
         "Тяговый\nпривод.",
-        --"Теневой"
+        "Теневой"
     }
     for i=1,#buttons do
         local x = {}
@@ -783,12 +793,11 @@ else
     local errorstates = {
         {"А",Color(255,0,0)},
         {"Б",Color(255,255,0)},
-        {"В",Color(0,255,255)},
+        {"В",Color(255,255,255)},
     }
 
     function TRAIN_SYSTEM:ClientInitialize()
         self.PowerCommand = 0
-        self.PowerCommandSmooth = 0
     end
 
     local function drawButton(i,text,state,format,color)
@@ -825,29 +834,32 @@ else
         local Active = Train:GetPackedBool("MFDUActive")
         local Back = Train:GetPackedBool("MFDUBackCab")
         local WagNum = Train:GetNW2Int("MFDUWagNum",0)
-        if state == -1 then
-            surface.SetDrawColor(255,0,0)
-            surface.DrawRect(200,0,1,600)
-            surface.SetDrawColor(0,0,20,15)
-            surface.DrawRect(201,0,599,600)
-        elseif state == -2 then
-                surface.SetTexture(kontron_logo)
-                surface.SetDrawColor(255,255,255)
-                surface.DrawTexturedRectRotated(238,122,296,64,0)
-
-                draw.SimpleText("Version 2.13.1215. Copyright (c) 2011 American Megatrends Inc.","Metrostroi_Calibri26",80, 196,Color(123,123,123),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                draw.SimpleText("Kontron version NTC1R111, 01/31/2012 10:47:49","Metrostroi_Calibri26",80, 216,Color(123,123,123),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                draw.SimpleText("Press <Del> or <F2> to enter Setup. <F7> for Boot menu","Metrostroi_Calibri26",80, 236,Color(123,123,123),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-        elseif state == -3 and Train:GetPackedBool("MFDUWin95Egg") then
-                render.SetScissorRect(2, 0, 800, 600, true)
-                surface.SetTexture(win95_splash)
-                surface.SetDrawColor(180,180,180)
-                surface.DrawTexturedRectRotated(512,512,1024,1024,0)
-                surface.SetTexture(windows95_load)
-                surface.SetDrawColor(180,180,180)
-                surface.DrawTexturedRectRotated(800+(RealTime()%4*200-400),591,800,14,0)
-                surface.DrawTexturedRectRotated(800+(RealTime()%4*200-400)-800,591,800,14,0)
+        if state == -2 then
+            if Train:GetPackedBool("MFDUWin95Egg") then
+                    render.SetScissorRect(2, 0, 800, 600, true)
+                    surface.SetTexture(win95_splash)
+                    surface.SetDrawColor(180,180,180)
+                    surface.DrawTexturedRectRotated(512,512,1024,1024,0)
+                    surface.SetTexture(windows95_load)
+                    surface.SetDrawColor(180,180,180)
+                    surface.DrawTexturedRectRotated(800+(RealTime()%4*200-400),591,800,14,0)
+                    surface.DrawTexturedRectRotated(800+(RealTime()%4*200-400)-800,591,800,14,0)
                 render.SetScissorRect( 0, 0, 0, 0, false )
+                --surface.DrawTexturedRectRotated(512,474,64,13,0)
+            else
+                local lstate = Train:GetNW2Int("MFDULoadState1",0)/100
+                local lstate2 = Train:GetNW2Int("MFDULoadState2",0)/100
+                local lstate3 = Train:GetNW2Int("MFDULoadState3",0)/100
+                surface.SetDrawColor(0,69,125)
+                surface.DrawRect(10,550,600*lstate,30)
+                surface.SetDrawColor(0,113,178)
+                surface.DrawRect(10,550,600*lstate2,30)
+                surface.SetDrawColor(255,255,255)
+                surface.DrawRect(10,550,600*lstate3,30)
+                draw.SimpleText("CentOS 6.5","Metrostroi_FixedSys35",620, 565,lstate2 == 1 and Color(255,255,255) or lstate == 1 and Color(0,113,178) or Color(0,69,125),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+            end
+            --surface.SetTexture(ubuntu_load)
+            --surface.SetDrawColor(255,255,255)
         elseif state == -10 then
             if Train:GetPackedBool("MFDUEmer") then
                 surface.SetDrawColor(255,255,255)
@@ -863,18 +875,13 @@ else
         elseif state == 1 then
             local PCmd = Train:GetPackedRatio("MFDUPowerCommand",0)
             local lineSel = Train:GetNW2Int("MFDULineSel")
-            local dPCmd = math.abs(PCmd-self.PowerCommand)/0.8
+            local dPCmd = math.abs(PCmd-self.PowerCommand)/0.6
             if dPCmd > 0.14 then
                 self.PowerCommand = PCmd
             elseif self.PowerCommand < PCmd then
-                self.PowerCommand = math.min(self.PowerCommand+dT*0.8,PCmd)
+                self.PowerCommand = math.min(self.PowerCommand+dT*0.55,PCmd)
             elseif self.PowerCommand > PCmd then
-                self.PowerCommand = math.max(self.PowerCommand-dT*0.8,PCmd)
-            end
-            if self.PowerCommandSmooth < PCmd and dPCmd > 0.14 and PCmd <= 0 then
-                self.PowerCommandSmooth = PCmd
-            else
-                self.PowerCommandSmooth = self.PowerCommandSmooth+(self.PowerCommand-self.PowerCommandSmooth)*dT*20
+                self.PowerCommand = math.max(self.PowerCommand-dT*0.55,PCmd)
             end
             if state2 == 0 then
                 if Back then
@@ -887,12 +894,11 @@ else
                     if Train:GetNW2Bool("MFDUALSActive") then
                         local speedLimit = Train:GetNW2Int("MFDUSpeedLimit",-1)
                         if speedLimit == -1 then
-                            draw.SimpleText("НЧ","Metrostroi_Calibri60",180, 80,Color(220,0,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            draw.SimpleText("БАРС","Metrostroi_Calibri30",180, 110,Color(220,0,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            draw.SimpleText("НЧ","Metrostroi_BUKPSpeed",180, 105,Color(220,0,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
                         elseif speedLimit >= 0 then
                             local color = Color(speedLimit < 60 and 255 or 0,speedLimit > 20 and 255 or 0,0)
-                            draw.SimpleText(speedLimit,"Metrostroi_Calibri60",180, 80,color,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            draw.SimpleText("БАРС","Metrostroi_Calibri30",180, 110,color,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            draw.SimpleText(speedLimit,"Metrostroi_BUKPSpeed",180, 105,color,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            draw.SimpleText("км/ч","Metrostroi_Calibri30",180, 145,color,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
                         end
                     end
 
@@ -928,9 +934,9 @@ else
                 --draw.SimpleText(math.floor(Train:GetPackedRatio("FREQ",99)),"Metrostroi_BUKPSpeed",384, 150,Color(220,0,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
                 surface.SetDrawColor(38,38,38)
                 surface.DrawRect(24,476,751,34)
-                if Active and -0.01 > self.PowerCommandSmooth or self.PowerCommandSmooth > 0.01 then
-                    surface.SetDrawColor(self.PowerCommandSmooth < 0 and 255 or 0,Train:GetNW2Bool("MFDUARSBrake",false) and 0 or 255,0)
-                    surface.DrawRect(400,477,math.Clamp(self.PowerCommandSmooth*377,-375,375),32)
+                if Active and -0.01 > self.PowerCommand or self.PowerCommand > 0.01 then
+                    surface.SetDrawColor(self.PowerCommand < 0 and 255 or 0,Train:GetNW2Bool("MFDUARSBrake",false) and 0 or 255,0)
+                    surface.DrawRect(400,477,math.Clamp(self.PowerCommand*377,-375,375),32)
                 end
 
                 for i=1,WagNum>6 and 8 or 6 do
@@ -976,7 +982,7 @@ else
                 end
 
                 if not Back then
-                    for i=0,8 do
+                    for i=0,9 do
                         surface.SetDrawColor(38,38,38)
                         surface.DrawRect(1+i*80,538,78,61)
                         Metrostroi.DrawRectOutline(1+i*80,538,78,61,Color(129,129,129),1)
@@ -1248,21 +1254,20 @@ else
                     local ix = i-page-1
                         Metrostroi.DrawRectOutline(13+ix*131,59,117,38,Color(129,129,129),1)
                         draw.SimpleText(Format("%05d",Train:GetNW2Int("MFDUWagNum"..i,0)),"Metrostroi_Calibri40",71+ix*131,78, Color(129,129,129),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        Metrostroi.DrawRectOutline(13+ix*131,110,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_1") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_1") and 6 or 1)
-                        draw.SimpleText("Двери","Metrostroi_Calibri35",71+ix*131,132,Train:GetNW2Bool("MFDUDPVUB"..i.."_1") and Color(220,0,0) or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        Metrostroi.DrawRectOutline(13+ix*131,171,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_2") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_2") and 6 or 1)
-                        draw.SimpleText("Свет","Metrostroi_Calibri35",71+ix*131,193, Train:GetNW2Bool("MFDUDPVUB"..i.."_2") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+
+                        Metrostroi.DrawRectOutline(13+ix*131,110,117,58,Train:GetNW2Bool("MFDUDPVUC"..i.."_1") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_1") and 6 or 1)
+                        draw.SimpleText("Двери","Metrostroi_Calibri35",71+ix*131,137,Train:GetNW2Bool("MFDUDPVUB"..i.."_1") and Color(220,0,0) or Color(129,129,129),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                        Metrostroi.DrawRectOutline(13+ix*131,181,117,58,Train:GetNW2Bool("MFDUDPVUC"..i.."_2") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_2") and 6 or 1)
+                        draw.SimpleText("Свет","Metrostroi_Calibri35",71+ix*131,208, Train:GetNW2Bool("MFDUDPVUB"..i.."_2") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
                         if Train:GetNW2Bool("MFDUWagTyp"..i,false) then
-                            Metrostroi.DrawRectOutline(13+ix*131,232,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_3") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_3") and 6 or 1)
-                            draw.SimpleText("ПСН","Metrostroi_Calibri35",71+ix*131,254, Train:GetNW2Bool("MFDUDPVUB"..i.."_3") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            Metrostroi.DrawRectOutline(13+ix*131,293,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_4") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_4") and 6 or 1)
-                            draw.SimpleText("МК","Metrostroi_Calibri35",71+ix*131,315, Train:GetNW2Bool("MFDUDPVUB"..i.."_4") and Color(220,0,0) or Color(129,129,129),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            Metrostroi.DrawRectOutline(13+ix*131,354,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_5") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_5") and 6 or 1)
-                            draw.SimpleText("БВ","Metrostroi_Calibri35",71+ix*131,376, Train:GetNW2Bool("MFDUDPVUB"..i.."_5") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            Metrostroi.DrawRectOutline(13+ix*131,415,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_6") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_6") and 6 or 1)
-                            draw.SimpleText("ТП","Metrostroi_Calibri35",71+ix*131,437, Train:GetNW2Bool("MFDUDPVUB"..i.."_6") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            Metrostroi.DrawRectOutline(13+ix*131,476,117,50,Train:GetNW2Bool("MFDUDPVUC"..i.."_7") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_7") and 6 or 1)
-                            draw.SimpleText("ТкПр","Metrostroi_Calibri35",71+ix*131,498, Train:GetNW2Bool("MFDUDPVUB"..i.."_7") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            Metrostroi.DrawRectOutline(13+ix*131,252,117,58,Train:GetNW2Bool("MFDUDPVUC"..i.."_3") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_3") and 6 or 1)
+                            draw.SimpleText("ПСН","Metrostroi_Calibri35",71+ix*131,279, Train:GetNW2Bool("MFDUDPVUB"..i.."_3") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            Metrostroi.DrawRectOutline(13+ix*131,323,117,58,Train:GetNW2Bool("MFDUDPVUC"..i.."_4") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_4") and 6 or 1)
+                            draw.SimpleText("МК","Metrostroi_Calibri35",71+ix*131,350, Train:GetNW2Bool("MFDUDPVUB"..i.."_4") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            Metrostroi.DrawRectOutline(13+ix*131,394,117,58,Train:GetNW2Bool("MFDUDPVUC"..i.."_5") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_5") and 6 or 1)
+                            draw.SimpleText("БВ","Metrostroi_Calibri35",71+ix*131,421, Train:GetNW2Bool("MFDUDPVUB"..i.."_5") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                            Metrostroi.DrawRectOutline(13+ix*131,465,117,58,Train:GetNW2Bool("MFDUDPVUC"..i.."_6") and Color(220,0,0) or Color(129,129,129),Train:GetNW2Bool("MFDUDPVUC"..i.."_6") and 6 or 1)
+                            draw.SimpleText("ТП","Metrostroi_Calibri35",71+ix*131,492, Train:GetNW2Bool("MFDUDPVUB"..i.."_6") and Color(220,0,0) or Color(0,220,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
                         end
 
 
@@ -1393,9 +1398,9 @@ else
                 end
                 surface.SetDrawColor(38,38,38)
                 surface.DrawRect(24,476,751,34)
-                if -0.01 > self.PowerCommandSmooth or self.PowerCommandSmooth > 0.01 then
-                    surface.SetDrawColor(self.PowerCommandSmooth < 0 and 255 or 0,Train:GetPackedBool("ARSComm",false) and 0 or 255,0)
-                    surface.DrawRect(400,477,math.Clamp(self.PowerCommandSmooth*377,-375,375),32)
+                if -0.01 > self.PowerCommand or self.PowerCommand > 0.01 then
+                    surface.SetDrawColor(self.PowerCommand < 0 and 255 or 0,Train:GetPackedBool("ARSComm",false) and 0 or 255,0)
+                    surface.DrawRect(400,477,math.Clamp(self.PowerCommand*377,-375,375),32)
                 end
 
                 surface.SetDrawColor(255,255,255)
@@ -1634,14 +1639,6 @@ else
 
                     if Train:GetNW2Bool("MFDUIdent") then
                         draw.SimpleText("Идентификация","Metrostroi_Calibri26",701, 22,Color(123,123,123),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                    elseif state2 > 1 and state2 ~= 2 then
-                        if Train:GetNW2Bool("MFDUBARSActive") then
-                            draw.SimpleText(math.floor(Train:GetNW2Int("MFDUSpeed",0)),"Metrostroi_Calibri60",650, 22,Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            draw.SimpleText("км/ч","Metrostroi_Calibri30",720, 22,Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        else
-                            draw.SimpleText(math.floor(Train:GetNW2Int("MFDUSpeed",0)),"Metrostroi_Calibri60",650, 22,Color(255,255,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                            draw.SimpleText("км/ч","Metrostroi_Calibri30",720, 22,Color(255,255,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        end
                     else--if Active then
                         local drvnum = Train:GetNW2Int("MFDUDriverNumber",-1)
                         draw.SimpleText(Format("%010d",drvnum > -1 and drvnum or 0),"Metrostroi_Calibri26",701, 22,Color(123,123,123),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
@@ -1654,7 +1651,7 @@ else
                 end
             end
         end
-        if state ~= 0 and state ~= -1 then
+        if state ~= 0 then
             surface.SetDrawColor(0,0,20,100)
             surface.DrawRect(0,0,800,600)
         end

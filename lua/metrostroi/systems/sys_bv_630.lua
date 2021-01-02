@@ -19,9 +19,7 @@ function TRAIN_SYSTEM:Outputs()
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
-    if name == "Enable" and value > 0 then
-        self.State = 1
-    end
+    if name == "Enable" and value > 0 then self.State = 1 end
     if name == "Disable" and value > 0 then self.State = 0 end
     if name == "Power" then self.Power = value end
 end

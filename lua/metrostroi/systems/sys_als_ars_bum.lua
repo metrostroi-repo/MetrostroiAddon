@@ -22,7 +22,7 @@ function TRAIN_SYSTEM:Initialize(typ)
         self.Train:LoadSystem("BUM_TR","Relay","ARS",{close_time=typ==2 and 0.02 or 0.15, bass=true,bass_separate=true})
         --self.Train:LoadSystem("BUM_PTR","Relay","ARS",{open_time=0.15, bass=true,bass_separate=true})
         --self.Train:LoadSystem("BUM_PTR1","Relay","ARS",{open_time=1.4, bass=true,bass_separate=true})
-        self.Train:LoadSystem("BUM_PTR","Relay","ARS",{open_time=1.25, bass=true,bass_separate=true})
+        self.Train:LoadSystem("BUM_PTR","Relay","ARS",{open_time=1.0, bass=true,bass_separate=true})
         self.Train:LoadSystem("BUM_PTR1","Relay","ARS",{open_time=0.9, bass=true,bass_separate=true})
 
         self.Train:LoadSystem("BUM_RIPP","Relay","ARS",{bass=true,bass_separate=true})

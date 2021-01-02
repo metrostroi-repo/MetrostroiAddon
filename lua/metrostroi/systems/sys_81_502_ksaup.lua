@@ -69,6 +69,52 @@ function TRAIN_SYSTEM:Outputs()
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
+    --[[ if name == "CommandBrakeElapsed" and self.KRR2 == 0 and self.KRR1 > 0 and value ~= -1 and self.CrossCount then
+        if self.Stage1 and value > 1 then self.Stage2Prepared = true end
+
+        if self.CrossCount > 10 then self.Station = true end
+        self.CrossCount = self.CrossCount+1
+        if value*1000 < 80+46+2*(8*1.5) then
+            if not self.Stage1 and self.BrakeProgramm then
+                self.Stage1 = true
+                self:SetTargetKPRK(14)
+            end
+            if self.Stage2Prepared then
+                self.Stage2 = true
+            end
+        end
+        --if self.VAV > 0 then print(self.Stage1,self.Stage2Prepared,self.Stage2,value*1000) end
+    end
+    if name == "CommandBrake" and self.KRR2 == 0 and self.KRR1 > 0 then
+        self.BrakeProgramm = self.LAVT > 0
+        self.CommandDrive = false
+        self.DriveCommand = false
+
+        if self.TargetKPRK and self.LastBrakeProgrammLoss and CurTime()-self.LastBrakeProgrammLoss > 0.3 then self:SetTargetKPRK(self.TargetKPRK+1) end
+        if value<0 then self:SetTargetKPRK(-value) end
+        self.LastBrakeProgrammLoss = value == 0 and CurTime()
+        if self.BrakeProgrammLossDistance and self.BrakeProgrammLossDistance>15 then
+            self.BrakeProgrammCurrentDistance=0
+        elseif value == 0 then
+            self.BrakeProgrammLossDistance = 0
+        end
+        if value ~= 0 then
+            self.CrossCount = 0
+        else
+            self.CrossCount = nil
+        end
+    end
+    if name == "CommandDrive" then
+        if value < 0 then
+            self.CommandDrive = false
+            self.DriveCommand = false
+            self.BrakeProgramm = false
+        elseif value > 0 then
+            self.CommandDrive = value
+        else
+            self.CommandDrive = false
+        end
+    end--]]
     if name == "CommandDoorsLeft" then self.DoorsLeft = value end
     if name == "CommandDoorsRight" then self.DoorsRight = value end
 end
@@ -114,6 +160,9 @@ function TRAIN_SYSTEM:Think(dT)
         if ALS.F5 <= 0 and self.F5Ring ~= nil then self.F5Ring = nil end
         if self.F5Ring and speed < 0.1 then self.F5Ring = false end
 
+        --if Vlimit ~= 20 and (ALS.F5 == 0 or self.RD > 0) and self.KVT then Vlimit = 20 end
+        --if Vlimit < 20 then print("???",self.Vlimit) end
+        --local zero = (ALS.NoFreq+ALS.RealF5) > 0
         -- Enable PV1 and disassembly when we overspeed
         if speed > Vlimit+0.5 and not self.ElectricBrake then
             self.ElectricBrake = true
@@ -169,6 +218,7 @@ function TRAIN_SYSTEM:Think(dT)
         if self.BrakeTTimer and CurTime()-self.BrakeTTimer > 2 then self.BrakeT = 1 end
         self.BrakeT = self.BrakeT or 0
         self[1] = self["1"]*Drive
+        --print(self.Train,2,self[1])
         self[2] = self["2"]+self.BrakeT
         self[3] = Brake
         if not RR then
@@ -196,6 +246,7 @@ function TRAIN_SYSTEM:Think(dT)
         self["8a"] = self.KRR
     else
         self[1] = 0
+        --print(self.Train,2,self[1])
         self[2] = 0--self["2"]
         self[3] = 0
         self[8] = 0

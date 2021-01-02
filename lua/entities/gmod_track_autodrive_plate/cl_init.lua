@@ -1,27 +1,19 @@
 include("shared.lua")
 
-local debug = GetConVar("metrostroi_drawsignaldebug")
-local function enableDebug()
-    if debug:GetBool() then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiAutoDebug",function(bDrawingDepth,bDrawingSkybox)
-            for _,ent in pairs(ents.FindByClass("gmod_track_autodrive_plate")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 512 then
-                    local pos = sig:LocalToWorld(Vector(0,0,0))
-                    local ang = sig:LocalToWorldAngles(Angle(0,90,90))
-                    cam.Start3D2D(pos, ang, 0.25)
-						surface.SetDrawColor(125, 125, 0, 255)
-						surface.DrawRect(-40, -20, 80, 20)
-                    cam.End3D2D()
-                end
-            end
-        end)
-    else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiAutoDebug")
-    end
-end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiAutoDebug")
-cvars.AddChangeCallback( "metrostroi_drawsignaldebug", enableDebug)
-enableDebug()
+hook.Add("PostDrawOpaqueRenderables", "gmod_track_autodrive_plate_debug_draw", function(isDD)
+		if isDD then return end
+		if GetConVarNumber("metrostroi_drawsignaldebug") == 0 then return end
+		--print(2)
+		for _,self in pairs(ents.FindByClass("gmod_track_autodrive_plate")) do
+			local pos = self:LocalToWorld(Vector(0,0,0))
+			local ang = self:LocalToWorldAngles(Angle(0,90,90))
+			cam.Start3D2D(pos , ang, 0.25)
+				surface.SetDrawColor(125, 125, 0, 255)
+				surface.DrawRect(-40, -20, 80, 20)
+			cam.End3D2D()
+		end
+end )
+
 
 function ENT:Initialize()
 end
@@ -29,6 +21,10 @@ end
 function ENT:OnRemove()
 end
 function ENT:RemoveModels()
+end
+function ENT:Think()
+	self:NextThink(CurTime()+5)
+	return true
 end
 
 function ENT:Draw()

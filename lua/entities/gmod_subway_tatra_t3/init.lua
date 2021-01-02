@@ -5,11 +5,11 @@ include("shared.lua")
 
 
 ---------------------------------------------------
--- Defined train information
+-- Defined train information                      
 -- Types of wagon(for wagon limit system):
--- 0 = Head or intherim
--- 1 = Only head
--- 2 = Only intherim
+-- 0 = Head or intherim                           
+-- 1 = Only head                                     
+-- 2 = Only intherim                                
 ---------------------------------------------------
 ENT.SubwayTrain = {
 	Type = "Tatra",
@@ -24,19 +24,19 @@ function ENT:Initialize()
 	self:SetModel("models/metrostroi/tatra_t3/tatra_t3.mdl")
 	self.BaseClass.Initialize(self)
 	self:SetPos(self:GetPos() + Vector(0,0,140))
-
+	
 	-- Create seat entities
 	self.DriverSeat = self:CreateSeat("driver",Vector(305,10,-12))
 	--self.InstructorsSeat = self:CreateSeat("instructor",Vector(395,35,-30))
-
+	
 	-- Create bogeys
 	self.FrontBogey = self:CreateBogey(Vector( 160,0,-60),Angle(0,180,0),true,"tatra")
 	self.RearBogey  = self:CreateBogey(Vector(-150,0,-60),Angle(0,0,0),false,"tatra")
-
+	
 	-- Create joins
 	self.FrontJoin = self:CreateJoin(Vector(350,0,-50),false)
 	self.RearJoin = self:CreateJoin(Vector(-350,0,-50),true)
-
+	
 	-- Initialize key mapping
 	self.KeyMap = {
 		[KEY_W] = "Drive",
@@ -65,7 +65,7 @@ function ENT:CreateJoin(pos,rev)
 		xmin = -2
 		xmax = 5
 	end
-
+	
 	constraint.AdvBallsocket(
 		join,
 		self,

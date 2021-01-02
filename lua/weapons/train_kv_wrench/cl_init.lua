@@ -339,7 +339,7 @@ function SWEP:CreateModels( tab )
 		if (v.type == "Model" and v.model and v.model ~= "" and (not IsValid(v.modelEnt) or v.createdModel ~= v.model) and
 				string.find(v.model, ".mdl") and file.Exists (v.model, "GAME") ) then
 
-			v.modelEnt = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
+			v.modelEnt = ents.CreateClientProp("models/metrostroi_train/reversor/reversor_classic.mdl")
 			v.modelEnt:SetModel(v.model)
 			if (IsValid(v.modelEnt)) then
 				v.modelEnt:SetPos(self:GetPos())

@@ -15,23 +15,20 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("RV3","Relay","REV-813T",{ open_time = 2.3 })
     -- Реле тока (РТ2)
     self.Train:LoadSystem("RT2","Relay","REV-830",{ trigger_level = 130 }) -- A
-    self.Train:LoadSystem("RT2r","Relay","REV-830",{  close_time = 0, open_time = 0.2 }) --UNREALISTIC Repeater for RT2 for MSK trains
     -- Реле контроля тормозного тока (РКТТ)
     self.Train:LoadSystem("RKTT","Relay","R-52B")
     self.Train.RKTTsh = 1
+    if parameters=="Ezh3" then self.NoRKTT = true end
 end
 
 function TRAIN_SYSTEM:Inputs()
-    return { "NoRKTT" }
+    return {  }
 end
 function TRAIN_SYSTEM:Outputs()
     --return { "RKTTClose" , "RKTTOpen", "RKTTCurrent"}
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
-    if name == "NoRKTT" then
-        self.NoRKTT = value > 0
-    end
 end
 
 function TRAIN_SYSTEM:Think()
@@ -39,7 +36,6 @@ function TRAIN_SYSTEM:Think()
     -- RT2 relay operation
     Train.RT2:TriggerInput("Set",Train.Electric.IRT2)
     if self.NoRKTT then return end
-    Train.RT2r:TriggerInput("Set",Train.RT2.Value)
     --self.RUTTarget = 250 + 150*self.WeightLoadRatio
     self.RKTTCurrent = Train.Electric.IRT2*Train.RKTTsh--(math.abs(Train.Electric.I13) + math.abs(Train.Electric.I24))*Train:ReadTrainWire(6)
     --self.RKTTClose  = 275 + 50*self.WeightLoadRatio --125

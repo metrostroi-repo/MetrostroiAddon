@@ -36,7 +36,6 @@ Panel.RedLights         = Abilita le luci dinamiche\ndelle luci rosse
 Panel.ShadowsOther      = Abilita le ombre dagli altri\nlight sources
 Panel.MinimizedShow     = Non scaricare nessun elemento\nwhen minimizzato
 Panel.FOV               = FOV
-Panel.Z                 = Altezza della videocamera
 Panel.RenderDistance    = Distanza di rendering
 Panel.ReloadClient      = Ricarica lato utente
 
@@ -45,7 +44,7 @@ Panel.DrawDebugInfo     = Disegna le informazioni di debug
 Panel.CheckAddons       = Verifica addons
 Panel.DrawSignalDebugInfo     = Segnala informazioni di debug
 Panel.ReloadLang        = Ricarica linguaggi
-Panel.SoftDraw          = Tempo di caricamento degli elementi del treno
+Panel.SoftDraw          = Elementi "smooth\nloading" percento
 Panel.SoftReloadLang    = Non ricaricare uno spawnmenu
 
 

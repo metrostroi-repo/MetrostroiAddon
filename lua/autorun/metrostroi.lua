@@ -67,34 +67,6 @@ if not Metrostroi then
     Metrostroi.Systems = {}
     Metrostroi.BaseSystems = {}
 end
-
---List of spawned trains
-Metrostroi.SpawnedTrains = {}
-for k,ent in pairs(ents.GetAll()) do
-    if ent.Base == "gmod_subway_base" or ent:GetClass() == "gmod_subway_base" then
-        Metrostroi.SpawnedTrains[ent] = true
-    end
-end
-
-hook.Add("EntityRemoved","MetrostroiTrains",function(ent)
-    if Metrostroi.SpawnedTrains[ent] then
-        Metrostroi.SpawnedTrains[ent] = nil
-    end
-end)
-if SERVER then
-    hook.Add("OnEntityCreated","MetrostroiTrains",function(ent)
-        if ent.Base == "gmod_subway_base" or  ent:GetClass() == "gmod_subway_base" then
-            Metrostroi.SpawnedTrains[ent] = true
-        end
-    end)
-else
-    hook.Add("OnEntityCreated","MetrostroiTrains",function(ent)
-        if ent:GetClass() == "gmod_subway_base" or scripted_ents.IsBasedOn(ent:GetClass(), "gmod_subway_base") then
-            Metrostroi.SpawnedTrains[ent] = true
-        end
-    end)
-end
-
 ------------------------
 -- Metrostroi version --
 ------------------------
@@ -133,7 +105,7 @@ function Metrostroi.AddSkin(category,name,tbl)
         print(Format("Metrostroi: Added a %s skin category",category))
         Metrostroi.Skins[category] = {}
     end
-    if not tbl.typ then ErrorNoHalt(Format("Metrostroi:Skin error: %s wont have a typ direvtive!\n",tbl.name or name)) return end
+    if not tbl.typ then ErrorNoHalt(Format("Metrostroi:Skin error: %s wont have a typ direvtive!",tbl.name or name)) return end
     Metrostroi.Skins[category][name] = tbl
     Metrostroi.Skins.GetTable = function(id,name,tbl,typ)
         local SkinsType = ENT and ENT.SkinsType
@@ -141,14 +113,14 @@ function Metrostroi.AddSkin(category,name,tbl)
             if SkinsType then
                 tbl = {}
                 for k,v in pairs(Metrostroi.Skins[typ]) do
-                    if v.typ == SkinsType and not hook.Run("MetrostroiSkinsCheck",SkinsType,typ,v.name or k,k) then tbl[k] = v.name or k end
+                    if v.typ == SkinsType then tbl[k] = v.name or k end
                 end
                 return tbl
             end
         end,nil,function(ent,val)
             if not Metrostroi.Skins or not Metrostroi.Skins[typ] then return end
             local texture = Metrostroi.Skins[typ][val]
-            if not texture or hook.Run("MetrostroiSkinsCheck",texture.typ,typ,texture.name or val,val) then return end
+            if not texture then return end
             ent:SetNW2String(id,val)
             --[[ if texture.textures then
                 ent:SetNW2String(id,texture.func and texture.func(ent) or val)
@@ -159,10 +131,10 @@ function Metrostroi.AddSkin(category,name,tbl)
             if not Metrostroi.Skins or not Metrostroi.Skins[typ] then return end
             local texture = Metrostroi.Skins[typ][List:GetOptionData(List:GetSelectedID())]
             if not texture or not texture.defaults then return end
+            for _,v in ipairs(VGUI) do v(nil,nil,true) end
             for k,v in pairs(texture.defaults) do
                 local id = VGUI[k].ID
-                print(List:GetOptionData(List:GetSelectedID()),id,VGUI[id],v)
-                if id and VGUI[id] then
+                if id then
                     VGUI[id](v,true)
                 end
             end
@@ -249,10 +221,10 @@ function Metrostroi.AddPassSchemeTex(id,name,schTbl)
         Metrostroi.Skins[id] = {}
     end
     local tbl = Metrostroi.Skins[id]
-    for k,v in ipairs(tbl) do
+    for k,v in pairs(tbl) do
         if name == v.name then
-            tbl[k] = schTbl
-            tbl[k].name = name
+            tbl[id] = schTbl
+            v.name = name
             return
         end
     end
@@ -310,39 +282,23 @@ end
 -- Load core files and skins
 --------------------------------------------------------------------------------
 if SERVER then
-    local OSes = {
-        Windows = "win32",
-        Linux = "linux",
-        BSD = "linux",
-        POSIX = "linux",
-        OSX = "osx",
-    }
     DISABLE_TURBOSTROI = false
     if not DISABLE_TURBOSTROI then
-        print(Format("Metrostroi: Trying to load simulation acceleration DLL for %s %s...",jit.os,jit.arch))
+        print("Metrostroi: Trying to load simulation acceleration DLL...")
         --TODO: OS specific check
-        if jit.arch == "x86" and OSes[jit.os] and file.Exists(Format("lua/bin/gmsv_turbostroi_%s.dll",OSes[jit.os]), "GAME") then
+        if file.Exists("lua/bin/gmsv_turbostroi_"..(system.IsWindows() and "win32" or system.IsLinux() and "linux" or "osx")..".dll", "GAME") then
+            print("Metrostroi: Founded. System: "..(system.IsWindows() and "Windows" or system.IsLinux() and "Linux" or "OSX"))
             if not pcall(require,"turbostroi") then
                 if system.IsWindows() then
-                    ErrorNoHalt("======================================================\nMetrostroi: Turbostroi library can't be loaded because of missing libraries!\nCheck, that you have Microsoft visual c++ 2010 and 2017 redistributable(x86) installed\nYou can download it from:\n")
-                    MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=5555\nhttps://aka.ms/vs/15/release/vc_redist.x86.exe\n")
-                    ErrorNoHalt("======================================================\n")
+                    ErrorNoHalt("Metrostroi: Turbostroi DLL can't be loaded!\nCheck, that you have Microsoft visual c++ 2010 redistributable(x86)\nYou can find it here:https://www.microsoft.com/en-us/download/details.aspx?id=5555\n")
                 else
                     ErrorNoHalt("Metrostroi: Turbostroi library can't be loaded!\n")
                 end
             else
-                print("Metrostroi: Turbostroi library loaded successfuly.")
+                print("Metrostroi: Turbostroi DLL be loaded successfuly.")
             end
-        elseif jit.arch ~= "x86" then
-            ErrorNoHalt("Metrostroi: Unsupported architecture "..jit.arch..".\nTurbostroi works only on x86(32 bit) version of server\n")
-        elseif system.IsWindows() then
-            ErrorNoHalt("======================================================\nMetrostroi: Turbostroi DLL not found.\nYou can found turbostroi for Windows at \n")
-            MsgC(Color(255,0,0),"https://metrostroi.net/turbostroi\n")
-            ErrorNoHalt("Just place this .dll to garrysmod/lua/bin folder.\nIf bin folder doesn't exists - create it.\nDon't forget to install Microsoft visual c++ 2010 and 2017 redistributable(x86)\nYou can download it from:\n")
-            MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=5555\nhttps://aka.ms/vs/15/release/vc_redist.x86.exe\n")
-            ErrorNoHalt("======================================================\n")
         else
-            ErrorNoHalt("Metrostroi: Turbostroi DLL not found.\n")
+            print("Metrostroi: Turbostroi DLL not not found")
         end
     else
         Turbostroi = nil
@@ -525,21 +481,21 @@ end
 if SERVER then
     util.AddNetworkString "MetrostroiMessages"
     local function CheckErr(ply)
-        if not Turbostroi and IsValid(ply) and (ply:IsSuperAdmin() or not game.IsDedicated()) then
+        if not Turbostroi then
             net.Start "MetrostroiMessages"
-                net.WriteString("Turbostroi is not installed!\nTurbostroi is accelerating train calculations by using multiple\ncores. Check "..(game.IsDedicated() and "server" or "game").." logs for more information.\nYou can download it at:\nhttps://metrostroi.net/turbostroi")
+                net.WriteString("Turbostroi is not installed! Performance will be low!\nDownload it at:\nhttps://metrostroi.net/turbostroi")
                 net.WriteString("https://metrostroi.net/turbostroi")
             net.Send(ply)
         end
         if not game.IsDedicated() then
             net.Start "MetrostroiMessages"
-                net.WriteString("For comfort and smooth experience, you need to\njoin to server or host a dedicated server.\nIt's required because Garry's mod using only\n1 core, and now it using it for client and server code.\nWhen you join or host server you can separate server\nand client processes to different cores.\nInformation about how to host server:\nhttp://wiki.garrysmod.com/page/Hosting_A_Dedicated_Server")
+                net.WriteString("You playing in listenserver. For comfortable playing, you need host a dedicated server:\nhttp://wiki.garrysmod.com/page/Hosting_A_Dedicated_Server")
                 net.WriteString("http://wiki.garrysmod.com/page/Hosting_A_Dedicated_Server")
             net.Send(ply)
         end
     end
     local m_adm = {}
-    for _,v in pairs(player.GetHumans()) do
+    for _,v in pairs(player.GetAll()) do
         if IsValid(v) and v:IsAdmin() then
             table.insert(m_adm,v)
         end
@@ -548,12 +504,10 @@ if SERVER then
     hook.Add("PlayerInitialSpawn","MetrostroiWarnMessage",CheckErr)
 else
     local function err(msg, url)
-        local count = #msg:gsub("[^\n]+","")
-        local size = 83+count*18
         local warn = vgui.Create("DFrame")
         warn:SetDeleteOnClose(true)
         warn:SetTitle("Warning")
-        warn:SetSize(380, size)
+        warn:SetSize(380, 120)
         warn:SetDraggable(false)
         warn:SetSizable(false)
         warn:Center()
@@ -564,30 +518,20 @@ else
             draw.DrawText(msg, "Trebuchet18", w/2, 30, color_white, 1)
         end
 
-        local Close = vgui.Create("DButton", warn)
-        Close:SetText("I understand")
-        Close:SetPos(290, size-30)
-        Close:SetSize(80, 25)
-        Close.DoClick = function()
-            warn:Close()
-        end
-
         local Open = vgui.Create("DButton", warn)
         Open:SetText("Open link")
-        Open:SetPos(15, size-30)
+        Open:SetPos(15, 85)
         Open:SetSize(80, 25)
         Open.DoClick = function()
-            Close:SetText("Close window")
             gui.OpenURL(url)
         end
 
-        local Copy = vgui.Create("DButton", warn)
-        Copy:SetText("Copy link")
-        Copy:SetPos(100, size-30)
-        Copy:SetSize(80, 25)
-        Copy.DoClick = function()
-            Close:SetText("Close window")
-            SetClipboardText(url)
+        local Close = vgui.Create("DButton", warn)
+        Close:SetText("Close")
+        Close:SetPos(290, 85)
+        Close:SetSize(80, 25)
+        Close.DoClick = function()
+            warn:Close()
         end
     end
     net.Receive("MetrostroiMessages", function()
@@ -875,7 +819,7 @@ if SERVER then
             local players
             if LastErr == "Server requested update (203)" then
                 players = {}
-                for _,v in pairs(player.GetHumans()) do
+                for _,v in pairs(player.GetAll()) do
                     if v:IsBot() then continue end
                     table.insert(players,v:SteamID())
                 end
@@ -898,9 +842,7 @@ if SERVER then
     end
 
     init()
-    concommand.Add("metrostroi_monitoring_start",function(ply)
-        if IsValid(ply) then return end
-
+    concommand.Add("metrostroi_monitoring_start",function()
         if not monitoringStarted() and CV_Enabled:GetBool() then
             init()
             MsgC(Color(255,0,255),"MetrostroiMon: ",Color(0,255,0),"Started.\n")
@@ -911,9 +853,7 @@ if SERVER then
                 Color(255,255,0),"\n\tIf you want send monitoring data, type\n\t",Color(255,0,255),"metrostroi_monitoring_allow 1",Color(255,255,0)," to console\n")
         end
     end,nil,"Try to start monitoring")
-    concommand.Add("metrostroi_monitoring_stop",function(ply)
-        if IsValid(ply) then return end
-
+    concommand.Add("metrostroi_monitoring_stop",function()
         if monitoringStarted() then
             shutdown()
             MsgC(Color(255,0,255),"MetrostroiMon: ",Color(0,255,0),"Stopped.\n")
@@ -930,9 +870,7 @@ if SERVER then
             string.NiceTime(elapsed),"\n"
         )
     end
-    concommand.Add("metrostroi_monitoring_status",function(ply)
-        if IsValid(ply) then return end
-
+    concommand.Add("metrostroi_monitoring_status",function()
         if State>0 then
             MsgC(Color(255,0,255),"MetrostroiMon:\t\t",Color(0,255,0),"Watchdog working\n")
             MsgC(Color(255,255,255),"\tStatus:\t\t")
@@ -964,16 +902,13 @@ if SERVER then
         end
     end,nil,"Monitoring status")
     --Restart monitoring, if we want to start it
-    concommand.Add("metrostroi_monitoring_restart",function(ply)
-        if IsValid(ply) then return end
-
+    concommand.Add("metrostroi_monitoring_restart",function()
         RunConsoleCommand("metrostroi_monitoring_stop")
         RunConsoleCommand("metrostroi_monitoring_start")
     end,nil,"Restart monitoring")
 
     concommand.Add("metrostroi_monitoring_confirm",function(ply,_,_,str)
         if IsValid(ply) then return end
-
         if not monitoringStarted() or State<=1 then
             print("Monitoring is not started. It can be disabled or have a error.")
             print("You can check monitoring status by metrostroi_monitoring_status console command.")

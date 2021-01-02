@@ -85,17 +85,13 @@ if CLIENT then
 
         local selected = Train:GetNW2Int("RRI:Selected",0)
         draw.SimpleText("▪","Metrostroi_Arial20",5,5+selected*10,Color(100,200,50),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-        draw.SimpleText(Format("Ln [%d] %s %s",line,rriL.NameEn or rriL.Name,rriL.Loop and "Loop" or ""),"Metrostroi_Arial13",10,5,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-        if rriL.Loop then
-            draw.SimpleText(Format("Path: %s",Train:GetNW2Bool("RRI:Path",false) and "II" or "I"),"Metrostroi_Arial13",10,15,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-        elseif firststation then
+        draw.SimpleText(Format("Ln [%d] %s",line,rriL.NameEn or rriL.Name),"Metrostroi_Arial13",10,5,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+        if firststation then
             draw.SimpleText(Format("FSt[%d] %s",firststation[1],firststation[3] or firststation[2]),"Metrostroi_Arial13",10,15,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
         else
             draw.SimpleText("FSt ERR","Metrostroi_Arial13",10,15,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
         end
-        if Train:GetNW2Int("RRI:LastStation",-1) == 0 then
-            draw.SimpleText("LSt[()] Loop","Metrostroi_Arial13",10,25,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-        elseif laststation then
+        if laststation then
             draw.SimpleText(Format("LSt[%d] %s",laststation[1],laststation[3] or laststation[2]),"Metrostroi_Arial13",10,25,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
         else
             draw.SimpleText("LSt ERR","Metrostroi_Arial13",10,25,Color(200,100,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
@@ -229,28 +225,23 @@ end
 function TRAIN_SYSTEM:Play()
     local message
     local tbl = self.CurrentTable[self.Line]
-    if not tbl then error(Format("Line %d not found in announcer %d",self.Line,self.Announcer)) end
     local stbl = tbl[self.Station]
     local last = self.LastStation
     local lastst
 
-    local path
+    local path = self.FirstStation > self.LastStation
     if tbl.Loop then
-        path = self.Path
         lastst = not self.Arrived and self.LastStation > 0 and self.Station == last and tbl[last].arrlast
     else
-        path = self.FirstStation > self.LastStation
         lastst = not self.Arrived and self.Station == last and tbl[last].arrlast
     end
-    path = path and 2 or 1
-
     if self.Arrived then
-        message = stbl.dep[path]
+        message = stbl.dep[path and 2 or 1]
     else
         if lastst then
-            message = stbl.arrlast[path]
+            message = stbl.arrlast[path and 2 or 1]
         else
-            message = stbl.arr[path]
+            message = stbl.arr[path and 2 or 1]
         end
     end
     self:AnnQueue{0.5,"click_start","buzz_start",0.6}
@@ -258,13 +249,7 @@ function TRAIN_SYSTEM:Play()
     self:AnnQueue(message)
     --local stbl = self.CurrentTable[self.Train:GetNW2Int("Announcer",1)][self.Line][self.Station]
     if self.LastStation > 0 and not self.Arrived and self.Station ~= last and tbl[last].not_last and (stbl.have_inrerchange or math.abs(last-self.Station) <= 3) then
-        local ltbl = tbl[last]
-        if stbl.not_last_c then
-            local patt = stbl.not_last_c[path]
-            self:AnnQueue(ltbl[patt] or ltbl.not_last)
-        else
-            self:AnnQueue(ltbl.not_last)
-        end
+        self:AnnQueue(tbl[last].not_last)
     end
     self:AnnQueue{2,"click_end","buzz_end",0.3}
     --self:UpdateBoards()
@@ -296,119 +281,71 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
                 self.Line = self.Line-1
                 if self.Line < 1 then self.Line = #rri end
             end
-            rriL = rri[self.Line]
-            self.FirstStation = -1
-            if not rriL.Loop then
-                self.LastStation = #rri[self.Line]+1
-                repeat
-                    self.FirstStation = self.FirstStation + 1
-                    if self.FirstStation > #rriL then self.FirstStation = 1 end
-                until (not rriL[self.FirstStation] or (rriL[self.FirstStation].arrlast and rriL[self.FirstStation].arrlast[self.FirstStation > self.LastStation and 2 or 1]))-- and self.FirstStation ~= self.LastStation
-                repeat
-                    self.LastStation = self.LastStation - 1
-                    if self.LastStation < (rriL.Loop and 0 or 1) then self.LastStation = #rriL end
-                until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.FirstStation > self.LastStation]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
-            else
-                self.LastStation = 0
-            end
+            self.FirstStation = 0
+            self.LastStation = #rri[self.Line]+1
+
+            repeat
+                self.FirstStation = self.FirstStation + 1
+                if self.FirstStation > #rriL then self.FirstStation = 1 end
+            until (not rriL[self.FirstStation] or rriL[self.FirstStation].arrlast)-- and self.FirstStation ~= self.LastStation
+            repeat
+                self.LastStation = self.LastStation - 1
+                if self.LastStation < 1 then self.LastStation = #rriL end
+            until (not rriL[self.LastStation] or rriL[self.LastStation].arrlast) and self.LastStation ~= self.FirstStation
 
             self.Arrived = true
         end
 
         if self.Selected == 1 then
             if name == "Right" then
-                if rriL.Loop then
-                    self.Path  = not self.Path
-                else
-                    repeat
-                        self.FirstStation = self.FirstStation + 1
-                        if self.FirstStation > #rriL then self.FirstStation = 1 end
-                    until (not rriL[self.FirstStation] or rriL[self.FirstStation].arrlast)-- and self.FirstStation ~= self.LastStation
-                    end
+                repeat
+                    self.FirstStation = self.FirstStation + 1
+                    if self.FirstStation > #rriL then self.FirstStation = 1 end
+                until (not rriL[self.FirstStation] or rriL[self.FirstStation].arrlast)-- and self.FirstStation ~= self.LastStation
             end
             if name == "Left" then
-                if rriL.Loop then
-                    self.Path  = not self.Path
-                else
-                    repeat
-                        self.FirstStation = self.FirstStation - 1
-                        if self.FirstStation < 1 then self.FirstStation = #rriL end
-                    until (not rriL[self.FirstStation] or rriL[self.FirstStation].arrlast)-- and self.FirstStation ~= self.LastStation
-                end
-            end
-
-            self.LastStation = (rriL.Loop and 0 or 1) and 0 or #rri[self.Line]+1
-            if rriL.Loop then
-                self.LastStation = 0
-            else
                 repeat
-                    self.LastStation = self.LastStation - 1
-                    if self.LastStation < 1 then self.LastStation = #rriL end
-                until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.FirstStation > self.LastStation  and 2 or 1]) or rriL.Loop and self.LastStation == 0)
-                if self.FirstStation==self.LastStation then
-                    self.LastStation = 0
-                    repeat
-                        self.LastStation = self.LastStation + 1
-                        if self.LastStation > #rriL then self.LastStation = (rriL.Loop and 0 or 1) end
-                    until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.FirstStation > self.LastStation  and 2 or 1]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
-                end
+                    self.FirstStation = self.FirstStation - 1
+                    if self.FirstStation < 1 then self.FirstStation = #rriL end
+                until (not rriL[self.FirstStation] or rriL[self.FirstStation].arrlast)-- and self.FirstStation ~= self.LastStation
             end
-            if self.FirstStation > 0 then
-                self.Station = self.FirstStation
-            else
-                self.Station = 1
+            self.Station = self.FirstStation
+            self.Arrived = true
+
+            self.LastStation = #rri[self.Line]+1
+            repeat
+                self.LastStation = self.LastStation - 1
+                if self.LastStation < 1 then self.LastStation = #rriL end
+            until (not rriL[self.LastStation] or rriL[self.LastStation].arrlast)
+            if self.FirstStation==self.LastStation then
+                self.LastStation = 0
+                repeat
+                    self.LastStation = self.LastStation + 1
+                    if self.LastStation > #rriL then self.LastStation = 1 end
+                until (not rriL[self.LastStation] or rriL[self.LastStation].arrlast) and self.LastStation ~= self.FirstStation
             end
         end
         if self.Selected == 2 then
             if name == "Right" then
-                if rriL.Loop then
-                    repeat
-                        self.LastStation = self.LastStation + 1
-                        if self.LastStation > #rriL then self.LastStation = (rriL.Loop and 0 or 1) end
-                    until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.Path and 2 or 1]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
-                else
-                    repeat
-                        self.LastStation = self.LastStation + 1
-                        if self.LastStation > #rriL then self.LastStation = (rriL.Loop and 0 or 1) end
-                    until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.FirstStation > self.LastStation and 2 or 1]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
-                end
+                repeat
+                    self.LastStation = self.LastStation + 1
+                    if self.LastStation > #rriL then self.LastStation = 1 end
+                until (not rriL[self.LastStation] or rriL[self.LastStation].arrlast) and self.LastStation ~= self.FirstStation
             end
             if name == "Left" then
-                if rriL.Loop then
-                    repeat
-                        self.LastStation = self.LastStation - 1
-                        if self.LastStation < (rriL.Loop and 0 or 1) then self.LastStation = #rriL end
-                    until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.Path and 2 or 1]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
-                else
-                    repeat
-                        self.LastStation = self.LastStation - 1
-                        if self.LastStation < (rriL.Loop and 0 or 1) then self.LastStation = #rriL end
-                    until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.FirstStation > self.LastStation and 2 or 1]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
-                end
-            end
-            if self.FirstStation > 0 then
-                self.Station = self.FirstStation
-            else
-                self.Station = 1
+                repeat
+                    self.LastStation = self.LastStation - 1
+                    if self.LastStation < 1 then self.LastStation = #rriL end
+                until (not rriL[self.LastStation] or rriL[self.LastStation].arrlast) and self.LastStation ~= self.FirstStation
             end
         end
         if self.Selected == 3 then
             if name == "Right" then
-                if rriL.Loop and (self.Arrived or self.Station == self.LastStation) and (self.Path and self.Station == 1 or not self.Path and self.Station == #rriL) then
-                    self.Arrived = false
-                    self.Station = self.Path and #rriL or 1
-                elseif not rriL.Loop and self.Station == self.LastStation then
+                if self.Station == self.LastStation then
                     self.Arrived = true
                     self.Station = self.FirstStation
                 elseif not self.Arrived then
                     self.Arrived = true
-                elseif rriL.Loop then
-                    if self.Path then
-                        self.Station = self.Station - 1
-                    else
-                        self.Station = self.Station + 1
-                    end
-                    self.Arrived = false
                 else
                     if self.FirstStation > self.LastStation then
                         self.Station = self.Station - 1
@@ -419,21 +356,11 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
                 end
             end
             if name == "Left" then
-                if rriL.Loop and (not self.Arrived) and (not self.Path and self.Station == 1 or self.Path and self.Station == #rriL) then
-                    self.Arrived = true
-                    self.Station = self.Path and 1 or #rriL
-                elseif not rriL.Loop and self.Station == self.FirstStation then
-                    self.Arrived = true
+                if self.Station == self.FirstStation then
+                    self.Arrived = false
                     self.Station = self.LastStation
                 elseif self.Arrived then
                     self.Arrived = false
-                elseif rriL.Loop then
-                    if self.Path then
-                        self.Station = self.Station + 1
-                    else
-                        self.Station = self.Station - 1
-                    end
-                    self.Arrived = true
                 else
                     if self.FirstStation > self.LastStation then
                         self.Station = self.Station + 1
@@ -448,22 +375,15 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
 end
 
 function TRAIN_SYSTEM:Trigger(name,value)
-    if self.Power and (name == "R_Program1" or name == "R_Program1H" or name == "SB10" or name == "SB20") and value > 0 then
-        if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click_end",0.5} end
+    if self.Power and (name == "R_Program1" or name == "R_Program1H" or name == "SB10" or name == "SB20") and self.LineOut==0  and value > 0 then
         self:Play()
-        local rriL = self.CurrentTable[self.Line]
-        if rriL.Loop and self.Arrived and (self.Path and self.Station == 1 or not self.Path and self.Station == #rriL) then
-            self.Arrived = false
-            self.Station = self.Path and #rriL or 1
-        elseif not rriL.Loop and self.Station == self.LastStation then
+        if self.Station == self.LastStation then
             self.Arrived = true
             self.Station = self.FirstStation
         elseif not self.Arrived then
             self.Arrived = true
         else
-            if self.FirstStation == -1 then
-                self.Station = self.Station + (self.Path and -1 or 1)
-            elseif self.FirstStation > self.LastStation then
+            if self.FirstStation > self.LastStation then
                 self.Station = self.Station - 1
             else
                 self.Station = self.Station + 1
@@ -489,7 +409,6 @@ function TRAIN_SYSTEM:Think()
     local Train = self.Train
     local VV = Train.RRI_VV
     self.Power = VV.Power > 0
-    if not self.Power and self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click_end"} end
 
     for k,v in pairs(self.TriggerNames) do
         if Train[v] and Train[v].Value ~= self.Triggers[v] then
@@ -506,16 +425,10 @@ function TRAIN_SYSTEM:Think()
         end
         if self.CurrentTable and self.CurrentTable[1] then
             self.Line = 1
-            if self.CurrentTable[self.Line].Loop then
-                self.FirstStation = -1
-                self.LastStation = 0
-                self.Path = faslse
-                self.Station = 1
-            else
-                self.FirstStation = 1
-                self.LastStation = #self.CurrentTable[self.Line]
-                self.Station = self.FirstStation
-            end
+
+            self.FirstStation = 1
+            self.LastStation = #self.CurrentTable[self.Line]
+            self.Station = self.FirstStation
         else
             self.Line = -1
 
@@ -528,7 +441,6 @@ function TRAIN_SYSTEM:Think()
     Train:SetNW2Int("RRI:FirstStation",self.FirstStation)
     Train:SetNW2Int("RRI:LastStation",self.LastStation)
     Train:SetNW2Int("RRI:Station",self.Station)
-    Train:SetNW2Bool("RRI:Path",self.Path)
     Train:SetNW2Bool("RRI:Arrived",self.Arrived)
 
     self.LineOut = #Train.Announcer.Schedule>0 and 1 or 0

@@ -24,25 +24,10 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=1,4 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i-1,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i-1,0))
-end
-
 ENT.AnnouncerPositions = {
     {Vector(-3,-60, 62),300,0.3},
     {Vector(-3,60 ,62),300,0.3},
 }
-
-ENT.MirrorCams = {
-    Vector(-441,75,15),Angle(1,0,0),75,
-    Vector(-441,-75,15),Angle(1,0,0),75,
-}
-
 ENT.Cameras = {
     {Vector(-434,20,-13),Angle(0,135,0),"Train.714.Shunt","Shunt"},
     {Vector(450+7,0,30),Angle(60,0,0),"Train.Common.CouplerCamera"},
@@ -100,34 +85,31 @@ function ENT:InitializeSounds()
     self.SoundNames["bpsn10"] = {"subway_trains/717/bpsn/bpsn_2.wav", loop=true}
     self.SoundNames["bpsn11"] = {"subway_trains/717/bpsn/bpsn_piter.wav", loop=true}
     self.SoundNames["bpsn12"] = {"subway_trains/717/bpsn/bpsn1.wav", loop=true}
-    self.SoundPositions["bpsn1"] = {600,1e9,Vector(0,45,-448),0.02}
-    self.SoundPositions["bpsn2"] = {600,1e9,Vector(0,45,-448),0.03}
-    self.SoundPositions["bpsn3"] = {600,1e9,Vector(0,45,-448),0.02}
-    self.SoundPositions["bpsn4"] = {600,1e9,Vector(0,45,-448),0.025}
-    self.SoundPositions["bpsn5"] = {600,1e9,Vector(0,45,-448),0.08}
-    self.SoundPositions["bpsn6"] = {600,1e9,Vector(0,45,-448),0.03}
-    self.SoundPositions["bpsn7"] = {600,1e9,Vector(0,45,-448),0.02}
-    self.SoundPositions["bpsn8"] = {600,1e9,Vector(0,45,-448),0.03}
-    self.SoundPositions["bpsn9"] = {600,1e9,Vector(0,45,-448),0.02}
-    self.SoundPositions["bpsn10"] = {600,1e9,Vector(0,45,-448),0.02}
-    self.SoundPositions["bpsn11"] = {600,1e9,Vector(0,45,-448),0.04}
-    self.SoundPositions["bpsn12"] = {600,1e9,Vector(0,45,-448),0.04}
+    self.SoundPositions["bpsn1"] = {500,1e9,Vector(0,45,-448),0.02}
+    self.SoundPositions["bpsn2"] = {500,1e9,Vector(0,45,-448),0.03}
+    self.SoundPositions["bpsn3"] = {500,1e9,Vector(0,45,-448),0.02}
+    self.SoundPositions["bpsn4"] = {500,1e9,Vector(0,45,-448),0.025}
+    self.SoundPositions["bpsn5"] = {500,1e9,Vector(0,45,-448),0.08}
+    self.SoundPositions["bpsn6"] = {500,1e9,Vector(0,45,-448),0.03}
+    self.SoundPositions["bpsn7"] = {500,1e9,Vector(0,45,-448),0.02}
+    self.SoundPositions["bpsn8"] = {500,1e9,Vector(0,45,-448),0.03}
+    self.SoundPositions["bpsn9"] = {500,1e9,Vector(0,45,-448),0.02}
+    self.SoundPositions["bpsn10"] = {500,1e9,Vector(0,45,-448),0.02}
+    self.SoundPositions["bpsn11"] = {500,1e9,Vector(0,45,-448),0.04}
+    self.SoundPositions["bpsn12"] = {500,1e9,Vector(0,45,-448),0.04}
 
     --Подвагонка
     self.SoundNames["lk2_on"] = "subway_trains/717/pneumo/lk2_on.mp3"
     self.SoundNames["lk5_on"] = "subway_trains/717/pneumo/lk1_on.mp3"
     self.SoundNames["lk2_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
-    self.SoundNames["lk2c"] = "subway_trains/717/pneumo/ksh1.mp3"
     self.SoundNames["lk3_on"] = "subway_trains/717/pneumo/lk3_on.mp3"
     self.SoundNames["lk3_off"] = "subway_trains/717/pneumo/lk3_off.mp3"
     --self.SoundNames["ksh1_off"] = "subway_trains/717/pneumo/ksh1.mp3"
     self.SoundPositions["lk2_on"] = {440,1e9,Vector(-60,-40,-66),0.22}
     self.SoundPositions["lk5_on"] = {440,1e9,Vector(-60,-40,-66),0.30}
     self.SoundPositions["lk2_off"] = self.SoundPositions["lk2_on"]
-    self.SoundPositions["lk2c"] = {440,1e9,Vector(-60,-40,-66),0.6}
     self.SoundPositions["lk3_on"] = self.SoundPositions["lk2_on"]
     self.SoundPositions["lk3_off"] = self.SoundPositions["lk2_on"]
-    --self.SoundPositions["ksh1_off"] = self.SoundPositions["lk1_on"]
 
     self.SoundNames["compressor"] = {loop=2.0,"subway_trains/d/pneumatic/compressor/compessor_d_start.wav","subway_trains/d/pneumatic/compressor/compessor_d_loop.wav", "subway_trains/d/pneumatic/compressor/compessor_d_end.wav"}
     self.SoundNames["compressor2"] = {loop=1.79,"subway_trains/717/compressor/compressor_717_start2.wav","subway_trains/717/compressor/compressor_717_loop2.wav", "subway_trains/717/compressor/compressor_717_stop2.wav"}
@@ -277,14 +259,10 @@ function ENT:InitializeSounds()
     self.SoundNames["vdor_off"] = self.SoundNames["vdol_off"]
     self.SoundPositions["vdor_on"] = self.SoundPositions["vdol_on"]
     self.SoundPositions["vdor_off"] = self.SoundPositions["vdol_off"]
-    for i=1,5 do
-        self.SoundNames["vdol_loud"..i] = "subway_trains/common/pneumatic/door_valve/vdo"..(2+i).."_on.mp3"
-        self.SoundNames["vdop_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundNames["vzd_loud"..i] = self.SoundNames["vdol_loud"..i]
-        self.SoundPositions["vdol_loud"..i] = {100,1e9,Vector(-420,45,-30),1}
-        self.SoundPositions["vdop_loud"..i] = self.SoundPositions["vdol_loud"..i]
-        self.SoundPositions["vzd_loud"..i] = self.SoundPositions["vdol_loud"..i]
-    end
+    self.SoundNames["vdol_loud"] = "subway_trains/common/pneumatic/door_valve/vdo3_on.mp3"
+    self.SoundNames["vdop_loud"] = self.SoundNames["vdol_loud"]
+    self.SoundPositions["vdol_loud"] = {100,1e9,Vector(-420,45,-30),1}
+    self.SoundPositions["vdop_loud"] = self.SoundPositions["vdol_loud"]
     self.SoundNames["vdz_on"] = {
         "subway_trains/common/pneumatic/door_valve/VDZ_on.mp3",
         "subway_trains/common/pneumatic/door_valve/VDZ2_on.mp3",
@@ -316,10 +294,7 @@ function ENT:InitializeSounds()
 
     for k,v in ipairs(self.AnnouncerPositions) do
         self.SoundNames["announcer_buzz"..k] = {loop=true,"subway_announcers/asnp/bpsn_ann.wav"}
-        self.SoundPositions["announcer_buzz"..k] = {v[2] or 600,1e9,v[1],v[3]/6}
-        self.SoundNames["announcer_buzz_o"..k] = {loop=true,"subway_announcers/upo/noiseT2.wav"}
-        --self.SoundNames["announcer_buzz_o"..k] = {loop=true,"subway_announcers/riu/bpsn_ann.wav"}
-        self.SoundPositions["announcer_buzz_o"..k] = {v[2] or 600,1e9,v[1],v[3]/6}
+        self.SoundPositions["announcer_buzz"..k] = {v[2] or 600,1e9,v[1],v[3]/4}
     end
 end
 function ENT:InitializeSystems()
@@ -348,7 +323,7 @@ function ENT:InitializeSystems()
     self:LoadSystem("BV","BV_630")
     self:LoadSystem("LK_755A")
     self:LoadSystem("YAR_13B")
-    self:LoadSystem("YAR_27",nil,"MSK")
+    self:LoadSystem("YAR_27")
     self:LoadSystem("YAK_36")
     self:LoadSystem("YAK_37E")
     self:LoadSystem("YAS_44V")
@@ -396,18 +371,18 @@ ENT.NumberRanges = {
     },
     {
         true,
-        {0623,0624,0625,0626,0627,0628,0629,0630,0631,0632,0633,0634,0635,0636,0637,0638,0639,0640,0641,0642,0643,0644,0645,0646,0647,0648,0649,0650,0651,0652,0653,0654,0655,0656,0657,0658,0662,0663,0664,0665,0666,0667,0668,0669,0670,0671,0672,0673,0674,0682,0684,0685,0686,0687,0688,0689,0690,0691,0692,0693,0694,0695,0696,0697,0698,0699,0703,0704,0705,0712,0713,0714,0715,0722,0723,0724,0725,0726,0727,0728,0729,0730,0731,0732,0733,0734,0735,0736,0737,0738,0739,0752,0753,0754,0755,0756,0757,0758,0759,0760,0761,0762,0763,0764,0765,0766,0767,0768,0769,0770,0771,0781,0782,0783,0786,0787,0788,0795,0796,0797,0798,0802,0803,0804,0805,0806,0807,0808,0809,0810,0811,0812,0813,0814,0818,0819,0820,0821,0822,0823,0824,0825,0826,0827,0828,0829,0830,0831,0833,0834,0835,0836,0837,0838,0839,0840,0841,0842,0843,0844,0845,0846,0847,0848,0849,0855,0856,0857,0858,0859,0860,0861,0862,0863,0864,0867,0872,0874,0875,0876,0877,0880,0881,0882,0883,0884,0885,0886,0887,0890,0891,0892,0893,0894,0895,0896,0897,0902,0903,0904,0905,0906,0907,0908,0909,0916,0917,0918},
+        {0623,0624,0625,0626,0627,0628,0629,0630,0631,0632,0633,0634,0635,0636,0637,0638,0639,0640,0641,0642,0643,0644,0645,0646,0647,0648,0649,0650,0651,0652,0653,0654,0655,0656,0657,0658,0662,0663,0664,0665,0666,0667,0668,0669,0670,0671,0672,0673,0674,0682,0684,0685,0686,0687,0688,0689,0690,0691,0692,0693,0694,0695,0696,0697,0698,0699,0703,0704,0705,0712,0713,074,0715,0722,0723,0724,0725,0726,0727,0728,0729,0730,0731,0732,0733,0734,0735,0736,0737,0738,0739,0752,0753,0754,0755,0756,0757,0758,0759,0760,0761,0762,0763,0764,0765,0766,0767,0768,0769,0770,0771,0781,0782,0783,0786,0787,0788,0795,0796,0797,0798,0802,0803,0804,0805,0806,0807,0808,0809,0810,0811,0812,0813,0814,0818,0819,0820,0821,0822,0823,0824,0825,0826,0827,0828,0829,0830,0831,0833,0834,0835,0836,0837,0838,0839,0840,0841,0842,0843,0844,0845,0846,0847,0848,0849,0855,0856,0857,0858,0859,0860,0861,0862,0863,0864,0867,0872,0874,0875,0876,0877,0880,0881,0882,0883,0884,0885,0886,0887,0890,0891,0892,0893,0894,0895,0896,0897,0902,0903,0904,0905,0906,0907,0908,0909,0916,0917,0918},
         {false, true,true ,true,{"Def_717MSKWhite","Def_717MSKWood4"}}
     },
     --717.5 ЛВЗ
     {
         true,
-        {8204,8205,8207,8208,8209,8210,8211,8212,8213,8214,8216,8217,8218,8219,8220,8221,8222,8223,8224,8225,8226,8227,8228,8229,8230,8231,8232,8233,8234,8235,8236,8237,8238,8239,8270,8271,8272,8273,8274,8275,8276,8278,8279,8280,8281,8282,8283,8284,8285,8286,8287,8288,8289,8290,8291,8292,8293,8294,8295,8296,8297,8298,8299,8300,8301,8302,8303,8304,8305,8306,8307,8309,8312,8343,8360,8361,8362,8363,8364,8365,8366,8367,8368,8368,8370,8377,8378,8379,8380,8381,8382,8383,8384,8385,8386,8387,8388},
+        {8204,8205,8207,8208,8209,8210,8211,8212,8213,8214,8216,8217,8218,8219,8220,8221,8222,8223,8224,8225,8226,8227,8228,8229,8230,8231,8232,8233,8234,8235,8236,8237,8238,8239,8270,8271,8272,8273,8274,8275,8276,8278,8279,8280,8281,8282,8283,8284,828,8286,8287,8288,8289,8290,8291,8292,8293,8294,8295,8296,8297,8298,8299,8300,8301,8302,8303,8304,8305,8306,8307,8309,8312,8343,8360,8361,8362,8363,8364,8365,8366,8367,8368,8368,8370,8377,8378,8379,8380,8381,8382,8383,8384,8385,8386,8387,8388},
         {true , true,false,true,{"Def_717MSKWhite","Def_717MSKWood4"}}
     },
     {
         true,
-        {11021,11022,11023,11024,11025,11026,11029,11030,11031,11032,11033,11034,11035,11036,11037,11038,11039,11040,11075,11076,11079,11089,11092,11093,11094,11095,11096,11097,11098,11099,11119,11120,11121,11122,11123,1112411125,11126,11127,11128,11129,11130,11131,11132,11133,11139,11140,11142,11143,11144,11145,11146,11147,11148,11149,11150,11151,11152,11153,11154,11155,11158,11159,11160,11161,11162,11163,11164,11165,11166,11169,11170,11171,11172,11175,11176,11177,11178,11179,11180,11183,11184,11185,11186,11193,11194,11195,11197,11198,11199,11200,11201,11202,11203,11204,11205,11206,11207,11208,11212,11213,11214,11216,11217,11218,11219,11221,11222,11223,11224,11226,11227,11228,11229,11230,11231,11232,11233,11234,11235,11236,11237,11238,11239,11240,11248,11250,11251,11252,11253,11256,11257,11264,11265,11266,11267,11268,11269,11270,11272,11274,11275,11276,11277,11278,11279,11280,11281,11282,11283,11286,11287,11288,11289,11290,11291,11295,11299,11307,11308,11309,11310,11311,11312,11313,11314,11315,11317,11318,11319,11320,11321,11324,11325,11326,11327,11328,11329,11330,11331,11332,11333,11334,11358,11359,11361,11363,11365,11366,11376},
+        {11021,11022,11023,11024,11025,11026,11029,11030,11031,11032,11033,11034,11035,11036,11037,11038,11039,11040,11075,11076,11079,11089,11092,11093,11094,11095,11096,11097,11098,11099,1117,11119,11120,11121,11122,11123,1112411125,11126,11127,11128,11129,11130,11131,11132,11133,11139,11140,11142,11143,11144,11145,11146,11147,11148,11149,11150,11151,11152,11153,11154,11155,11158,11159,11160,11161,11162,11163,11164,11165,11166,11169,11170,11171,11172,11175,11176,11177,11178,11179,11180,11183,11184,11185,11186,11193,11194,11195,11197,11198,11199,11200,11201,11202,11203,11204,11205,11206,11207,11208,11212,11213,11214,11216,11217,11218,11219,11221,11222,11223,11224,11226,11227,11228,11229,11230,11231,11232,11233,11234,11235,11236,11237,11238,11239,11240,11248,11250,11251,11252,11253,11256,11257,11264,11265,11266,11267,11268,11269,11270,11272,11274,11275,11276,11277,11278,11279,11280,11281,11282,11283,11286,11287,11288,11289,11290,11291,11295,11299,11307,11308,11309,11310,11311,11312,11313,11314,11315,11317,11318,11319,11320,11321,11324,11325,11326,11327,11328,11329,11330,11331,11332,11333,11334,11358,11359,11361,11363,11365,11366,11376},
         {true , true,true ,true,{"Def_717MSKWhite","Def_717MSKWood4"}}
     },
 }

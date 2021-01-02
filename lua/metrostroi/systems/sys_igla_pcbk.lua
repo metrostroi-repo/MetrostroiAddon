@@ -56,11 +56,8 @@ function TRAIN_SYSTEM:Think(dT)
         if self.Update then
             self:CANWrite("Timer",CurTime())
         end
-        local electric = self.Train.Electric
         self.Time= CurTime()+math.random()*0.4
-        self:CState("PTROverheat",(electric.Overheat1 > 0 or electric.Overheat2 > 0) and math.max(electric.T1,electric.T2))
-        self:CState("PTROverheating",(electric.T1 > 500 or electric.T2 > 500) and math.min(999,math.max(electric.T1,electric.T2)))
-        --[[ local schengaged = Train:ReadTrainWire(20)>0
+        local schengaged = Train:ReadTrainWire(20)>0
         local schengagedD = schengaged and Train:ReadTrainWire(1)>0
         local schengagedB = schengaged and Train:ReadTrainWire(6)>0
         local RP = Train.RPvozvrat.Value > 0.5
@@ -88,7 +85,7 @@ function TRAIN_SYSTEM:Think(dT)
             if self.EngageTimer then self.EngageTimer = nil end
             if self.BrakesTimer then self.BrakesTimer = nil end
         end
-        self:CState("SCHEME",self.EngageTimer and CurTime()-self.EngageTimer > 3)
+        --[[ self:CState("SCHEME",self.EngageTimer and CurTime()-self.EngageTimer > 3)
         self:CState("RP",RP)
         self:CState("DOORS",DOORS)
         self:CState("BPSN",self.BPSNTimer and CurTime()-self.BPSNTimer > 7)

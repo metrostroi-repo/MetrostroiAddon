@@ -1,26 +1,20 @@
 include("shared.lua")
 
-local debug = GetConVar("metrostroi_drawsignaldebug")
-local function enableDebug()
-    if debug:GetBool() then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiSwitchDebug",function(bDrawingDepth,bDrawingSkybox)
-            for _,ent in pairs(ents.FindByClass("gmod_track_switch")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 512 then
-					local pos = ent:LocalToWorld(Vector(30,0,75))
-					local ang = ent:LocalToWorldAngles(Angle(0,180,90))
-					cam.Start3D2D(pos, ang, 0.25)
-						surface.SetDrawColor(125, 125, 0, 255)
-						surface.DrawRect(0, 0, 160, 24)
+function ENT:Initialize()
+	hook.Add("PostDrawOpaqueRenderables", "metrostroi_switch_draw_"..self:EntIndex(), function()
+			--print(1)
+			if GetConVarNumber("metrostroi_drawsignaldebug") ~= 1 then return end
+			--print(2)
+			local pos = self:LocalToWorld(Vector(30,0,75))
+			local ang = self:LocalToWorldAngles(Angle(0,180,90))
+			cam.Start3D2D(pos, ang, 0.25)
+				surface.SetDrawColor(125, 125, 0, 255)
+				surface.DrawRect(0, 0, 160, 24)
 
-						draw.DrawText("SwitchID:"..ent:GetNW2String("ID"),"Trebuchet24",5,0,Color(0,0,0,255))
-					cam.End3D2D()
-                end
-            end
-        end)
-    else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiSwitchDebug")
-    end
+				draw.DrawText("SwitchID:"..self:GetNW2String("ID"),"Trebuchet24",5,0,Color(0,0,0,255))
+			cam.End3D2D()
+	end )
 end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiSwitchDebug")
-cvars.AddChangeCallback( "metrostroi_drawsignaldebug", enableDebug)
-enableDebug()
+function ENT:OnRemove()
+	hook.Remove("PostDrawOpaqueRenderables", "metrostroi_switch_draw_"..self:EntIndex())
+end

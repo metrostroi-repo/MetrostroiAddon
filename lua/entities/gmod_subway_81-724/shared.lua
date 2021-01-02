@@ -21,18 +21,6 @@ function ENT:GetStandingArea()
     return Vector(-450,-30,-62),Vector(380,30,-62)
 end
 
-local function GetDoorPosition(i,k)
-    return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
-end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 function ENT:InitializeSounds()
     self.BaseClass.InitializeSounds(self)
     self.SoundNames["release"] = {loop=true,"subway_trains/722/pneumo_release2.wav"}
@@ -85,6 +73,12 @@ function ENT:InitializeSounds()
     self.SoundNames["door_cab_open"] = "subway_trains/common/door/cab/door_open.mp3"
     self.SoundNames["door_cab_close"] = "subway_trains/common/door/cab/door_close.mp3"
 
+    local function GetDoorPosition(i,k,j)
+        if j == 0
+        then return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
+        else return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
+        end
+    end
     self.SoundNames["doors"] = "subway_trains/722/door_start.mp3"
     self.SoundNames["doorl"] = {loop=true,"subway_trains/722/door_loop.wav"}
     self.SoundPositions["doors"] = {300,1e9,Vector(0,0,0),0.5}
@@ -92,7 +86,7 @@ function ENT:InitializeSounds()
     for i=0,3 do
         for k=0,1 do
             self.SoundNames["door"..i.."x"..k.."c"] = "subway_trains/722/door_close.mp3"
-            self.SoundPositions["door"..i.."x"..k.."c"] = {800,1e9,GetDoorPosition(i,k),0.2}
+            self.SoundPositions["door"..i.."x"..k.."c"] = {800,1e9,GetDoorPosition(i,k,0),0.2}
         end
     end
     self.SoundNames["door_alarm"] = {"subway_trains/722/door_alarm.mp3"}

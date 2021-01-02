@@ -13,20 +13,6 @@ Train.722.CabLights     = Cabin lighting panel
 Train.722.Disconnects   = Disconnect valves
 Train.722.KRMH          = KRMSH and RVTB valves
 
-Train.Buttons.BattOn    = Battery is enabled #NEW (indicator)
-Train.Buttons.BattOff   = Battery is disabling #NEW (indicator)
-Train.Buttons.VentEmer  = Emergency #NEW (passenger ventilation)
-Train.Buttons.VentAuto  = Auto #NEW (passenger ventilation)
-Train.Buttons.Vent1/2   = Half of ventilation fans #NEW (passenger ventilation)
-Train.Buttons.VentAll   = All ventilation fans #NEW (passenger ventilation)
-
-Train.Buttons.VRUAH         = Emergency control #NEW
-Train.Buttons.VRUOn         = Manual activation #NEW (manual cab activation)
-Train.Buttons.PantSC        = Enable shorting device #NEW
-Train.Buttons.DoorCloseA    = Auto closing (with buzzer) #NEW
-Train.Buttons.DoorCloseM    = Manual closing (without buzzer) #NEW
-Train.Buttons.AHActive      = Emergency control is active #NEW
-
 #######Buttons###########
 Common.722.MirrorHeating                = Mirrors heater
 Common.722.EmergencyDrive               = Emergency start in the emergency drive mode

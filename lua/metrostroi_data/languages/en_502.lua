@@ -6,7 +6,7 @@ return [[
 #######Buttons###########
 #Common
 Common.502.KS                   = KSAUP operating indicator
-Common.502.AV                   = ATO is engaged
+Common.502.AV                   = Autodrive is engaged
 Common.502.SD                   = SD: Door state light (doors are closed)
 Common.502.SDW                  = SD: Door state light (doors are opened)
 Common.502.L3w                  = 3rd wire lamp (X3 mode)
@@ -28,7 +28,7 @@ Spawner.502.TypeKVLN        = New train from KVL
 Spawner.502.EWagons         = Add "E" type wagons
 
 #gmod_subway_81-502
-Entities.gmod_subway_81-502.Buttons.VBA.VBAToggle = ATO battery on/off
+Entities.gmod_subway_81-502.Buttons.VBA.VBAToggle = Autodrive battery on/off
 
 Entities.gmod_subway_81-502.Buttons.AV.VRUToggle = VRU: Emergency driving mode
 Entities.gmod_subway_81-502.Buttons.AV.KPVUToggle = KPVU: Turn off the pneumatic control disabler
@@ -166,7 +166,7 @@ Entities.gmod_subway_81-502.Buttons.Stopkran.EmergencyBrakeValveToggle          
 Entities.gmod_subway_81-502.Buttons.ParkingBrake.ParkingBrakeLeft                           = @[Common.703.ParkingBrakeLeft]
 Entities.gmod_subway_81-502.Buttons.ParkingBrake.ParkingBrakeRight                          = @[Common.703.ParkingBrakeRight]
 Entities.gmod_subway_81-502.Buttons.UAVAPanel.UAVAToggle                                    = @[Common.ALL.UAVA]
-Entities.gmod_subway_81-502.Buttons.UAVAPanel.UAVACToggle                                   = @[Common.ALL.UAVAContact]
+Entities.gmod_subway_81-502.Buttons.UAVAPanel.UAVAContactSet                                = @[Common.ALL.UAVAContact]
 Entities.gmod_subway_81-502.Buttons.DriverValveBLDisconnect.DriverValveBLDisconnectToggle   = @[Common.ALL.DriverValveBLDisconnect]
 Entities.gmod_subway_81-502.Buttons.DriverValveTLDisconnect.DriverValveTLDisconnectToggle   = @[Common.ALL.DriverValveTLDisconnect]
 Entities.gmod_subway_81-502.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle            = @[Common.ALL.FrontBrakeLineIsolationToggle]
@@ -208,8 +208,8 @@ Entities.gmod_subway_81-501.Buttons.AV1.VU3Toggle               = @[Common.703.V
 
 Entities.gmod_subway_81-501.Buttons.VU.VUToggle                 = @[Common.ALL.VU]
 
-Entities.gmod_subway_81-501.Buttons.Main.!GRP                   = @[Common.ALL.GRP]
-Entities.gmod_subway_81-501.Buttons.Main.!RRP                   = @[Common.ALL.RRP]
+Entities.gmod_subway_81-501.Buttons.Main.!GRP                   = @[Common.ALL.RRP]
+Entities.gmod_subway_81-501.Buttons.Main.!RRP                   = @[Common.ALL.GRP]
 Entities.gmod_subway_81-501.Buttons.Main.!SD                    = @[Common.703.SD]
 Entities.gmod_subway_81-501.Buttons.Main.LOnSet                 = @[Common.703.LOn]
 Entities.gmod_subway_81-501.Buttons.Main.LOffSet                = @[Common.703.LOff]

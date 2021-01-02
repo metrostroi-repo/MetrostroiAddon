@@ -118,8 +118,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     Panel.RRP = S["U2"]*T[18]
 
-    Train.Panel.Sequence = ARS.GE*Train.BSM_GE.Value*(1-Train.BSM_RNT.Value)
-
     local RCU = KV.RCU
 
     S["ZR"] = (1-Train.RRU.Value)+(B*Train.RRU.Value)*-1
@@ -147,7 +145,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     --Train["RUTreg"] = T[9]
     S["10I"] = S["10A"]*RheostatController.RKM2
-    --Train.Panel.Sequence =S["10A"]*RheostatController.RKM1
+    Train.Panel.Sequence =S["10A"]*RheostatController.RKM1
     Train["RUTpod"] = S["10I"]*Train.LK4.Value
     Train["RRTpod"] = S["10I"]*(1-Train.LK1.Value)
     Train.RRT:TriggerInput("Close",Train.RRTuderzh*Train.RRTpod)
@@ -232,8 +230,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Panel.Headlights2 = S["F7"]*Train.VU14.Value
     Panel.RedLights = BO*KV["B2-F1"]
     S["D1"] = BO*(KV["D-D1"]+KRU["11/3-D1/1"])
-    Train:WriteTrainWire(31,S["D1"]*(Train.V6.Value+Train.KU12.Value)+T[12])
-    Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value+T[12])
+    Train:WriteTrainWire(31,S["D1"]*(Train.V6.Value+Train.KU12.Value))
+    Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value)
     Train:WriteTrainWire(12,S["D1"]*Train.V10.Value)
     Train:WriteTrainWire(16,S["D1"]*Train.V2.Value*Train.V3.Value)
 
@@ -283,6 +281,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
 
     S["10A"] = BO*RCU
     S["10I"] = S["10A"]*RheostatController.RKM2
+    Train.Panel.Sequence =S["10A"]*RheostatController.RKM1
     Train["RUTpod"] = S["10I"]*Train.LK4.Value
     Train["RRTpod"] = S["10I"]*(1-Train.LK1.Value)
     Train["RRTuderzh"] = T[25]
@@ -565,8 +564,8 @@ function TRAIN_SYSTEM:Think(dT,iter)
     if not self.ResistorBlocksInit then
         self.ResistorBlocksInit  = true
         self.Train:LoadSystem("ResistorBlocks","Gen_Res_710")
+        self.Train.ResistorBlocks.InitializeResistances_81_710(self.Train)
     end
-    if iter == 1 then Train.ResistorBlocks.InitializeResistances_81_710(Train) end
     ----------------------------------------------------------------------------
     -- Voltages from the third rail
     ----------------------------------------------------------------------------

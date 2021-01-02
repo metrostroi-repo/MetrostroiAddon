@@ -31,17 +31,12 @@ Panel.DrawCams          = Отрисовывать камеры
 Panel.DisableHUD        = Откл. HUD в кресле машиниста
 Panel.DisableCamAccel   = Откл. симуляцию качания головы
 Panel.DisableHoverText  = Откл. всплывающий текст
-Panel.DisableHoverTextP = Откл. дополнительную информацию\nв всплывающем тексте
 Panel.ScreenshotMode    = Режим съёмки (НИЗКИЙ ФПС)
 Panel.ShadowsHeadlight  = Вкл. тени от фар
 Panel.RedLights         = Вкл. динамический свет от\nкрасных фар
 Panel.ShadowsOther      = Вкл. тени от остальных\nисточников света
-Panel.PanelSprites      = Вкл. отображение спрайтов\nна пульте
 Panel.MinimizedShow     = Не выгружать элементы\nпри сворачивании
-Panel.PanelLights       = Вкл. динамический свет от\nламп на пульте
-Panel.RouteNumber       = Номер маршрута
 Panel.FOV               = Поле зрения
-Panel.Z                 = Высота камеры
 Panel.RenderDistance    = Дальность прорисовки
 Panel.ReloadClient      = Перезагрузить клиентскую часть
 
@@ -56,8 +51,6 @@ Panel.SoftReloadLang    = Не перезагружать спавнменю
 
 
 #Common train
-
-#Cameras
 Train.Common.Camera0        = Место машиниста
 Train.Common.RouteNumber    = Номер маршрута
 Train.Common.LastStation    = Конечная станция
@@ -67,57 +60,7 @@ Train.Common.PneumoPanels   = Краны разобщения и ЭПК
 Train.Common.Voltmeters     = Вольтметры и амперметры
 Train.Common.CouplerCamera  = Сцепка
 Common.ARM.Monitor1         = Монитор 1 АРМ
-
 Train.Buttons.Sealed        = Запломбировано
-Train.Buttons.Active        = Активен
-Train.Buttons.Auto          = Автоматически
-Train.Buttons.On            = Включен
-Train.Buttons.Off           = Отключен
-Train.Buttons.Closed        = Закрыт
-Train.Buttons.Opened        = Открыт
-Train.Buttons.Disconnected  = Разъединён
-Train.Buttons.Connected     = Соединён
-Train.Buttons.UAVAOff       = Цепи управления разомкнуты
-Train.Buttons.UAVAOn        = Цепи управления замкнуты
-Train.Buttons.Freq1/5       = 1/5 АБ
-Train.Buttons.Freq2/6       = 2/6 АЛС-АРС
-Train.Buttons.Left          = Левые
-Train.Buttons.Right         = Правые
-Train.Buttons.Low           = Слабо
-Train.Buttons.High          = Сильно
-Train.Buttons.LFar          = Дальний свет
-Train.Buttons.LNear         = Ближний свет
-Train.Buttons.0             = 0
-Train.Buttons.1             = 1
-Train.Buttons.2             = 2
-Train.Buttons.3             = 3
-Train.Buttons.4             = 4
-Train.Buttons.Forward       = Вперед
-Train.Buttons.Back          = Назад
-Train.Buttons.VentHalf      = 1/2 скорости
-Train.Buttons.VentFull      = Полная скорость
-Train.Buttons.VTRF          = Прямо ориентированные вагоны
-Train.Buttons.VTRB          = Обратно ориентированные вагоны
-Train.Buttons.VTR1          = Чётные вагоны
-Train.Buttons.VTR2          = Нечётные вагоны
-Train.Buttons.VTRH1         = Первая половина
-Train.Buttons.VTRH2         = Вторая половина
-Train.Buttons.VTRAll        = Все вагоны
-
-Train.Buttons.BatteryVoltage = %d В
-Train.Buttons.HighVoltage    = %d В
-Train.Buttons.BatteryCurrent = %d А
-Train.Buttons.EnginesCurrent = %d А
-Train.Buttons.Speed          = %d км/ч
-Train.Buttons.SpeedAll       = %d км/ч\nОграничение:%s км/ч
-Train.Buttons.SpeedLimit     = %s км/ч
-Train.Buttons.SpeedLimitNext = %s км/ч
-Train.Buttons.Acceleration   = % 4.2f м/с
-Train.Buttons.04             = ОЧ
-Train.Buttons.BCPressure     = %.1f кгс/см²
-Train.Buttons.BLTLPressure   = НМ: %.1f\nТМ: %.1f кгс/см²
-Train.Buttons.Locked         = Заблокирован
-Train.Buttons.Unlocked       = Разблокирован
 
 #Train entities
 Entities.gmod_subway_base.Name        = База метропоездов
@@ -181,9 +124,9 @@ Weapons.train_kv_wrench_gold.Purpose        = @[Weapons.train_kv_wrench.Purpose]
 Weapons.train_kv_wrench_gold.Instructions   = @[Weapons.train_kv_wrench.Instructions]
 
 #Spawner common
-Spawner.Title                           = Спавнер поездов
-Spawner.Spawn                           = Создать
-Spawner.Close                           = Закрыть
+Spawner.Title                           = Спавнер поездов #FIXME
+Spawner.Spawn                           = Создать #FIXME
+Spawner.Close                           = Закрыть #FIXME
 Spawner.Trains1                         = Разрешено ваг.
 Spawner.Trains2                         = На человека
 Spawner.WagNum                          = Количество вагонов
@@ -200,12 +143,12 @@ Common.Spawner.SpawnMode.Deadlock       = Тупик
 Common.Spawner.SpawnMode.Full           = Запущен полностью
 Common.Spawner.SpawnMode.NightDeadlock  = Ночной отстой
 Common.Spawner.SpawnMode.Depot          = Депо
-Spawner.Common.EType                    = Тип электросхем #FIXME
+Spawner.Common.EType                    = Тип электросхем
 Common.Spawner.Scheme                   = Схема в салоне
-Common.Spawner.Random                   = Случайно
-Common.Spawner.Old                      = Старые
-Common.Spawner.New                      = Новые
-Common.Spawner.Type                     = Тип
+Common.Spawner.Random                   = Случайно #FIXME
+Common.Spawner.Old                      = Старые #FIXME
+Common.Spawner.New                      = Новые #FIXME
+Common.Spawner.Type                     = Тип #FIXME
 Common.Spawner.SchemeInvert             = Инвертировать наддверные схемы
 
 #Coupler common
@@ -260,7 +203,7 @@ Common.ALL.KAHK                             = Крышка кнопки КАХ
 Common.ALL.VAD                              = ВАД: Выключатель аварийный дверей
 Common.ALL.OVT                              = ОВТ: Отключение вентильных тормозов
 Common.ALL.VOVT                             = ВОВТ: Выключатель отключения вентильных тормозов
-Common.ALL.EmergencyBrakeValve              = Стоп-кран
+Common.ALL.EmergencyBrakeValve              = Стопкран
 Common.ALL.ParkingBrake                     = Стояночный тормоз
 Common.ALL.VU                               = ВУ: Выключатель управления
 Common.ALL.KDP                              = КДП: Открытие правых дверей
@@ -339,7 +282,6 @@ Common.ARS.VRD                              = ВРД: Выключатель р�
 Common.ARS.KB                               = КБ: Кнопка бдительности
 Common.ARS.KVT                              = КВТ: Кнопка восприятия торможения
 Common.ARS.KVTR                             = КВТ: Кнопка восприятия торможения при работе от АРС-Р
-Common.ARS.AO                               = АО: Сигнал абсолютной остановки
 Common.ARS.04                               = ОЧ: Лампа отсутствия частоты
 Common.ARS.N4                               = НЧ: Лампа отсутствия частоты
 Common.ARS.0                                = 0: Лампа разрешённой скорости 0 км\ч

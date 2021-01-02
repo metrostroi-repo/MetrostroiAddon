@@ -93,10 +93,7 @@ function TRAIN_SYSTEM:Outputs()
 			 --[[ "ThyristorResistance", "ThyristorState",
 			 "ElectricEnergyUsed", "ElectricEnergyDissipated", "EnergyChange",
 			 "RPSignalResistor", --]] "Cosume","Type",
-			 "ElectricEnergyUsed", "ElectricEnergyDissipated","ThyristorControllerPower","ThyristorControllerWork",
-
-            --"Main750V","Aux750V","Power750V","Aux80V","Lights80V","R1","R2","R3","Rs1","Rs2","Rstator13","Rstator24","Ranchor13","Ranchor24","Itotal","I13","I24","Ustator13","Ustator24","Ishunt13","Istator13","Ishunt24","Istator24","Magnetization","IR1","IR2","IRT2","T1","T2","P1","P2","Overheat1","Overheat2","ElectricEnergyUsed","ThyristorResistance","ThyristorState","ThyristorControllerPower","ThyristorControllerWork",
-        }
+			 "ElectricEnergyUsed", "ElectricEnergyDissipated","ThyristorControllerPower","ThyristorControllerWork"}
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
@@ -131,7 +128,7 @@ function TRAIN_SYSTEM:Think(dT,iter)
 	if self.ThyristorController then
 		self:SolveThyristorController(Train,dT)
 	end
-	self:SolvePowerCircuits(Train,dT,iter==1)
+	self:SolvePowerCircuits(Train,dT)
 	self:SolveInternalCircuits(Train,dT,iter==1)
 
 
@@ -268,13 +265,13 @@ end
 
 
 --------------------------------------------------------------------------------
-function TRAIN_SYSTEM:SolvePowerCircuits(Train,dT,firstIter)
+function TRAIN_SYSTEM:SolvePowerCircuits(Train,dT)
 	if not self.ResistorBlocksInit then
 		self.ResistorBlocksInit	 = true
 		-- Load resistor blocks
 		self.Train:LoadSystem("ResistorBlocks","Gen_Res_710")
+		Train.ResistorBlocks.InitializeResistances_81_710(Train)
 	end
-    if firstIter then Train.ResistorBlocks.InitializeResistances_81_710(Train) end
 	self.ExtraResistanceLK5 = Train.KF_47A["L2-L4"  ]*(1-Train.LK5.Value)
 	self.ExtraResistanceLK2 = Train.KF_47A["L12-L13"]*(1-Train.LK2.Value)
 

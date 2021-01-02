@@ -44,7 +44,6 @@ function TRAIN_SYSTEM:Initialize()
     self["3"] = 0 --Ход 3
     self["8"] = 0 --Замещение электрического торможения
     self["16"] = 0 --Закрытие дверей
-    self["68"] = 1 --Открытие правых дверей хвостового вагона (у ПУАВ контроля нет)
     self["17"] = 0  -- Разрешение восстановления реле перегрузки
     self["19"] = 0 -- Разрешение замещения электрического торможения
     self["20"] = 0 -- Включение двигателей
@@ -550,7 +549,7 @@ function TRAIN_SYSTEM:Think(dT)
         if self.AntiRolling and (self.AntiRollingCount<-(AntiRollingAccept and 0.35 or 5) or CurTime()-self.AntiRolling > 6) then
             local time = CurTime()-self.AntiRolling-6
 
-            if self.KGR == 1 and speed < 0.1 and self.KRR3 <= 0 then
+            if self.KGR == 1 and speed < 0.1 then
                 self.AntiRolling = false
                 self.AntiRollingCount = false
             end
@@ -583,7 +582,7 @@ function TRAIN_SYSTEM:Think(dT)
         if KD and self.KDTimer and CurTime()-self.KDTimer < 0.3 then KD=false end
         --print(self.KD)-- ,self.KD>0 , NoFreq == 0 , Vz > 20 , self.KSOT > 0 , self.VZP*self.VAV  > 0 , self.KRT == 0 , self.KRR3 == 0)
         --Autodrive drive commands control
-        local CanDrive = KD and NoFreq == 0 and Vz > 20 and self.KSOT > 0 and self.VZP*self.VAV  > 0 and self.KRT == 0 and self.KRR3 <= 0 and self.KDCycle -- and self.KGR > 0 or speed > 0.1)
+        local CanDrive = KD and NoFreq == 0 and Vz > 20 and self.KSOT > 0 and self.VZP*self.VAV  > 0 and self.KRT == 0 and self.KRR3 == 0 and self.KDCycle -- and self.KGR > 0 or speed > 0.1)
         local commandDrive = math.max(self.CommandDrive or 0,self.KH3*3--[[ *(Vz > 40 and 3 or 2)--]] ,self.DriveCommand or 0)
         if self.KH3*self.VAV>0 and self.KDOffTimer then
             self.CommandDrive = 3--Vz > 40 and 3 or 2
@@ -638,17 +637,17 @@ function TRAIN_SYSTEM:Think(dT)
         end
         --if --[[ self.KH3 > 0 or--]]  speed < 0.1 and (not self.OpenLeftTimer and not self.OpenLeftTimer) or self.KD < 1 then self.BrakeProgramm = false end
         --if self.KH3 > 0 then self.Station = false end
-        if self.K16 > 0 or self.OpenLeftTimer and CurTime()-self.OpenLeftTimer > 1 then self.OpenLeftTimer = false end
-        if self.K16 > 0 or self.OpenRightTimer and CurTime()-self.OpenRightTimer > 1 then self.OpenRightTimer = false end
+        if self.OpenLeftTimer and CurTime()-self.OpenLeftTimer > 1 then self.OpenLeftTimer = false end
+        if self.OpenRightTimer and CurTime()-self.OpenRightTimer > 1 then self.OpenRightTimer = false end
         if CanOpenLeft or CanOpenRight then
             self.CanOpen = true
         end
         if not CanOpen then self.CanOpen = false end
         if self.CanOpen then self:SetDoorMode("DO") else self:SetDoorMode("ZD") end
-        if CanOpenLeft and (self.KDL > 0 or self.OpenLeftTimer) then
+        if CanOpenLeft and (self.KDL > 0 or self.K16 == 0 and self.OpenLeftTimer) then
             self:SetDoorMode("DL")
         end
-        if CanOpenRight and (self.KDP > 0 or self.OpenRightTimer) then
+        if CanOpenRight and (self.KDP > 0 or self.K16 == 0 and self.OpenRightTimer) then
             self:SetDoorMode("DP")
         end
 

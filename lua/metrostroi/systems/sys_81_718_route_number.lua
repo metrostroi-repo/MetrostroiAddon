@@ -10,11 +10,7 @@ if TURBOSTROI then return end
 
 function TRAIN_SYSTEM:Initialize(parameter)
     self.Max = parameter or 2
-    if not TURBOSTROI then
-        local num = IsValid(self.Train.Owner) and (tonumber(self.Train.Owner:GetInfo("metrostroi_route_number","61")) or 0)
-        self.RouteNumber =  Format("%03d",num*(10^(3-self.Max))%1000)
-        self.Train:SetNW2String("RouteNumber",self.RouteNumber)
-    end
+    self.RouteNumber = "000"
 end
 
 function TRAIN_SYSTEM:Outputs()
@@ -58,8 +54,7 @@ else
         if not scents["route1"] or self.Reloaded then return end
 
         self.Reloaded = true
-        local rn = Format("%03d",self.RouteNumber)
-        print(self.RouteNumber)
+        local rn = Format("%02d",self.RouteNumber)
         for i=1,2 do
             if IsValid(scents["route"..i]) then
                 scents["route"..i]:SetSkin(rn[i])

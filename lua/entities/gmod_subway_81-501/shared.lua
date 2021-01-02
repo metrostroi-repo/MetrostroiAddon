@@ -24,15 +24,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 ENT.AnnouncerPositions = {
     {Vector(412,-49 ,61),80,0.6},
     {Vector(-3,-60, 62),300,0.6},
@@ -436,8 +427,6 @@ end
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("Type",self.Electric.NVL)
 end
-
-ENT.NumberRanges = {{6027,6128}}
 
 ENT.SubwayTrain = {
     Type = "E",

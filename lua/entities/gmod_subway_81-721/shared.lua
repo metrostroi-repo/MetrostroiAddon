@@ -22,15 +22,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
 function ENT:InitializeSounds()
     self.BaseClass.InitializeSounds(self)
     self.SoundNames["tisu"]   = {"subway_trains/720/tisu.wav",loop = true}

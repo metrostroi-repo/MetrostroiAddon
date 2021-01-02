@@ -83,11 +83,10 @@ function TRAIN_SYSTEM:Think(dT)
     if ALSPower ~= ALS.Enabled then
         ALS:TriggerInput("Enable",ALSPower)
     end
-    ALSPower = ALSPower*Train.Panel.BARSPower
     local FreqCode = bit.bor(ALS.F1*1,ALS.F2*2,ALS.F3*4,ALS.F4*8,ALS.F5*16,ALS.F6*32,ALSPower*64)
     if self.FreqCode ~= FreqCode then
         if not self.FreqCodeTimer then self.FreqCodeTimer = CurTime() end
-        if self.FreqCodeTimer and CurTime()-self.FreqCodeTimer>0.2 then
+        if self.FreqCodeTimer and CurTime()-self.FreqCodeTimer>0.8 then
             self.FreqCode = FreqCode
             self.FreqCodeTimer = nil
 
@@ -109,7 +108,8 @@ function TRAIN_SYSTEM:Think(dT)
         local States = Train.BUKP.States
         self.KB = (Train.Vigilance.Value+Train.PB.Value) > 0
         self.VRD = Train.VRD.Value > 0
-        local pos = (Train.BUKP.Active>0 or Train.Electric.CabActive > 0) and (States.Brake and -States.DriveStrength or States.DriveStrength) or -1
+        local pos = Train.BUKP.Active>0 and (States.Brake and -States.DriveStrength or States.DriveStrength) or -1
+
         local Vzad = 20
         if self.F4 > 0 then Vzad = 40 end
         if self.F3 > 0 then Vzad = 60 end
@@ -152,7 +152,7 @@ function TRAIN_SYSTEM:Think(dT)
             self.BrakeTimer = false
         end
         self.PTR = (self.BrakeTimer and CurTime()-self.BrakeTimer > 1.5)
-        if (not self.RNT or not self.RUVD) and (Train.Acceleration > -0.8 and speed>3) then
+        if not self.RNT or not self.RUVD and (Train.Acceleration > -0.8 and speed>3) then
             if not self.EKTimer then self.EKTimer = CurTime() end
         elseif self.EKTimer then
             self.EKTimer = false

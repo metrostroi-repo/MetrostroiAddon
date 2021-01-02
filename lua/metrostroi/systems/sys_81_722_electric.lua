@@ -20,8 +20,8 @@ function TRAIN_SYSTEM:Initialize()
     self.HaveAsyncInverter = 0--self.HaveAsyncInverter or self.Type<self.T724 and 1 or 0
 
     self.Train:LoadSystem("Battery","Relay","")
-    self.Train:LoadSystem("BatteryOn","Relay",nil,{bass=true,open_time=0,close_time=0.7})
-    self.Train:LoadSystem("BatteryOff","Relay",nil,{bass=true,open_time=0,close_time=0.6})
+    self.Train:LoadSystem("BatteryOn","Relay",nil,{bass=true,open_time=0,close_time=3})
+    self.Train:LoadSystem("BatteryOff","Relay",nil,{bass=true,open_time=0,close_time=3})
 
     self.Power = 0
     self.BatterySound = 0
@@ -188,7 +188,7 @@ function TRAIN_SYSTEM:Think(dT)
         Panel.SOSD = S["RV"]*Train.SF7.Value*Train.SF24.Value*Train.BUKP.SOSD*(1-self.LSD)
         Panel.BARSPower = BO*min(1,(Train.SF8.Value*C(Train.BARSMode.Value > 0)+Train.SF9.Value*C(Train.BARSMode.Value < 2))*Train.RCARS.Value)
         Panel.ARSPower = Panel.BARSPower*(1-Train.BUKP.Back)*Train.ARS.Value
-        Panel.ALSPower = BO*(1-Train.BUKP.Back)*Train.ALS.Value
+        Panel.ALSPower = Panel.BARSPower*(1-Train.BUKP.Back)*Train.ALS.Value
 
         Panel.UPOPower = BO*S["RV"]*Train.R_UPO.Value
         Train:WriteTrainWire(15,BO*(Train.UPO.LineOut*Train.SarmatUPO.UPOActive+Train.SarmatUPO.LineOut))
@@ -214,26 +214,25 @@ function TRAIN_SYSTEM:Think(dT)
 
         Async:TriggerInput("Power",BO*Train.SF56.Value*(1-BUKV.DisableTP))
 
-        local speed = math.abs(Async.Speed)
+        local command = 0
+
         if self.AsyncEmer > 0 then
-            Async:TriggerInput("Drive",W[19])
+            command = self.AsyncEmer*W[19]
+            Async:TriggerInput("Drive",command)
             Async:TriggerInput("Brake",0)
-            if W[19] > 0 then
-                Async:TriggerInput("TargetTorque",(1.0+Clamp(speed/15,0,1)-Clamp((speed-30)/38,0,2))*(3))
-            else
-                Async:TriggerInput("TargetTorque",0)
-            end
         else
             Async:TriggerInput("Drive",BUKV.Drive)
             Async:TriggerInput("Brake",BUKV.Brake)
-            local command = (BUKV.Strength/100)*(BUKV.Drive-BUKV.Brake)
-            if command > 0 then
-                Async:TriggerInput("TargetTorque",(math.abs(command)^0.5)*(1.0+Clamp(speed/15,0,1)-Clamp((speed-30)/38,0,2))*(1+Train.Pneumatic.WeightLoadRatio*0.3))
-            elseif command < 0 then
-                Async:TriggerInput("TargetTorque",Clamp((speed-1)/4,0,1)*math.abs(command)*2.4*(1+Train.Pneumatic.WeightLoadRatio*0.3))
-            else
-                Async:TriggerInput("TargetTorque",0)
-            end
+            command = (BUKV.Strength/100)*(BUKV.Drive-BUKV.Brake)
+        end
+        --print(Format("%.2f %.2f %d %.2f",command,Async.Speed,Async.Mode,Async.State))
+        local speed = math.abs(Async.Speed)
+        if command > 0 then
+            Async:TriggerInput("TargetTorque",(math.abs(command)^0.75)*(1.0+Clamp(speed/15,0,1)-Clamp((speed-30)/35,0,2))*(1+Train.Pneumatic.WeightLoadRatio*0.3))
+        elseif command < 0 then
+            Async:TriggerInput("TargetTorque",Clamp((speed-2)/6,0,1)*math.abs(command)*2.4*(1+Train.Pneumatic.WeightLoadRatio*0.3))
+        else
+            Async:TriggerInput("TargetTorque",0)
         end
 
         self.PSN = HV*(1-BUKV.DisablePSN)

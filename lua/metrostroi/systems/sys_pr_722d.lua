@@ -41,10 +41,10 @@ function TRAIN_SYSTEM:Think(dT)
         self.Speed = math.max(-1,math.min(1,self.Speed+dT*(self.VPS-self.NZS)*0.9))
     end
     self.Position = math.max(0,math.min(1,self.Position + self.RotationRate*self.Speed))
-    if self.Position < 0.1 and self.RKRS or self.Position > 0.9 and not self.RKRS then
-        self.RKRS = self.Position > 0.9
+    if self.OldVP ~= self.VP then
+        self.OldVP = self.VP
         self.Train:PlayOnce("RKR","bass",1,1)
     end
-    self.NZ = self.Position < 0.2 and 1 or 0
-    self.VP = self.Position > 0.2 and 1 or 0
+    self.NZ = self.Position <  0.5 and 1 or 0
+    self.VP = self.Position >= 0.5 and 1 or 0
 end

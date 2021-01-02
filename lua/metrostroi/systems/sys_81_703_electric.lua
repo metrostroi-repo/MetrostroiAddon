@@ -7,7 +7,6 @@
 Metrostroi.DefineSystem("81_703_Electric")
 TRAIN_SYSTEM.E = 1
 TRAIN_SYSTEM.Ezh = 2
-TRAIN_SYSTEM.Em = 3
 function TRAIN_SYSTEM:Initialize(typ1,typ2)
     self.RRI = 0
     -- Load all functions from base
@@ -52,7 +51,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
 
     local isE = elType == 1
     local isEzh = elType == 2
-    local isEm = elType == 3
 
     local BO = min(1,B * Train.VB.Value+T[10])--B * Train.VB.Value
     local KV = Train.KV
@@ -60,7 +58,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
     local Panel = Train.Panel
     local ARS = Train.ALS_ARS
     local RC
-    if isEzh then RC = Train.RC1.Value end
+    if not isE then RC = Train.RC1.Value end
 
     Panel.V1 = BO
 
@@ -74,10 +72,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         S["U2"] = S["10AK"]*KV["U2-10AK"]
     end
 
-    if isEzh then
+    if not isE then
         Train:WriteTrainWire(14,(BO*KRU["14/1-B3"]+T[5]*Train.KRR.Value)*(Train.ROT2.Value+Train.KAH.Value)*(Train.UOS.Value+Train.SOT.Value)*Train.KU14.Value)
-    elseif isEm then
-        Train:WriteTrainWire(14,(BO*KRU["14/1-B3"]+T[5]*Train.KRR.Value)*Train.KU14.Value)
     end
     Panel.RRP = S["U2"]*T[18]
     if isEzh then
@@ -96,27 +92,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
             ASNP_VV.AmplifierPower = ASNP_VV.Power*Train.ASNP.LineOut
             Train:WriteTrainWire(13,ASNP_VV.AmplifierPower)
             Panel.CBKIPower = T[10]
-            --Train:WriteTrainWire(-13,ASNP_VV.AmplifierPower*Train.PowerSupply.X2_2)
-            --ASNP_VV.CabinSpeakerPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_G.Value
-        end
-    elseif isEm then
-        Train:WriteTrainWire(4,S["10AK"]*KV["U2-4"])
-        Train:WriteTrainWire(5,S["10AK"]*KV["U2-5"]+KRU["5/3-ZM31"]*-10*(1-Train.KRR.Value)+BO*KRU["14/1-B3"]*Train.KRR.Value)
-        --Panel.Sequence = T[2]
-        Panel.UKS = BO*Train.UKS.UKSEngaged
-        Panel.UKSb = BO*Train.UKS.UKSTriggered
-        if self.RRI> 0 then
-            local RRI_VV = Train.RRI_VV
-            RRI_VV.Power = BO*Train["50V"].Value*Train.RRIEnable.Value
-            RRI_VV.AmplifierPower = BO*Train.RRIAmplifier.Value
-            Train:WriteTrainWire(13,RRI_VV.AmplifierPower*Train.RRI.LineOut)
-            --RRI_VV.CabinSpeakerPower = T[13]
-        else
-            local ASNP_VV = Train.ASNP_VV
-            ASNP_VV.Power = BO*Train["50V"].Value*Train.R_ASNPOn.Value
-            ASNP_VV.AmplifierPower = ASNP_VV.Power*Train.ASNP.LineOut
-            Train:WriteTrainWire(13,ASNP_VV.AmplifierPower)
-            Panel.CBKIPower = T[10]*Train["50V"].Value
             --Train:WriteTrainWire(-13,ASNP_VV.AmplifierPower*Train.PowerSupply.X2_2)
             --ASNP_VV.CabinSpeakerPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_G.Value
         end
@@ -144,7 +119,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train:WriteTrainWire(17,S["10AK"]*Train.KU9.Value)
 
         Train:WriteTrainWire(8,BO*KV["10-8"])
-    elseif isEzh then
+    else
         S["10a"] = BO*KV["10a-8"]
         ARS.ALS  = S["10a"]*Train.ALS.Value*RC
         ARS.GE = S["10a"]*Train.ARS.Value*RC
@@ -184,23 +159,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train:WriteTrainWire(8,BO*(KV["10-8"]+KV["10a-8"]*(1-Train.KAH.Value)*(1-Train.RPB.Value))+ARS["8"]*RC)
         Train.RO:TriggerInput("Set",ARS["48"])
         Train:WriteTrainWire(44,BO*Train.RO.Value*RC)
-    else
-        S["10a"] = BO*KV["10a-8"]
-
-        Train:WriteTrainWire(1,S["10AK"]*Train.R1_5.Value+KRU["1/3-ZM31"]*-10)
-        Train:WriteTrainWire(2,S["U2"]*KV["U2-2"]+KRU["2/3-ZM31"]*-10)
-        Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+KRU["3/3-ZM31"]*-10)
-        --Train:WriteTrainWire(25,S["U2"]*KV["25-6"]*(ARS["25"]*RC+(1-RC)))
-        Train:WriteTrainWire(25,S["U2"]*KV["25-6"])
-        Train:WriteTrainWire(20,S["U2"]*KV["U2-20"]+KRU["20/3-ZM31"]*-10)
-        Train:WriteTrainWire(6,S["10AK"]*Train.RVT.Value)
-
-        Train.RVT:TriggerInput("Set",S["10AK"]*KV["U2-6"])
-        Train.RV2:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*(Train.AVU.Value+Train.OtklAVU.Value)*Train.UAVAC.Value*(1-Train.UKS.UKSTriggered))
-        Train.R1_5:TriggerInput("Set",S["10AK"]*Train.RV2.Value)
-        Train:WriteTrainWire(17,S["10AK"]*Train.KU9.Value)
-        Train:WriteTrainWire(8,BO*KV["10-8"])
-        Train:WriteTrainWire(44,S["10AK"]*Train.UV1.Value)
+        --KV["10a-8"]
     end
 
 
@@ -232,14 +191,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train.PneumaticNo2:TriggerInput("Set",T[8]*(1-Train.RV3.Value)*(1-Train.LK4.Value))
         Train.RS:TriggerInput("Set",T[12]*RUM)
         Train.RV3:TriggerInput("Set",T[14]*RUM)
-        Train.Panel.PP1 = T[1]
-        Train.Panel.PP6 = T[6]
     else
-        if isEzh then
-            Train:WriteTrainWire(48,BO*Train.RO.Value*RC+C(P == 4 and 1 <= RK and RK <= 5))
-        else
-            Train:WriteTrainWire(48,C(P == 4 and 1 <= RK and RK <= 5)+BO*Train.UV1.Value)
-        end
+        Train:WriteTrainWire(48,BO*Train.RO.Value*RC+C(P == 4 and 1 <= RK and RK <= 5))
         Train.PneumaticNo1:TriggerInput("Set",(T[8]+T[44])*T[48])
         Train.PneumaticNo2:TriggerInput("Set",T[8]*(1-Train.LK4.Value))
     end
@@ -368,15 +321,9 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         S["D1"] = BO*(KV["D-D1"]+KRU["11/3-D1/1"])
         S["F7"] = (BO*KV["F-F7"]+KRU["11/3-FR1"])
         Train.RRP:TriggerInput("Set",T[14])
-        if isEm then
-            Train:WriteTrainWire(31,S["D1"]*(Train.KU6.Value+Train.KU13.Value)+T[12]+Train.KU10R.Value)
-            Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value+T[12]+Train.KU10R.Value)
-            Train:WriteTrainWire(12,S["D1"]*Train.KU10.Value)
-        else
-            Train:WriteTrainWire(31,S["D1"]*(Train.KU6.Value+Train.KU13.Value)+T[12])
-            Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value+T[12])
-            Train:WriteTrainWire(12,S["D1"]*Train.KU10.Value)
-        end
+        Train:WriteTrainWire(31,S["D1"]*(Train.KU6.Value+Train.KU13.Value))
+        Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value)
+        Train:WriteTrainWire(12,S["D1"]*Train.KU10.Value)
         Panel.RedLights = BO*KV["B2-F1"]
     end
     Train:WriteTrainWire(16,S["D1"]*Train.KU2.Value*Train.KU3.Value)
@@ -386,9 +333,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
 
     if isE then
         S["11A"] = T[11]*(1-Train.KZ1.Value)
-        Panel.Ring = S["11A"]+T[28]
-    elseif isEm then
-        S["11A"] = T[11]*(1-Train.NR.Value)
         Panel.Ring = S["11A"]+T[28]
     else
         S["11A"] = T[11]*(1-Train.NR.Value)
@@ -418,7 +362,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
     local BD = 1-Train.BD.Value
     Train:WriteTrainWire(15,BD*(1-Train.KU11.Value))--Заземление 15 провода
     Train.Panel.SD = (S["D1"]+BO*Train.KU11.Value)*(T[15]*(1-Train.KU11.Value)+BD)
-    Train.Panel.SDW = BO*BD
 
     Train.VDZ:TriggerInput("Set",T[16]*BD)
     if isE then
@@ -427,11 +370,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
     else
         Train.VDOL:TriggerInput("Set",T[31]+T[12])
         Train.VDOP:TriggerInput("Set",T[32]+T[12])
-        if isEm then
-            Panel.PCBKPower = T[10]*Train["50V"].Value
-        else
-            Panel.PCBKPower = T[10]
-        end
+        Panel.PCBKPower = T[10]
     end
     return S
 end
@@ -461,7 +400,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train)
     S["10B"] = S["10A"]*(Train.RV1.Value+Train.TSH.Value)
     if isE then
         S["25B"] = (1-Train.TSH.Value)*Train.LK2.Value
-        S["25A"] = min(1,Train.KSH2.Value + Train.RS.Value)
+        S["25A"] = (Train.KSH2.Value + Train.RS.Value)
         Train["RUTreg"] = S["10A"]*(S["25B"]-S["25A"])
         S["10I"] = S["10A"]*RheostatController.RKM2
         Train["RUTpod"] = S["10I"]*Train.LK4.Value
@@ -719,8 +658,8 @@ function TRAIN_SYSTEM:Think(dT,iter)
     if not self.ResistorBlocksInit then
         self.ResistorBlocksInit  = true
         Train:LoadSystem("ResistorBlocks","Gen_Res_703")
+        Train.ResistorBlocks.InitializeResistances_81_703(Train)
     end
-    if iter == 1 then Train.ResistorBlocks.InitializeResistances_81_703(Train) end
     ----------------------------------------------------------------------------
     -- Voltages from the third rail
     ----------------------------------------------------------------------------

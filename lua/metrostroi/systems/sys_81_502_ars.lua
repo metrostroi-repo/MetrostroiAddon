@@ -79,15 +79,16 @@ function TRAIN_SYSTEM:Think(dT)
     if self.ALS ~= ALS.Enabled then
         ALS:TriggerInput("Enable",self.ALS)
     end
-    self.RPB = self.Power
+    self.RPB = Power and 1 or 0
     self.F6 = ALS.F6
     self.F5 = ALS.F5
     self.F4 = ALS.F4
     self.F3 = ALS.F3
     self.F2 = ALS.F2
     self.F1 = ALS.F1
-    self.NoFreq = (1-math.min(1,(self.F1+self.F2+self.F3+self.F4+self.F5+self.F6)))*math.min(1,self.ALS+self.Power)
+    self.NoFreq = ALS.NoFreq
 
+    if ALS.Enabled == 0 and VRD then self.NoFreq = 1 end
     --ALS
     if Power then
         local Vlimit = -10

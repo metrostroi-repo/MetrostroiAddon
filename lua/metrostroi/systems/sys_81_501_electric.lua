@@ -73,7 +73,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
         S["DA"] = S["10AK"]*KV["10AK-DA"]
         Train:WriteTrainWire(8,T[10]*KV["10-8"])
         Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"])
-        Train:WriteTrainWire(5,S["10AK"]*KV["10AK-5"]*(Train.UAVAC.Value+KV["5-5a"]))
+        Train:WriteTrainWire(5,S["10AK"]*KV["10AK-5"])
 
         Train:WriteTrainWire(1,S["10AK"]*KV["1-10AK"]*Train.RV2.Value+(BO*Train.RO1.Value))
         Train:WriteTrainWire(17,S["10AK"]*Train.VozvratRP.Value)
@@ -84,7 +84,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
         Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+(BO*Train.RO2.Value))
 
         Train.RVT:TriggerInput("Set",S["U2"]*KV["U2-RVT"])
-        Train.RV2:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*(1-Train.RVT.Value))
+        Train.RV2:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*(Train.AVU.Value+Train.KPVU.Value)*(1-Train.RVT.Value))
 
     else
         S["DA"] = T[10]*KV["10AK-DA"]
@@ -101,7 +101,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
         Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+(BO*Train.RO2.Value))
 
         Train.RVT:TriggerInput("Set",S["U2"]*KV["U2-RVT"])
-        Train.RV2:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*(1-Train.RVT.Value))
+        Train.RV2:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*(Train.AVU.Value+Train.KPVU.Value)*(1-Train.RVT.Value))
     end
     Panel.UPOPower = BO*KV["10AK-DA"]
 
@@ -143,13 +143,13 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
     S["10I"] = S["10A"]*RheostatController.RKM2
     Train["RUTpod"] = S["10I"]*Train.LK4.Value
 
-    S["25A"] = T[25]*RUM
+	S["25A"] = T[25]*RUM
     Train["RRTpod"] = S["25A"]*min(1,Train["RRTpod"]+S["10I"])
-    Train.RRT:TriggerInput("Set",S["25A"]*Train["RRTpod"])
+	Train.RRT:TriggerInput("Set",S["25A"]*Train["RRTpod"])
 
-    S["DT"] = BO*Train.BPT.Value
-    Panel.BrY = S["DT"]
-    Train:WriteTrainWire(34,S["DT"])
+	S["DT"] = BO*Train.BPT.Value
+	Panel.BrY = S["DT"]
+	Train:WriteTrainWire(34,S["DT"])
 
     if KVL then
         S["10B"] = S["10A"]*(Train.RV1.Value+Train.TSH.Value*(1-Train.KSH3.Value))
@@ -214,9 +214,9 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
     Train.RO2:TriggerInput("Set",T[9]*Train.RO1.Value)
     S["20G"] = C(1<=RK and RK<=5 and (P==2 or P==3))
     S["20V"] = C((RK==1 or RK==18) and P==1)+S["20G"]*Train.KSH1.Value
-    S["20D"] = S["10A"]*(S["20G"]+S["20V"]*(1-Train.Rper.Value))*(Train.LK5.Value+Train.LK4.Value)
-    Train.KSH2:TriggerInput("Set",S["20D"])
-    Train.KSH1:TriggerInput("Set",S["20D"])--+S["20V"]*(1-Train.Rper.Value))
+	S["20D"] = S["10A"]*(S["20G"]+S["20V"]*(1-Train.Rper.Value))*(Train.LK5.Value+Train.LK4.Value)
+	Train.KSH2:TriggerInput("Set",S["20D"])
+	Train.KSH1:TriggerInput("Set",S["20D"])--+S["20V"]*(1-Train.Rper.Value))
 
     --Вспом цепи низкого напряжения
     Train:WriteTrainWire(11,T[10]*Train.VU2.Value)
@@ -399,10 +399,10 @@ function TRAIN_SYSTEM:Think(dT,iter)
     local Train = self.Train
     if not self.ResistorBlocksInit then
         self.ResistorBlocksInit  = true
-        self.Train.YAR_13A.NoRRT = true
+    	self.Train.YAR_13A.NoRRT = true
         Train:LoadSystem("ResistorBlocks","Gen_Res_703")
+        Train.ResistorBlocks.InitializeResistances_81_703(Train)
     end
-    if iter == 1 then Train.ResistorBlocks.InitializeResistances_81_703(Train) end
     ----------------------------------------------------------------------------
     -- Voltages from the third rail
     ----------------------------------------------------------------------------

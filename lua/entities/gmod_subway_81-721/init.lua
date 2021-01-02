@@ -148,35 +148,34 @@ function ENT:Think()
     --local mul = self.SF45.Value > 0.5 and self.BUV.MainLights and 1 or self.SF46.Value > 0.5 and 0.5 or 0
     --self:SetLightPower(11,self.BUV.Power and mul > 0, mul)
     --self:SetLightPower(12,self.BUV.Power and mul > 0, mul)
-    self.Engines:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
-        local A = 2*self.Engines.BogeyMoment
-        self.FrontBogey.MotorForce = (24000+3000*(A < 0 and 1 or 0))--*add--35300+10000*(A < 0 and 1 or 0)
-        self.FrontBogey.Reversed = self.KMR2.Value > 0
-        self.FrontBogey.DisableSound = 0
-        self.RearBogey.MotorForce  = (24000+3000*(A < 0 and 1 or 0))--*add--+5000--35300
-        self.RearBogey.Reversed = self.KMR1.Value > 0
-        self.RearBogey.DisableSound = 0
+        self.Engines:TriggerInput("Speed",self.Speed)
+        if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+            local A = 2*self.Engines.BogeyMoment
+            self.FrontBogey.MotorForce = (24000+3000*(A < 0 and 1 or 0))--*add--35300+10000*(A < 0 and 1 or 0)
+            self.FrontBogey.Reversed = self.KMR2.Value > 0
+            self.FrontBogey.DisableSound = 0
+            self.RearBogey.MotorForce  = (24000+3000*(A < 0 and 1 or 0))--*add--+5000--35300
+            self.RearBogey.Reversed = self.KMR1.Value > 0
+            self.RearBogey.DisableSound = 0
 
-        -- These corrections are required to beat source engine friction at very low values of motor power
-        local P = math.max(0,0.04449 + 1.06879*math.abs(A) - 0.465729*A^2)
-        if math.abs(A) > 0.4 then P = math.abs(A) end
-        if math.abs(A) < 0.05 then P = 0 end
-        if self.Speed < 10 then P = P*(1.0 + 0.5*(10.0-self.Speed)/10.0) end
-        self.RearBogey.MotorPower  = P*0.5*((A > 0) and 1 or -1)
-        self.FrontBogey.MotorPower = P*0.5*((A > 0) and 1 or -1)
+            -- These corrections are required to beat source engine friction at very low values of motor power
+            local P = math.max(0,0.04449 + 1.06879*math.abs(A) - 0.465729*A^2)
+            if math.abs(A) > 0.4 then P = math.abs(A) end
+            if math.abs(A) < 0.05 then P = 0 end
+            if self.Speed < 10 then P = P*(1.0 + 0.5*(10.0-self.Speed)/10.0) end
+            self.RearBogey.MotorPower  = P*0.5*((A > 0) and 1 or -1)
+            self.FrontBogey.MotorPower = P*0.5*((A > 0) and 1 or -1)
 
-        self.FrontBogey.PneumaticBrakeForce = (50000.0--[[ +5000+10000--]] ) --40000
-        self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
-        self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.FrontBogey.DisableContacts = self.BUV.Pant
-        self.RearBogey.PneumaticBrakeForce = (50000.0--[[ +5000+10000--]] ) --40000
-        self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.RearBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
-        self.RearBogey.DisableContacts = self.BUV.Pant
-    end
+            self.FrontBogey.PneumaticBrakeForce = (50000.0--[[ +5000+10000--]] ) --40000
+            self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
+            self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)
+            self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
+            self.FrontBogey.DisableContacts = self.BUV.Pant
+            self.RearBogey.PneumaticBrakeForce = (50000.0--[[ +5000+10000--]] ) --40000
+            self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
+            self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
+            self.RearBogey.DisableContacts = self.BUV.Pant
+        end
     return retVal
 end
 

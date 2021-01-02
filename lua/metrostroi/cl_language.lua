@@ -28,18 +28,14 @@ end
 if not file.Exists("metrostroi_data","DATA") then file.CreateDir("metrostroi_data") end
 if not file.Exists("metrostroi_data/languages","DATA") then file.CreateDir("metrostroi_data/languages") end
 local function debugmsg(...)
-    if GetConVarNumber("metrostroi_drawdebug") == 0 then return end
-    MsgC(...)
-    MsgC("\n")
+    if GetConVarNumber("metrostroi_drawdebug") > 0 then
+        MsgC(...)
+        MsgC("\n")
+    end
 end
 local function errmsg(...)
-    if GetConVarNumber("metrostroi_drawdebug") == 0 then return end
     MsgC(...)
     ErrorNoHalt("\n")
-end
-local function errnhmsg(...)
-    if GetConVarNumber("metrostroi_drawdebug") == 0 then return end
-    ErrorNoHalt(...)
 end
 function Metrostroi.LoadLanguage(lang,force)
     if not Metrostroi.Languages[lang] then return end
@@ -76,11 +72,11 @@ function Metrostroi.LoadLanguage(lang,force)
                 debugmsg(Color(255,0,255),"Add language ",lang," phrase:\t",Color(0,255,0),id,"=",phrase,Color(255,0,255)," for class ",Color(0,255,0),class)
             elseif tbl[2] == "Buttons" then
                 if not ENT.ButtonMap[tbl[3]] then
-                    errnhmsg("Check translation for "..id.."! Can't find panel named "..tbl[3].."\n")
+                    ErrorNoHalt("Check translation for "..id.."! Can't find panel named "..tbl[3].."\n")
                     continue
                 end
                 if not ENT.ButtonMap[tbl[3]].buttons then
-                    errnhmsg("Check translation for "..id.."! Can't find buttons in panel named "..tbl[3].."\n")
+                    ErrorNoHalt("Check translation for "..id.."! Can't find buttons in panel named "..tbl[3].."\n")
                 end
                 local button
                 for k,v in pairs(ENT.ButtonMap[tbl[3]].buttons) do
@@ -91,7 +87,7 @@ function Metrostroi.LoadLanguage(lang,force)
                     end
                 end
                 if not button then
-                    errnhmsg("Check translation for "..id.."! Can't find button named "..tbl[4].." in panel "..tbl[3].."\n")
+                    ErrorNoHalt("Check translation for "..id.."! Can't find button named "..tbl[4].." in panel "..tbl[3].."\n")
                 end
             elseif tbl[2] == "Spawner" then
                 if not ENT.Spawner then
@@ -155,11 +151,12 @@ local function parseLangFile(filename,txt)
     local ignoring = false
     for line in txt:gmatch("[^\n\r]+") do
         i = i + 1
-        if ignoring and line:find("%][^\\]?#") then ignoring = false continue end
+        if line:find("%][^\\]?#") then ignoring = false continue end
         if ignoring then continue end
         if line:find("[^\\]?#%[") then ignoring = true end
         local lang,founded = removeSpaces(line):gsub("^%[([%w]+)%]$","%1")
         if founded > 0 then
+            print("Selected lang",lang)
             currlang = lang
             Metrostroi.Languages[lang] = Metrostroi.Languages[lang] or {}
             continue
@@ -168,14 +165,14 @@ local function parseLangFile(filename,txt)
         local k,v = line:match("([^=]+)=([^=]+)")
         if k and v then
             if not currlang then
-                errnhmsg("Metrostroi: Language not selected\n")
+                ErrorNoHalt("Metrostroi: Language not selected\n")
                 break
             end
             Metrostroi.Languages[currlang][removeSpaces(k)] = removeSpaces(v):gsub("\\n","\n"):gsub("\\t","\t")
             continue
         end
         if #line > 0 and line[1] ~="#" then
-            errnhmsg(Format("Metrostroi: Language parse error in line %d: %s [%s]\n",i,line,filename))
+            ErrorNoHalt(Format("Metrostroi: Language parse error in line %d: %s [%s]\n",i,line,filename))
             break
         end
     end
@@ -188,7 +185,7 @@ local function exportLangJSON(filename,txt)
     local ignoring = false
     for line in txt:gmatch("[^\n\r]+") do
         i = i + 1
-        if ignoring and line:find("%][^\\]?#") then ignoring = false continue end
+        if line:find("%][^\\]?#") then ignoring = false continue end
         if ignoring then continue end
         if line:find("[^\\]?#%[") then ignoring = true end
         local lang,founded = removeSpaces(line):gsub("^%[([%w]+)%]$","%1")
@@ -202,7 +199,7 @@ local function exportLangJSON(filename,txt)
         local k,v = line:match("([^=]+)=([^=]+)")
         if k and v then
             if not currlang then
-                errnhmsg("Metrostroi: Language not selected\n")
+                ErrorNoHalt("Metrostroi: Language not selected\n")
                 break
             end
             local str,addstr = langs[currlang],Format('\n\t"%s": "%s"',removeSpaces(k),removeSpaces(string.JavascriptSafe(v):gsub("\\\\([tn])","\\%1")))
@@ -214,7 +211,7 @@ local function exportLangJSON(filename,txt)
             continue
         end
         if #line > 0 and line[1] ~="#" then
-            errnhmsg(Format("Metrostroi: Language parse error in line %d: %s [%s]\n",i,line,filename))
+            ErrorNoHalt(Format("Metrostroi: Language parse error in line %d: %s [%s]\n",i,line,filename))
             break
         end
     end
@@ -247,7 +244,7 @@ local function reloadLang()
         end
     end--]]
 
-    --Load builtin lua languages/*_base.lua
+    --Load builtin lua languages
     for k, filename in pairs(file.Find("metrostroi_data/languages/*_base.lua","LUA")) do
         local lang = include("metrostroi_data/languages/"..filename)
         if not lang then continue end

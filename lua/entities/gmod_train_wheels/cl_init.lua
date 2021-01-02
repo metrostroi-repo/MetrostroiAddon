@@ -15,5 +15,5 @@ function ENT:Think()
 	-- Rotate wheel
 	self.Angle = ((self.Angle or math.random()) + ang_vel*dT) % 1.0
 	self:SetPoseParameter("position",1.0-self.Angle)
-	--self:InvalidateBoneCache()
+	self:InvalidateBoneCache()
 end

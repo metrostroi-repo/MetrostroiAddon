@@ -23,21 +23,6 @@ end
 local function GetDoorPosition(i,k)
     return Vector(377.0 - 36.0 + 1*(k) - 230*i,-64*(1-2*k),-10)
 end
-
--- Setup door positions
-ENT.LeftDoorPositions = {}
-ENT.RightDoorPositions = {}
-for i=0,3 do
-    table.insert(ENT.LeftDoorPositions,GetDoorPosition(i,1))
-    table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
-end
-
-ENT.MirrorCams = {
-    Vector(441,72,15),Angle(1,180,0),15,
-    Vector(441,-72,15),Angle(1,180,0),15,
-}
-
-
 local yventpos = {
     -414.5+0*117,
     -414.5+1*117+6.2,
@@ -428,7 +413,7 @@ ENT.Spawner = {
             for i1=1,#trains do
                 local tent = trains[i==1 and i1 or #trains-i1+1]
                 ent.BUKP.Trains[i1] = tent:GetWagonNumber()
-                ent.BUKP.Trains[-tent:GetWagonNumber()] = {}
+                ent.BUKP.Trains[tent:GetWagonNumber()] = {}
             end
         end
     end,

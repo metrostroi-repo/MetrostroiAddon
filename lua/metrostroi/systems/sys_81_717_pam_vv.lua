@@ -22,7 +22,6 @@ function TRAIN_SYSTEM:Initialize()
     self.KPRK = 0
     self.KDL = 0
     self.KDP = 0
-    self.OPD = 0
 
     self.ZD = 0
     self.K16 = 0
@@ -52,7 +51,7 @@ end
 function TRAIN_SYSTEM:Outputs()
     return {
         "Power",
-        "KGR","KRR","KRR1","KRR2","KRT","KRH","KB","KZP","KET","LPT","KSOT","KSZD","KPRK","KDL","KDP","OPD","ZD","K16","KD","KRU","KVARS","KTARS","VRD",
+        "KGR","KRR","KRR1","KRR2","KRT","KRH","KB","KZP","KET","LPT","KSOT","KSZD","KPRK","KDL","KDP","ZD","K16","KD","KRU","KVARS","KTARS","VRD",
         "V1","V2",
         "I2","I3","I25","I33G","I33"
     }

@@ -5,12 +5,12 @@ return [[
 
 #######Buttons###########
 #Cameras
-Train.720.CameraCond    = Condizionatore d'aria, IGLA
-Train.720.CameraPPZ     = PPZ
-Train.720.CameraPV      = VPU
-Train.720.CameraVityaz  = SAU "Vityaz"
-Train.720.CameraKRMH    = Valvole KRMSH e UAVA 
-Train.720.CameraPVZ     = PVZ
+Train.720.CameraCond    = Condizionatore d'aria, IGLA #FIXME
+Train.720.CameraPPZ     = PPZ #FIXME
+Train.720.CameraPV      = VPU #FIXME
+Train.720.CameraVityaz  = SAU "Vityaz" #FIXME
+Train.720.CameraKRMH    = Valvole KRMSH e UAVA  #FIXME
+Train.720.CameraPVZ     = PVZ #FIXME
 
 #Common
 Common.720.SF1              = SF1: Alimentazione principale

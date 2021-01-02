@@ -274,7 +274,7 @@ function Metrostroi.RerailTrain(train)
 		train.FrontBogey.Wheels,
 		train.RearBogey.Wheels,
 		train.FrontCouple,
-		train.RearCouple
+		train.RearCouples
 	}
 
 	local solids = {}

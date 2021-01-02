@@ -295,21 +295,18 @@ function ENT:CreateRT(name, w, h)
     return RT
 end
 
+
 local C_DisableHUD          = GetConVar("metrostroi_disablehud")
 local C_RenderDistance      = GetConVar("metrostroi_renderdistance")
 local C_SoftDraw            = GetConVar("metrostroi_softdrawmultipier")
 local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
 local C_DrawDebug           = GetConVar("metrostroi_drawdebug")
 local C_CabFOV              = GetConVar("metrostroi_cabfov")
-local C_CabZ                = GetConVar("metrostroi_cabz")
 local C_FovDesired          = GetConVar("fov_desired")
 local C_MinimizedShow       = GetConVar("metrostroi_minimizedshow")
 local C_Shadows1            = GetConVar("metrostroi_shadows1")
 local C_Shadows2            = GetConVar("metrostroi_shadows2")
 local C_Shadows3            = GetConVar("metrostroi_shadows3")
-local C_Shadows4            = GetConVar("metrostroi_shadows4")
-local C_AA                  = GetConVar("mat_antialias")
-local C_Sprites             = GetConVar("metrostroi_sprites")
 local whitelist = {
     ["CHudChat"] = true,
     ["CHudDeathNotice"] = true,
@@ -317,6 +314,15 @@ local whitelist = {
 }
 hook.Add("HUDShouldDraw","MetrostroiHUDHider",function(name)
     if LocalPlayer().InMetrostroiTrain and C_DisableHUD:GetBool() and not whitelist[name] then return false end
+end)
+hook.Add("Think","MetrostroiHUDHider",function()
+    local ply = LocalPlayer()
+    local seat = ply:GetVehicle()
+    if IsValid(seat) and IsValid(seat:GetNW2Entity("TrainEntity")) then
+        ply.InMetrostroiTrain =  seat:GetNW2Entity("TrainEntity")
+    else
+        ply.InMetrostroiTrain = false
+    end
 end)
 --------------------------------------------------------------------------------
 -- Buttons layout
@@ -361,10 +367,7 @@ end
 function ENT:ShouldDrawPanel(v)
     return not self.HiddenPanelsDistance[v] and not self.HiddenPanels[v]
 end
-function ENT:ShouldDrawClientEnt(k,v)
-    if self.Hidden[k] or self.Hidden.anim[k] then return false end
-    v = v or self.ClientProps[k]
-    if not v then return false end
+function ENT:ShouldDrawClientEnt(v)
     local distance =  LocalPlayer():GetPos():Distance(self:LocalToWorld(v.pos))
     local renderDist = C_RenderDistance:GetFloat()
     if v.nohide then return true end
@@ -384,9 +387,8 @@ function ENT:ShouldDrawClientEnt(k,v)
 end
 --util.PrecacheModel("models/metrostroi_train/81-720/81-720.mdl")
 function ENT:SpawnCSEnt(k,override)
-    if override and (self.Hidden[k] or self.Hidden.anim[k]) or not override and not self:ShouldDrawClientEnt(k,self.ClientProps[k]) then return false end
     local v = self.ClientPropsOv and self.ClientPropsOv[k] or self.ClientProps[k]
-    if v and not IsValid(self.ClientEnts[k]) and  v.model ~= "" then
+    if v and k ~= "BaseClass" and not IsValid(self.ClientEnts[k]) and not self.Hidden[k] and not self.Hidden.anim[id] and (override or self:ShouldDrawClientEnt(self.ClientProps[k])) and v.model ~= "" then
         --local cent = ents.CreateClientProp(LocalPlayer():GetModel())
         local model = v.model
         if v.modelcallback then model = v.modelcallback(self) or v.model end
@@ -403,7 +405,6 @@ function ENT:SpawnCSEnt(k,override)
         cent:SetParent(self)
         cent:SetPos(self:LocalToWorld(v.pos))
         cent:SetAngles(self:LocalToWorldAngles(v.ang))
-        cent:SetLOD(C_ScreenshotMode:GetBool() and 0 or -1)
         --[[
         hook.Add("MetrostroiBigLag",cent,function(ent)
             --print(ent:GetLocalPos())
@@ -425,13 +426,6 @@ function ENT:SpawnCSEnt(k,override)
                 cent:SetBodygroup(v1,k1)
             end
         end
-        if v.lamps then
-            for i,k in ipairs(v.lamps) do
-                self.HiddenLamps[k] = false
-            end
-        end
-        cent.lamps = v.lamps
-
         local texture = Metrostroi.Skins["train"][self:GetNW2String("Texture")]
         local passtexture = Metrostroi.Skins["pass"][self:GetNW2String("PassTexture")]
         local cabintexture = Metrostroi.Skins["cab"][self:GetNW2String("CabTexture")]
@@ -467,33 +461,20 @@ function ENT:SpawnCSEnt(k,override)
         end
 
         cent.BASSSounds = {}
-        cent.DestroySound = self.DestroySound
-        cent.Think = function(ent)
+        hook.Add("Think",cent,function(ent)
             for k,v in pairs(ent.BASSSounds) do
                 if not IsValid(v) or v:GetState() == GMOD_CHANNEL_STOPPED then
-                    self:DestroySound(v)
                     table.remove(ent.BASSSounds,k)
                 end
             end
-            ent:SetNextClientThink(CurTime()+0.5)
-            return true
-        end
+            ent:NextThink(RealTime()+0.5)
+        end)
         cent.CalcAbsolutePosition = function(ent,pos,ang)
             for k,v in pairs(ent.BASSSounds) do
                 if IsValid(v) and v:GetState() ~= GMOD_CHANNEL_STOPPED then
                     v:SetPos(pos,ang:Forward())
                 end
             end
-        end
-        if v.lamps then
-            cent:CallOnRemove("RemoveLights", function(ent)
-                if IsValid(self) then
-                    for i,k in ipairs(ent.lamps) do
-                        self:SetLightPower(k,false)
-                        self.HiddenLamps[k] = true
-                    end
-                end
-            end)
         end
         self:ShowHide(k, not self.Hidden[k],true)
         if v.callback then v.callback(self,cent) end
@@ -508,18 +489,10 @@ end
 function ENT:GetDirtLevel()
     return self:GetNW2Float("DirtLevel",0.25)
 end
-hook.Remove("Think","metrostroi_collect_garbage",function()
-    if Metrostroi.CollectGarbage then
-        collectgarbage("collect")
-        Metrostroi.CollectGarbage = false
-    end
-end)
+
 hook.Add("EntityRemoved","metrostroi_bass_disable",function(ent)
     if ent.BASSSounds then
-        for k,v in pairs(ent.BASSSounds) do
-            ent:DestroySound(v)
-            ent.BASSSounds[k] = nil
-        end
+        for k,v in pairs(ent.BASSSounds) do v:Stop() end
     end
 end)
 function ENT:SetCSBodygroup(csent,id,value)
@@ -528,27 +501,23 @@ function ENT:SetCSBodygroup(csent,id,value)
     if IsValid(self.ClientEnts[csent]) then self.ClientEnts[csent]:SetBodygroup(id,value) end
 end
 local elapsed = SysTime()
-local spawnedCount = 0
-hook.Add("Think","SpawnElasped",function() elapsed = SysTime() spawnedCount = 0 end)
+hook.Add("Think","SpwanElasped",function() elasped = SysTime() end)
 function ENT:CreateCSEnts()
-    local mul = C_SoftDraw:GetFloat()/100
-    local time = mul*0.01
+    local count = 0
+    local time = C_SoftDraw:GetFloat()/100*0.001
     if self.ClientPropsOv then
         for k in pairs(self.ClientPropsOv) do
-            if k ~= "BaseClass" and not IsValid(self.ClientEnts[k]) and self:SpawnCSEnt(k)then
-                if SysTime()-elapsed > time then
-                    return false
-                end
+            if k ~= "BaseClass" and not IsValid(self.ClientEnts[k]) then
+                self:SpawnCSEnt(k)
+                if SysTime()-elapsed > time then return false end
             end
         end
     end
     --RunConsoleCommand("say","1:"..tostring(elapsed))
     for k in pairs(self.ClientProps) do
         if k ~= "BaseClass" and not IsValid(self.ClientEnts[k]) then
-            if spawnedCount*mul*3 > 4 and SysTime()-elapsed > time then
-                return false
-            end
-            if self:SpawnCSEnt(k) then spawnedCount = spawnedCount + 1 end
+            if count > 5 and SysTime()-elapsed > time then return false end
+            if self:SpawnCSEnt(k) then count = count + 1 end
             --RunConsoleCommand("say","1:")
         end
     end
@@ -578,70 +547,51 @@ function ENT:RemoveCSEnts()
         end
     end
     self.ClientEnts = {}
-    self.GlowingLights = {}
-    self.Sprites = {}
 end
 
 
 -- Checks if the player is driving a train, also returns said train
 local function isValidTrainDriver(ply)
-    if IsValid(ply.InMetrostroiTrain) then return ply.InMetrostroiTrain end
-
+    local train
+    local seat = ply:GetVehicle()
+    if IsValid(seat) then train = seat:GetNW2Entity("TrainEntity") end
+    if IsValid(train) then return train end
     local weapon = IsValid(LocalPlayer():GetActiveWeapon()) and LocalPlayer():GetActiveWeapon():GetClass()
-    if weapon ~= "train_kv_wrench" and weapon ~= "train_kv_wrench_gold" then return end
-
-    local train = util.TraceLine({
-        start = LocalPlayer():GetPos(),
-        endpos = LocalPlayer():GetPos() - LocalPlayer():GetAngles():Up() * 100,
-        filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
-    }).Entity
-    if not IsValid(train) then
+    if weapon == "train_kv_wrench"  or weapon == "train_kv_wrench_gold" then
         train = util.TraceLine({
-            start = LocalPlayer():EyePos(),
-            endpos = LocalPlayer():EyePos() + LocalPlayer():EyeAngles():Forward() * 300,
+            start = LocalPlayer():GetPos(),
+            endpos = LocalPlayer():GetPos() - LocalPlayer():GetAngles():Up() * 100,
             filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
         }).Entity
+        if not IsValid(train) then
+            train = util.TraceLine({
+                start = LocalPlayer():EyePos(),
+                endpos = LocalPlayer():EyePos() + LocalPlayer():EyeAngles():Forward() * 300,
+                filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
+            }).Entity
+        end
     end
-    return IsValid(train) and train, true
+    return train, true
 end
 --------------------------------------------------------------------------------
 -- Clientside initialization
 --------------------------------------------------------------------------------
 function ENT:CanDrawThings()
-    return not LocalPlayer().InMetrostroiTrain or self == LocalPlayer().InMetrostroiTrain
-end
-local function colAlpha(col,a)
-    return Color(col.r*a,col.g*a,col.b*a)
+    return not IsValid(LocalPlayer():GetVehicle()) or self == LocalPlayer():GetVehicle():GetParent()
 end
 hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,isDD)
     if isDD then return end
-    for ent in pairs(Metrostroi.SpawnedTrains) do
-        if ent:IsDormant() then continue end
-        if MetrostroiStarted and MetrostroiStarted~=true or ent.RenderBlock then
-            local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
+    for _,ent in pairs(ents.GetAll()) do
+        --print(self.BaseClassName)
+        if ent.Base ~= "gmod_subway_base" then continue end
+        if MetrostroiStarted~=true then
             cam.Start3D2D(ent:LocalToWorld(Vector(0,-200,100)),ent:LocalToWorldAngles(Angle(0,90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                draw.SimpleText("Wait, train will be available across "..string.NiceTime(MetrostroiStarted and 10-(RealTime()-MetrostroiStarted) or 10))
             cam.End3D2D()
             cam.Start3D2D(ent:LocalToWorld(Vector(0,200,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                draw.SimpleText("Wait, train will be available across "..string.NiceTime(MetrostroiStarted and 10-(RealTime()-MetrostroiStarted) or 10))
             cam.End3D2D()
-            return
         end
-        cam.IgnoreZ(true)
-        for i,vHandle in pairs(ent.Sprites) do
-            local br = ent.LightBrightness[i]
-            local lightData = ent.LightsOverride[i] or ent.Lights[i]
-            if lightData[1] ~= "glow" and lightData[1] ~= "light" or br <= 0 then continue end
-
-            local pos = ent:LocalToWorld(lightData[2])
-            local visibility = util.PixelVisible(pos, lightData.size or 5, vHandle)--math.max(0,util.PixelVisible(pos, 5, vHandle)-0.25)/0.75
-            if visibility > 0 then
-                render.SetMaterial(lightData.mat)
-                render.DrawSprite(pos,128*lightData.scale,128*(lightData.vscale or lightData.scale),colAlpha(lightData[4] or Color(255,255,255),visibility*br))
-                --render.DrawQuadEasy( ent:GetPos(),-EyeVector(), 128*ent.Scale, 128*ent.Scale, ent:GetColor())
-            end
-        end
-        cam.IgnoreZ(false)
         if not ent.ShouldRenderClientEnts or not ent:ShouldRenderClientEnts() then continue end
 
         if ent.DrawPost then ent:DrawPost(not ent:CanDrawThings()) end
@@ -653,82 +603,75 @@ hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,is
                 v:ClientDraw()
             end
         end
-    end
-end)
+        --[[
+        --Drawing schedule for trains which support it
+        if ent.ButtonMap and ent.ButtonMap["Schedule"] then
+            ent:DrawOnPanel("Schedule", function(panel)
+                ent:DrawSchedule(panel)
+            end)
+        end]]
 
-local function enableDebug()
-    if C_DrawDebug:GetInt() > 0 then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiTrainDebug",function(bDrawingDepth,bDrawingSkybox)
-            if bDrawingSkybox then return end
-            for ent in pairs(Metrostroi.SpawnedTrains) do
-                -- Debug draw for buttons
-                if ent.ButtonMap ~= nil then
-                    draw.NoTexture()
-                    for kp,panel in pairs(ent.ButtonMap) do
-                        if kp ~= "BaseClass" and LocalPlayer():GetPos():Distance(ent:LocalToWorld(panel.pos)) < 512 then
-                            ent:DrawOnPanel(kp,function()
-                                surface.SetDrawColor(0,0,255)
-                                if not ent:ShouldDrawPanel(kp) then surface.SetDrawColor(255,0,0) end
-                                surface.DrawOutlinedRect(0,0,panel.width,panel.height)
+        -- Debug draw for buttons
+        if C_DrawDebug:GetInt() > 0 and (ent.ButtonMap ~= nil) then
+             draw.NoTexture()
+            for kp,panel in pairs(ent.ButtonMap) do
+                if kp ~= "BaseClass" then
+                    ent:DrawOnPanel(kp,function()
+                        surface.SetDrawColor(0,0,255)
+                        if not ent:ShouldDrawPanel(kp) then surface.SetDrawColor(255,0,0) end
+                        surface.DrawOutlinedRect(0,0,panel.width,panel.height)
 
-                                if panel.aimX and panel.aimY then
-                                    surface.SetTextColor(255,255,255)
-                                    surface.SetFont("BudgetLabel")
-                                    surface.SetTextPos(panel.width/2,5)
-                                    surface.DrawText(string.format("%d %d",panel.aimX,panel.aimY))
-                                end
-
-
-                                --surface.SetDrawColor(255,255,255)
-                                --surface.DrawRect(0,0,panel.width,panel.height)
-                                if panel.buttons then
-
-                                    surface.SetAlphaMultiplier(0.2)
-                                    if ent.HiddenPanels[kp] then surface.SetAlphaMultiplier(0.1) end
-
-                                    for kb,button in pairs(panel.buttons) do
-                                        if ent.Hidden[button.PropName] or ent.Hidden[button.ID] or ent.Hidden.anim[button.PropName] or ent.Hidden.anim[button.ID] or ent.Hidden.button[button.PropName] or ent.Hidden.button[button.ID] then
-                                            surface.SetDrawColor(255,255,0)
-                                        elseif ent.Hidden[kb] or ent.Hidden.anim[kb] then
-                                            surface.SetDrawColor(255,255,0)
-                                        elseif ent.HiddenPanels[kp] then
-                                            surface.SetDrawColor(100,0,0)
-                                        elseif not button.ID or button.ID[1] == "!" then
-                                            surface.SetDrawColor(25,40,180)
-                                        elseif button.state then
-                                            surface.SetDrawColor(255,0,0)
-                                        else
-                                            surface.SetDrawColor(0,255,0)
-                                        end
-
-                                        if button.w and button.h then
-                                            surface.DrawRect(button.x, button.y, button.w, button.h)
-                                            surface.DrawRect(button.x + button.w/2 - 8,button.y + button.h/2 - 8,16,16)
-                                            else
-                                                ent:DrawCircle(button.x,button.y,button.radius or 10)
-                                            surface.DrawRect(button.x-8,button.y-8,16,16)
-                                        end
-                                    end
-
-                                    --Gotta reset this otherwise the qmenu draws transparent as well
-                                    surface.SetAlphaMultiplier(1)
-
-                                end
-
-
-                            end,true)
+                        if panel.aimX and panel.aimY then
+                            surface.SetTextColor(255,255,255)
+                            surface.SetFont("BudgetLabel")
+                            surface.SetTextPos(panel.width/2,5)
+                            surface.DrawText(string.format("%d %d",panel.aimX,panel.aimY))
                         end
-                    end
+
+
+                        --surface.SetDrawColor(255,255,255)
+                        --surface.DrawRect(0,0,panel.width,panel.height)
+                        if panel.buttons then
+
+                            surface.SetAlphaMultiplier(0.2)
+                            if ent.HiddenPanels[kp] then surface.SetAlphaMultiplier(0.1) end
+
+                            for kb,button in pairs(panel.buttons) do
+                                if ent.Hidden[button.PropName] or ent.Hidden[button.ID] or ent.Hidden.anim[button.PropName] or ent.Hidden.anim[button.ID] or ent.Hidden.button[button.PropName] or ent.Hidden.button[button.ID] then
+                                    surface.SetDrawColor(255,255,0)
+                                elseif ent.Hidden[kb] or ent.Hidden.anim[kb] then
+                                    surface.SetDrawColor(255,255,0)
+                                elseif ent.HiddenPanels[kp] then
+                                    surface.SetDrawColor(100,0,0)
+                                elseif not button.ID or button.ID[1] == "!" then
+                                    surface.SetDrawColor(25,40,180)
+                                elseif button.state then
+                                    surface.SetDrawColor(255,0,0)
+                                else
+                                    surface.SetDrawColor(0,255,0)
+                                end
+
+                                if button.w and button.h then
+                                    surface.DrawRect(button.x, button.y, button.w, button.h)
+                                    surface.DrawRect(button.x + button.w/2 - 8,button.y + button.h/2 - 8,16,16)
+                                    else
+                                        ent:DrawCircle(button.x,button.y,button.radius or 10)
+                                    surface.DrawRect(button.x-8,button.y-8,16,16)
+                                end
+                            end
+
+                            --Gotta reset this otherwise the qmenu draws transparent as well
+                            surface.SetAlphaMultiplier(1)
+
+                        end
+
+
+                    end,true)
                 end
             end
-        end)
-    else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiTrainDebug")
+        end
     end
-end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiTrainDebug")
-cvars.AddChangeCallback( "metrostroi_drawdebug", enableDebug)
-enableDebug()
+end)
 
 local function recurePrecache(sound)
     if type(sound) == "table" then
@@ -746,12 +689,12 @@ function ENT:GetWagonNumber()
     end
     return number
 end
+
 function ENT:Initialize()
     -- Create clientside props
     self.ClientEnts = {}
     self.HiddenPanels = {}
     self.HiddenPanelsDistance = {}
-    self.HiddenLamps = {}
     self.Hidden = {
         anim = {},button = {},override = {},
     }
@@ -761,16 +704,13 @@ function ENT:Initialize()
     self:InitializeSounds()
     recurePrecache(self.SoundNames)
     self.Sounds = {
-        loop = {},
-        isloop = {},
+        loop = {}
     }
     self.CurrentCamera = 0
-    self.Sprites = {}
     if self.NoTrain then return end
     self.ButtonMapMatrix = {}
     -- Passenger models
     self.PassengerEnts = {}
-    self.PassengerEntsStucked = {}
     self.PassengerPositions = {}
     --self.HiddenQuele = {}
     -- Systems defined in the train
@@ -778,16 +718,6 @@ function ENT:Initialize()
     -- Initialize train systems
     self:InitializeSystems()
 
-    self.GlowingLights = {}
-    self.LightBrightness = {}
-    self.LightsOverride = {}
-    if self.Lights then
-        for i,lightData in pairs(self.Lights) do
-            if lightData.changable then
-                self.LightsOverride[i] = table.Copy(lightData)
-            end
-        end
-    end
     --self:EntIndex()
     self.PassengerModels = {
         "models/metrostroi/passengers/f1.mdl",
@@ -839,8 +769,9 @@ function ENT:UpdateWagonNumber() end
 
 ENT.Cameras = {}
 function ENT:OnRemove(nfinal)
-    self.RenderBlock = RealTime()
-    if nfinal then
+    if not nfinal then
+        self.RenderBlock = RealTime()
+    else
         drawCrosshair = false
         canDrawCrosshair = false
         toolTipText = nil
@@ -850,32 +781,29 @@ function ENT:OnRemove(nfinal)
 
 
     for _,v in pairs(self.Sounds) do
-        if type(v) ~= "function" and type(v) ~= "table" then
-            self:DestroySound(v)
+        if type(v) ~= "function" and IsValid(v) then
+            v:Stop()
         end
     end
     for k,v in pairs(self.Sounds.loop) do
         for i,sndt in ipairs(v) do
-            self:DestroySound(sndt.sound)
+            if IsValid(sndt.sound) then
+                sndt.sound:Stop()
+            end
         end
     end
     for _,v in pairs(self.PassengerEnts or {}) do
         SafeRemoveEntity(v)
     end
-    for _,v in pairs(self.PassengerEntsStucked or {}) do
-        SafeRemoveEntity(v)
-    end
     if self.GUILocker then self:BlockInput(false) end
-    self.Sounds = {loop = {},isloop = {}}
+    self.Sounds = {loop = {}}
     self.PassengerEnts = {}
-    self.PassengerEntsStucked = {}
 end
 
 function ENT:CalcAbsolutePosition(pos, ang)
     if self.RenderClientEnts then
         if self.Lights and self.GlowingLights then
             for id, light in pairs(self.GlowingLights) do
-                if not IsValid(light) then continue end
                 local lightData = self.Lights[id]
                 light:SetPos(self:LocalToWorld(lightData[2]))
                 light:SetAngles(self:LocalToWorldAngles(lightData[3]))
@@ -884,6 +812,7 @@ function ENT:CalcAbsolutePosition(pos, ang)
         for k,v in pairs(self.Sounds) do
             if type(v) == "IGModAudioChannel" then
                 if not IsValid(v) then
+                    if v.Remove then v:Remove() end
                     self.Sounds[k] = nil
                     continue
                 end
@@ -897,6 +826,7 @@ function ENT:CalcAbsolutePosition(pos, ang)
                     end
                     continue
                 end
+                --self.Sounds[k] = nil
             end
         end
         for k,v in pairs(self.Sounds.loop) do
@@ -933,14 +863,19 @@ local function SoundTrace(startv,endv)
 end
 
 MetrostroiStarted = MetrostroiStarted or nil
+local _TEST
 hook.Add("KeyPress","MetrostroiStarted",function(_,key)
     if key~=IN_FORWARD and key~=IN_BACK and key~=IN_MOVELEFT and key~=IN_MOVERIGHT then return end
     hook.Add("Think","MetrostroiStarted",function()
-        if MetrostroiStarted == nil then
-            MetrostroiStarted = RealTime()
-        elseif MetrostroiStarted == true or MetrostroiStarted and RealTime()-MetrostroiStarted > 3 then
-            MetrostroiStarted = true
+        if MetrostroiStarted==true then
             hook.Remove("Think","MetrostroiStarted")
+        elseif MetrostroiStarted == nil then
+            MetrostroiStarted = RealTime()
+        elseif MetrostroiStarted and RealTime()-MetrostroiStarted > 10 then
+            MetrostroiStarted = true
+        end
+        if IsValid(LocalPlayer()) and not _TEST then
+            _TEST = true
         end
     end)
     hook.Remove("KeyPress","MetrostroiStarted")
@@ -950,6 +885,14 @@ function ENT:Think()
     self.PrevTime = self.PrevTime or RealTime()
     self.DeltaTime = (RealTime() - self.PrevTime)
     self.PrevTime = RealTime()
+    if self.RenderBlock then
+        if RealTime()-self.RenderBlock < 5 then
+        self.ClientPropsInitialized = false
+            return
+        else
+            self.RenderBlock = false
+        end
+    end
     if MetrostroiStarted~=true then
         return
     end
@@ -959,6 +902,23 @@ function ENT:Think()
         self.RenderClientEnts = true
         self.CreatingCSEnts = false
         return
+    end
+    if not self.ClientPropsInitialized then
+        self.ClientPropsInitialized = true
+        self:RemoveCSEnts()
+        self:InitializeSounds()
+        self.RenderClientEnts = false
+        self.StopSounds = false
+    end
+
+    if self.GlowingLights and (self.HeadlightShadows ~= C_Shadows1:GetBool() or self.OtherShadows ~= C_Shadows2:GetBool()) then
+        self.HeadlightShadows = C_Shadows1:GetBool()
+        self.OtherShadows = C_Shadows2:GetBool()
+        for k,v in pairs(self.GlowingLights) do
+            if IsValid(v) then v:Remove() end
+        end
+        self.GlowingLights = {}
+        self.LightBrightness = {}
     end
     if self.RenderClientEnts ~= self:ShouldRenderClientEnts() then
         self.RenderClientEnts = self:ShouldRenderClientEnts()
@@ -971,46 +931,12 @@ function ENT:Think()
             --if not IsValid(ent) then self.RenderClientEnts = false end
         else
             self:OnRemove(true)
+            for k,v in pairs(self.PassengerEnts or {}) do
+                SafeRemoveEntity(v)
+            end
+            self.PassengerEnts = {}
             return
         end
-    end
-    if not self.RenderClientEnts then return end
-
-    if self.RenderBlock then
-        if RealTime()-self.RenderBlock < 3 then
-            self.ClientPropsInitialized = false
-            return
-        else
-            self.RenderBlock = false
-        end
-    end
-
-    if not self.ClientPropsInitialized then
-        self.ClientPropsInitialized = true
-        self:RemoveCSEnts()
-        self:InitializeSounds()
-        self.RenderClientEnts = false
-        self.StopSounds = false
-    end
-    if self.GlowingLights and (
-            self.HeadlightShadows ~= C_Shadows1:GetBool()
-            or self.OtherShadows ~= C_Shadows2:GetBool()
-            or self.RedLights ~= C_Shadows3:GetBool()
-            or self.OtherLights ~= C_Shadows4:GetBool()
-            or self.AAEnabled ~= (C_AA:GetInt() > 1)
-            or self.SpritesEnabled ~= C_Sprites:GetBool()) then
-        self.HeadlightShadows = C_Shadows1:GetBool()
-        self.OtherShadows = C_Shadows2:GetBool()
-        self.RedLights = C_Shadows3:GetBool()
-        self.OtherLights = C_Shadows4:GetBool()
-        self.SpritesEnabled = C_Sprites:GetBool()
-        self.AAEnabled = C_AA:GetInt() > 1
-        for k,v in pairs(self.GlowingLights) do
-            if IsValid(v) then v:Remove() end
-        end
-        self.GlowingLights = {}
-        self.LightBrightness = {}
-        self.Sprites = {}
     end
 
 
@@ -1052,6 +978,7 @@ function ENT:Think()
     else
         self.HeadAcceleration = 0
     end
+
     -- Simulate systems
     if self.Systems then
         for _,v in pairs(self.Systems) do
@@ -1059,12 +986,9 @@ function ENT:Think()
         end
     end
     if not self.StopSounds then
-        local soundPos = self.SoundPositions
-        local soundNames = self.SoundNames
         for k,v in pairs(self.Sounds.loop) do
-
-            local tbl = soundPos[k]
-            local ntbl =  soundNames[k]
+            local tbl = self.SoundPositions[k]
+            local ntbl =  self.SoundNames[k]
             local good = true
             for i,stbl in ipairs(v) do
                 if not stbl.volume then good = false end
@@ -1074,7 +998,15 @@ function ENT:Think()
                 local snd = stbl.sound
                 if not IsValid(snd) then continue end
                 if snd:GetState() == GMOD_CHANNEL_PLAYING then
+                    if tbl then
+                        --snd:SetPos(self:LocalToWorld(tbl[3]))
+                    else
+                        --snd:SetPos(self:GetPos())
+                    end
+                    --snd:SetPlaybackRate(v.pitch)
+                    --snd:SetVolume(stbl.volume or 0)
                     self:SetPitchVolume(snd,v.pitch or 1,stbl.volume,tbl)
+                    --snd:Set3DFadeDistance(tbl[1],tbl[2])
                     if stbl.volume == 0 and not stbl.time then
                         snd:Pause()
                         snd:SetTime(0)
@@ -1100,6 +1032,7 @@ function ENT:Think()
                     local endt = (ntbl.loop and snd:GetTime() > ntbl.loop or snd:GetTime()/snd:GetLength() >= 0.8) or no1
                     if stbl.state and stbl.volume < v.volume and not no1 then
                         if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
+                            snd:SetTime(0)
                             snd:Play()
                             self:SetBASSPos(snd,tbl)
                         end
@@ -1110,6 +1043,7 @@ function ENT:Think()
                                 v[i].time=2
                                 if v[i].GetState and v[i]:GetState() ~= GMOD_CHANNEL_PLAYING then
                                     v[i]:EnableLooping(i==2)
+                                    v[i]:SetTime(0)
                                     v[i]:Play()
                                     self:SetBASSPos(v[i],tbl)
                                 end
@@ -1135,6 +1069,7 @@ function ENT:Think()
                     if stbl.state and not stbl.time and stbl.volume == 0 then
                         if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
                             snd:EnableLooping(true)
+                            snd:SetTime(0)
                             snd:Play()
                             self:SetBASSPos(snd,tbl)
                         end
@@ -1154,6 +1089,7 @@ function ENT:Think()
                     local time = v[2].time or v[1].time
                     if stbl.state and time and not stbl.time then
                         if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
+                            snd:SetTime(0)
                             snd:Play()
                             self:SetBASSPos(snd,tbl)
                         end
@@ -1165,6 +1101,7 @@ function ENT:Think()
                             if v[i].volume > 0 then
                                 v[i].time=0.07/v.pitch
                                 if v[i].GetState and v[i]:GetState() ~= GMOD_CHANNEL_PLAYING then
+                                    v[i]:SetTime(0)
                                     v[i]:Play()
                                     self:SetBASSPos(v[i],tbl)
                                 end
@@ -1230,7 +1167,8 @@ function ENT:Think()
         end
     end
     if not self.HandleMouseInput and self.ButtonMap then
-        if self == LocalPlayer().InMetrostroiTrain then
+        local seat = LocalPlayer():GetVehicle()
+        if IsValid(seat) and self == seat:GetNW2Entity("TrainEntity") then
             for kp,pan in pairs(self.ButtonMap) do
                 if not self:ShouldDrawPanel(kp) then continue end
                 --If player is looking at this panel
@@ -1254,18 +1192,6 @@ function ENT:Think()
     if self.ButtonMap and (not self.LastCheck or RealTime()-self.LastCheck > 0.5) then
         self.LastCheck = RealTime()
         local screenshotMode = C_ScreenshotMode:GetBool()
-        if self.ScreenshotMode ~= screenshotMode then
-            self:SetLOD(screenshotMode and 0 or -1)
-            for k,cent in pairs(self.ClientEnts) do
-                if IsValid(cent) then
-                    cent:SetLOD(screenshotMode and 0 or -1)
-                end
-            end
-            self.ScreenshotMode = screenshotMode
-        end
-        for k in pairs(self.HiddenLamps) do
-            self.HiddenLamps[k] = false
-        end
         for k,v in pairs(self.ClientProps) do
             if not v.pos then continue end
             local cent = self.ClientEnts[k]
@@ -1276,102 +1202,40 @@ function ENT:Think()
                 end
                 continue
             end
-            local hidden = not self:ShouldDrawClientEnt(k,v)
+            local hidden = not self:ShouldDrawClientEnt(v)
             if IsValid(cent) and hidden then
                 cent:Remove()
                 self.ClientEnts[k] = nil
             elseif not IsValid(cent) and not hidden then
-                self:SpawnCSEnt(k,true)
-            end
-            if v.lamps and hidden then
-                for i,k in ipairs(v.lamps) do
-                    self:SetLightPower(k,false)
-                    self.HiddenLamps[k] = true
-                end
-            end
-        end
-        for k,v in pairs(self.Sounds) do
-            if type(v) ~= "function" and type(v) ~= "table" and not self.Sounds.isloop[k] and (not IsValid(v) or v:GetState() == GMOD_CHANNEL_STOPPED) then
-                self:DestroySound(v)
-                self.Sounds[k] = nil
+                self:SpawnCSEnt(k)
             end
         end
         for k,v in pairs(self.ButtonMap) do
             if not v.pos then continue end
+            local cent = self.ClientEnts[k]
 
             if not v.hide or (v.nohide or screenshotMode) then
                 self.HiddenPanelsDistance[k] = v.screenHide
                 continue
             end
-            self.HiddenPanelsDistance[k] = not self:ShouldDrawClientEnt(k,self.ButtonMap[k])
+            self.HiddenPanelsDistance[k] = not self:ShouldDrawClientEnt(v)
         end
     end
 
-    if self.AutoAnims && self.AutoAnimNames then
-        local aAnims = self.AutoAnims
-        local aAnimNames = self.AutoAnimNames
-        local hidden = self.Hidden
-        for i=1, #aAnims do
-            if not aAnimNames[i] or not hidden[aAnimNames[i]] then
-                aAnims[i](self)
-            end
+    if self.AutoAnims then
+        for name,func in ipairs(self.AutoAnims) do
+            func(self)
         end
     end
     if self.Lights and self.GlowingLights then
         for id, light in pairs(self.GlowingLights) do
-            if light.Update then
-                light:Update()
-            end
+            light:Update()
         end
     end
     -- Update passengers
     if self.RenderClientEnts and self.PassengerEnts then
-        local stucked = self.PassengerEntsStucked
-        for i,v in ipairs(self.LeftDoorPositions) do
-            if self:GetPackedBool("DoorLS"..i) and not IsValid(stucked[i]) then
-                local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
-                ent:SetPos(self:LocalToWorld(Vector(v.x,v.y,self:GetStandingArea().z)))
-                ent:SetAngles(self:LocalToWorldAngles(Angle(0,v.y < 0 and -90 or 90,0)))
-                ent:SetSkin(math.floor(ent:SkinCount()*math.random()))
-                ent:SetModelScale(0.98 + (-0.02+0.04*math.random()),0)
-                ent:SetParent(self)
-                stucked[i] = ent
-                if math.random() > 0.99 then
-                    self:PlayOnceFromPos("PassStuckL"..i,"subway_trains/common/door/pass_stAAAck.mp3",5,0.9+math.random()*0.2,150,400,v)
-                elseif math.random() > 0.95 then
-                    self:PlayOnceFromPos("PassStuckL"..i,"subway_trains/common/door/tom.mp3",5,0.9+math.random()*0.2,150,400,v)
-                elseif ent:GetModel():find("models/metrostroi/passengers/f") then
-                    self:PlayOnceFromPos("PassStuckL"..i,"subway_trains/common/door/pass_stuck.mp3",5,1.6+math.random()*0.2,150,400,v)
-                else
-                    self:PlayOnceFromPos("PassStuckL"..i,"subway_trains/common/door/pass_stuck.mp3",5,0.9+math.random()*0.2,150,400,v)
-                end
-            elseif not self:GetPackedBool("DoorLS"..i) and IsValid(stucked[i]) then
-                SafeRemoveEntity(stucked[i])
-            end
-        end
-        for i,v in ipairs(self.RightDoorPositions) do
-            if self:GetPackedBool("DoorRS"..i) and not IsValid(stucked[-i]) then
-                local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
-                ent:SetPos(self:LocalToWorld(Vector(v.x,v.y,self:GetStandingArea().z)))
-                ent:SetAngles(self:LocalToWorldAngles(Angle(0,v.y < 0 and -90 or 90,0)))
-                ent:SetSkin(math.floor(ent:SkinCount()*math.random()))
-                ent:SetModelScale(0.98 + (-0.02+0.04*math.random()),0)
-                ent:SetParent(self)
-                stucked[-i] = ent
-                if math.random() > 0.99 then
-                    self:PlayOnceFromPos("PassStuckR"..i,"subway_trains/common/door/pass_stAAAck.mp3",5,0.9+math.random()*0.2,150,400,v)
-                elseif math.random() > 0.95 then
-                    self:PlayOnceFromPos("PassStuckR"..i,"subway_trains/common/door/tom.mp3",5,0.9+math.random()*0.2,150,400,v)
-                elseif ent:GetModel():find("models/metrostroi/passengers/f") then
-                    self:PlayOnceFromPos("PassStuckR"..i,"subway_trains/common/door/pass_stuck.mp3",5,1.6+math.random()*0.2,150,400,v)
-                else
-                    self:PlayOnceFromPos("PassStuckR"..i,"subway_trains/common/door/pass_stuck.mp3",5,0.9+math.random()*0.2,150,400,v)
-                end
-            elseif not self:GetPackedBool("DoorRS"..i) and IsValid(stucked[-i]) then
-                SafeRemoveEntity(stucked[-i])
-            end
-        end
         if #self.PassengerEnts ~= self:GetNW2Float("PassengerCount") then
+
             -- Passengers go out
             while #self.PassengerEnts > self:GetNW2Float("PassengerCount") do
                 local ent = self.PassengerEnts[#self.PassengerEnts]
@@ -1403,12 +1267,17 @@ function ENT:Think()
                 table.insert(self.PassengerEnts,ent)
             end
         end
+    elseif self.PassengerEnts then
+        for k,v in pairs(self.PassengerEnts) do
+            if IsValid(v) then v:Remove() end
+            self.PassengerEnts[k] = nil
+        end
     end
-    for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
 end
 function ENT:BlockInput(block)
-    if IsValid(LocalPlayer().InMetrostroiTrain) then
-        if self ~= LocalPlayer().InMetrostroiTrain then
+    local seat = LocalPlayer():GetVehicle()
+    if IsValid(seat) then
+        if self ~= seat:GetNW2Entity("TrainEntity") then
             block = false
         end
     end
@@ -1469,17 +1338,7 @@ function ENT:HandleMouse(handle)
         self:BlockInput(self.HandleMouseInput)
     end
 end
-
-local function compensateSeat(val)
-    local valAbs = math.abs(val)
-    if valAbs < 10 then return 1 end
-    if valAbs > 45 then return 0 end
-
-    local sign = val < 0 and -1 or 1
-    return 1-math.Clamp((valAbs-10)/6,0,2)+(math.Clamp((valAbs-30)/10,0,1))+(math.Clamp((valAbs-40)/5,0,1))
-end
-
-local OldTrainHandle,OldSeat
+local OldTrainHandle
 hook.Add("Think","metrostroi_mouse_handle",function()
     local train, outside = isValidTrainDriver(LocalPlayer())
     if outside then train = nil end
@@ -1487,50 +1346,15 @@ hook.Add("Think","metrostroi_mouse_handle",function()
     if OldTrainHandle ~= train then
         if IsValid(OldTrainHandle) and OldTrainHandle.BlockInput then OldTrainHandle:BlockInput(false) end
         if IsValid(train) and train.BlockInput then train:BlockInput(train.HandleMouseInput) end
-        if IsValid(train) then
-            OldSeat = LocalPlayer():GetVehicle()
-            --[=[train.CamAnglesComp = Angle(0,0,0)
-            train.OldAng = false
-            --OldSeat.CalcAbsolutePosition = function(...) return ... end
-            if not OldSeat.OldCalcAbsolutePosition then
-                OldSeat.OldCalcAbsolutePosition = OldSeat.CalcAbsolutePosition
-            end
-            OldSeat.CalcAbsolutePosition = function(ent,...)
-                --[[local target_ang = Angle(0,0,0)
-                local train = ent:GetNW2Entity("TrainEntity")
-                if not IsValid(train) then return end
-                target_ang:RotateAroundAxis(ent:GetAngles():Forward(),-train.CamAng.p)
-                target_ang:RotateAroundAxis(ent:GetAngles():Up(),train.CamAng.y)
-                target_ang:RotateAroundAxis(ent:GetAngles():Right(),train.CamAng.r)
-                train.CamAnglesComp = target_ang
-                print(target_ang)]]
-                return ent:OldCalcAbsolutePosition(...)
-            end
-            print(OldSeat.OnAngleChangeID)--]=]
-        elseif IsValid(OldSeat) then
-            OldSeat.CalcAbsolutePosition = OldSeat.OldCalcAbsolutePosition or OldSeat.CalcAbsolutePosition
-            OldSeat.OldCalcAbsolutePosition = nil
-            OldSeat = nil
-        end
         OldTrainHandle = train
-    end
-end)
---[[hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
-    local train = veh:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
-        train.CamAnglesComp = Angle(0,0,0)
-        train.OldAng = false
-        if train.BlockInput then train:BlockInput(train.HandleMouseInput) end
     end
 end)
 hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
     local train = veh:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
-        train.CamAnglesComp = Angle(0,0,0)
-        train.OldAng = false
-        if train.BlockInput then train:BlockInput(train.HandleMouseInput) end
+    if IsValid(train) and train.BlockInput then
+        train:BlockInput(train.HandleMouseInput)
     end
-end)]]
+end)
 --[[ hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
     local train = veh:GetNW2Entity("TrainEntity")
     if IsValid(train) and train.BlockInput then
@@ -1788,43 +1612,42 @@ end
 --------------------------------------------------------------------------------
 function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
     local id = clientProp
-    local anims = self.Anims
-    if not anims[id] then
-        anims[id] = {}
-        anims[id].val = value
-        anims[id].value = min + (max-min)*value
-        anims[id].V = 0.0
-        anims[id].block = false
-        anims[id].stuck = false
-        anims[id].P = value
+    if not self.Anims[id] then
+        self.Anims[id] = {}
+        self.Anims[id].val = value
+        self.Anims[id].value = min + (max-min)*value
+        self.Anims[id].V = 0.0
+        self.Anims[id].block = false
+        self.Anims[id].stuck = false
+        self.Anims[id].P = value
     end
     if self.Hidden[id] or self.Hidden.anim[id] then return 0 end
-    if anims[id].Ignore then
-        if RealTime()-anims[id].Ignore < 0 then
-            return anims[id].value
+    if self.Anims[id].Ignore then
+        if RealTime()-self.Anims[id].Ignore < 0 then
+            return self.Anims[id].value
         else
-            anims[id].Ignore = nil
+            self.Anims[id].Ignore = nil
         end
     end
-    local val = anims[id].val
+    local val = self.Anims[id].val
     if value ~= val then
-        anims[id].block = false
+        self.Anims[id].block = false
     end
-    if anims[id].block then
-        if anims[id].reload and IsValid(self.ClientEnts[clientProp]) then
-            self.ClientEnts[clientProp]:SetPoseParameter("position",anims[id].value)
-            anims[id].reload = false
+    if self.Anims[id].block then
+        if self.Anims[id].reload and IsValid(self.ClientEnts[clientProp]) then
+            self.ClientEnts[clientProp]:SetPoseParameter("position",self.Anims[id].value)
+            self.Anims[id].reload = false
         end
-        return anims[id].value--min + (max-min)*anims[id].val
+        return self.Anims[id].value--min + (max-min)*self.Anims[id].val
     end
     --if self["_anim_old_"..id] == value then return self["_anim_old_"..id] end
     -- Generate sticky value
     if stickyness and damping then
-        if (math.abs(anims[id].P - value) < stickyness) and (anims[id].stuck) then
-            value = anims[id].P
-            anims[id].stuck = false
+        if (math.abs(self.Anims[id].P - value) < stickyness) and (self.Anims[id].stuck) then
+            value = self.Anims[id].P
+            self.Anims[id].stuck = false
         else
-            anims[id].P = value
+            self.Anims[id].P = value
         end
     end
     local dT = FrameTime()--self.DeltaTime
@@ -1838,9 +1661,9 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
         end
         if math.abs(value - val) < dX then
             val = value
-            anims[id].V = 0
+            self.Anims[id].V = 0
         else
-            anims[id].V = dX
+            self.Anims[id].V = dX
         end
     else
         -- Prepare speed limiting
@@ -1849,33 +1672,33 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
         local max_accel = 0.5 / dT
 
         -- Simulate
-        local dX2dT = (speed or 128)*(value - val) - anims[id].V * (damping or 8.0)
+        local dX2dT = (speed or 128)*(value - val) - self.Anims[id].V * (damping or 8.0)
         if dX2dT >  max_accel then dX2dT =  max_accel end
         if dX2dT < -max_accel then dX2dT = -max_accel end
 
-        anims[id].V = anims[id].V + dX2dT * dT
-        if anims[id].V >  max_speed then anims[id].V =  max_speed end
-        if anims[id].V < -max_speed then anims[id].V = -max_speed end
+        self.Anims[id].V = self.Anims[id].V + dX2dT * dT
+        if self.Anims[id].V >  max_speed then self.Anims[id].V =  max_speed end
+        if self.Anims[id].V < -max_speed then self.Anims[id].V = -max_speed end
 
-        val = math.max(0,math.min(1,val + anims[id].V * dT))
+        val = math.max(0,math.min(1,val + self.Anims[id].V * dT))
 
         -- Check if value got stuck
         if (math.abs(dX2dT) < 0.001) and stickyness and (dT > 0) then
-            anims[id].stuck = true
+            self.Anims[id].stuck = true
         end
     end
     local retval = min + (max-min)*val
     if IsValid(self.ClientEnts[clientProp]) then
         self.ClientEnts[clientProp]:SetPoseParameter("position",retval)
     end
-    if math.abs(anims[id].V) == 0 and math.abs(val-value) == 0 and not anims[id].stuck then
-        anims[id].block = true
+    if math.abs(self.Anims[id].V) == 0 and math.abs(val-value) == 0 and not self.Anims[id].stuck then
+        self.Anims[id].block = true
     end
 
-    anims[id].val = val
-    anims[id].oldival = value
-    anims[id].oldspeed = speed
-    anims[id].value = retval
+    self.Anims[id].val = val
+    self.Anims[id].oldival = value
+    self.Anims[id].oldspeed = speed
+    self.Anims[id].value = retval
     return retval
 end
 function ENT:AnimateFrom(clientProp,from,min,max)
@@ -1894,7 +1717,8 @@ function ENT:ShowHide(clientProp, value, over)
     --if IsValid(self.ClientEnts[clientProp]) then
     if value == true and (self.Hidden[clientProp] or over) then
         self.Hidden[clientProp] = false
-        if not IsValid(self.ClientEnts[clientProp]) and self:SpawnCSEnt(clientProp) then
+        if not IsValid(self.ClientEnts[clientProp]) then
+            self:SpawnCSEnt(clientProp)
             self.UpdateRender = true
         end
         --self.ClientEnts[clientProp]:SetRenderMode(RENDERMODE_NORMAL)
@@ -1922,7 +1746,6 @@ function ENT:HideButton(clientProp, value)
 end
 function ENT:ShowHideSmooth(clientProp, value,color)
     if self.Hidden.override[clientProp] then return value end
-    if not IsValid(self.ClientEnts[clientProp]) and self.SmoothHide[clientProp] then self.SmoothHide[clientProp] = 0 end
     if self.SmoothHide[clientProp] and (self.SmoothHide[clientProp] == value and not color) then return value end
     self.SmoothHide[clientProp] = value
     self.Hidden.anim[clientProp] = value == 0
@@ -2046,29 +1869,19 @@ function ENT:GetTrainAccelerationAtPos(pos)
 end
 
 
+
+
+
 --------------------------------------------------------------------------------
 -- Look into mirrors hook
 --------------------------------------------------------------------------------
---[[hook.Add("InputMouseApply", "Metrostroi_TrainView", function(cmd,x,y,ang)
-    local seat = LocalPlayer():GetVehicle()
+hook.Add("CalcView", "Metrostroi_TrainView", function(ply,pos,ang,fov,znear,zfar)
+    local seat = ply:GetVehicle()
     if (not seat) or (not seat:IsValid()) then
         return
     end
     local train = seat:GetNW2Entity("TrainEntity")
     if (not train) or (not train:IsValid()) then
-        return
-    end
-    local target_ang = Angle(0,0,0)
-    target_ang:RotateAroundAxis(seat:GetAngles():Forward(),-ang.p)
-    target_ang:RotateAroundAxis(seat:GetAngles():Up(),ang.y)
-    target_ang:RotateAroundAxis(seat:GetAngles():Right(),ang.r)
-    train.CamAnglesComp = target_ang
-    train.CamAng = ang
-end)]]
-
-hook.Add("CalcVehicleView", "Metrostroi_TrainView", function(seat,ply,tbl)
-    local train = ply.InMetrostroiTrain
-    if not IsValid(train) then
         return
     end
 
@@ -2097,45 +1910,72 @@ hook.Add("CalcVehicleView", "Metrostroi_TrainView", function(seat,ply,tbl)
         angles = ang + Angle(offset.x,0,0),
     }]]--
 
-    if seat:GetThirdPersonMode() and train.MirrorCams[1] then
-        local trainAng = tbl.angles - train:GetAngles()
+
+    if seat:GetThirdPersonMode() then
+        local trainAng = ang - train:GetAngles()
         if trainAng.y >  180 then trainAng.y = trainAng.y - 360 end
         if trainAng.y < -180 then trainAng.y = trainAng.y + 360 end
         if trainAng.y > 0 then
-            train.CamPos =  train:LocalToWorld(train.MirrorCams[1])
-            train.CamAngles =  train:LocalToWorldAngles(train.MirrorCams[2])
+            local target_ang = (train:GetAngles() + Angle(2,0,0))
+            target_ang:RotateAroundAxis(train:GetAngles():Up(),180)
+            train.CamPos =  train:LocalToWorld(Vector(475,80,30))
+            train.CamAngles =  target_ang
+            --[[ if ply.OldFOV ~= 30 then
+                ply:SetFOV(30,0)
+                ply.OldFOV = 30
+            end--]]
             return {
                 origin = train.CamPos,
-                angles = train.CamAngles,
-                fov = train.MirrorCams[3],
+                angles = target_ang,
+                fov = 30,
+                znear = znear,
+                zfar = zfar
             }
         else
-            train.CamPos =  train:LocalToWorld(train.MirrorCams[4])
-            train.CamAngles =  train:LocalToWorldAngles(train.MirrorCams[5])
+            local target_ang = (train:GetAngles() + Angle(2,0,0))
+            target_ang:RotateAroundAxis(train:GetAngles():Up(),180)
+            train.CamPos = train:LocalToWorld(Vector(475,-80,30))
+            train.CamAngles =  target_ang
+           --[[  if ply.OldFOV ~= 20 then
+                ply:SetFOV(20,0)
+                ply.OldFOV = 20
+            end--]]
             return {
                 origin = train.CamPos,
-                angles = train.CamAngles,
-                fov = train.MirrorCams[6],
+                angles = target_ang,
+                fov = 20,
+                znear = znear,
+                zfar = zfar
             }
         end
     elseif train.CurrentCamera > 0 and train.Cameras[train.CurrentCamera] then
         local camera = train.Cameras[train.CurrentCamera]
         train.CamPos = train:LocalToWorld(camera[1])
-        local tFov = tbl.fov/C_FovDesired:GetFloat()*C_CabFOV:GetFloat()
+        local tFov = fov/C_FovDesired:GetFloat()*C_CabFOV:GetFloat()
+        --ply:SetFOV(tFov,0)
 
         return {
             origin = train.CamPos,
-            angles = tbl.angles,--+train:LocalToWorldAngles(camera[2]),
+            angles = ang,--+train:LocalToWorldAngles(camera[2]),
             fov = tFov,
+            znear = znear,
+            zfar = zfar
         }
     else
-
-        train.CamPos = train:LocalToWorld(train:WorldToLocal(tbl.origin)+Vector(train.HeadAcceleration,0,C_CabZ:GetFloat()))
-        local tFov = tbl.fov/C_FovDesired:GetFloat()*C_CabFOV:GetFloat()
+        --train.HeadAcceleration = GetConVarNumber("metrostroi_disablecamaccel") == 0 and math.Clamp((train.HeadAcceleration or 0)*0.95 + (train:GetNW2Float("Accel"))*1.1, -10, 10) or 0
+--function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
+    --print(train:GetNW2Float("Accel")*1.1,train:Animate("accel",train:GetNW2Float("Accel")*1.1+5,-0,10,                nil, nil,  64,2,4))
+        --local headPos = train:WorldToLocal(pos)
+        train.CamPos = train:LocalToWorld(train:WorldToLocal(pos)+Vector(train.HeadAcceleration,0,0))
+        local tFov = fov/C_FovDesired:GetFloat()*C_CabFOV:GetFloat()
+        --ply:SetFOV(tFov,0)
+        train.CamAngles =  ang
         return {
             origin = train.CamPos,
-            angles = tbl.angles,--target_ang+train.CamAnglesComp,
+            angles = ang,
             fov = tFov,
+            znear = znear,
+            zfar = zfar
         }
     end
     return
@@ -2223,7 +2063,6 @@ hook.Add("Think","metrostroi-cabin-panel",function()
 
     local train, outside = isValidTrainDriver(ply)
     if not IsValid(train) then return end
-    if gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
     if train.ButtonMap ~= nil then
         canDrawCrosshair = true
         local plyaimvec
@@ -2279,20 +2118,11 @@ hook.Add("Think","metrostroi-cabin-panel",function()
             if button then
                 if ttdelay == 0 or CurTime() - lastAimButtonChange > ttdelay then
                     if C_DrawDebug:GetInt() > 0 then
-                        toolTipText,toolTipColor = button.ID,Color(255,0,255)
+                        toolTipText,_,toolTipColor = button.ID,Color(255,0,255)
                     elseif button.plombed then
                         toolTipText,_,toolTipColor = button.plombed(train)
                     else
-                        toolTipText,toolTipColor = button.tooltip
-                    end
-                    --[[toolTipPosition = nil
-                    if button.tooltipState then
-                        local newTT,newTTpos = button.tooltipState(train)
-                        toolTipText = toolTipText..newTT
-                        toolTipPosition = Metrostroi.GetPhrase(newTTpos)
-                    end]]
-                    if GetConVarNumber("metrostroi_disablehovertextpos") == 0 and button.tooltipState and button.tooltip then
-                        toolTipText = toolTipText..button.tooltipState(train)
+                        toolTipText,_,toolTipColor = button.tooltip
                     end
                 end
             end
@@ -2369,13 +2199,15 @@ end
 -- Args are player, IN_ enum and bool for press/release
 local function handleKeyEvent(ply,key,pressed)
     if not game.SinglePlayer() and not IsFirstTimePredicted() then return end
-    if gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
+
+    if gui.IsConsoleVisible() or gui.IsGameUIVisible() --[[ or vgui.GetHoveredPanel() and vgui.GetHoveredPanel():GetName() ~= "ContextMenu" and vgui.GetHoveredPanel():GetName() ~= "GModBase"--]]  then return end
     if key ~= MOUSE_LEFT and key ~= MOUSE_RIGHT then return end
     local train, outside = isValidTrainDriver(ply)
 
     if not IsValid(train) then return end
     if train.ButtonMap == nil then return end
     if key == MOUSE_LEFT and not pressed then train:ClearButtons() end
+
     if pressed then
         local button,x,y,system = findAimButton(ply,train)
         local plombed = false
@@ -2484,7 +2316,7 @@ local oldTrain
 hook.Add( "HUDPaint", "metrostroi-draw-cameras", function()
     local train, outside = isValidTrainDriver(LocalPlayer())
     if not IsValid(train) or not train.Cameras or outside then
-        if IsValid(oldTrain) then
+        if oldTrain then
             oldTrain.CurrentCamera = 0
             if oldTrain.CamMoved then oldTrain:CamMoved() end
             oldTrain = nil
@@ -2532,29 +2364,18 @@ hook.Add( "HUDPaint", "metrostroi-draw-crosshair-tooltip", function()
         end
 
         if toolTipText ~= nil then
+            local text1 = string.sub(toolTipText,1,string.find(toolTipText,"\n"))
+            local text2 = string.sub(toolTipText,string.find(toolTipText,"\n") or 1e9)
             surface.SetFont("MetrostroiLabels")
             local w,h = surface.GetTextSize("SomeText")
             local height = h*1.1
             local texts = string.Explode("\n",toolTipText)
             surface.SetDrawColor(0,0,0,125)
             for i,v in ipairs(texts) do
-                local y = scrY/2+height*(i)
                 if #v==0 then continue end
                 local w2,h2 = surface.GetTextSize(v)
                 surface.DrawRect(scrX/2-w2/2-5, scrY/2-h2/2+height*(i), w2+10, h2)
-                --[[if toolTipPosition and i==#texts then
-                    local st,en = v:find(toolTipPosition)
-                    local textSt,textEn = v:sub(1,st-1),v:sub(en+1,-1)
-                    local x1 = 0-w2/2
-                    local x2 = surface.GetTextSize(textSt)-w2/2
-                    local x3 = surface.GetTextSize(textSt)+surface.GetTextSize(toolTipPosition)-w2/2
-                    draw.SimpleText(textSt,"MetrostroiLabels",scrX/2+x1,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(toolTipPosition,"MetrostroiLabels",scrX/2+x2,y, toolTipColor or Color(0,255,0),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(textEn,"MetrostroiLabels",scrX/2+x3,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    Metrostroi.DrawLine(scrX/2+x2,y+h/2-3,scrX/2+x3,y+h/2-3,toolTipColor or Color(0,255,0),1)
-                else]]
-                    draw.SimpleText(v,"MetrostroiLabels",scrX/2,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                --end
+                draw.SimpleText(v,"MetrostroiLabels",scrX/2,scrY/2+height*(i), toolTipColor or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
             end
             --[[
             local w1 = surface.GetTextSize(text1)
@@ -2574,22 +2395,12 @@ language.Add("SBoxLimit_train_limit","Wagons limit")
 -- Turn light on or off
 --------------------------------------------------------------------------------
 function ENT:SetLightPower(index,power,brightness)
-    if self.HiddenLamps[index] then return end
-    local lightData = self.LightsOverride[index] or self.Lights[index]
+    local lightData = self.Lights[index]
+    self.GlowingLights = self.GlowingLights or {}
+    self.LightBrightness = self.LightBrightness or {}
     brightness = brightness or 1
-    if lightData[1] == "glow" or lightData[1] == "light" then
-        if lightData.panel and not self.SpritesEnabled or lightData.aa and self.AAEnabled then return end
-        self.LightBrightness[index] = brightness * (lightData.brightness or 0.5)
-        if power and self.Sprites[index] then return end
-        self.Sprites[index] = nil
-        if not power then return end
-        self.Sprites[index] = util.GetPixelVisibleHandle()
-        lightData.mat = Metrostroi.MakeSpriteTexture((lightData.texture or "sprites/light_glow02"),lightData[1] == "light")
-        return
-    end
-
-    if power and IsValid(self.GlowingLights[index]) then
-        if lightData[1] == "headlight" and IsValid(self.GlowingLights[index]) then
+    if (lightData[1] == "headlight") then
+        if (power and (not lightData.backlight or C_Shadows3:GetBool()) and IsValid(self.GlowingLights[index])) then
             -- Check if light already glowing
             if brightness ~= self.LightBrightness[index] then
                 local light = self.GlowingLights[index]
@@ -2598,45 +2409,18 @@ function ENT:SetLightPower(index,power,brightness)
                 self.LightBrightness[index] = brightness
             end
             return
-        elseif (lightData[1] == "glow") or (lightData[1] == "light") then
-            local brightness = brightness * (lightData.brightness or 0.5)
-            if brightness ~= self.LightBrightness[index] then
-                local light = self.GlowingLights[index]
-                light:SetBrightness(brightness)
-                self.LightBrightness[index] = brightness
-            end
-            return
-        elseif lightData[1] == "dynamiclight" then
-            if brightness ~= self.LightBrightness[index] then
-                local light = self.GlowingLights[index]
-                light:SetLightStrength(brightness)
-                self.LightBrightness[index] = brightness
-            end
-            return
         end
-    end
-    if IsValid(self.GlowingLights[index]) then
-        self.GlowingLights[index]:Remove()
+
+        -- Turn off light
+        if IsValid(self.GlowingLights[index]) then
+            self.GlowingLights[index]:Remove()
+        end
     end
     self.GlowingLights[index] = nil
     self.LightBrightness[index] = brightness
-    if not power then return end
+
     -- Create light
-    if lightData[1] == "light" or lightData[1] == "glow" then
-        local light = ents.CreateClientside("gmod_train_sprite")
-        light:SetPos(self:LocalToWorld(lightData[2]))
-        --light:SetLocalAngles(lightData[3])
-
-        -- Set parameters
-        local brightness = brightness * (lightData.brightness or 0.5)
-        light:SetColor(lightData[4])
-        light:SetBrightness(brightness)
-        light:SetTexture((lightData.texture or "sprites/light_glow02")..".vmt",lightData[1] == "light")
-        light:SetSize(lightData.scale or 1.0)
-        light:Set3D(false)
-
-        self.GlowingLights[index] = light
-    elseif (lightData[1] == "headlight") and (not lightData.backlight or self.RedLights) and (not lightData.panellight or self.OtherLights) then
+    if (lightData[1] == "headlight") and (power and (not lightData.backlight or C_Shadows3:GetBool())) then
         local light = ProjectedTexture()
         light:SetPos(self:LocalToWorld(lightData[2]))
         light:SetAngles(self:LocalToWorldAngles(lightData[3]))
@@ -2677,24 +2461,6 @@ function ENT:SetLightPower(index,power,brightness)
         light:Update() --"effects/flashlight/caustics"
         --light:Input("SpotlightTexture",nil,nil,lightData.texture or "effects/flashlight001")
         self.GlowingLights[index] = light
-    elseif lightData[1] == "dynamiclight" then
-        local light = ents.CreateClientside("gmod_train_dlight")
-        light:SetParent(self)
-
-        -- Set position
-        light:SetLocalPos(lightData[2])
-        --light:SetLocalAngles(lightData[3])
-
-        -- Set parameters
-        light:SetDColor(lightData[4])
-        --light:SetKeyValue("style", 0)
-        light:SetSize(lightData.distance)
-        light:SetBrightness(lightData.brightness or 2)
-        light:SetLightStrength(brightness)
-
-        -- Turn light on
-        light:Spawn()
-        self.GlowingLights[index] = light
     end
 end
 
@@ -2718,4 +2484,3 @@ concommand.Add("metrostroi_reload_client",function()
     Metrostroi.ReloadClientside = true
     timer.Simple(0.5,function() if Metrostroi.ReloadClientside then Metrostroi.ReloadClientside = false end end)
 end,nil,"Reload all clientside models")
-Metrostroi.OptimisationPatch()

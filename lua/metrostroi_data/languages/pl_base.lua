@@ -31,16 +31,12 @@ Panel.DrawCams          = Renderuj obraz z kamer
 Panel.DisableHUD        = Wyłącz HUD na miejscu maszynisty
 Panel.DisableCamAccel   = Wyłącz ruch kamery (wrażenie przyspieszenia)
 Panel.DisableHoverText  = Wyłącz podpowiedzi przycisków
-Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW #FIXME
 Panel.ScreenshotMode    = Tryb fotografii (NISKI FPS!)
 Panel.ShadowsHeadlight  = Włącz dynamiczne cienie (lampy)
 Panel.RedLights         = Enable dynamic light\nof red lights
 Panel.ShadowsOther      = Włącz dynamiczne cienie (inne źródła)
 Panel.MinimizedShow     = Nie zwalniaj zasobów podczas minimalizacji
-Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
-Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = FOV (pole widzenia)
-Panel.Z                 = Camera height #NEW
 Panel.RenderDistance    = Odległość rysowania
 Panel.ReloadClient      = Przeładuj zasoby (klient)
 
@@ -55,8 +51,6 @@ Panel.SoftReloadLang    = Nie przeładowywuj spawnmenu
 
 
 #Common train
-
-#Cameras
 Train.Common.Camera0        = Miejsce maszynisty
 Train.Common.RouteNumber    = Numer brygady
 Train.Common.LastStation    = Stacja końcowa
@@ -66,56 +60,7 @@ Train.Common.PneumoPanels   = Pneumatic valves #FIXME
 Train.Common.Voltmeters     = Voltmeters and amperemeters #FIXME
 Train.Common.CouplerCamera  = Coupler #FIXME
 Common.ARM.Monitor1         = Monitor ARM 1
-
 Train.Buttons.Sealed        = Zaplombowane
-Train.Buttons.Active        = Active #NEW
-Train.Buttons.Auto          = Auto #NEW
-Train.Buttons.On            = On #NEW
-Train.Buttons.Off           = Off #NEW
-Train.Buttons.Closed        = Closed #NEW
-Train.Buttons.Opened        = Opened #NEW
-Train.Buttons.Disconnected  = Disconnected #NEW
-Train.Buttons.Connected     = Connected #NEW
-Train.Buttons.UAVAOff       = Control circuits is open #NEW (OFF)
-Train.Buttons.UAVAOn        = Control circuits is closed #NEW (ON)
-Train.Buttons.Freq1/5       = 1/5 autoblocking #NEW
-Train.Buttons.Freq2/6       = 2/6 ALS-ARS #NEW
-Train.Buttons.Left          = Left #NEW
-Train.Buttons.Right         = Right #NEW
-Train.Buttons.Low           = Low #NEW
-Train.Buttons.High          = High #NEW #FIXME
-Train.Buttons.LFar          = Bright #NEW #FIXME (headlights)
-Train.Buttons.LNear         = Dim #NEW #FIXME (headlights)
-Train.Buttons.0             = 0 #NEW
-Train.Buttons.1             = 1 #NEW
-Train.Buttons.2             = 2 #NEW
-Train.Buttons.3             = 3 #NEW
-Train.Buttons.4             = 4 #NEW
-Train.Buttons.Forward       = Forward #NEW
-Train.Buttons.Back          = Backward #NEW
-Train.Buttons.VentHalf      = 1/2 of speed #NEW (of ventilation)
-Train.Buttons.VentFull      = Full speed #NEW (of ventilation)
-Train.Buttons.VTRF          = Forward oriented wagons #NEW
-Train.Buttons.VTRB          = Back oriented wagons #NEW
-Train.Buttons.VTR1          = Even wagons #NEW
-Train.Buttons.VTR2          = Odd wagons #NEW
-Train.Buttons.VTRH1         = First half of train #NEW
-Train.Buttons.VTRH2         = Second half of train #NEW
-Train.Buttons.VTRAll        = All wagons #NEW
-
-Train.Buttons.BatteryVoltage = %d V #NEW
-Train.Buttons.HighVoltage    = %d V #NEW
-Train.Buttons.BatteryCurrent = %d A #NEW
-Train.Buttons.EnginesCurrent = %d A #NEW
-Train.Buttons.Speed          = %d km/h #NEW
-Train.Buttons.SpeedAll       = %d km/h\nSpeed limit: %s km/h #NEW #FIXME
-Train.Buttons.SpeedLimit     = %s km/h #NEW
-Train.Buttons.SpeedLimitNext = %s km/h #NEW
-Train.Buttons.04             = NF #NEW (no frequency)
-Train.Buttons.BCPressure     = %.1f bar
-Train.Buttons.BLTLPressure   = TL: %.1f\nBL: %.1f bar #NEW (TL: Train line, BL: Brake line acronyms)
-Train.Buttons.Locked         = Locked #NEW
-Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Baza pociągu metra

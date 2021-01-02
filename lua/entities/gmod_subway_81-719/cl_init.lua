@@ -42,7 +42,6 @@ ENT.ClientPropsInitialized = false
 ENT.ClientProps = {}
 ENT.ButtonMap = {}
 ENT.AutoAnims = {}
-ENT.AutoAnimNames = {}
 ENT.ClientSounds = {}
 
 ENT.ClientProps["schemes"] = {
@@ -105,7 +104,6 @@ local function placeLamps(name)
                 var=button.var,
                 color=button.col=="y" and Color(255,168,0) or button.col=="r" and Color(255,56,30) or button.col=="g" and Color(175,250,20) or Color(255,255,255)}
         }
-        button.var=nil
     end
 end
 ENT.ButtonMap["BUV_MPS"] = {
@@ -312,10 +310,13 @@ ENT.ButtonMap["FrontPneumatic"] = {
     width = 900,
     height = 100,
     scale = 0.1,
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
 
     buttons = {
-        {ID = "FrontBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="FbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "FrontTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="FtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
+        {ID = "FrontBrakeLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "FrontTrainLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["FrontBrake"] = {--
@@ -340,11 +341,13 @@ ENT.ButtonMap["RearPneumatic"] = {
     width = 1050,
     height = 100,
     scale = 0.1,
-
+    hideseat=0.2,
+    hide=true,
+    screenHide = true,
     buttons = {
-        {ID = "RearTrainLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip="",var="RtI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "RearBrakeLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip="",var="RbI",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},
-        {ID = "ParkingBrakeToggle",x=900, y=0, w=150, h=100, tooltip="",var="ParkingBrake"},
+        {ID = "RearTrainLineIsolationToggle",x=000, y=0, w=400, h=100, tooltip=""},
+        {ID = "RearBrakeLineIsolationToggle",x=500, y=0, w=400, h=100, tooltip=""},
+        {ID = "ParkingBrakeToggle",x=900, y=0, w=150, h=100, tooltip=""},
     }
 }
 ENT.ClientProps["RearTrain"] = {--
@@ -378,7 +381,6 @@ ENT.ButtonMap["GV"] = {
             var="GV",sndid = "gv",
             sndvol = 0.8,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
             snd = function(val) return val and "gv_f" or "gv_b" end,
-            states={"Train.Buttons.Disconnected","Train.Buttons.On"}
         }},
     }
 }
@@ -406,7 +408,7 @@ ENT.ButtonMap["AirDistributor"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "AirDistributorDisconnectToggle",x=0,y=0,w= 170,h = 80,tooltip="",var="AD",states={"Train.Buttons.On","Train.Buttons.Off"}},
+        {ID = "AirDistributorDisconnectToggle",x=0,y=0,w= 170,h = 80,tooltip=""},
     }
 }
 
@@ -425,32 +427,6 @@ ENT.ButtonMap["Battery"] = {
             var="VB",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
-    }
-}
-ENT.ButtonMap["Voltages"] = {
-    pos = Vector(-464.3,-15.2,60.7),
-    ang = Angle(0,90,90),
-    width = 145,
-    height = 75,
-    scale = 0.0625,
-    hideseat=0.2,
-
-    buttons = {
-        {ID = "!BatteryVoltage", x=0, y=0, w=72.5,h=75, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*150) end},
-        {ID = "!BatteryCurrent", x=72.5, y=0, w=72.5,h=75, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryCurrent"),ent:GetPackedRatio("BatteryCurrent")*500) end},
-    }
-}
-ENT.ButtonMap["Pressures"] = {
-    pos = Vector(-464.3,6.3,61),
-    ang = Angle(0,90,90),
-    width = 160,
-    height = 80,
-    scale = 0.0625,
-    hideseat=0.2,
-
-    buttons = {
-        {ID = "!BCPressure", x=0, y=0, w=80,h=80, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BCPressure"),ent:GetPackedRatio("BCPressure")*6) end},
-        {ID = "!BLTLPressure", x=80, y=0, w=80,h=80, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BLTLPressure"),ent:GetPackedRatio("TLPressure")*16,ent:GetPackedRatio("BLPressure")*16) end},
     }
 }
 ENT.ButtonMap["couch_cap"] = {
@@ -534,7 +510,6 @@ ENT.ButtonMap["FrontDoor"] = {
             var="door1",sndid="door1",
             sndvol = 1, snd = function(val) return val and "cab_door_open" or "cab_door_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -556,7 +531,6 @@ ENT.ButtonMap["RearDoor"] = {
             var="door2",sndid="door2",
             sndvol = 1, snd = function(val) return val and "cab_door_open" or "cab_door_close" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-            noTooltip = true,
         }},
     }
 }
@@ -839,17 +813,6 @@ for i=0,3 do
 end
 
 ENT.Lights = {
-    [11] = { "dynamiclight",    Vector( 200, 0, -20), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128, changable = true  },
-    [12] = { "dynamiclight",    Vector(   0, 0, -20), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400, fov=180,farz = 128, changable = true  },
-    [13] = { "dynamiclight",    Vector(-200, 0, -20), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128, changable = true  },
-
-    -- Side lights
-    [15] = { "light",Vector(-52,67,45.5)+Vector(0,0.9,3.25), Angle(0,0,0), Color(254,254,254), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02", size = 1.5 },
-    [16] = { "light",Vector(-52,67,45.5)+Vector(0,0.9,-0.02), Angle(0,0,0), Color(40,240,122), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02", size = 1.5 },
-    [17] = { "light",Vector(-52,67,45.5)+Vector(0,0.9,-3.3), Angle(0,0,0), Color(254,210,18), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02", size = 1.5 },
-    [18] = { "light",Vector(39,-67,45.5)+Vector(0,-0.9,3.25), Angle(0,0,0), Color(254,254,254), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02", size = 1.5 },
-    [19] = { "light",Vector(39,-67,45.5)+Vector(0,-0.9,-0.02), Angle(0,0,0), Color(40,240,122), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02", size = 1.5 },
-    [20] = { "light",Vector(39,-67,45.5)+Vector(0,-0.9,-3.3), Angle(0,0,0), Color(254,210,18), brightness = 0.1, scale = 0.2, texture = "sprites/light_glow02", size = 1.5 },
 }
 
 local tbl = {[0]=-0.25,0.00,0.04,0.09,0.13,0.17,0.20,0.27,0.33,0.42,0.56,0.73,1.00}
@@ -932,36 +895,16 @@ function ENT:Think()
     self:ShowHideSmooth("bortlamp2_w",Bortlamp_w)
     self:ShowHideSmooth("bortlamp2_g",Bortlamp_g)
     self:ShowHideSmooth("bortlamp2_y",Bortlamp_y)
-    self:SetLightPower(15, Bortlamp_w > 0.5)
-    self:SetLightPower(18, Bortlamp_w > 0.5)
-    self:SetLightPower(16, Bortlamp_g > 0.5)
-    self:SetLightPower(19, Bortlamp_g > 0.5)
-    self:SetLightPower(17, Bortlamp_y > 0.5)
-    self:SetLightPower(20, Bortlamp_y > 0.5)
-
-    local activeLights = 0
     for i = 1,30 do
         local colV = self:GetNW2Vector("lamp"..i)
         local col = Color(colV.x,colV.y,colV.z)
-        local state = self:Animate("Lamp1_"..i,self:GetPackedBool("lightsActive"..i) and 1 or 0,0,1,6,false)
-        self:ShowHideSmooth("lamp1_"..i,state,col)
-        activeLights = activeLights + state
-    end
-    for i=11,13 do
-        local col = self:GetNW2Vector("lampD"..i)
-        if self.LightsOverride[i].vec ~= col then
-            self.LightsOverride[i].vec = col
-            self.LightsOverride[i][4] = Color(col.x,col.y,col.z)
-            self:SetLightPower(i, false)
-        else
-            self:SetLightPower(i, activeLights > 0,activeLights/30)
-        end
+        self:ShowHideSmooth("lamp1_"..i,self:Animate("Lamp1_"..i,self:GetPackedBool("lightsActive"..i) and 1 or 0,0,1,6,false),col)
     end
     self:Animate("brake_line",      self:GetPackedRatio("BLPressure"),0.14, 0.875,  256,2)--,,0.01)
     self:Animate("train_line",      self:GetPackedRatio("TLPressure"),0.14, 0.875,  256,2)--,,0.01)
     self:Animate("brake_cylinder",  self:GetPackedRatio("BCPressure"),0.14, 0.875,  256,2)--,,0.03)
     self:Animate("voltmeter",       self:GetPackedRatio("BatteryVoltage"),0.601, 0.400)
-    self:Animate("ampermeter",      0.5+self:GetPackedRatio("BatteryCurrent"),0.604, 0.398)
+    self:Animate("ampermeter",      (0+500)/1000,0.604, 0.398)
 
     local capOpened = self:GetPackedBool("CouchCap")
     self:ShowHide("seats_old_cap_o",capOpened)
@@ -982,7 +925,7 @@ function ENT:Think()
 
     --self:Animate("Autodrive",     self:GetPackedBool(132) and 1 or 0, 0,1, 16, false)
     local door1 = self:Animate("door1",self:GetPackedBool("FrontDoor") and 1 or 0,0,0.25,4,0.5)
-    local door2 = self:Animate("door2",self:GetPackedBool("RearDoor") and (capOpened and 0.25 or 1) or 0,0,0.25,4,0.5)
+    local door2 = self:Animate("door2",self:GetPackedBool("RearDoor") and 1 or 0,0,0.25,4,0.5)
     if self.Door1 ~= (door1 > 0) then
         self.Door1 = door1 > 0
         self:PlayOnce("door1","bass",self.Door1 and 1 or 0)
@@ -1147,25 +1090,22 @@ function ENT:Think()
     self:SetSoundState("bpsn",self:GetPackedBool("BBE") and 1 or 0,1.0) --FIXME громкость по другому
 
     local work = self:GetPackedBool("AnnPlay")
-    local buzz = self:GetPackedBool("AnnBuzz") and self:GetNW2Int("AnnouncerBuzz",-1) > 0
+    local buzz = self:GetPackedBool("AnnBuzz") and self:GetNW2Bool("AnnouncerBuzz")
     for k in ipairs(self.AnnouncerPositions) do
         self:SetSoundState("announcer_buzz"..k,(buzz and work) and 1 or 0,1)
     end
     for k,v in ipairs(self.AnnouncerPositions) do
-        if IsValid(self.Sounds["announcer"..k]) then
+        if self.Sounds["announcer"..k] and IsValid(self.Sounds["announcer"..k]) then
             self.Sounds["announcer"..k]:SetVolume(work  and (v[3] or 1)  or 0)
         end
     end
 end
 
-function ENT:OnAnnouncer(volume)
-    return self:GetPackedBool("AnnPlay") and volume  or 0
-end
 
 function ENT:Draw()
     self.BaseClass.Draw(self)
 end
-function ENT:DrawPost()
+function ENT:DrawPost(special)
 end
 
 function ENT:OnButtonPressed(button)

@@ -85,8 +85,6 @@ function TRAIN_SYSTEM:Initialize()
         self.RightDoorDir = { 0,0,0,0 }
         self.LeftDoorSpeed = {0,0,0,0}
         self.RightDoorSpeed = {0,0,0,0}
-        self.LeftDoorStuck = {false, false, false, false}
-        self.RightDoorStuck = {false, false, false, false}
         self.DoorSpeedMain = math.Rand(1.9,2.1)
         for i=1,#self.LeftDoorSpeed do
             self.LeftDoorSpeed[i] = math.Rand(self.DoorSpeedMain-0.3,self.DoorSpeedMain+0.3)
@@ -325,7 +323,7 @@ function TRAIN_SYSTEM:Think(dT)
             self.Leak = true
         end
         self.EPKLeaking = self.Leak
-        self.Train:SetPackedRatio("EmergencyValveEPK_dPdT", -leak*2)
+        self.Train:SetPackedRatio("EmergencyValveEPK_dPdT", -leak)
     end
     local leak = 0
     if self.Train.EmergencyBrakeValve and self.Train.EmergencyBrakeValve.Value > 0.5 then
@@ -385,7 +383,7 @@ function TRAIN_SYSTEM:Think(dT)
     if self.EmergencyBrakeActive then
         PMPressure = self.AirDistributorPressure
         if self.BrakeCylinderPressure < self.AirDistributorPressure and self.AirDistributorPressure-self.BrakeCylinderPressure > 0.1 then
-            self:equalizePressure(dT,"AirDistributorPressure",0, math.min(self.TrainLinePressure,self.AirDistributorPressure-self.BrakeCylinderPressure)*1, (self.AirDistributorPressure-self.BrakeCylinderPressure)*1, nil, 2)
+            self:equalizePressure(dT,"AirDistributorPressure",0, (self.AirDistributorPressure-self.BrakeCylinderPressure)*1, (self.AirDistributorPressure-self.BrakeCylinderPressure)*1, nil, 2)
         end
     end
     if Power then
@@ -393,13 +391,13 @@ function TRAIN_SYSTEM:Think(dT)
             if Train:ReadTrainWire(29) > 0 then
                 EPMPressure = 1.7+self.WeightLoadRatio*0.7 --2 уставка
             elseif Train:ReadTrainWire(30) > 0 then
-                EPMPressure = 0.75+self.WeightLoadRatio*0.5 --1 уставка
+                EPMPressure = 0.9+self.WeightLoadRatio*0.5 --1 уставка
             end
         else
             if Train.BUKV.PN2 then
                 EPMPressure = 1.7+self.WeightLoadRatio*0.7 --2 уставка
             elseif Train.BUKV.PN1 then
-                EPMPressure = 0.75+self.WeightLoadRatio*0.5 --1 уставка
+                EPMPressure = 0.9+self.WeightLoadRatio*0.5 --1 уставка
             end
         end
     end
@@ -422,7 +420,7 @@ function TRAIN_SYSTEM:Think(dT)
         local pneumaticValveConsumption_dPdT = 0
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,pneumaticValveConsumption_dPdT)
         if self.BrakeCylinderValve == 1 then
-            self:equalizePressure(dT,"BrakeCylinderPressure", math.min(3.3,self.TrainLinePressure,targetPressure), 2.50, 2.50, nil, self.BrakeCylinderPressure > targetPressure and 0.3+math.Clamp((self.BrakeCylinderPressure-0.4)/3.3,0,0.6) or 0.9)
+            self:equalizePressure(dT,"BrakeCylinderPressure", math.min(3.3,targetPressure), 2.50, 2.50, nil, self.BrakeCylinderPressure > targetPressure and 0.3+math.Clamp((self.BrakeCylinderPressure-0.4)/3.3,0,0.6) or 0.9)
             --if self.DriversValve == 1 then
                 --self:equalizePressure(dT,"BrakeCylinderPressure", targetPressure, 2.00, 3.50, nil, 1.0) --0.75, 1.25)
             --else
@@ -530,27 +528,14 @@ function TRAIN_SYSTEM:Think(dT)
         self.DoorRight = false
     elseif commandLeft then self.DoorLeft = true
     elseif commandRight then self.DoorRight = true end
-    if Train.CanStuckPassengerLeft then
-        for i in ipairs(self.LeftDoorStuck) do
-            self.LeftDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerLeft*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
-        end
-        Train.CanStuckPassengerLeft = false
-    end
-    if Train.CanStuckPassengerRight then
-        for i in ipairs(self.RightDoorStuck) do
-            self.RightDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerRight*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
-        end
-        Train.CanStuckPassengerRight = false
-    end
-
     Train.LeftDoorsOpen = false
     Train.RightDoorsOpen = false
     for i=1,4 do
         self.LeftDoorDir[i] = math.Clamp(self.LeftDoorDir[i]+dT*(self.DoorLeft and self.LeftDoorSpeed[i] or -self.LeftDoorSpeed[i]),-1,1)
         self.RightDoorDir[i] = math.Clamp(self.RightDoorDir[i]+dT*(self.DoorRight and self.RightDoorSpeed[i] or -self.RightDoorSpeed[i]),-1,1)
-        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + (1/self.LeftDoorSpeed[i]*dT*self.LeftDoorDir[i]),self.LeftDoorStuck[i] and 0.3 or 0,1)
+        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + (1/self.LeftDoorSpeed[i]*dT*self.LeftDoorDir[i]),0,1)
         if self.LeftDoorState[i] == 0 or self.LeftDoorState[i] == 1 then self.LeftDoorDir[i] = 0 end
-        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + (1/self.RightDoorSpeed[i]*dT*self.RightDoorDir[i]),self.RightDoorStuck[i] and 0.3 or 0,1)
+        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + (1/self.RightDoorSpeed[i]*dT*self.RightDoorDir[i]),0,1)
         if self.RightDoorState[i] == 0 or self.RightDoorState[i] == 1 then self.RightDoorDir[i] = 0 end
         ---[[
         if self.LeftDoorState[i] > 0 then

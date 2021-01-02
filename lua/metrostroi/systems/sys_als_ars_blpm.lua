@@ -49,7 +49,7 @@ local S = {}
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
     local ALS = Train.ALSCoil
-    --[[if Train.KPK2 and Train.KPK2.Value > 0 then
+    if Train.KPK2 and Train.KPK2.Value > 0 then
         S["TW94"] = Train:ReadTrainWire(self.PKWire or 94)
         S["F6"] = bit.band(S["TW94"],32)/32
         S["F5"] = bit.band(S["TW94"],16)/16
@@ -64,21 +64,6 @@ function TRAIN_SYSTEM:Think(dT)
         S["F3"] = ALS.F3
         S["F2"] = ALS.F2
         S["F1"] = ALS.F1
-    end]]
-    S["F6"] = ALS.F6
-    S["F5"] = ALS.F5
-    S["F4"] = ALS.F4
-    S["F3"] = ALS.F3
-    S["F2"] = ALS.F2
-    S["F1"] = ALS.F1
-    if Train.KPK2 and Train.KPK2.Value > 0 then
-        S["TW94"] = Train:ReadTrainWire(self.PKWire or 94)
-        S["F6"] = math.max(S["F6"],bit.band(S["TW94"],32)/32)
-        S["F5"] = math.max(S["F5"],bit.band(S["TW94"],16)/16)
-        S["F4"] = math.max(S["F4"],bit.band(S["TW94"],8)/8)
-        S["F3"] = math.max(S["F3"],bit.band(S["TW94"],4)/4)
-        S["F2"] = math.max(S["F2"],bit.band(S["TW94"],2)/2)
-        S["F1"] = math.max(S["F1"],bit.band(S["TW94"],1)/1)
     end
     local freqCount = self.Power*(S["F6"]+S["F5"]+S["F4"]+S["F3"]+S["F2"]+S["F1"])
     self.NoneFreq =freqCount==0 and 1 or 0

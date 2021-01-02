@@ -177,11 +177,11 @@ function ENT:Think()
     self.AsyncInverter:TriggerInput("Speed",self.Speed)
     if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
         local A = self.AsyncInverter.Torque
-        self.FrontBogey.MotorForce = 43000+9000*(A < 0 and 1 or 0)--35300
+        self.FrontBogey.MotorForce = 39000+5000*(A < 0 and 1 or 0)--35300
         self.FrontBogey.Reversed = self.Electric.Reverser < 0
         self.FrontBogey.DisableSound = 1
         self.FrontBogey.DisableContacts = self.Electric.DisablePant > 0
-        self.RearBogey.MotorForce  = 43000+9000*(A < 0 and 1 or 0)--35300
+        self.RearBogey.MotorForce  = 39000+5000*(A < 0 and 1 or 0)--35300
         self.RearBogey.Reversed = self.Electric.Reverser > 0
         self.RearBogey.DisableSound = 1
         self.RearBogey.DisableContacts = self.Electric.DisablePant > 0
@@ -197,12 +197,11 @@ function ENT:Think()
         -- Apply brakes
         self.FrontBogey.PneumaticBrakeForce = 50000.0--3000 --40000
         self.FrontBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
-        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
+        self.FrontBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)
         self.FrontBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
         self.RearBogey.PneumaticBrakeForce = 50000.0--3000 --40000
         self.RearBogey.BrakeCylinderPressure = self.Pneumatic.BrakeCylinderPressure
         self.RearBogey.BrakeCylinderPressure_dPdT = -self.Pneumatic.BrakeCylinderPressure_dPdT
-        self.RearBogey.ParkingBrakePressure = math.max(0,(3-self.Pneumatic.ParkingBrakePressure)/3)/2
     end
     return retVal
 end

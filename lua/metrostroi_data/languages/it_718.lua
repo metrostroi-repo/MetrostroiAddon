@@ -5,19 +5,19 @@ return [[
 
 #######Buttons###########
 #Cameras
-Train.718.BUP = BUP
-Train.718.PPZ = PPZ
-Train.718.VPU = VPU
+Train.718.BUP = BUP #FIXME
+Train.718.PPZ = PPZ #FIXME
+Train.718.VPU = VPU #FIXME
 
 #Common
 Common.718.SB4   = Verifica integrità dei circuiti
 Common.718.SB5   = Trasferimento dei controlli (Emettitore sonoro)
 Common.718.SB7K  = copertura modalità di guida
 Common.718.SB7   = Modalità di guida
-Common.718.SB12  = Abilita unità interruttori automatici
-Common.718.SB13  = Disabilita unità interruttori automatici
-Common.718.SB15  = Abilita l'alimentazione del treno
-Common.718.SB16  = Disabilita l'alimentazione del treno
+Common.718.SB12  = Enable automatic switches unit
+Common.718.SB13  = Disable automatic switches unit
+Common.718.SB15  = Enable train power supply
+Common.718.SB16  = Disable train power supply
 
 Common.718.VTPR    = Interuttore modalità di rilascio corrente dai collettori
 Common.718.RX1      = Guida d'emergenza 1

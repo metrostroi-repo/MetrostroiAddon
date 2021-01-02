@@ -169,7 +169,6 @@ net.Receive("metrostroi-signal", function()
     if not IsValid(ent) then return end
     ent.LightType = net.ReadInt(3)
     ent.Name = net.ReadString()
-    --ent.Name = " BUDAPEiT"..string.gsub(ent.Name,"[A-Za-z]*","")
     ent.Lenses = net.ReadString()
     ent.ARSOnly = ent.Lenses == "ARSOnly"
     ent.RouteNumberSetup = net.ReadString()
@@ -546,132 +545,130 @@ local ars = {
     {"75  Hz", "80 KM/H"},
 }
 local function enableDebug()
-    if debug:GetBool() then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiSignalDebug",function(bDrawingDepth,bDrawingSkybox)
-            for _,ent in pairs(ents.FindByClass("gmod_track_signal")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 384 then
-                    local pos = sig:LocalToWorld(Vector(48,0,150))
-                    local ang = sig:LocalToWorldAngles(Angle(0,180,90))
-                    cam.Start3D2D(pos, ang, 0.25)
+    for k,sig in pairs(ents.FindByClass("gmod_track_signal")) do
+        if debug:GetBool() then
+            hook.Add("PostDrawTranslucentRenderables",sig,function(bDrawingDepth,bDrawingSkybox)
+                if bDrawingDepth and IsValid(sig) and LocalPlayer():GetPos():Distance(sig:GetPos()) < 384 then
+                        local pos = sig:LocalToWorld(Vector(48,0,150))
+                        local ang = sig:LocalToWorldAngles(Angle(0,180,90))
+                        cam.Start3D2D(pos, ang, 0.25)
 
-                        if sig:GetNW2Bool("Debug",false) then
-                            surface.SetDrawColor(sig.ARSOnly and 255 or 125, 125, 0, 255)
-                            surface.DrawRect(0, -60, 364, 210)
-                            if not sig.ARSOnly then
-                                surface.DrawRect(0, 155, 240, 170)
-                                surface.DrawRect(0, 330, 240, 190)
-                                surface.SetDrawColor(0,0,0, 255)
-                                surface.DrawRect(245, 155, 119, 365)
-                            else
-                                surface.DrawRect(0, 155, 364, 150)
-                                surface.DrawRect(0, 310, 364, 190)
-                            end
-
-                            if sig.Name then
-                                draw.DrawText(Format("Joint main info (%d)",sig:EntIndex()),"Trebuchet24",5,-60,Color(200,0,0,255))
-                                draw.DrawText("Signal name: "..sig.Name,"Trebuchet24",          15, -40,Color(0,0,0,255))
-                                draw.DrawText("TrackID: "..sig:GetNW2Int("PosID",0),"Trebuchet24",  25, -20,Color(0,0,0,255))
-                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("Pos",0)),"Trebuchet24", 135, -20,Color(0,0,0,255))
-                                draw.DrawText(Format("NextSignalName: %s",sig:GetNW2String("NextSignalName","N/A")),"Trebuchet24",  15, 0,Color(0,0,0,255))
-                                draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("NextPosID",0)),"Trebuchet24", 25, 20,Color(0,0,0,255))
-                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("NextPos",0)),"Trebuchet24", 135, 20,Color(0,0,0,255))
-                                draw.DrawText(Format("Dist: %.02f",sig:GetNW2Float("DistanceToNext",0)),"Trebuchet24",  15, 40,Color(0,0,0,255))
-                                draw.DrawText(Format("PrevSignalName: %s",sig:GetNW2String("PrevSignalName","N/A")),"Trebuchet24",  15, 60,Color(0,0,0,255))
-                                draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("PrevPosID",0)),"Trebuchet24", 25, 80,Color(0,0,0,255))
-                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("PrevPos",0)),"Trebuchet24", 135, 80,Color(0,0,0,255))
-                                draw.DrawText(Format("DistPrev: %.02f",sig:GetNW2Float("DistanceToPrev",0)),"Trebuchet24",  15, 100,Color(0,0,0,255))
-                                draw.DrawText(Format("Current route: %d",sig:GetNW2Int("CurrentRoute",-1)),"Trebuchet24",   15, 120,Color(0,0,0,255))
-
-                                draw.DrawText("AB info","Trebuchet24",5,160,Color(200,0,0,255))
-                                draw.DrawText(Format("Occupied: %s",sig:GetNW2Bool("Occupied",false) and "Y" or "N"),"Trebuchet24",5,180,Color(0,0,0,255))
-                                draw.DrawText(Format("Linked to controller: %s",sig:GetNW2Bool("LinkedToController",false) and "Y" or "N"),"Trebuchet24",5,200,Color(0,0,0,255))
-                                draw.DrawText(Format("Num: %d",sig:GetNW2Int("ControllersNumber",0)),"Trebuchet24",10,220,Color(0,0,0,255))
-                                draw.DrawText(Format("Controller logic: %s",sig:GetNW2Bool("BlockedByController",false) and "Y" or "N"),"Trebuchet24",5,240,Color(0,0,0,255))
-                                draw.DrawText(Format("Autostop: %s",not sig.ARSOnly and sig.AutostopPresent and (sig:GetNW2Bool("Autostop") and "Up" or "Down") or "No present"),"Trebuchet24",5,260,Color(0,0,0,255))
-                                draw.DrawText(Format("2/6: %s",sig:GetNW2Bool("2/6",false) and "Y" or "N"),"Trebuchet24",5,280,Color(0,0,0,255))
-                                draw.DrawText(Format("FreeBS: %d",sig:GetNW2Int("FreeBS")),"Trebuchet24",5,300,Color(0,0,0,255))
-
-                                draw.DrawText("ARS info","Trebuchet24",5,335,Color(200,0,0,255))
-                                local num = 0
-                                for i,tbl in pairs(ars) do
-                                    if not tbl then continue end
-                                    if sig:GetNW2Bool("CurrentARS"..(i-1),false) then
-                                        draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color(0,100,0,255))
-                                        draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color(0,100,0,255))
-                                    else
-                                        draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color(0,0,0,255))
-                                        draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color(0,0,0,255))
-                                    end
-                                    num = num+1
-                                end
-                                if sig:GetNW2Bool("CurrentARS325",false) or sig:GetNW2Bool("CurrentARS325_2",false) then
-                                    draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color(0,100,0,255))
-                                    draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color(0,100,0,255))
-                                else
-                                    draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color(0,0,0,255))
-                                    draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color(0,0,0,255))
-                                end
-
+                            if sig:GetNW2Bool("Debug",false) then
+                                surface.SetDrawColor(sig.ARSOnly and 255 or 125, 125, 0, 255)
+                                surface.DrawRect(0, -60, 364, 210)
                                 if not sig.ARSOnly then
-                                    draw.DrawText("Signal info","Trebuchet24",250,160,Color(200,0,0,255))
-                                    local ID = 0
-                                    local ID2 = 0
-                                    local first = true
-                                    for _,v in ipairs(sig.LensesTBL) do
-                                        local data
-                                        if not sig.TrafficLightModels[sig.LightType][v] then
-                                            data = sig.TrafficLightModels[sig.LightType][#v-1]
+                                    surface.DrawRect(0, 155, 240, 170)
+                                    surface.DrawRect(0, 330, 240, 190)
+                                    surface.SetDrawColor(0,0,0, 255)
+                                    surface.DrawRect(245, 155, 119, 365)
+                                else
+                                    surface.DrawRect(0, 155, 364, 150)
+                                    surface.DrawRect(0, 310, 364, 190)
+                                end
+
+                                if sig.Name then
+                                    draw.DrawText(Format("Joint main info (%d)",sig:EntIndex()),"Trebuchet24",5,-60,Color(200,0,0,255))
+                                    draw.DrawText("Signal name: "..sig.Name,"Trebuchet24",          15, -40,Color(0,0,0,255))
+                                    draw.DrawText("TrackID: "..sig:GetNW2Int("PosID",0),"Trebuchet24",  25, -20,Color(0,0,0,255))
+                                        draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("Pos",0)),"Trebuchet24", 135, -20,Color(0,0,0,255))
+                                    draw.DrawText(Format("NextSignalName: %s",sig:GetNW2String("NextSignalName","N/A")),"Trebuchet24",  15, 0,Color(0,0,0,255))
+                                    draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("NextPosID",0)),"Trebuchet24", 25, 20,Color(0,0,0,255))
+                                        draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("NextPos",0)),"Trebuchet24", 135, 20,Color(0,0,0,255))
+                                    draw.DrawText(Format("Dist: %.02f",sig:GetNW2Float("DistanceToNext",0)),"Trebuchet24",  15, 40,Color(0,0,0,255))
+                                    draw.DrawText(Format("PrevSignalName: %s",sig:GetNW2String("PrevSignalName","N/A")),"Trebuchet24",  15, 60,Color(0,0,0,255))
+                                    draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("PrevPosID",0)),"Trebuchet24", 25, 80,Color(0,0,0,255))
+                                        draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("PrevPos",0)),"Trebuchet24", 135, 80,Color(0,0,0,255))
+                                    draw.DrawText(Format("DistPrev: %.02f",sig:GetNW2Float("DistanceToPrev",0)),"Trebuchet24",  15, 100,Color(0,0,0,255))
+                                    draw.DrawText(Format("Current route: %d",sig:GetNW2Int("CurrentRoute",-1)),"Trebuchet24",   15, 120,Color(0,0,0,255))
+
+                                    draw.DrawText("AB info","Trebuchet24",5,160,Color(200,0,0,255))
+                                    draw.DrawText(Format("Occupied: %s",sig:GetNW2Bool("Occupied",false) and "Y" or "N"),"Trebuchet24",5,180,Color(0,0,0,255))
+                                    draw.DrawText(Format("Linked to controller: %s",sig:GetNW2Bool("LinkedToController",false) and "Y" or "N"),"Trebuchet24",5,200,Color(0,0,0,255))
+                                    draw.DrawText(Format("Num: %d",sig:GetNW2Int("ControllersNumber",0)),"Trebuchet24",10,220,Color(0,0,0,255))
+                                    draw.DrawText(Format("Controller logic: %s",sig:GetNW2Bool("BlockedByController",false) and "Y" or "N"),"Trebuchet24",5,240,Color(0,0,0,255))
+                                    draw.DrawText(Format("Autostop: %s",not sig.ARSOnly and sig.AutostopPresent and (sig:GetNW2Bool("Autostop") and "Up" or "Down") or "No present"),"Trebuchet24",5,260,Color(0,0,0,255))
+                                    draw.DrawText(Format("2/6: %s",sig:GetNW2Bool("2/6",false) and "Y" or "N"),"Trebuchet24",5,280,Color(0,0,0,255))
+                                    draw.DrawText(Format("FreeBS: %d",sig:GetNW2Int("FreeBS")),"Trebuchet24",5,300,Color(0,0,0,255))
+
+                                    draw.DrawText("ARS info","Trebuchet24",5,335,Color(200,0,0,255))
+                                    local num = 0
+                                    for i,tbl in pairs(ars) do
+                                        if not tbl then continue end
+                                        if sig:GetNW2Bool("CurrentARS"..(i-1),false) then
+                                            draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color(0,100,0,255))
+                                            draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color(0,100,0,255))
                                         else
-                                            data = sig.TrafficLightModels[sig.LightType][v]
+                                            draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color(0,0,0,255))
+                                            draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color(0,0,0,255))
                                         end
-                                        if not data then continue end
-
-                                        --sig.NamesOffset = sig.NamesOffset + Vector(0,0,data[1])
-                                        local cols = {
-                                            R = Color(200,0,0),
-                                            Y = Color(200,200,0),
-                                            G = Color(0,200,0),
-                                            W = Color(200,200,200),
-                                            B = Color(0,0,200),
-                                        }
-                                        if v ~= "M" then
-                                            for i = 1,#v do
-                                                ID2 = ID2 + 1
-                                                local State = tonumber(sig.Sig[ID2]) == 1 and "X" or (tonumber(sig.Sig[ID2]) == 2 and (RealTime() % 1.2 > 0.4)) and "B" or false
-                                                draw.DrawText(Format(v[i],sig:EntIndex()),"Trebuchet24",250,160 + ID*20 + ID2*20,cols[v[i]])
-                                                if State then
-                                                    draw.DrawText(State,"Trebuchet24",280,160 + ID*20 + ID2*20,cols[v[i]])
-                                                end
-                                            end
-                                        else
-                                            ID2 = ID2 + 1
-                                            draw.DrawText("M","Trebuchet24",250,160 + ID*20 + ID2*20,Color(200,200,200))
-                                            draw.DrawText(sig.Num or "none","Trebuchet24",280,160 + ID*20 + ID2*20,Color(200,200,200))
-
-                                            --if Metrostroi.RoutePointer[sig.Num[1]] then sig.Models[1][sig.RouteNumber]:SetSkin(Metrostroi.RoutePointer[sig.Num[1]]) end
-                                        end
-
-                                        ID = ID + 1
+                                        num = num+1
                                     end
+                                    if sig:GetNW2Bool("CurrentARS325",false) or sig:GetNW2Bool("CurrentARS325_2",false) then
+                                        draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color(0,100,0,255))
+                                        draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color(0,100,0,255))
+                                    else
+                                        draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color(0,0,0,255))
+                                        draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color(0,0,0,255))
+                                    end
+
+                                    if not sig.ARSOnly then
+                                        draw.DrawText("Signal info","Trebuchet24",250,160,Color(200,0,0,255))
+                                        local ID = 0
+                                        local ID2 = 0
+                                        local first = true
+                                        for _,v in ipairs(sig.LensesTBL) do
+                                            local data
+                                            if not sig.TrafficLightModels[sig.LightType][v] then
+                                                data = sig.TrafficLightModels[sig.LightType][#v-1]
+                                            else
+                                                data = sig.TrafficLightModels[sig.LightType][v]
+                                            end
+                                            if not data then continue end
+
+                                            --sig.NamesOffset = sig.NamesOffset + Vector(0,0,data[1])
+                                            local cols = {
+                                                R = Color(200,0,0),
+                                                Y = Color(200,200,0),
+                                                G = Color(0,200,0),
+                                                W = Color(200,200,200),
+                                                B = Color(0,0,200),
+                                            }
+                                            if v ~= "M" then
+                                                for i = 1,#v do
+                                                    ID2 = ID2 + 1
+                                                    local State = tonumber(sig.Sig[ID2]) == 1 and "X" or (tonumber(sig.Sig[ID2]) == 2 and (RealTime() % 1.2 > 0.4)) and "B" or false
+                                                    draw.DrawText(Format(v[i],sig:EntIndex()),"Trebuchet24",250,160 + ID*20 + ID2*20,cols[v[i]])
+                                                    if State then
+                                                        draw.DrawText(State,"Trebuchet24",280,160 + ID*20 + ID2*20,cols[v[i]])
+                                                    end
+                                                end
+                                            else
+                                                ID2 = ID2 + 1
+                                                draw.DrawText("M","Trebuchet24",250,160 + ID*20 + ID2*20,Color(200,200,200))
+                                                draw.DrawText(sig.Num or "none","Trebuchet24",280,160 + ID*20 + ID2*20,Color(200,200,200))
+
+                                                --if Metrostroi.RoutePointer[sig.Num[1]] then sig.Models[1][sig.RouteNumber]:SetSkin(Metrostroi.RoutePointer[sig.Num[1]]) end
+                                            end
+
+                                            ID = ID + 1
+                                        end
+                                    end
+                                else
+                                    draw.DrawText("No data...","Trebuchet24",5,0,Color(0,0,0,255))
                                 end
                             else
-                                draw.DrawText("No data...","Trebuchet24",5,0,Color(0,0,0,255))
+                                surface.SetDrawColor(sig.ARSOnly and 255 or 125, 125, 0, 255)
+                                surface.DrawRect(0, 0, 364, 25)
+                                draw.DrawText("Debug disabled...","Trebuchet24",5,0,Color(0,0,0,255))
                             end
-                        else
-                            surface.SetDrawColor(sig.ARSOnly and 255 or 125, 125, 0, 255)
-                            surface.DrawRect(0, 0, 364, 25)
-                            draw.DrawText("Debug disabled...","Trebuchet24",5,0,Color(0,0,0,255))
-                        end
-                    cam.End3D2D()
+                        cam.End3D2D()
                 end
-            end
-        end)
-    else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiSignalDebug")
+            end)
+        else
+            hook.Remove("PostDrawTranslucentRenderables",sig)
+        end
     end
 end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiSignalDebug")
+hook.Remove("PostDrawTranslucentRenderables","SignalDebug")
 cvars.AddChangeCallback( "metrostroi_drawsignaldebug", enableDebug)
 enableDebug()
-
-Metrostroi.OptimisationPatch()

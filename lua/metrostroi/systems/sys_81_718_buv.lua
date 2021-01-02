@@ -37,9 +37,6 @@ function TRAIN_SYSTEM:Initialize()
     self.OTK=0;self.RP=0;self.PROV=0
     --МЛУА
     self.SS = 0
-
-    self.ISet = 0
-    self.PTTIState = 0
 end
 
 function TRAIN_SYSTEM:Inputs()
@@ -119,10 +116,8 @@ function TRAIN_SYSTEM:Think()
         if self.RP > 0 then self.O75V = 1 end
         --Управление ЛК и ПТТИ
         if disableScheme>0 or Train.PTTI.Zero then
-            if (self.IKX+self.IKT) > 0 and not self.OffTimer then self.OffTimer = CurTime() end
-            if self.OffTimer and (self.IKX+self.IKT) == 0 and CurTime()-self.OffTimer > 0.3 then self.OffTimer = false end
-            self.OVP = self.OffTimer and 1 or 0
-            self.ONZ = self.OffTimer and 1 or 0
+            self.OVP = 0
+            self.ONZ = 0
             self.OLK = 0
             self.OKX = 0
             self.OKT = 0
@@ -161,7 +156,6 @@ function TRAIN_SYSTEM:Think()
             self.PTTIState = 0
         elseif self.IKX > 0 and Drive then
             self.PTTIState = 1
-            self.BlockRV = self.IU2 == 0
             self.FreqBlock = self.Shunt and 1 or 0--(((self.ITP1+self.ITP2+self.ITP3+self.ITP4) > 0 and not self.Shunt) and 0 or 1)
             self.ISet = ((self.ITP1+self.ITP2+self.ITP3+self.ITP4) > 0 and self.IM == 0) and 150+self.IU1*(90+loadR/2)+self.IU2*(90+loadR/2) or 150
         elseif self.IKX > 0 and DriveEmer then
@@ -249,8 +243,6 @@ function TRAIN_SYSTEM:Think()
             self.ORMT = 0 --805
         end
     else
-        self.ISet = 0
-        self.PTTIState = 0
         --Входные сигналы
         --self.IVP=0;self.INZ=0;self.IVR=0;self.INR=0
 
