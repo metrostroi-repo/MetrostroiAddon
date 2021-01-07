@@ -179,11 +179,10 @@ function TRAIN_SYSTEM:Think(dT)
         S["R7"]*Train.BSM_SIR3.Value+
         S["R5"]*Train.BSM_SIR4.Value
 
-    S["BR1_16"] = S["R3"]*Train.BSM_SIR5.Value*(1-Train.BLPM_5R3.Value)
+    S["BR1_16"] = S["R3"]*Train.BSM_SIR5.Value
     S["BR2_16"] = S["R3"]*(1-Train.BSM_SIR5.Value)
 
-    --S["KSR"] = (S["BR1_14"]*(1-Train.BSM_BR1.Value)+S["BR1_16"]*Train.BSM_BR1.Value)*(1-Train.BSM_BR2.Value)+S["BR2_16"]*Train.BSM_BR2.Value
-    S["KSR"] = S["BR1_14"]+S["BR1_16"]*Train.BSM_BR1.Value+S["BR2_16"]*Train.BSM_BR2.Value
+    S["KSR"] = S["BR1_14"]*(1-Train.BSM_BR1.Value)*(1-Train.BSM_BR2.Value)+S["BR1_16"]*Train.BSM_BR1.Value+S["BR2_16"]*Train.BSM_BR2.Value
     Train.BSM_KSR1:TriggerInput("Set",S["KSR"])
     Train.BSM_KSR2:TriggerInput("Set",S["KSR"])
 
