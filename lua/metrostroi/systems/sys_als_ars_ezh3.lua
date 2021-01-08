@@ -179,11 +179,10 @@ function TRAIN_SYSTEM:Think(dT)
         S["R7"]*Train.BSM_SIR3.Value+
         S["R5"]*Train.BSM_SIR4.Value
 
-    S["BR1_16"] = S["R3"]*Train.BSM_SIR5.Value*(1-Train.BLPM_5R3.Value)
+    S["BR1_16"] = S["R3"]*Train.BSM_SIR5.Value
     S["BR2_16"] = S["R3"]*(1-Train.BSM_SIR5.Value)
 
-    --S["KSR"] = (S["BR1_14"]*(1-Train.BSM_BR1.Value)+S["BR1_16"]*Train.BSM_BR1.Value)*(1-Train.BSM_BR2.Value)+S["BR2_16"]*Train.BSM_BR2.Value
-    S["KSR"] = S["BR1_14"]+S["BR1_16"]*Train.BSM_BR1.Value+S["BR2_16"]*Train.BSM_BR2.Value
+    S["KSR"] = S["BR1_14"]*(1-Train.BSM_BR1.Value)*(1-Train.BSM_BR2.Value)+S["BR1_16"]*Train.BSM_BR1.Value+S["BR2_16"]*Train.BSM_BR2.Value
     Train.BSM_KSR1:TriggerInput("Set",S["KSR"])
     Train.BSM_KSR2:TriggerInput("Set",S["KSR"])
 
@@ -194,18 +193,13 @@ function TRAIN_SYSTEM:Think(dT)
     Train.BSM_RNT:TriggerInput("Set",self.ALS*(Train.BSM_BR1.Value+Train.BSM_BR2.Value+Train.KVT.Value+Train.BSM_RNT.Value*(Train.BSM_KSR1.Value*Train.BSM_KSR2.Value+Train.BSM_KRT.Value)))
     self.Ring = self.GE*(1-Train.BSM_RNT.Value)*(1-Train.BSM_RVV.Value)
 
-    --Train.BSM_BR1:TriggerInput("Set",)
-    S["LUDS"] = S["SRPower"]*Train.BSM_SR1.Value
-    S["LUDS70"] = S["LUDS"]*(Train.BLPM_5R3.Value*Train.BLPM_4R3.Value*Train.BLPM_3R3.Value*(1-Train.BLPM_2R3.Value)*Train.BLPM_2R1.Value*Train.BLPM_2R2.Value)--+(1-Train.BSM_SIR1.Value))
-    S["LUDS60"] = S["LUDS"]*(Train.BLPM_5R3.Value*Train.BLPM_4R3.Value*(1-Train.BLPM_3R3.Value)*Train.BLPM_3R1.Value*Train.BLPM_3R2.Value)--+(1-Train.BSM_SIR2.Value)*(1-Train.BSM_SIR1.Value))
-    S["LUDS40"] = S["LUDS"]*(Train.BLPM_5R3.Value*(1-Train.BLPM_4R3.Value)*Train.BLPM_4R1.Value*Train.BLPM_4R2.Value)--+(1-Train.BSM_SIR3.Value)*(1-Train.BSM_SIR2.Value)*(1-Train.BSM_SIR1.Value))
-    S["LUDS0"] = S["LUDS"]*((1-Train.BLPM_5R3.Value)*Train.BLPM_5R1.Value*Train.BLPM_5R2.Value)--+(1-Train.BSM_SIR4.Value)*(1-Train.BSM_SIR3.Value)*(1-Train.BSM_SIR2.Value)*(1-Train.BSM_SIR1.Value))
+    S["LUDS"] = S["SRPower"]*Train.BSM_SR1.Value*Train.BSM_SR2.Value
     S["AR80"] = S["LUDS"]*Train.BSM_SIR1.Value
-    S["AR70"] = S["LUDS70"]*Train.BSM_SIR2.Value
-    S["AR60"] = S["LUDS60"]*Train.BSM_SIR3.Value
-    S["AR40"] = S["LUDS40"]*Train.BSM_SIR4.Value
-    S["AR0"] =  S["LUDS0"]*Train.BSM_SIR5.Value
-    S["AR04"] = S["LUDS"]*(1-Train.BSM_SIR5.Value)
+    S["AR70"] = S["LUDS"]*(1-Train.BSM_SIR1.Value)*Train.BSM_SIR2.Value 
+    S["AR60"] = S["LUDS"]*(1-Train.BSM_SIR1.Value)*(1-Train.BSM_SIR2.Value)*Train.BSM_SIR3.Value
+    S["AR40"] = S["LUDS"]*(1-Train.BSM_SIR1.Value)*(1-Train.BSM_SIR2.Value)*(1-Train.BSM_SIR3.Value)*Train.BSM_SIR4.Value
+    S["AR0"] =  S["LUDS"]*(1-Train.BSM_SIR1.Value)*(1-Train.BSM_SIR2.Value)*(1-Train.BSM_SIR3.Value)*(1-Train.BSM_SIR4.Value)*Train.BSM_SIR5.Value
+    S["AR04"] = S["LUDS"]*(1-Train.BSM_SIR1.Value)*(1-Train.BSM_SIR2.Value)*(1-Train.BSM_SIR3.Value)*(1-Train.BSM_SIR4.Value)*(1-Train.BSM_SIR5.Value)
 
     Train.BSM_RVV:TriggerInput("Set",Train.ARS.Value*(1-Train.KVT.Value)*Train.BSM_RNT.Value)
 
