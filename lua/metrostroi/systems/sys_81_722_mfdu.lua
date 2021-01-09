@@ -459,6 +459,7 @@ if SERVER then
                 if self.MFDUL2State > 2 then
                     self.MFDUL2State = 0
                 end
+                Train:SetPackedRatio("MFDUPowerCommand",0)
                 Train:SetNW2Int("MFDUSpeed",0)
                 self.MFDUL3State = 0
                 self.MFDUL4State = 0
