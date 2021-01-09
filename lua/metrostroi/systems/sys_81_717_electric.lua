@@ -387,7 +387,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Train.BIS200.Power = T[10]*Train.A43.Value*(Train.ALS.Value+Train.ARS.Value)*Train.AIS.Value
         ARS.KB=T[91]*RC1+(ARS.ALS*(1-Train.BSM_GE.Value)+ARS.GE*Train.BSM_GE.Value)*Train.KVT.Value
 
-        Train.BSM_KRT:TriggerInput("Set",(max(0,T[6])+max(0,T[8]))*RC1)
+        Train.BSM_KRT:TriggerInput("Set",(max(0,Panel.LST)+max(0,T[8]*Train.A41.Value)+ARS["8"])*RC1)
         ARS.KRH = (max(0,T[1])+T[14])*RC1
         ARS.R11 = T[15]
         ARS.R12 = (T[87]+S["7Ga"]*KV["7GA-RC27"]+S["14a"]*Train.A42.Value*(1-Train.KRP.Value))
