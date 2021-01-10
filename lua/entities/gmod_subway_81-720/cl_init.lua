@@ -1565,8 +1565,22 @@ table.insert(ENT.ClientSounds["PB"],{"PB",function(ent,var) return var > 0 and "
 ENT.Lights = {
     -- Headlight glow
     [1] = { "headlight",Vector(495,0,-40),Angle(0,0,0),Color(216,161,92),farz=5144,brightness = 4, hfov=105,vfov=105, texture = "models/metrostroi_train/equipment/headlight",shadows = 1,headlight=true},
+    [31]  = { "light",Vector(500,-35,-29), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02.vmt" },
+    [32]  = { "light",Vector(500, 35,-29), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02.vmt" },
+    -- Reverse
     [2] = { "headlight",        Vector(495,0,-40), Angle(0,0,0), Color(255,0,0), fov=170 ,brightness = 0.1, farz=450,texture = "models/metrostroi_train/equipment/headlight2",shadows = 0,backlight=true},
+    [33] = { "light",Vector(500,-50, -29), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
+    [34] = { "light",Vector(500, 50, -29), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
+    [35] = { "light",Vector(500,-50, -75), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
+    [36] = { "light",Vector(500, 50, -75), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
+    -- Apparats
     [3] = { "headlight",        Vector(380,40,43.9), Angle(50,40,-0), Color(206,135,80), hfov=100, vfov=100,farz=200,brightness = 6,shadows=1},
+    -- Cabin
+    [10] = { "dynamiclight",    Vector( 440, 0, 13), Angle(0,0,0), Color(206,135,80), brightness = 0.7, distance = 550 },
+    -- Interior
+    [15] = { "dynamiclight",    Vector(-350, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.75, distance = 500, fov=180,farz = 128 },
+    [16] = { "dynamiclight",    Vector(-60, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.75, distance = 500, fov=180,farz = 128 },
+    [17] = { "dynamiclight",    Vector( 230, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.75, distance = 500, fov=180,farz = 128 },
 }
 
 ENT.ButtonMap["Vityaz"] = {
@@ -1663,6 +1677,10 @@ function ENT:Think()
     end
 
     self:SetLightPower(3,self.Door5 and self:GetPackedBool("AppLights"),self:GetPackedBool("AppLights") and 1 or 0)
+    local passlight = self:GetPackedRatio("SalonLighting")
+    self:SetLightPower(15,passlight>0,passlight)
+    self:SetLightPower(16,passlight>0,passlight)
+    self:SetLightPower(17,passlight>0,passlight)
     --ANIMS
     self:Animate("brake_line", self:GetPackedRatio("BL"), 0, 0.753,  256,2)
     self:Animate("train_line", self:GetPackedRatio("TL"),   0, 0.753,  4096,2)
@@ -1696,10 +1714,11 @@ function ENT:Think()
     self:Animate("km013", Cpos[self:GetPackedRatio("Cran")] or 0, 0, 0.7,  2,false)
     self:Animate("PB",  self:GetPackedBool("PB") and 1 or 0,0,0.2,  8,false)
 
-    self:ShowHideSmooth("lamps_emer",self:Animate("LampsEmer",self:GetPackedRatio("SalonLighting") == 0.4 and 1 or 0,0,1,5,false))
-    self:ShowHideSmooth("lamps_full",self:Animate("LampsFull",self:GetPackedRatio("SalonLighting") == 1 and 1 or 0,0,1,5,false))
+    self:ShowHideSmooth("lamps_emer",self:Animate("LampsEmer",passlight == 0.4 and 1 or 0,0,1,5,false))
+    self:ShowHideSmooth("lamps_full",self:Animate("LampsFull",passlight == 1 and 1 or 0,0,1,5,false))
 
     local cab_lamp = self:Animate("cab_lamp",self:GetPackedBool("CabinEnabledFull") and 1 or self:GetPackedBool("CabinEnabledEmer") and 0.5 or 0,0,1,5,false)
+    self:SetLightPower(10,cab_lamp>0,cab_lamp)
     self:ShowHideSmooth("cab_emer",cab_lamp)
     self:ShowHideSmooth("cab_full",cab_lamp)
 
@@ -1751,7 +1770,13 @@ function ENT:Think()
     self:ShowHideSmooth("RedLights",RL)
     local headlights = HL1*0.4+HL2*0.6
     self:SetLightPower(1,headlights>0,headlights)
+    self:SetLightPower(31,headlights>0,headlights)
+    self:SetLightPower(32,headlights>0,headlights)
     self:SetLightPower(2,RL>0,RL)
+    self:SetLightPower(33,RL>0,RL)
+    self:SetLightPower(34,RL>0,RL)
+    self:SetLightPower(35,RL>0,RL)
+    self:SetLightPower(36,RL>0,RL)
     if IsValid(self.GlowingLights[1]) then
         if self:GetPackedRatio("Headlights") < 1 and self.GlowingLights[1]:GetFarZ() ~= 4096 then
             self.GlowingLights[1]:SetFarZ(4096)

@@ -444,8 +444,10 @@ for i=1,8 do
     }
 end
 ENT.Lights = {
-    -- Headlight glow
-    --[2] = { "dynamiclight",   Vector( 300, 0, 40), Angle(0,0,0), Color(255,255,255), brightness = 4, distance = 550 },
+    -- Interior
+    [15] = { "dynamiclight",    Vector(-330, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.5, distance = 500, fov=180,farz = 128 },
+    [16] = { "dynamiclight",    Vector(-0, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.5, distance = 500, fov=180,farz = 128 },
+    [17] = { "dynamiclight",    Vector( 330, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.5, distance = 500, fov=180,farz = 128 },
 }
 
 function ENT:Initialize()
@@ -521,6 +523,11 @@ function ENT:Think()
         self.PassSchemesDone=false
         self.InvertSchemes = self:GetNW2Bool("PassSchemesInvert",false)
     end
+    
+    local passlight = self:GetPackedRatio("SalonLighting")
+    self:SetLightPower(15,passlight > 0, passlight)
+    self:SetLightPower(16,passlight > 0, passlight)
+    self:SetLightPower(17,passlight > 0, passlight)
 
     if self.LastGVValue ~= self:GetPackedBool("GV") then
         self.ResetTime = CurTime()+1.5

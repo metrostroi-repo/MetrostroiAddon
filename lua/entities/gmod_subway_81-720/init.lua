@@ -178,26 +178,7 @@ function ENT:Initialize()
         [13] = 12, -- Reverser F<->B
         [38] = 37, -- Doors L<->R
     }
-
-    self.Lights = {
-        [1]  = { "light",Vector(500,-35,-29), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02.vmt" },
-        [2]  = { "light",Vector(500, 35,-29), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02.vmt" },
-
-        [3] = { "light",Vector(500,-50, -29), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
-        [4] = { "light",Vector(500, 50, -29), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
-        [5] = { "light",Vector(500,-50, -75), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
-        [6] = { "light",Vector(500, 50, -75), Angle(0,0,0), Color(255,50,50),     brightness = 0.1, scale = 1.5, texture = "sprites/light_glow02.vmt"  },
-
-        [10] = { "dynamiclight",    Vector( 440, 0, 13), Angle(0,0,0), Color(206,135,80), brightness = 0.7, distance = 550 },
-        -- Interior
-        --[11] = { "dynamiclight",  Vector( 200, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128
-        [15] = { "dynamiclight",    Vector(-350, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.75, distance = 500, fov=180,farz = 128 },
-        [16] = { "dynamiclight",    Vector(-60, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.75, distance = 500, fov=180,farz = 128 },
-        [17] = { "dynamiclight",    Vector( 230, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.75, distance = 500, fov=180,farz = 128 },
-        --[13] = { "dynamiclight",  Vector(-200, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128 },
-        --[11] = { "dynamiclight",  Vector( 100, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128 },
-        --[12] = { "dynamiclight",  Vector( 100, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400, fov=180,farz = 128 },
-    }
+    
     self.InteractionZones = {
         {   Pos = Vector(466, 64, 30),
             Radius = 48,
@@ -303,21 +284,9 @@ function ENT:Think()
     local headlights = self.Panel.Headlights1*0.5+self.Panel.Headlights2*0.5
     local redlights = self.Panel.RedLights>0
     self:SetPackedBool("BacklightsEnabled",redlights)
-    self:SetLightPower(1,headlights>0,headlights)
-    self:SetLightPower(2,headlights>0,headlights)
-    self:SetLightPower(3,redlights)
-    self:SetLightPower(4,redlights)
-    self:SetLightPower(5,redlights)
-    self:SetLightPower(6,redlights)
-    local cablight = self.Panel.CabLights
-    self:SetLightPower(10,cablight > 0 ,cablight)
-    self:SetPackedBool("CabinEnabledEmer", cablight > 0)
-    self:SetPackedBool("CabinEnabledFull", cablight > 0.5)
-    local passlight = power and (self.BUV.MainLights and 1 or self.SFV20.Value > 0.5 and 0.4) or 0
-    self:SetLightPower(15,passlight > 0, passlight)
-    self:SetLightPower(16,passlight > 0, passlight)
-    self:SetLightPower(17,passlight > 0, passlight)
-    self:SetPackedRatio("SalonLighting",passlight)
+    self:SetPackedBool("CabinEnabledEmer", self.Panel.CabLights > 0)
+    self:SetPackedBool("CabinEnabledFull", self.Panel.CabLights > 0.5)
+    self:SetPackedRatio("SalonLighting",power and (self.BUV.MainLights and 1 or self.SFV20.Value > 0.5 and 0.4) or 0)
     --self:SetPackedRatio("TrainLine",7.3/16)
     --self:SetPackedRatio("BrakeLine",5.2/16)
     --self:SetPackedRatio("BrakeCylinder",self.AsyncInverter.PN1*1.1/6)

@@ -97,16 +97,6 @@ function ENT:Initialize()
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
     }
-    self.Lights = {
-        -- Interior
-        --[11] = { "dynamiclight",  Vector( 200, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128
-        [15] = { "dynamiclight",    Vector(-330, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.5, distance = 500, fov=180,farz = 128 },
-        [16] = { "dynamiclight",    Vector(-0, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.5, distance = 500, fov=180,farz = 128 },
-        [17] = { "dynamiclight",    Vector( 330, 0, 10), Angle(0,0,0), Color(238,238,197), brightness = 0.5, distance = 500, fov=180,farz = 128 },
-        --[13] = { "dynamiclight",  Vector(-200, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128 },
-        --[11] = { "dynamiclight",  Vector( 100, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400 , fov=180,farz = 128 },
-        --[12] = { "dynamiclight",  Vector( 100, 0, 10), Angle(0,0,0), Color(255,175,50), brightness = 3, distance = 400, fov=180,farz = 128 },
-    }
     self.FrontDoor = false
     self.RearDoor = false
 end
@@ -139,12 +129,7 @@ function ENT:Think()
 
     self:SetPackedBool("FrontDoor",self.FrontDoor)
     self:SetPackedBool("RearDoor",self.RearDoor)
-    local passlight = power and (self.BUV.MainLights and 1 or self.SFV20.Value > 0.5 and 0.4) or 0
-    --self:SetLightPower(11,power and mul > 0, mul)
-    self:SetLightPower(15,passlight > 0, passlight)
-    self:SetLightPower(16,passlight > 0, passlight)
-    self:SetLightPower(17,passlight > 0, passlight)
-    self:SetPackedRatio("SalonLighting",passlight)
+    self:SetPackedRatio("SalonLighting",power and (self.BUV.MainLights and 1 or self.SFV20.Value > 0.5 and 0.4) or 0)
     --local mul = self.SF45.Value > 0.5 and self.BUV.MainLights and 1 or self.SF46.Value > 0.5 and 0.5 or 0
     --self:SetLightPower(11,self.BUV.Power and mul > 0, mul)
     --self:SetLightPower(12,self.BUV.Power and mul > 0, mul)
