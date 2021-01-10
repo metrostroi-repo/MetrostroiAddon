@@ -424,10 +424,18 @@ ENT.ClientProps["otsek4"] = {
     hideseat=1.7,
 }
 ENT.Lights = {
-    -- Headlight glow
-    --[2] = { "dynamiclight",   Vector( 300, 0, 40), Angle(0,0,0), Color(255,255,255), brightness = 4, distance = 550 },
-}
+    [10] = { "dynamiclight",    Vector( 430, 0, 40), Angle(0,0,0), Color(255,255,255), brightness = 0.05, distance = 550 },
 
+    -- Interior
+    [11] = { "dynamiclight",    Vector( 180+30, 0, -5), Angle(0,0,0), Color(230,230,255), brightness = 3, distance = 260},
+    [12] = { "dynamiclight",    Vector( -50+30, 0, -5), Angle(0,0,0), Color(230,230,255), brightness = 3, distance = 260},
+    [13] = { "dynamiclight",    Vector(-280+30, 0, -5), Angle(0,0,0), Color(230,230,255), brightness = 3, distance = 260},
+
+    [15] = { "light",Vector(-46.4, 66,28.1)+Vector(0, 0,4.1), Angle(0,0,0), Color(254,254,254), brightness = 0.4, scale = 0.1, texture = "sprites/light_glow02.vmt" },
+    [16] = { "light",Vector(-46.4, 66,28.1)+Vector(0, 0.4,-0), Angle(0,0,0), Color(254,210,18), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
+    [18] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0,4.1), Angle(0,0,0), Color(254,254,254), brightness = 0.4, scale = 0.1, texture = "sprites/light_glow02.vmt" },
+    [19] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0.4,-0), Angle(0,0,0), Color(254,210,18), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
+}
 ENT.ButtonMap["Tickers1"] = {
     pos = Vector(-455.4,-11.1,52.8),
     ang = Angle(0,90,90),
@@ -520,6 +528,19 @@ function ENT:Think()
         self.PassSchemesDone=false
         self.InvertSchemes = self:GetNW2Bool("SarmatInvert",false)
     end
+    
+    local passlight = self:GetPackedRatio("SalonLighting")
+    self:SetLightPower(11,passlight > 0, passlight)
+    self:SetLightPower(12,passlight > 0, passlight)
+    self:SetLightPower(13,passlight > 0, passlight)
+
+    local BortLSD,BortPneumo,BortBV = self:GetPackedBool("BortLSD"),self:GetPackedBool("BortPneumo"),self:GetPackedBool("BortBV")
+    self:ShowHide("bortlamp_lsd",BortLSD)
+    self:ShowHide("bortlamp_pneumo",BortPneumo)
+    self:SetLightPower(15,BortLSD,1)
+    self:SetLightPower(18,BortLSD,1)
+    self:SetLightPower(16,BortPneumo,1)
+    self:SetLightPower(19,BortPneumo,1)
 
     self:ShowHide("bortlamp_pneumo",self:GetPackedBool("BortPneumo"))
     self:ShowHide("bortlamp_lsd",self:GetPackedBool("BortLSD"))

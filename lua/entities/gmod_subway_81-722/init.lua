@@ -178,26 +178,6 @@ function ENT:Initialize()
         },
     }
 
-    self.Lights = {
-        [1]  = { "light",           Vector(493  ,   -60, -36), Angle(0,0,0), Color(200,255,255), brightness = 0.5, scale = 2.5, texture = "sprites/light_glow02.vmt" },
-        [2]  = { "light",           Vector(493  ,   62, -36), Angle(0,0,0), Color(200,255,255), brightness = 0.5, scale = 2.5, texture = "sprites/light_glow02.vmt" },
-        [3]  = { "light",           Vector(490,   -65, 15), Angle(0,0,0), Color(255,50,50), brightness = 0.2, scale = 4, texture = "sprites/light_glow02.vmt" },
-        [4]  = { "light",           Vector(489,   60, 15), Angle(0,0,0), Color(255,50,50), brightness = 0.2, scale = 4, texture = "sprites/light_glow02.vmt" },
-        [10] = { "dynamiclight",    Vector( 440, 0, 14), Angle(0,0,0), Color(255,255,255), brightness = 0.25, distance = 550 },
-        -- Interior
-        [11] = { "dynamiclight",    Vector( 180+30, 0, -5), Angle(0,0,0), Color(230,230,255), brightness = 3, distance = 260},
-        [12] = { "dynamiclight",    Vector( -50+30, 0, -5), Angle(0,0,0), Color(230,230,255), brightness = 3, distance = 260},
-        [13] = { "dynamiclight",    Vector(-280+30, 0, -5), Angle(0,0,0), Color(230,230,255), brightness = 3, distance = 260},
-
-        [15] = { "light",Vector(-46.4, 66,28.1)+Vector(0, 0,4.1), Angle(0,0,0), Color(254,254,254), brightness = 0.4, scale = 0.1, texture = "sprites/light_glow02.vmt" },
-        [16] = { "light",Vector(-46.4, 66,28.1)+Vector(0, 0.4,-0), Angle(0,0,0), Color(254,210,18), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
-        [17] = { "light",Vector(-46.4, 66,28.1)+Vector(0, 0.8,-4.1), Angle(0,0,0), Color(40,240,122), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
-        [18] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0,4.1), Angle(0,0,0), Color(254,254,254), brightness = 0.4, scale = 0.1, texture = "sprites/light_glow02.vmt" },
-        [19] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0.4,-0), Angle(0,0,0), Color(254,210,18), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
-        [20] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0.8,-4.1), Angle(0,0,0), Color(40,240,122), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
-
-    }
-
     self.PassengerDoor = false
     self.CabinDoorLeft = false
     self.CabinDoorRight = false
@@ -242,7 +222,6 @@ function ENT:Think()
             end
         end
     end
-    --[[
     self.TestA = self.TestA or nil
     self.TestV = self.TestV or nil
     local accel = self.Acceleration
@@ -317,28 +296,14 @@ function ENT:Think()
     self:SetPackedBool("Lamp70",self.ALSCoil.F2 > 0)
     self:SetPackedBool("Lamp80",self.ALSCoil.F1 > 0)
 
-    local cablight = self.Panel.CabLights
-    self:SetLightPower(10,cablight > 0,cablight)
-    self:SetPackedBool("CabinEnabledEmer", cablight > 0)
-    self:SetPackedBool("CabinEnabledFull", cablight > 0.3)
+    self:SetPackedRatio("CabLights",self.Panel.CabLights==0.5 and 0.3 or self.Panel.CabLights)
     self:SetPackedBool("PanelLighting",self.Panel.PanelLights>0)
-    local HeadlightsPower = self.Panel.Headlights2 > 0 and 1 or self.Panel.Headlights1 > 0 and 0.5 or 0
     self:SetPackedBool("Headlights1",self.Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",self.Panel.Headlights2 > 0)
-
-    self:SetLightPower(1,HeadlightsPower > 0,HeadlightsPower^0.5)
-    self:SetLightPower(2,HeadlightsPower > 0,HeadlightsPower^0.5)
-    self:SetPackedRatio("Headlight",HeadlightsPower)
+    self:SetPackedRatio("Headlight",self.Panel.Headlights2 > 0 and 1 or self.Panel.Headlights1 > 0 and 0.5 or 0)
     self:SetPackedBool("RedLights",self.Panel.RedLights>0)
-    self:SetLightPower(3,self.Panel.RedLights>0)
-    self:SetLightPower(4,self.Panel.RedLights>0)
 
-    local passlight = math.min(1,self.Panel.MainLights+self.Panel.EmergencyLights*0.3)
-    --self:SetLightPower(11,power and mul > 0, mul)
-    self:SetLightPower(11,passlight > 0, passlight)
-    self:SetLightPower(12,passlight > 0, passlight)
-    self:SetLightPower(13,passlight > 0, passlight)
-    self:SetPackedRatio("SalonLighting",passlight)
+    self:SetPackedRatio("SalonLighting",math.min(1,self.Panel.MainLights+self.Panel.EmergencyLights*0.3))
 
     self:SetPackedBool("CompressorWork",self.Pneumatic.Compressor)
 
@@ -358,17 +323,10 @@ function ENT:Think()
     self:SetPackedBool("SOSD",self.Panel.SOSD>0)
     self:SetPackedBool("SOSDLamp",self.BUKP.SOSD>0)
     self.SOSD = self.Panel.SOSD>0
-
-
+    
     self:SetPackedBool("BortPneumo",self.Panel.BrW>0)
     self:SetPackedBool("BortLSD",self.Panel.DoorsW>0)
     self:SetPackedBool("BortBV",self.Panel.GRP>0)
-    self:SetLightPower(15, self.Panel.DoorsW > 0.5,1)
-    self:SetLightPower(18, self.Panel.DoorsW > 0.5,1)
-    self:SetLightPower(16, self.Panel.BrW > 0.5,1)
-    self:SetLightPower(19, self.Panel.BrW > 0.5,1)
-    self:SetLightPower(17, self.Panel.GRP > 0.5,1)
-    self:SetLightPower(20, self.Panel.GRP > 0.5,1)
 
     self:SetPackedBool("RingEnabled",self.BUKP.Ring)
     self:SetPackedBool("RingEnabledBARS",self.BARS.Ring>0)
