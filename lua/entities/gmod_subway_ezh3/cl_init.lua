@@ -1700,8 +1700,7 @@ function ENT:Think()
     self:Animate("brake_cylinder",self:GetPackedRatio("BCPressure"), 0.052, 0.794,nil,2)--,,0.03)
     self:Animate("voltmeter",self:GetPackedRatio("EnginesVoltage"), 0.632,0.36,92,2)
     self:Animate("ampermeter",self:GetPackedRatio("EnginesCurrent"), 0.632,0.36,             nil, nil,  92,20,3)
-    --self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.6,0.5,45,2)
-	self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.613,0.455,72,2)
+    self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.613,0.455,72,2)
     self:Animate("speed1",self:GetPackedRatio("Speed"),0.645, 0.363, nil, nil,  90,200,20)
 
 
