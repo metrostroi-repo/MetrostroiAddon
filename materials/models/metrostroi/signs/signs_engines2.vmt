@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture"	"models\metrostroi\signs\signs_engines2"
+	"$bumpmap" "models\metrostroi\signs\signs_engines2_n"
+}

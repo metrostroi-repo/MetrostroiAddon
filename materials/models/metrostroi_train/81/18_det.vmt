@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81/18_det"
+	"$model" "1"
+	"$nocull" "1"
+}

@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-710/gauges_lit"
+	"$model" "1"
+	$additive 1
+	$color2 "[1 1 1]"
+    hdr { "$color2" "[0.81 0.81 0.81]" }
+}

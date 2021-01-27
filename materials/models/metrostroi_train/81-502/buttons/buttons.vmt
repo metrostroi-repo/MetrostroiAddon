@@ -1,0 +1,14 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-502/buttons/buttons"
+	"$model" "1"
+	"$phong" "1"
+ 
+	"$bumpmap"				"models/metrostroi_train/81-502/buttons/buttons_n"
+	"$phongexponenttexture"	"models/metrostroi_train/81-502/buttons/buttons_s"
+	"$phongboost"				1
+	"$phongfresnelranges"		"[0.5 0.5 0.5]"
+	$envmap			env_cubemap
+	$normalmapalphaenvmapmask 1
+	$envmaptint "[0.05 0.05 0.05]"
+}

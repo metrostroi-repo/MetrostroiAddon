@@ -1,0 +1,16 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-720/buttons"
+	"$model" "1"
+	"$selfillum" "1"
+	"$selfillumint"		"[1 1 1]"
+	"$phong" "1"
+ 
+	"$bumpmap"				"models/metrostroi_train/81-720/buttons_n"
+	"$phongexponenttexture"	"models/metrostroi_train/81-720/buttons_s"
+	"$phongboost"				1
+	"$phongfresnelranges"		"[1 1 1]"
+	$envmap			env_cubemap
+	$normalmapalphaenvmapmask 1
+	$envmaptint "[0.01 0.01 0.01]"
+}

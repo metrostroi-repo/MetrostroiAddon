@@ -1,0 +1,47 @@
+Refract
+{
+  $model 1
+  //$refractamount ".01"
+  $bluramount .3
+
+  $refracttinttexture "models/metrostroi/signals/lense_ref_glass"
+
+  $dudvmap "models/metrostroi/signals/lense_ref"
+  $normalmap "models/metrostroi/signals/lense_ref"
+  $surfaceprop glass
+  $translucent 1
+  $nocull 1
+
+  $envmap env_cubemap
+  $envmaptint "0.1"
+  $envmapsaturation .5
+
+  "<dx90"
+  {
+    $fallbackmaterial "models/metrostroi/signals/lense_ref"
+  }
+
+  $sbsrc .02
+  $distance 0
+  Proxies
+  {
+    PlayerProximity
+    {
+       resultVar $refractamount
+       scale 0.00007
+    }
+    Subtract
+    {
+      srcVar1 $sbsrc
+      srcVar2 $refractamount
+      resultVar $refractamount
+    }
+    Clamp
+    {
+       srcVar1 $refractamount
+       min 0
+       max 1
+       resultVar $refractamount
+    }
+  }
+}

@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-710/gauges_lit"
+	"$model" "1"
+	$ambientocclusion 0
+}

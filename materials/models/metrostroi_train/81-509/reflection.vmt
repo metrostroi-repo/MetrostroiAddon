@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-509/reflection"
+	$additive 1
+	$color2 "[0.6 0.6 0.6]"
+    hdr { "$color2" "[0.6 0.6 0.6]" }
+}

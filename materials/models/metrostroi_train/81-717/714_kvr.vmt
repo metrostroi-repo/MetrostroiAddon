@@ -1,0 +1,39 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-717/714_kvr"
+	"$model" "1"
+
+	"$phong" "1"
+	"$bumpmap"				"models/metrostroi_train/81-717/717_kvr_n"
+	"$phongexponenttexture"	"models/metrostroi_train/81-717/717_kvr_s"
+	"$phongboost"				1
+	"$phongfresnelranges"		"[1 1 1]"
+	
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .01 .01 .01 ]"
+	"$envmapsaturation" ".01"
+	"$envmapcontrast" "0.1"
+	"$envmapFresnel" "1"
+	$normalmapalphaenvmapmask 1
+	
+	"$rimlight" "1"
+	"$rimlightexponent" "1"
+	"$rimlightboost" "3"
+	"$rimmask" "1"
+	
+	$detail "models/metrostroi_train/81-717/717_decal"
+	$detailblendmode 2
+	$detailscale 1
+
+	"Proxies"
+	{
+		TrainBodyColor
+		{
+			resultVar	$color2
+		}
+		TrainBodyDecal
+		{
+			resultVar	$detailblendfactor
+		}
+	}
+}

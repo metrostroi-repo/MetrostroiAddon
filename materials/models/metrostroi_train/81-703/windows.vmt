@@ -1,0 +1,14 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-508/windows"
+	"$model" "1"
+	"$alphatest" "1"
+	$phong 1
+	$phongexponent 80
+	
+	"$allowalphatocoverage" "1"
+	$phongfresnelranges "[1 1 1]"
+	$envmap			env_cubemap
+	$envmaptint "[0.5 0.5 0.5]"
+	$envmapmask		"models/metrostroi_train/81-508/windows"
+}

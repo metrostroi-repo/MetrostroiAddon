@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/common/bort_numbers/bort_number7"
+	"$model" "1"
+	"$alphatest" "1"
+	 $allowAlphaToCoverage 1
+}

@@ -1,0 +1,11 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/Equipment/tab5"
+
+	
+	"$phong" "1"
+ 
+	"$phongboost"				3
+	"$phongfresnelranges"		"[0.1 0.3 0.5]"
+
+}

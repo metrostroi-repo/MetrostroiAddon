@@ -1,0 +1,55 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/metrostroi_train/reversor/revers"
+	
+	"$phong" "1"
+	"$phongexponenttexture"	"models/metrostroi_train/reversor/revers_s"
+	"$phongboost" "5"	
+	"$phongfresnelranges"	"[.3 .5 3]"
+	"$halflambert" "1"
+	"$bumpmap"				"models/metrostroi_train/reversor/revers_n"
+	
+	// Begin GOLD look
+
+	"$envmap" "cubemaps/cubemap_metrogold"	
+	"$envmaptint" "[0.25 0.25 0.12]"
+	
+	// End GOLD look
+	
+	"$rimlight" "1"						
+	"$rimlightexponent" "20"				
+	"$rimlightboost" ".25"
+	
+	"$cloakPassEnabled" "1"
+
+	"$detail" "models/metrostroi_train/reversor/sheen"	
+ 	"$detailscale" "0.5"
+	"$detailblendfactor" 1
+	"$detailblendmode" 1
+
+	"$glowcolor" "1"
+	
+	"Proxies"
+	{
+		"AnimatedTexture"
+		{
+			"animatedtexturevar" 		"$detail"
+			"animatedtextureframenumvar" 	"$detailframe"
+			"animatedtextureframerate" 		"68"
+		}
+		"ModelGlowColor"
+		{
+			"resultVar" "$glowcolor"
+		}
+		"Equals"
+		{
+			"srcVar1"  "$glowcolor"
+			"resultVar" "$selfillumtint"
+		}
+		"Equals"
+		{
+			"srcVar1"  "$glowcolor"
+			"resultVar" "$color2"
+		}
+	}
+}
