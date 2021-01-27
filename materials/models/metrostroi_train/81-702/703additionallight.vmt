@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-703/703additionallight"
+	"$model" "1"
+	"$selfillum" "1"
+}

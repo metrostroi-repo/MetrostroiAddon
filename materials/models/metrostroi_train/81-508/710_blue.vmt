@@ -1,0 +1,32 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-710/710_blue"
+	"$model" "1"
+
+	"$phong" "1"
+ 
+	"$bumpmap"				"models/metrostroi_train/81-710/710_n"
+	"$phongexponenttexture"	"models/metrostroi_train/81-710/710_s"
+	"$phongboost"				1.5
+	"$phongfresnelranges"		"[1 1 1]"
+	$envmap			env_cubemap
+	$normalmapalphaenvmapmask 1
+	$envmaptint "[0.05 0.05 0.05]"
+	
+	$detail "models/metrostroi_train/81-707/81-707_decal"
+	$detailblendmode 2
+	$detailscale 1
+
+	"Proxies"
+	{
+		TrainBodyColor
+		{
+			resultVar	$color2
+		}
+		TrainBodyDecal
+		{
+			resultVar	$detailblendfactor
+		}
+	}
+	
+}

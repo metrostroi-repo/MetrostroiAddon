@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-502/labels/label_11"
+	"$model" "1"
+	$color2 "[1 1 1]"
+    hdr { "$color2" "[0.75 0.75 0.75]" }
+}

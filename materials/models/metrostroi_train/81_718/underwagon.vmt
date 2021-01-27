@@ -1,0 +1,27 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-717/underwagon"
+	"$model" "1"
+
+	"$phong" "1"
+	"$bumpmap"				"models/metrostroi_train/81-717/underwagon_n"
+	"$phongexponenttexture"	"models/metrostroi_train/81-717/underwagon_s"
+	"$phongboost"				1
+	"$phongfresnelranges"		"[0.1 0.1 0.1]"
+	
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .05 .05 .05 ]"
+	"$envmapsaturation" ".01"
+	"$envmapcontrast" "0.1"
+	"$envmapFresnel" "1"
+	$normalmapalphaenvmapmask 1
+	
+	"$rimlight" "1"
+	"$rimlightexponent" "1"
+	"$rimlightboost" "1"
+	"$rimmask" "1"
+}
+
+
+
+

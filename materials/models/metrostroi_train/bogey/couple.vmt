@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/bogey/couple"
+	"$model" "1"
+	"$phong" "1"
+	"$bumpmap"				"models/metrostroi_train/bogey/couple_n"
+	"$phongexponenttexture"	"models/metrostroi_train/bogey/couple_s"
+	"$phongboost"				0.6
+	"$phongfresnelranges"		"[0.5 0.5 0.5]"
+	$normalmapalphaenvmapmask 1
+	$envmaptint "[0.15 0.15 0.15]"
+}

@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-703/decals"
+	"$alphatest" "1"
+	$allowalphatocoverage 1
+}
