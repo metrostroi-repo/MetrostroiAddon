@@ -3,5 +3,5 @@
 Licensing
 ================================================================================
 ### Models and materials
-All models and materials belong to their corresponding authors. Mainly used without
-permission for purposes of prototyping a subway train simulator.
+All models, materials nad sounds belong to their corresponding authors. Used with
+permission for purposes of prototyping a subway train simulator inside Garry's-Mod only.
