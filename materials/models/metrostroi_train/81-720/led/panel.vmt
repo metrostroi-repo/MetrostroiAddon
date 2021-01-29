@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-720/led/panel"
+	"$model" "1"
+	"$phong" "1"
+ 
+	"$phongboost"				1
+	"$phongfresnelranges"		"[0 0.7 1]"
+}

@@ -1,0 +1,11 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-720/buttons2"
+	"$model" "1"
+	"$selfillum" "1"
+	"$selfillumint"		"[3 3 3]"
+	"$phong" "1"
+ 
+	"$phongboost"				1
+	"$phongfresnelranges"		"[1 1 1]"
+}

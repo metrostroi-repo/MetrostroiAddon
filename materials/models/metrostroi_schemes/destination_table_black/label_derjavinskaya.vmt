@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/metrostroi_schemes/destination_table_black/label_derjavinskaya"
+	"$alphatest" 1
+}

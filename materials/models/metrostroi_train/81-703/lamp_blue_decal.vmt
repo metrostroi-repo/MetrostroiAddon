@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-703/lamp_blue_decal"
+	"$model" "1"
+	"$additive" "1"
+}

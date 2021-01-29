@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-707/digit7"
+	"$model" "1"
+	"$alphatest" "1"
+	$allowAlphaToCoverage 1
+}

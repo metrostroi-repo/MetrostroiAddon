@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	$basetexture models/metrostroi_train/81-502/lamps
+	$model 1
+	$additive 0
+}
