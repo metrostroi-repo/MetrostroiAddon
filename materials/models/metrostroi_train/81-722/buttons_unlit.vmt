@@ -1,7 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "models/metrostroi_train/81-722/buttons"
-	$model 1
-	$color2 "[1 1 1]"
-    hdr { "$color2" "[0.85 0.85 0.85]" }
-}

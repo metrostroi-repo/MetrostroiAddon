@@ -1,9 +1,0 @@
-"VertexLitGeneric"
-{
-	"$basetexture" "models/metrostroi_train/81-703/underwagon"
-	"$model" "1"
-	"$bumpmap"				"models/metrostroi_train/81-703/underwagon_n"
-	"$phongexponenttexture"	"models/metrostroi_train/81-703/underwagon_spec"
-	"$phongboost"				5
-	"$phongfresnelranges"		"[0.2 0.2 0.2]"
-}

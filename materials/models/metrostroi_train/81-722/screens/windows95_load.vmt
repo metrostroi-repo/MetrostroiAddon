@@ -1,8 +1,0 @@
-"UnlitGeneric"
-{
-	$basetexture models/metrostroi_train/81-722/screens/windows95_load
-	$nolod 1
-	$ignorez 1
-	$vertexcolor 1
-	$vertexalpha 1
-}

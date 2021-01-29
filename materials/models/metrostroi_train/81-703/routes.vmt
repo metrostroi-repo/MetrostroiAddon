@@ -1,6 +1,0 @@
-"VertexLitGeneric"
-{
-	"$basetexture" "models/metrostroi_train/81-703/routes"
-	"$model" "1"
-	$halflambert 1
-}
