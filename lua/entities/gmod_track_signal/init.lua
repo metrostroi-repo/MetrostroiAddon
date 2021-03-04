@@ -561,7 +561,7 @@ function ENT:Think()
 				if self.NextSignalLink.RouteNumberOverrite and (not self.Red or self.InvationSignal) and self.Routes[self.Route or 1].EnRou then
 					number = number..self.NextSignalLink.RouteNumberOverrite
 				end
-				if self.NextSignalLink.RouteNumber and (self.Routes[self.Route or 1].EnRou and not self.AutoEnabled and (not self.Red or self.InvationSignal)) then
+				if self.NextSignalLink.RouteNumber and (self.Routes[self.Route or 1].EnRou and not self.AutoEnabled or (not self.Red or self.InvationSignal)) then
 					number = number..self.NextSignalLink.RouteNumber
 				end
 				--print(self.Name,self.NextSignalLink.RouteNumberOverrite)
