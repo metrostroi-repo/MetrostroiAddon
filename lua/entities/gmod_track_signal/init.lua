@@ -561,7 +561,7 @@ function ENT:Think()
 				if self.NextSignalLink.RouteNumberOverrite and (not self.Red or self.InvationSignal) and self.Routes[self.Route or 1].EnRou then
 					number = number..self.NextSignalLink.RouteNumberOverrite
 				end
-				if self.NextSignalLink.RouteNumber and (self.Routes[self.Route or 1].EnRou and not self.AutoEnabled or self.InvationSignal) then
+				if self.NextSignalLink.RouteNumber and (self.Routes[self.Route or 1].EnRou and not self.AutoEnabled and (not self.Red or self.InvationSignal)) then
 					number = number..self.NextSignalLink.RouteNumber
 				end
 				--print(self.Name,self.NextSignalLink.RouteNumberOverrite)
@@ -574,7 +574,7 @@ function ENT:Think()
 			number = number.."W"
 		end
 		if self.KGU then number = number.."K" end
-		if number then self:SetNW2String("Number", not self.Red and number) end
+		if number then self:SetNW2String("Number",number) end
 
 		if self.ARSOnly then
 			if self.Sprites then
@@ -657,7 +657,7 @@ function ENT:Think()
 			number = number.."W"
 		end
 		if self.KGU then number = number.."K" end
-		if number then self:SetNW2String("Number",not self.Red and number) end
+		if number then self:SetNW2String("Number",number) end
 		local index = 1
 		self.Colors = ""
 		for k,v in ipairs(self.Lenses) do
