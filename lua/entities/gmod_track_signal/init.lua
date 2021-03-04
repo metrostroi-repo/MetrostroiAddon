@@ -574,7 +574,7 @@ function ENT:Think()
 			number = number.."W"
 		end
 		if self.KGU then number = number.."K" end
-		if number then self:SetNW2String("Number",number) end
+		if number then self:SetNW2String("Number", not self.Red and number) end
 
 		if self.ARSOnly then
 			if self.Sprites then
@@ -657,7 +657,7 @@ function ENT:Think()
 			number = number.."W"
 		end
 		if self.KGU then number = number.."K" end
-		if number then self:SetNW2String("Number",number) end
+		if number then self:SetNW2String("Number",not self.Red and number) end
 		local index = 1
 		self.Colors = ""
 		for k,v in ipairs(self.Lenses) do
