@@ -47,6 +47,7 @@ function TRAIN_SYSTEM:Initialize()
     self.K2 = false
     self.SD2 = 0
     self.SD3 = 0
+    self.SD4 = 0
     -- Isolation valves
     self.Train:LoadSystem("FrontBrakeLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
     self.Train:LoadSystem("RearBrakeLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
@@ -113,7 +114,7 @@ end
 
 function TRAIN_SYSTEM:Outputs()
     return { "BrakeLinePressure", "BrakeCylinderPressure", "DriverValvePosition",
-             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "SD2","SD3" }
+             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "SD2","SD3","SD4" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
@@ -472,7 +473,9 @@ function TRAIN_SYSTEM:Think(dT)
 
     if self.BrakeLinePressure <= 2.6 and self.SD2~=1 then self.SD2 = 1  end
     if self.BrakeLinePressure >= 2.8 and self.SD2~=0 then self.SD2 = 0 end
-    self.SD3 = (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.1 and 1 or 0
+    if self.BrakeLinePressure <= 2.0 and self.SD3~=1 then self.SD3 = 1  end
+    if self.BrakeLinePressure >= 2.2 and self.SD3~=0 then self.SD3 = 0 end    
+    self.SD4 = (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.1 and 1 or 0
     ----------------------------------------------------------------------------
     -- FIXME
     Train:SetNW2Bool("FbI",Train.FrontBrakeLineIsolation.Value ~= 0)
