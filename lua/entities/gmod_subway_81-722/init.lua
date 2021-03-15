@@ -52,8 +52,10 @@ function ENT:Initialize()
 
     -- Create seat entities
     self.DriverSeat = self:CreateSeat("driver",Vector(450-2,11,-35+2))
-    self.InstructorsSeat = self:CreateSeat("instructor",Vector(430,35,-30))
-    self.InstructorsSeat2 = self:CreateSeat("instructor",Vector(430,-20,-30))
+    self.InstructorsSeat = self:CreateSeat("instructor",Vector(440,42,-50),Angle(0,60,0),"models/vehicles/prisoner_pod_inner.mdl")
+    self.InstructorsSeat2 = self:CreateSeat("instructor",Vector(420,12,-47),Angle(0,90,0),"models/vehicles/prisoner_pod_inner.mdl")
+    self.InstructorsSeat3 = self:CreateSeat("instructor",Vector(428,-19,-50),Angle(0,120,0),"models/vehicles/prisoner_pod_inner.mdl")
+    self.InstructorsSeat4 = self:CreateSeat("instructor",Vector(455,-30,-50),Angle(0,90,0),"models/vehicles/prisoner_pod_inner.mdl")
 
     -- Hide seats
     self.DriverSeat:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -62,6 +64,10 @@ function ENT:Initialize()
     self.InstructorsSeat:SetColor(Color(0,0,0,0))
     self.InstructorsSeat2:SetRenderMode(RENDERMODE_TRANSALPHA)
     self.InstructorsSeat2:SetColor(Color(0,0,0,0))
+    self.InstructorsSeat3:SetRenderMode(RENDERMODE_TRANSALPHA)
+    self.InstructorsSeat3:SetColor(Color(0,0,0,0))
+    self.InstructorsSeat4:SetRenderMode(RENDERMODE_TRANSALPHA)
+    self.InstructorsSeat4:SetColor(Color(0,0,0,0))
 
     -- Create bogeys
     self.FrontBogey = self:CreateBogey(Vector( 322,0,-90),Angle(0,180,0),true,"722")

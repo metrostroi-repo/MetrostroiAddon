@@ -130,7 +130,7 @@ function TRAIN_SYSTEM:Think(dT)
         Train:WriteTrainWire(13,S["RVnE"]*C(Train.KRO.Value==0))
         Train:WriteTrainWire(36,BO*Train.SF3.Value*C(Train.VRU.Value >0)*self.CabActive)
         Train:WriteTrainWire(34,S["RU"])
-        Train:WriteTrainWire(19,S["RU"]*Train.EmergencyDrive.Value)
+        Train:WriteTrainWire(19,S["RU"]*(1-Train.Pneumatic.SD3)*Train.EmergencyDrive.Value)
 
         Train:WriteTrainWire(27,BO*S["RU"])
         Train:WriteTrainWire(29,self.BTB*S["RU"]*(C(Panel.Controller<=-2)+Train.EmergencyBrakeTPlus.Value))
@@ -200,7 +200,7 @@ function TRAIN_SYSTEM:Think(dT)
     Train:WriteTrainWire(8,W[-8]*S["DoorsP"]*Train.S1.Value)
 
     Panel.DoorsW = S["DoorsP"]*(1-Train.S1.Value)
-    Panel.BrW = BO*Train.SF36.Value*Train.Pneumatic.SD3
+    Panel.BrW = BO*Train.SF36.Value*Train.Pneumatic.SD4
     Panel.AnnouncerPlaying = W[15]
     S["WagP"] = Train.Battery.Value*Train.SF33.Value
     if self.HaveAsyncInverter > 0 then

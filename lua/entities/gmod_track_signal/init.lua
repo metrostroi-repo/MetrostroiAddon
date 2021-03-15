@@ -558,11 +558,13 @@ function ENT:Think()
 				else
 					self.RouteNumberOverrite = self.RouteNumber
 				end
-				if self.NextSignalLink.RouteNumberOverrite and (not self.Red or self.InvationSignal) and self.Routes[self.Route or 1].EnRou then
-					number = number..self.NextSignalLink.RouteNumberOverrite
-				end
-				if self.NextSignalLink.RouteNumber and (self.Routes[self.Route or 1].EnRou and not self.AutoEnabled or self.InvationSignal) then
-					number = number..self.NextSignalLink.RouteNumber
+				if (not self.Red or self.InvationSignal) and self.Routes[self.Route or 1].EnRou then
+					if self.NextSignalLink.RouteNumberOverrite then
+						number = number..self.NextSignalLink.RouteNumberOverrite
+					end
+					if self.NextSignalLink.RouteNumber and not self.AutoEnabled then
+						number = number..self.NextSignalLink.RouteNumber
+					end
 				end
 				--print(self.Name,self.NextSignalLink.RouteNumberOverrite)
 				self.RouteNumberOverrite = (self.RouteNumberOverrite or "")..number
