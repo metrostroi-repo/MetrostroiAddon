@@ -90,16 +90,18 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
     local TLM = self.TrafficLightModels[self.LightType]
     for k,v in pairs(TLM) do
         if type(v) == "string" and not k:find("long") then
-            if IsValid(self.Models[1][add and v..add or v]) then break else
-                if TLM[k.."_long"] and LenseNum >= 7 then
-                    self.Models[1][add and v..add or v] = ClientsideModel(TLM[k.."_long"],RENDERGROUP_OPAQUE)
+			local idx = add and v..add or v
+            if IsValid(self.Models[1][idx]) then break else
+				local k_long = k.."_long"
+                if TLM[k_long] and LenseNum >= 7 then
+                    self.Models[1][idx] = ClientsideModel(TLM[k_long],RENDERGROUP_OPAQUE)
                     self.LongOffset = Vector(0,0,TLM[k.."_long_pos"])
                 else
                     self.Models[1][add and v..add or v] = ClientsideModel(v,RENDERGROUP_OPAQUE)
                 end
-                self.Models[1][add and v..add or v]:SetPos(self:LocalToWorld(pos))
-                self.Models[1][add and v..add or v]:SetAngles(self:LocalToWorldAngles(ang))
-                self.Models[1][add and v..add or v]:SetParent(self)
+                self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
+                self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
+                self.Models[1][idx]:SetParent(self)
             end
         end
     end
@@ -116,23 +118,26 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
         self.RN = self.RN + 1
     end
     local id = self.RN
-    if id and not IsValid(self.Models[1]["rou"..id]) then
+	local rouid = id and "rou"..id
+    if rouid and not IsValid(self.Models[1][rouid]) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "2" or "") or "5")
-        self.Models[1]["rou"..id] = ClientsideModel(self.LampIndicatorModels..rnadd..".mdl",RENDERGROUP_OPAQUE)
-        self.Models[1]["rou"..id]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*Vector(self.Left and 0.2 or 1)))
-        self.Models[1]["rou"..id]:SetAngles(self:GetAngles())
-        self.Models[1]["rou"..id]:SetParent(self)
+        self.Models[1][rouid] = ClientsideModel(self.LampIndicatorModels..rnadd..".mdl",RENDERGROUP_OPAQUE)
+        self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*Vector(self.Left and 0.2 or 1)))
+        self.Models[1][rouid]:SetAngles(self:GetAngles())
+        self.Models[1][rouid]:SetParent(self)
         if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset*Vector(self.Left and 0.2 or 1) end
         self.RN = self.RN + 1
     end
     if notM then
         if glass then
+			local ID_glass = tostring(ID).."_glass"
             for i,tbl in pairs(glass) do
-                if not IsValid(self.Models[1][tostring(ID).."_glass"..i]) then  --NEWLENSES
-                    self.Models[1][tostring(ID).."_glass"..i] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
-                    self.Models[1][tostring(ID).."_glass"..i]:SetPos(self:LocalToWorld(pos+tbl[2]*Vector(add and -1 or 1,1,1)))
-                    self.Models[1][tostring(ID).."_glass"..i]:SetAngles(self:LocalToWorldAngles(ang))
-                    self.Models[1][tostring(ID).."_glass"..i]:SetParent(self)
+				local ID_glassi = ID_glass..i
+                if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
+                    self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
+                    self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*Vector(add and -1 or 1,1,1)))
+                    self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
+                    self.Models[1][ID_glassi]:SetParent(self)
                 end
             end
         end
@@ -141,43 +146,47 @@ end
 
 function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
 	local StateAndChange = State > 0 and Change
-	if IsValid(self.Models[3][ID..ID2]) then
+	local IDID2 = ID..ID2
+	if IsValid(self.Models[3][IDID2]) then
         if StateAndChange then
-            self.Models[3][ID..ID2]:SetColor(Color(255,255,255,State*255))
+            self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
         elseif State == 0 then
-            self.Models[3][ID..ID2]:Remove()
+            self.Models[3][IDID2]:Remove()
         end
 	elseif StateAndChange then
-        self.Models[3][ID..ID2] = ClientsideModel(self.LampBaseModel,RENDERGROUP_OPAQUE)
-        self.Models[3][ID..ID2]:SetPos(self:LocalToWorld(pos))
-        self.Models[3][ID..ID2]:SetAngles(self:LocalToWorldAngles(ang))
-        self.Models[3][ID..ID2]:SetSkin(skin)
-        self.Models[3][ID..ID2]:SetParent(self)
-        self.Models[3][ID..ID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
-        self.Models[3][ID..ID2]:SetColor(Color_255_255_255_0)
+        self.Models[3][IDID2] = ClientsideModel(self.LampBaseModel,RENDERGROUP_OPAQUE)
+        self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
+        self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
+        self.Models[3][IDID2]:SetSkin(skin)
+        self.Models[3][IDID2]:SetParent(self)
+        self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
+        self.Models[3][IDID2]:SetColor(Color_255_255_255_0)
 	end
 end
 
 function ENT:SpawnLetter(i,model,pos,letter,double)
+	local LetMaterialsStart = self.LetMaterials.."let_start"
+	local LetMaterialsletter = self.LetMaterials..letter
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle_0_180_0))
         self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePosition+pos))
         self.Models[2][i]:SetParent(self)
         for k,v in pairs(self.Models[2][i]:GetMaterials()) do
-            if v:find(self.LetMaterials.."let_start") then
-                self.Models[2][i]:SetSubMaterial(k-1,self.LetMaterials..letter)
+            if v:find(LetMaterialsStart) then
+                self.Models[2][i]:SetSubMaterial(k-1,LetMaterialsletter)
             end
         end
     end
-    if not double and not IsValid(self.Models[2][i.."d"]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
-        self.Models[2][i.."d"] = ClientsideModel(model,RENDERGROUP_OPAQUE)
-        self.Models[2][i.."d"]:SetAngles(self:LocalToWorldAngles(Angle_0_180_0))
-        self.Models[2][i.."d"]:SetPos(self:LocalToWorld((self.BasePosition+pos)*Vector_m1_1_1))
-        self.Models[2][i.."d"]:SetParent(self)
-        for k,v in pairs(self.Models[2][i.."d"]:GetMaterials()) do
-            if v:find(self.LetMaterials.."let_start") then
-                self.Models[2][i.."d"]:SetSubMaterial(k-1,self.LetMaterials..letter)
+	local id = i.."d"
+    if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
+        self.Models[2][id] = ClientsideModel(model,RENDERGROUP_OPAQUE)
+        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle_0_180_0))
+        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePosition+pos)*Vector_m1_1_1))
+        self.Models[2][id]:SetParent(self)
+        for k,v in pairs(self.Models[2][id]:GetMaterials()) do
+            if v:find(LetMaterialsStart) then
+                self.Models[2][id]:SetSubMaterial(k-1,LetMaterialsletter)
             end
         end
     end
@@ -496,6 +505,8 @@ function ENT:Think()
 
             ID = ID + 1
         end
+		local LampIndicatorModels_numb_mdl = self.LampIndicatorModels.."_numb.mdl"
+		local LampIndicatorModels_lamp_mdl = self.LampIndicatorModels.."_lamp.mdl"
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
             local State1 = self:Animate("rou1"..k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
@@ -505,7 +516,7 @@ function ENT:Think()
 			local rou1k = "rou1"..k
             if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
             if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
-                self.Models[3][rou1k] = ClientsideModel(self.LampIndicatorModels..(v[3] and "_numb" or "_lamp")..".mdl",RENDERGROUP_OPAQUE)
+                self.Models[3][rou1k] = ClientsideModel(v[3] and LampIndicatorModels_numb_mdl or LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
                 self.Models[3][rou1k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4]))
                 self.Models[3][rou1k]:SetAngles(self:GetAngles())
                 self.Models[3][rou1k]:SetParent(self)
@@ -521,7 +532,7 @@ function ENT:Think()
                 end
             end
             if not IsValid(self.Models[3][rou2k]) and v[3] and v[2] and State2 > 0 then
-                self.Models[3][rou2k] = ClientsideModel(self.LampIndicatorModels.."_numb.mdl",RENDERGROUP_OPAQUE)
+                self.Models[3][rou2k] = ClientsideModel(LampIndicatorModels_numb_mdl,RENDERGROUP_OPAQUE)
                 self.Models[3][rou2k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4] + Vector_0_0_7p2))
                 self.Models[3][rou2k]:SetAngles(self:GetAngles())
                 self.Models[3][rou2k]:SetParent(self)
@@ -540,7 +551,7 @@ function ENT:Think()
         if self.Arrow then
             local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
             if not IsValid(self.Models[3]["roua"]) and State > 0 then
-                self.Models[3]["roua"] = ClientsideModel(self.LampIndicatorModels.."_lamp.mdl",RENDERGROUP_OPAQUE)
+                self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
                 self.SpecRouteNumbers.pos = (self.BasePosition+offset-Vector_3_m1_3)-self.RouteNumberOffset+ Vector_10p5_0_m6
                 if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*Vector_m0p8_1_0p94 end
                 self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(Vector_6p2_0_24p5))
