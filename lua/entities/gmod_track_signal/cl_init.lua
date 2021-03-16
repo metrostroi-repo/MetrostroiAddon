@@ -147,7 +147,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
         elseif State == 0 then
             self.Models[3][ID..ID2]:Remove()
         end
-	elseif StateAndChange
+	elseif StateAndChange then
         self.Models[3][ID..ID2] = ClientsideModel("models/metrostroi/signals/mus/lamp_base.mdl",RENDERGROUP_OPAQUE)
         self.Models[3][ID..ID2]:SetPos(self:LocalToWorld(pos))
         self.Models[3][ID..ID2]:SetAngles(self:LocalToWorldAngles(ang))
