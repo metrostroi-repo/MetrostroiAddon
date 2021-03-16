@@ -118,7 +118,7 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
     local id = self.RN
     if id and not IsValid(self.Models[1]["rou"..id]) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "2" or "") or "5")
-        self.Models[1]["rou"..id] = ClientsideModel("models/metrostroi/signals/mus/light_lampindicator"..rnadd..".mdl",RENDERGROUP_OPAQUE)
+        self.Models[1]["rou"..id] = ClientsideModel(self.LampIndicatorModels..rnadd..".mdl",RENDERGROUP_OPAQUE)
         self.Models[1]["rou"..id]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*Vector(self.Left and 0.2 or 1)))
         self.Models[1]["rou"..id]:SetAngles(self:GetAngles())
         self.Models[1]["rou"..id]:SetParent(self)
@@ -148,7 +148,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
             self.Models[3][ID..ID2]:Remove()
         end
 	elseif StateAndChange then
-        self.Models[3][ID..ID2] = ClientsideModel("models/metrostroi/signals/mus/lamp_base.mdl",RENDERGROUP_OPAQUE)
+        self.Models[3][ID..ID2] = ClientsideModel(self.LampBaseModel,RENDERGROUP_OPAQUE)
         self.Models[3][ID..ID2]:SetPos(self:LocalToWorld(pos))
         self.Models[3][ID..ID2]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[3][ID..ID2]:SetSkin(skin)
@@ -165,8 +165,8 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
         self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePosition+pos))
         self.Models[2][i]:SetParent(self)
         for k,v in pairs(self.Models[2][i]:GetMaterials()) do
-            if v:find("models/metrostroi/signals/let/let_start") then
-                self.Models[2][i]:SetSubMaterial(k-1,"models/metrostroi/signals/let/"..letter)
+            if v:find(self.LetMaterials.."let_start") then
+                self.Models[2][i]:SetSubMaterial(k-1,self.LetMaterials..letter)
             end
         end
     end
@@ -176,8 +176,8 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
         self.Models[2][i.."d"]:SetPos(self:LocalToWorld((self.BasePosition+pos)*Vector_m1_1_1))
         self.Models[2][i.."d"]:SetParent(self)
         for k,v in pairs(self.Models[2][i.."d"]:GetMaterials()) do
-            if v:find("models/metrostroi/signals/let/let_start") then
-                self.Models[2][i.."d"]:SetSubMaterial(k-1,"models/metrostroi/signals/let/"..letter)
+            if v:find(self.LetMaterials.."let_start") then
+                self.Models[2][i.."d"]:SetSubMaterial(k-1,self.LetMaterials..letter)
             end
         end
     end
@@ -312,7 +312,7 @@ function ENT:Think()
             if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
                 local id = self.RouteNumbers.sep
                 local rnadd = self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "3" or "4"
-                self.Models[1]["rous"] = ClientsideModel("models/metrostroi/signals/mus/light_lampindicator"..rnadd..".mdl",RENDERGROUP_OPAQUE)
+                self.Models[1]["rous"] = ClientsideModel(self.LampIndicatorModels..rnadd..".mdl",RENDERGROUP_OPAQUE)
                 self.RouteNumbers[id].pos = (self.BasePosition+offset+self.LongOffset-Vector_8_0_0)
                 if self.Left then self.RouteNumbers[id].pos = self.RouteNumbers[id].pos*Vector_m0p9_1_1 end
                 self.Models[1]["rous"]:SetPos(self:LocalToWorld(self.RouteNumbers[id].pos))
@@ -379,7 +379,7 @@ function ENT:Think()
             end
             if self.Arrow then
                 local id = self.Arrow
-                self.Models[1]["roua"] = ClientsideModel("models/metrostroi/signals/mus/light_lampindicator4.mdl",RENDERGROUP_OPAQUE)
+                self.Models[1]["roua"] = ClientsideModel(self.LampIndicatorModels.."4.mdl",RENDERGROUP_OPAQUE)
                 self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-Vector_3_0_3)*Vector(self.Left and -1 or 1,1,self.Left and 0.85 or 1)-(self.RouteNumberOffset or Vector_0_0_0)
                 self.Models[1]["roua"]:SetPos(self:LocalToWorld(self.SpecRouteNumbers.pos))
                 self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(Angle(self.Left and -90 or 90,0,0)))
@@ -392,12 +392,12 @@ function ENT:Think()
             local double = self.LightType ~= 1 and string.find(self.Name,"^[A-Z][A-Z]")
             if double then
                     if not self.Left or self.Double then
-                        self:SpawnLetter(0,"models/metrostroi/signals/mus/sign_letter_small.mdl",offset - Vector_m1p5_0_0,(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),true)
-                        self:SpawnLetter(1,"models/metrostroi/signals/mus/sign_letter_small.mdl",offset - Vector_1p5_0_0,(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),true)
+                        self:SpawnLetter(0,self.SignLetterSmallModel,offset - Vector_m1p5_0_0,(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),true)
+                        self:SpawnLetter(1,self.SignLetterSmallModel,offset - Vector_1p5_0_0,(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),true)
                     end
                     if self.Left or self.Double then
-                        self:SpawnLetter(0,"models/metrostroi/signals/mus/sign_letter_small.mdl",offset - Vector_1p5_0_0,(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),false)
-                        self:SpawnLetter(1,"models/metrostroi/signals/mus/sign_letter_small.mdl",offset - Vector_m1p5_0_0,(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),false)
+                        self:SpawnLetter(0,self.SignLetterSmallModel,offset - Vector_1p5_0_0,(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),false)
+                        self:SpawnLetter(1,self.SignLetterSmallModel,offset - Vector_m1p5_0_0,(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),false)
                     end
             end
             local min = 0
@@ -407,13 +407,13 @@ function ENT:Think()
                 if self.Name[i+1] == " " then continue end
                 if self.Name[i+1] == "/" then min = min + 1; continue end
                 --if not IsValid(self.Models[2][i]) then
-                self:SpawnLetter(i,"models/metrostroi/signals/mus/sign_letter.mdl",offset - Vector(0,0,id*5.85),(Metrostroi.LiterWarper[self.Name[i+1]] or self.Name[i+1]))
+                self:SpawnLetter(i,self.SignLetterModel,offset - Vector(0,0,id*5.85),(Metrostroi.LiterWarper[self.Name[i+1]] or self.Name[i+1]))
                 --end
             end
             if self.Name and self.Name:match("(/+)$") then
                 local i = #self.Name
                 local id = (double and i-1 or i) - min
-                self:SpawnLetter(i,"models/metrostroi/signals/mus/sign_letter.mdl",offset - Vector(0,0,id*5.85),Format("s%d",math.min(3,#self.Name:match("(/+)$"))))
+                self:SpawnLetter(i,self.SignLetterModel,offset - Vector(0,0,id*5.85),Format("s%d",math.min(3,#self.Name:match("(/+)$"))))
             end
         else
             local k = "m1"
@@ -505,7 +505,7 @@ function ENT:Think()
 			local rou1k = "rou1"..k
             if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
             if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
-                self.Models[3][rou1k] = ClientsideModel("models/metrostroi/signals/mus/light_lampindicator_"..(v[3] and "numb" or "lamp")..".mdl",RENDERGROUP_OPAQUE)
+                self.Models[3][rou1k] = ClientsideModel(self.LampIndicatorModels..(v[3] and "_numb" or "_lamp")..".mdl",RENDERGROUP_OPAQUE)
                 self.Models[3][rou1k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4]))
                 self.Models[3][rou1k]:SetAngles(self:GetAngles())
                 self.Models[3][rou1k]:SetParent(self)
@@ -521,7 +521,7 @@ function ENT:Think()
                 end
             end
             if not IsValid(self.Models[3][rou2k]) and v[3] and v[2] and State2 > 0 then
-                self.Models[3][rou2k] = ClientsideModel("models/metrostroi/signals/mus/light_lampindicator_numb.mdl",RENDERGROUP_OPAQUE)
+                self.Models[3][rou2k] = ClientsideModel(self.LampIndicatorModels.."_numb.mdl",RENDERGROUP_OPAQUE)
                 self.Models[3][rou2k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4] + Vector_0_0_7p2))
                 self.Models[3][rou2k]:SetAngles(self:GetAngles())
                 self.Models[3][rou2k]:SetParent(self)
@@ -540,7 +540,7 @@ function ENT:Think()
         if self.Arrow then
             local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
             if not IsValid(self.Models[3]["roua"]) and State > 0 then
-                self.Models[3]["roua"] = ClientsideModel("models/metrostroi/signals/mus/light_lampindicator_lamp.mdl",RENDERGROUP_OPAQUE)
+                self.Models[3]["roua"] = ClientsideModel(self.LampIndicatorModels.."_lamp.mdl",RENDERGROUP_OPAQUE)
                 self.SpecRouteNumbers.pos = (self.BasePosition+offset-Vector_3_m1_3)-self.RouteNumberOffset+ Vector_10p5_0_m6
                 if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*Vector_m0p8_1_0p94 end
                 self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(Vector_6p2_0_24p5))

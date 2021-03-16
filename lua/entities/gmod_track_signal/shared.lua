@@ -294,3 +294,12 @@ ENT.SignalConverter = {
 	B = 4,
 	W = 5
 }
+
+ENT.ArsBoxModel = "models/metrostroi/signals/mus/ars_box.mdl"
+ENT.ArsBoxMittorModel = "models/metrostroi/signals/mus/ars_box_mittor.mdl"
+ENT.LampIndicatorModels = "models/metrostroi/signals/mus/light_lampindicator"
+ENT.LampBaseModel = "models/metrostroi/signals/mus/lamp_base.mdl"
+ENT.SignLetterSmallModel = "models/metrostroi/signals/mus/sign_letter_small.mdl"
+ENT.SignLetterModel = "models/metrostroi/signals/mus/sign_letter.mdl"
+ENT.LetMaterials = "models/metrostroi/signals/let/"
+
