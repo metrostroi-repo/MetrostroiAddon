@@ -1,31 +1,24 @@
+include("shared.lua")
+
 --по-нормальному надо написать парсер, который это будет делать. И просто пропарсить все скрипты
 local Vector_m1_1_1 = Vector(-1,1,1)
-local Vector_8_0_0 = Vector(8,0,0)
-local Vector_m0p9_1_1 = Vector(-0.9,1,1)
-local Vector_10_0_0 = Vector(10,0,0)
-local Vector_3_0_3 = Vector(3,0,3)
-local Vector_m1p5_0_0 = Vector(-1.5,0,0)
-local Vector_1p5_0_0 = Vector(1.5,0,0)
-local Vector_0_0_1p62 = Vector(0,0,1.62)
-local Vector_0_0_7p2 = Vector(0,0,7.2)
-local Vector_3_m1_3 = Vector(3,-1,3)
-local Vector_10p5_0_m6 = Vector(10.5,0,-6)
-local Vector_m0p8_1_0p94 = Vector(-0.8,1,0.94)
-local Vector_6p2_0_24p5 = Vector(6.2,0,24.5)
+local Vector_1_1_0 = Vector(1,1)
+local Vector_m1_1_0 = Vector(-1,1)
 local Vector_48_0_150 = Vector(48,0,150)
 
 
 local Angle_0_180_0 = Angle(0,180,0)
 local Angle_180_0_0 = Angle(180,0,0)
 local Angle_180_0_90 = Angle(0,180,90)
+local Angle_m90_0_0 = Angle(-90,0,0)
+local Angle_90_0_0 = Angle(90,0,0)
+local Angle_m1_1_1 = Angle(-1,1,1)
+local Angle_1_1_1 = Angle(1,1,1)
 
 
 local Color_0_100_0_255 = Color(0,100,0,255)
 local Color_200_0_0_255 = Color(200,0,0,255)
-
 --следать за: векторы, углы, цвета, повторяющиеся вызовы, повторяющаяся конкатинация
-
-include("shared.lua")
 
 --------------------------------------------------------------------------------
 function ENT:Initialize()
@@ -117,11 +110,12 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
 	local rouid = id and "rou"..id
     if rouid and not IsValid(self.Models[1][rouid]) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "2" or "") or "5")
-        self.Models[1][rouid] = ClientsideModel(self.LampIndicatorModels..rnadd..".mdl",RENDERGROUP_OPAQUE)
-        self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*Vector(self.Left and 0.2 or 1)))
+		local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
+        self.Models[1][rouid] = ClientsideModel(LampIndicator.model..rnadd..".mdl",RENDERGROUP_OPAQUE)
+        self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2])))
         self.Models[1][rouid]:SetAngles(self:GetAngles())
         self.Models[1][rouid]:SetParent(self)
-        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset*Vector(self.Left and 0.2 or 1) end
+        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2]) end
         self.RN = self.RN + 1
     end
     if notM then
@@ -131,7 +125,7 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
 				local ID_glassi = ID_glass..i
                 if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
                     self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
-                    self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*Vector(add and -1 or 1,1,1)))
+                    self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and Vector_m1_1_1 or 1)))
                     self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
                     self.Models[1][ID_glassi]:SetParent(self)
                 end
@@ -150,7 +144,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
             self.Models[3][IDID2]:Remove()
         end
 	elseif StateAndChange then
-        self.Models[3][IDID2] = ClientsideModel(self.LampBaseModel,RENDERGROUP_OPAQUE)
+        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase,RENDERGROUP_OPAQUE)
         self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
         self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[3][IDID2]:SetSkin(skin)
@@ -161,8 +155,9 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
 end
 
 function ENT:SpawnLetter(i,model,pos,letter,double)
-	local LetMaterialsStart = self.LetMaterials.."let_start"
-	local LetMaterialsletter = self.LetMaterials..letter
+	local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials
+	local LetMaterialsStart = LetMaterials.."let_start"
+	local LetMaterialsletter = LetMaterials..letter
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle_0_180_0))
@@ -317,17 +312,17 @@ function ENT:Think()
             if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
                 local id = self.RouteNumbers.sep
                 local rnadd = self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "3" or "4"
-                self.Models[1]["rous"] = ClientsideModel(self.LampIndicatorModels..rnadd..".mdl",RENDERGROUP_OPAQUE)
-                self.RouteNumbers[id].pos = (self.BasePosition+offset+self.LongOffset-Vector_8_0_0)
-                if self.Left then self.RouteNumbers[id].pos = self.RouteNumbers[id].pos*Vector_m0p9_1_1 end
+                self.Models[1]["rous"] = ClientsideModel(TLM.LampIndicator.model..rnadd..".mdl",RENDERGROUP_OPAQUE)
+                self.RouteNumbers[id].pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[3])
+                if self.Left then self.RouteNumbers[id].pos = self.RouteNumbers[id].pos*TLM.LampIndicator[4] end
                 self.Models[1]["rous"]:SetPos(self:LocalToWorld(self.RouteNumbers[id].pos))
                 self.Models[1]["rous"]:SetAngles(self:GetAngles())
                 self.Models[1]["rous"]:SetParent(self)
             end
             if #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep) then
                 self.RN = 1
-                self.RouteNumberOffset = Vector_10_0_0
-                offset = offset + self.RouteNumberOffset*Vector(self.Left and -1 or 1,1,1)
+                self.RouteNumberOffset = TLM.RouteNumberOffset
+                offset = offset + self.RouteNumberOffset*(self.Left and Vector_m1_1_1 or 1)
             else
                 self.RouteNumberOffset = nil
                 self.RN = nil
@@ -372,7 +367,7 @@ function ENT:Think()
                         ID2 = ID2 + 1
                         if not self.Signals[ID2] then self.Signals[ID2] = {} end
                         if not self.DoubleL then
-                            self:SetLight(ID,ID2,self.BasePosition*Vector(self.Left and -1 or 1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(self.Left and -1 or 1,1,1),angle_zero,self.SignalConverter[v[i]]-1,0    )
+                            self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector_m1_1_1 or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector_m1_1_1 or 1),angle_zero,self.SignalConverter[v[i]]-1,0    )
                         else
                             self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],angle_zero,self.SignalConverter[v[i]]-1,0)
                             self:SetLight(ID,ID2.."x",self.BasePosition*Vector_m1_1_1 + offsetAndLongOffset + data[3][i-1]*Vector_m1_1_1,angle_zero,self.SignalConverter[v[i]]-1,0)
@@ -384,10 +379,10 @@ function ENT:Think()
             end
             if self.Arrow then
                 local id = self.Arrow
-                self.Models[1]["roua"] = ClientsideModel(self.LampIndicatorModels.."4.mdl",RENDERGROUP_OPAQUE)
-                self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-Vector_3_0_3)*Vector(self.Left and -1 or 1,1,self.Left and 0.85 or 1)-(self.RouteNumberOffset or vector_origin)
+                self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.model.."4.mdl",RENDERGROUP_OPAQUE)
+                self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[5])*(self.Left and TLM.LampIndicator[6] or 1) - (self.RouteNumberOffset or vector_origin)
                 self.Models[1]["roua"]:SetPos(self:LocalToWorld(self.SpecRouteNumbers.pos))
-                self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(Angle(self.Left and -90 or 90,0,0)))
+                self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and AnAngle_m90_0_0 or Angle_90_0_0))
                 self.Models[1]["roua"]:SetParent(self)
             end
             offset = self.RenderOffset[self.LightType]+(OneLense and TLM.name_one or TLM.name)+(OneLense and self.RouteNumberOffset or vector_origin)
@@ -397,28 +392,28 @@ function ENT:Think()
             local double = self.LightType ~= 1 and string.find(self.Name,"^[A-Z][A-Z]")
             if double then
                     if not self.Left or self.Double then
-                        self:SpawnLetter(0,self.SignLetterSmallModel,offset - Vector_m1p5_0_0,(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),true)
-                        self:SpawnLetter(1,self.SignLetterSmallModel,offset - Vector_1p5_0_0,(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),true)
+                        self:SpawnLetter(0,TLM.SignLetterSmall.model,offset - TLM.SignLetterSmall[2],(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),true)
+                        self:SpawnLetter(1,TLM.SignLetterSmall.model,offset - TLM.SignLetterSmall[1],(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),true)
                     end
                     if self.Left or self.Double then
-                        self:SpawnLetter(0,self.SignLetterSmallModel,offset - Vector_1p5_0_0,(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),false)
-                        self:SpawnLetter(1,self.SignLetterSmallModel,offset - Vector_m1p5_0_0,(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),false)
+                        self:SpawnLetter(0,TLM.SignLetterSmall.model,offset - TLM.SignLetterSmall[1],(Metrostroi.LiterWarper[self.Name[0+1]] or self.Name[0+1]),false)
+                        self:SpawnLetter(1,TLM.SignLetterSmall.model,offset - TLM.SignLetterSmall[2],(Metrostroi.LiterWarper[self.Name[1+1]] or self.Name[1+1]),false)
                     end
             end
             local min = 0
             for i = double and 2 or 0,#self.Name-1 do
                 local id = (double and i-1 or i) - min
-                if double and i == 2 then offset = offset + Vector_0_0_1p62 end
+                if double and i == 2 then offset = offset + TLM.DoubleOffset end
                 if self.Name[i+1] == " " then continue end
                 if self.Name[i+1] == "/" then min = min + 1; continue end
                 --if not IsValid(self.Models[2][i]) then
-                self:SpawnLetter(i,self.SignLetterModel,offset - Vector(0,0,id*5.85),(Metrostroi.LiterWarper[self.Name[i+1]] or self.Name[i+1]))
+                self:SpawnLetter(i,TLM.SignLetter.model,offset - Vector(0,0,id*TLM.SignLetter.z),(Metrostroi.LiterWarper[self.Name[i+1]] or self.Name[i+1]))
                 --end
             end
             if self.Name and self.Name:match("(/+)$") then
                 local i = #self.Name
                 local id = (double and i-1 or i) - min
-                self:SpawnLetter(i,self.SignLetterModel,offset - Vector(0,0,id*5.85),Format("s%d",math.min(3,#self.Name:match("(/+)$"))))
+                self:SpawnLetter(i,TLM.SignLetter.model,offset - Vector(0,0,id*TLM.SignLetter.z),Format("s%d",math.min(3,#self.Name:match("(/+)$"))))
             end
         else
             local k = "m1"
@@ -426,8 +421,8 @@ function ENT:Think()
             if not IsValid(self.Models[1][k]) then
                 local v = TLM["m1"]
                 self.Models[1][k] = ClientsideModel(v,RENDERGROUP_OPAQUE)
-                self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePosition*Vector(self.Left and -1 or 1,1,1)))
-                self.Models[1][k]:SetAngles(self:LocalToWorldAngles(Angle(self.Left and -1 or 1,1,1)))
+                self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePosition*(self.Left and Vector_m1_1_1 or 1)))
+                self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle_m1_1_1 or Angle_1_1_1))
                 self.Models[1][k]:SetParent(self)
             end
         end
@@ -454,7 +449,7 @@ function ENT:Think()
         end
         if self.ARSOnly then return true end
         local offset = (self.RenderOffset[self.LightType] or vector_origin)
-        if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*Vector(self.Left and -1 or 1,1) end
+        if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and Vector_m1_1_0 or Vector_1_1_0) end
         local ID = 0
         local ID2 = 0
         local first = true
@@ -488,7 +483,7 @@ function ENT:Think()
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
 					local offsetAndLongOffset = offset + self.LongOffset
                     if not self.DoubleL then
-                        self:SetLight(ID,ID2,self.BasePosition*Vector(self.Left and -1 or 1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(self.Left and -1 or 1,1,1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector_m1_1_1 or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector_m1_1_1 or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     else
                         self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                         self:SetLight(ID,ID2.."x",self.BasePosition*Vector_m1_1_1 + offsetAndLongOffset + data[3][i-1]*Vector_m1_1_1,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
@@ -501,8 +496,9 @@ function ENT:Think()
 
             ID = ID + 1
         end
-		local LampIndicatorModels_numb_mdl = self.LampIndicatorModels.."_numb.mdl"
-		local LampIndicatorModels_lamp_mdl = self.LampIndicatorModels.."_lamp.mdl"
+
+		local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb.mdl"
+		local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
             local State1 = self:Animate("rou1"..k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
@@ -529,7 +525,7 @@ function ENT:Think()
             end
             if not IsValid(self.Models[3][rou2k]) and v[3] and v[2] and State2 > 0 then
                 self.Models[3][rou2k] = ClientsideModel(LampIndicatorModels_numb_mdl,RENDERGROUP_OPAQUE)
-                self.Models[3][rou2k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4] + Vector_0_0_7p2))
+                self.Models[3][rou2k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4] + TLM.RouteNumberOffset2))
                 self.Models[3][rou2k]:SetAngles(self:GetAngles())
                 self.Models[3][rou2k]:SetParent(self)
                 self.Models[3][rou2k]:SetSkin(self.OldRouteNumberSetup[5][v[2]] or tonumber(v[2])-1)
@@ -548,9 +544,9 @@ function ENT:Think()
             local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
             if not IsValid(self.Models[3]["roua"]) and State > 0 then
                 self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
-                self.SpecRouteNumbers.pos = (self.BasePosition+offset-Vector_3_m1_3)-self.RouteNumberOffset+ Vector_10p5_0_m6
-                if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*Vector_m0p8_1_0p94 end
-                self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(Vector_6p2_0_24p5))
+                self.SpecRouteNumbers.pos = (self.BasePosition+offset-TLM.SpecRouteNumberOffset)-self.RouteNumberOffset+TLM.RouteNumberOffset3
+                if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*TLM.SpecRouteNumberOffset2 end
+                self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(TLM.RouaOffset))
                 self.Models[3]["roua"]:SetAngles(self.Models[1]["roua"]:LocalToWorldAngles(Angle_180_0_0))
                 self.Models[3]["roua"]:SetParent(self)
                 if self.Left then
