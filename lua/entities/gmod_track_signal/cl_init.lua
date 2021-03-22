@@ -159,7 +159,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
 end
 
 function ENT:SpawnLetter(i,model,pos,letter,double)
-	local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials
+	local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials.str
 	local LetMaterialsStart = LetMaterials.."let_start"
 	local LetMaterialsletter = LetMaterials..letter
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then

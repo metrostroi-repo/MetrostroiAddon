@@ -306,7 +306,7 @@ for i = 0,2 do
 	ENT.TrafficLightModels[i].LampBase = {model = "models/metrostroi/signals/mus/lamp_base.mdl"}
 	ENT.TrafficLightModels[i].SignLetterSmall = {model = "models/metrostroi/signals/mus/sign_letter_small.mdl", Vector(1.5,0,0), Vector(-1.5,0,0)}
 	ENT.TrafficLightModels[i].SignLetter = {model = "models/metrostroi/signals/mus/sign_letter.mdl", z = 5.85}
-	ENT.TrafficLightModels[i].LetMaterials = "models/metrostroi/signals/let/"
+	ENT.TrafficLightModels[i].LetMaterials = {str = "models/metrostroi/signals/let/"}
 	
 	ENT.TrafficLightModels[i].RouteNumberOffset = Vector(10,0,0)
 	ENT.TrafficLightModels[i].DoubleOffset = Vector(0,0,1.62)
