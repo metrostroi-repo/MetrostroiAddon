@@ -298,12 +298,12 @@ ENT.SignalConverter = {
 
 for i = 0,2 do
 	--SERVER
-	ENT.TrafficLightModels[i].ArsBox = "models/metrostroi/signals/mus/ars_box.mdl"
-	ENT.TrafficLightModels[i].ArsBoxMittor = "models/metrostroi/signals/mus/ars_box_mittor.mdl"
+	ENT.TrafficLightModels[i].ArsBox = {model = "models/metrostroi/signals/mus/ars_box.mdl"}
+	ENT.TrafficLightModels[i].ArsBoxMittor = {model = "models/metrostroi/signals/mus/ars_box_mittor.mdl"}
 	
 	--CLIENT
 	ENT.TrafficLightModels[i].LampIndicator = {model = "models/metrostroi/signals/mus/light_lampindicator", Vector(0.2), Vector(1), Vector(8), Vector(-0.9,1,1), Vector(3,0,3), Vector(-1,1,0.85)}
-	ENT.TrafficLightModels[i].LampBase = "models/metrostroi/signals/mus/lamp_base.mdl"
+	ENT.TrafficLightModels[i].LampBase = {model = "models/metrostroi/signals/mus/lamp_base.mdl"}
 	ENT.TrafficLightModels[i].SignLetterSmall = {model = "models/metrostroi/signals/mus/sign_letter_small.mdl", Vector(1.5,0,0), Vector(-1.5,0,0)}
 	ENT.TrafficLightModels[i].SignLetter = {model = "models/metrostroi/signals/mus/sign_letter.mdl", z = 5.85}
 	ENT.TrafficLightModels[i].LetMaterials = "models/metrostroi/signals/let/"

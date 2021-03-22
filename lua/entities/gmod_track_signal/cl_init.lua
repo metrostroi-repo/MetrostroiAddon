@@ -144,7 +144,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
             self.Models[3][IDID2]:Remove()
         end
 	elseif StateAndChange then
-        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase,RENDERGROUP_OPAQUE)
+        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model,RENDERGROUP_OPAQUE)
         self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
         self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[3][IDID2]:SetSkin(skin)
