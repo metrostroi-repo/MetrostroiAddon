@@ -501,11 +501,11 @@ function ENT:Think()
 		local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
-            local State1 = self:Animate("rou1"..k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
+			local rou1k = "rou1"..k
+            local State1 = self:Animate(rou1k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
             local State2
             --if v[3] then
 			local rou2k = "rou2"..k
-			local rou1k = "rou1"..k
             if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
             if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
                 self.Models[3][rou1k] = ClientsideModel(v[3] and LampIndicatorModels_numb_mdl or LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
