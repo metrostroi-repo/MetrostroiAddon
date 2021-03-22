@@ -86,7 +86,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
                     self.Models[1][idx] = ClientsideModel(TLM[k_long],RENDERGROUP_OPAQUE)
                     self.LongOffset = Vector(0,0,TLM[k.."_long_pos"])
                 else
-                    self.Models[1][add and v..add or v] = ClientsideModel(v,RENDERGROUP_OPAQUE)
+                    self.Models[1][idx] = ClientsideModel(v,RENDERGROUP_OPAQUE)
                 end
                 self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
                 self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
