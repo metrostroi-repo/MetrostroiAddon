@@ -607,9 +607,9 @@ local cols = {
 }
 local function enableDebug()
     if debug:GetBool() then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiSignalDebug",function(bDrawingDepth,bDrawingSkybox)
-            for _,ent in pairs(ents.FindByClass("gmod_track_signal")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 384 then
+        hook.Add("PreDrawEffects","MetrostroiSignalDebug",function()
+            for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
+                if IsValid(sig) and LocalPlayer():GetPos():Distance(sig:GetPos()) < 384 then
                     local pos = sig:LocalToWorld(Vector_48_0_150)
                     local ang = sig:LocalToWorldAngles(Angle_180_0_90)
                     cam.Start3D2D(pos, ang, 0.25)
@@ -721,10 +721,10 @@ local function enableDebug()
             end
         end)
     else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiSignalDebug")
+        hook.Remove("PreDrawEffects","MetrostroiSignalDebug")
     end
 end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiSignalDebug")
+hook.Remove("PreDrawEffects","MetrostroiSignalDebug")
 cvars.AddChangeCallback( "metrostroi_drawsignaldebug", enableDebug)
 enableDebug()
 
