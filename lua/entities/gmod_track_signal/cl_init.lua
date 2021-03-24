@@ -1,25 +1,5 @@
 include("shared.lua")
 
---по-нормальному надо написать парсер, который это будет делать. И просто пропарсить все скрипты
-local Vector_m1_1_1 = Vector(-1,1,1)
-local Vector_1_1_0 = Vector(1,1)
-local Vector_m1_1_0 = Vector(-1,1)
-local Vector_48_0_150 = Vector(48,0,150)
-
-
-local Angle_0_180_0 = Angle(0,180,0)
-local Angle_180_0_0 = Angle(180,0,0)
-local Angle_180_0_90 = Angle(0,180,90)
-local Angle_m90_0_0 = Angle(-90,0,0)
-local Angle_90_0_0 = Angle(90,0,0)
-local Angle_m1_1_1 = Angle(-1,1,1)
-local Angle_1_1_1 = Angle(1,1,1)
-
-
-local Color_0_100_0_255 = Color(0,100,0,255)
-local Color_200_0_0_255 = Color(200,0,0,255)
---следать за: векторы, углы, цвета, повторяющиеся вызовы, повторяющаяся конкатинация
-
 --------------------------------------------------------------------------------
 function ENT:Initialize()
     self.Sig = ""
@@ -125,7 +105,7 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
 				local ID_glassi = ID_glass..i
                 if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
                     self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
-                    self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and Vector_m1_1_1 or 1)))
+                    self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and Vector(-1,1,1) or 1)))
                     self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
                     self.Models[1][ID_glassi]:SetParent(self)
                 end
@@ -153,7 +133,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
         self.Models[3][IDID2]:SetSkin(skin)
         self.Models[3][IDID2]:SetParent(self)
         self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
-        -- self.Models[3][IDID2]:SetColor(color_transparent)
+        -- self.Models[3][IDID2]:SetColor(Color(255, 255, 255, 0))
 		self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
 	end
 end
@@ -164,7 +144,7 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
 	local LetMaterialsletter = LetMaterials..letter
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
-        self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle_0_180_0))
+        self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
         self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePosition+pos))
         self.Models[2][i]:SetParent(self)
         for k,v in pairs(self.Models[2][i]:GetMaterials()) do
@@ -176,8 +156,8 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
 	local id = i.."d"
     if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
         self.Models[2][id] = ClientsideModel(model,RENDERGROUP_OPAQUE)
-        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle_0_180_0))
-        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePosition+pos)*Vector_m1_1_1))
+        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
+        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePosition+pos)*Vector(-1,1,1)))
         self.Models[2][id]:SetParent(self)
         for k,v in pairs(self.Models[2][id]:GetMaterials()) do
             if v:find(LetMaterialsStart) then
@@ -219,8 +199,8 @@ net.Receive("metrostroi-signal", function()
 end)
 
 function ENT:Think()
-	local CurTime = CurTime()--функция вызывается несколько раз, почему бы не поместить ее просто один раз в переменную
-	self:SetNextClientThink(CurTime + 0.05)--объективно чаще чем 20 раз в секунду ему обновляться не надо
+	local CurTime = CurTime()
+	self:SetNextClientThink(CurTime + 0.0333)
     self.PrevTime = self.PrevTime or RealTime()
     self.DeltaTime = (RealTime() - self.PrevTime)
     self.PrevTime = RealTime()
@@ -302,10 +282,10 @@ function ENT:Think()
                 end
             end
             if LenseNum == 0 then OneLense = false end
-            local offset = self.RenderOffset[self.LightType] or vector_origin
-            self.LongOffset = self.LongOffset or vector_origin
-            if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,angle_zero,LenseNum) end
-            if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*Vector_m1_1_1,Angle_0_180_0,LenseNum,self.Double and "d" or nil) end
+            local offset = self.RenderOffset[self.LightType] or Vector(0, 0, 0)
+            self.LongOffset = self.LongOffset or Vector(0, 0, 0)
+            if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
+            if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*Vector(-1,1,1),Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
 
 
             if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
@@ -326,7 +306,7 @@ function ENT:Think()
             if #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep) then
                 self.RN = 1
                 self.RouteNumberOffset = TLM.RouteNumberOffset
-                offset = offset + self.RouteNumberOffset*(self.Left and Vector_m1_1_1 or 1)
+                offset = offset + self.RouteNumberOffset*(self.Left and Vector(-1,1,1) or 1)
             else
                 self.RouteNumberOffset = nil
                 self.RN = nil
@@ -339,7 +319,7 @@ function ENT:Think()
                     self.Models[1]["autostop"]:SetParent(self)
                 end
             end
-            self.NamesOffset = vector_origin
+            self.NamesOffset = Vector(0, 0, 0)
             -- Create traffic light models
             --if self.LightType > 2 then self.LightType = 2 end
             --if self.LightType < 0 then self.LightType = 0 end
@@ -364,17 +344,17 @@ function ENT:Think()
 
                 self.NamesOffset = self.NamesOffset + vec
 				local offsetAndLongOffset = offset + self.LongOffset
-                if not self.Left or self.Double then    self:SpawnHeads(ID,data[2],self.BasePosition + offsetAndLongOffset,angle_zero,data[3] and data[3].glass,v~="M") end
-                if self.Left or self.Double then self:SpawnHeads((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector_m1_1_1 + offsetAndLongOffset,angle_zero,data[3] and data[3].glass,v~="M",true) end
+                if not self.Left or self.Double then    self:SpawnHeads(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M") end
+                if self.Left or self.Double then self:SpawnHeads((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M",true) end
                 if v ~= "M" then
                     for i = 1,#v do
                         ID2 = ID2 + 1
                         if not self.Signals[ID2] then self.Signals[ID2] = {} end
                         if not self.DoubleL then
-                            self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector_m1_1_1 or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector_m1_1_1 or 1),angle_zero,self.SignalConverter[v[i]]-1,0    )
+                            self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,0    )
                         else
-                            self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],angle_zero,self.SignalConverter[v[i]]-1,0)
-                            self:SetLight(ID,ID2.."x",self.BasePosition*Vector_m1_1_1 + offsetAndLongOffset + data[3][i-1]*Vector_m1_1_1,angle_zero,self.SignalConverter[v[i]]-1,0)
+                            self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],Angle(0, 0, 0),self.SignalConverter[v[i]]-1,0)
+                            self:SetLight(ID,ID2.."x",self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,0)
                         end
                     end
                 end
@@ -384,12 +364,12 @@ function ENT:Think()
             if self.Arrow then
                 local id = self.Arrow
                 self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.model.."4.mdl",RENDERGROUP_OPAQUE)
-                self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[5])*(self.Left and TLM.LampIndicator[6] or 1) - (self.RouteNumberOffset or vector_origin)
+                self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[5])*(self.Left and TLM.LampIndicator[6] or 1) - (self.RouteNumberOffset or Vector(0, 0, 0))
                 self.Models[1]["roua"]:SetPos(self:LocalToWorld(self.SpecRouteNumbers.pos))
-                self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and AnAngle_m90_0_0 or Angle_90_0_0))
+                self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-90,0,0) or Angle(90,0,0)))
                 self.Models[1]["roua"]:SetParent(self)
             end
-            offset = self.RenderOffset[self.LightType]+(OneLense and TLM.name_one or TLM.name)+(OneLense and self.RouteNumberOffset or vector_origin)
+            offset = self.RenderOffset[self.LightType]+(OneLense and TLM.name_one or TLM.name)+(OneLense and self.RouteNumberOffset or Vector(0, 0, 0))
             if self.LightType == 1 then
                 offset = offset - self.NamesOffset
             end
@@ -425,8 +405,8 @@ function ENT:Think()
             if not IsValid(self.Models[1][k]) then
                 local v = TLM["m1"]
                 self.Models[1][k] = ClientsideModel(v,RENDERGROUP_OPAQUE)
-                self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePosition*(self.Left and Vector_m1_1_1 or 1)))
-                self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle_m1_1_1 or Angle_1_1_1))
+                self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePosition*(self.Left and Vector(-1,1,1) or 1)))
+                self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-1,1,1) or Angle(1,1,1)))
                 self.Models[1][k]:SetParent(self)
             end
         end
@@ -452,8 +432,8 @@ function ENT:Think()
             self.Num = ""
         end
         if self.ARSOnly then return true end
-        local offset = (self.RenderOffset[self.LightType] or vector_origin)
-        if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and Vector_m1_1_0 or Vector_1_1_0) end
+        local offset = (self.RenderOffset[self.LightType] or Vector(0, 0, 0))
+        if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and Vector(-1,1) or Vector(1,1)) end
         local ID = 0
         local ID2 = 0
         local first = true
@@ -487,10 +467,10 @@ function ENT:Think()
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
 					local offsetAndLongOffset = offset + self.LongOffset
                     if not self.DoubleL then
-                        self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector_m1_1_1 or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector_m1_1_1 or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     else
-                        self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
-                        self:SetLight(ID,ID2.."x",self.BasePosition*Vector_m1_1_1 + offsetAndLongOffset + data[3][i-1]*Vector_m1_1_1,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2.."x",self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     end
                     self.Signals[ID2].State = State
                 end
@@ -518,7 +498,7 @@ function ENT:Think()
                 self.Models[3][rou1k]:SetParent(self)
                 self.Models[3][rou1k]:SetSkin(v[3] and self.OldRouteNumberSetup[5][v[1]] or self.OldRouteNumberSetup[6][v[1]] or tonumber(v[1])-1)
                 self.Models[3][rou1k]:SetRenderMode(RENDERMODE_TRANSCOLOR)
-                self.Models[3][rou1k]:SetColor(color_transparent)
+                self.Models[3][rou1k]:SetColor(Color(255, 255, 255, 0))
             end
             if IsValid(self.Models[3][rou1k]) then
                 if State1 > 0 then
@@ -534,7 +514,7 @@ function ENT:Think()
                 self.Models[3][rou2k]:SetParent(self)
                 self.Models[3][rou2k]:SetSkin(self.OldRouteNumberSetup[5][v[2]] or tonumber(v[2])-1)
                 self.Models[3][rou2k]:SetRenderMode(RENDERMODE_TRANSCOLOR)
-                self.Models[3][rou2k]:SetColor(color_transparent)
+                self.Models[3][rou2k]:SetColor(Color(255, 255, 255, 0))
             end
             if IsValid(self.Models[3][rou2k]) then
                 if State2 > 0 then
@@ -548,10 +528,10 @@ function ENT:Think()
             local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
             if not IsValid(self.Models[3]["roua"]) and State > 0 then
                 self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
-                self.SpecRouteNumbers.pos = (self.BasePosition+offset-TLM.SpecRouteNumberOffset)-(self.RouteNumberOffset or vector_origin)+TLM.RouteNumberOffset3
+                self.SpecRouteNumbers.pos = (self.BasePosition+offset-TLM.SpecRouteNumberOffset)-(self.RouteNumberOffset or Vector(0, 0, 0))+TLM.RouteNumberOffset3
                 if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*TLM.SpecRouteNumberOffset2 end
                 self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(TLM.RouaOffset))
-                self.Models[3]["roua"]:SetAngles(self.Models[1]["roua"]:LocalToWorldAngles(Angle_180_0_0))
+                self.Models[3]["roua"]:SetAngles(self.Models[1]["roua"]:LocalToWorldAngles(Angle(180,0,0)))
                 self.Models[3]["roua"]:SetParent(self)
                 if self.Left then
                     if self.Num[1] == "L" then
@@ -563,7 +543,7 @@ function ENT:Think()
                     self.Models[3]["roua"]:SetSkin(self.OldRouteNumberSetup[6][self.Num[1]] or 0)
                 end
                 self.Models[3]["roua"]:SetRenderMode(RENDERMODE_TRANSCOLOR)
-                self.Models[3]["roua"]:SetColor(color_transparent)
+                self.Models[3]["roua"]:SetColor(Color(255, 255, 255, 0))
             end
             if IsValid(self.Models[3]["roua"]) then
                 if State > 0 then
@@ -610,8 +590,8 @@ local function enableDebug()
         hook.Add("PreDrawEffects","MetrostroiSignalDebug",function()
             for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
                 if IsValid(sig) and LocalPlayer():GetPos():Distance(sig:GetPos()) < 384 then
-                    local pos = sig:LocalToWorld(Vector_48_0_150)
-                    local ang = sig:LocalToWorldAngles(Angle_180_0_90)
+                    local pos = sig:LocalToWorld(Vector(48,0,150))
+                    local ang = sig:LocalToWorldAngles(Angle(0,180,90))
                     cam.Start3D2D(pos, ang, 0.25)
 
                         if sig:GetNW2Bool("Debug",false) then
@@ -628,52 +608,52 @@ local function enableDebug()
                             end
 
                             if sig.Name then
-                                draw.DrawText(Format("Joint main info (%d)",sig:EntIndex()),"Trebuchet24",5,-60,Color_200_0_0_255)
-                                draw.DrawText("Signal name: "..sig.Name,"Trebuchet24",          15, -40,color_black)
-                                draw.DrawText("TrackID: "..sig:GetNW2Int("PosID",0),"Trebuchet24",  25, -20,color_black)
-                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("Pos",0)),"Trebuchet24", 135, -20,color_black)
-                                draw.DrawText(Format("NextSignalName: %s",sig:GetNW2String("NextSignalName","N/A")),"Trebuchet24",  15, 0,color_black)
-                                draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("NextPosID",0)),"Trebuchet24", 25, 20,color_black)
-                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("NextPos",0)),"Trebuchet24", 135, 20,color_black)
-                                draw.DrawText(Format("Dist: %.02f",sig:GetNW2Float("DistanceToNext",0)),"Trebuchet24",  15, 40,color_black)
-                                draw.DrawText(Format("PrevSignalName: %s",sig:GetNW2String("PrevSignalName","N/A")),"Trebuchet24",  15, 60,color_black)
-                                draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("PrevPosID",0)),"Trebuchet24", 25, 80,color_black)
-                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("PrevPos",0)),"Trebuchet24", 135, 80,color_black)
-                                draw.DrawText(Format("DistPrev: %.02f",sig:GetNW2Float("DistanceToPrev",0)),"Trebuchet24",  15, 100,color_black)
-                                draw.DrawText(Format("Current route: %d",sig:GetNW2Int("CurrentRoute",-1)),"Trebuchet24",   15, 120,color_black)
+                                draw.DrawText(Format("Joint main info (%d)",sig:EntIndex()),"Trebuchet24",5,-60,Color(200,0,0,255))
+                                draw.DrawText("Signal name: "..sig.Name,"Trebuchet24",          15, -40,Color(0, 0, 0, 255))
+                                draw.DrawText("TrackID: "..sig:GetNW2Int("PosID",0),"Trebuchet24",  25, -20,Color(0, 0, 0, 255))
+                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("Pos",0)),"Trebuchet24", 135, -20,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("NextSignalName: %s",sig:GetNW2String("NextSignalName","N/A")),"Trebuchet24",  15, 0,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("NextPosID",0)),"Trebuchet24", 25, 20,Color(0, 0, 0, 255))
+                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("NextPos",0)),"Trebuchet24", 135, 20,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Dist: %.02f",sig:GetNW2Float("DistanceToNext",0)),"Trebuchet24",  15, 40,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("PrevSignalName: %s",sig:GetNW2String("PrevSignalName","N/A")),"Trebuchet24",  15, 60,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("TrackID: %s",sig:GetNW2Int("PrevPosID",0)),"Trebuchet24", 25, 80,Color(0, 0, 0, 255))
+                                    draw.DrawText(Format("PosX: %.02f",sig:GetNW2Float("PrevPos",0)),"Trebuchet24", 135, 80,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("DistPrev: %.02f",sig:GetNW2Float("DistanceToPrev",0)),"Trebuchet24",  15, 100,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Current route: %d",sig:GetNW2Int("CurrentRoute",-1)),"Trebuchet24",   15, 120,Color(0, 0, 0, 255))
 
-                                draw.DrawText("AB info","Trebuchet24",5,160,Color_200_0_0_255)
-                                draw.DrawText(Format("Occupied: %s",sig:GetNW2Bool("Occupied",false) and "Y" or "N"),"Trebuchet24",5,180,color_black)
-                                draw.DrawText(Format("Linked to controller: %s",sig:GetNW2Bool("LinkedToController",false) and "Y" or "N"),"Trebuchet24",5,200,color_black)
-                                draw.DrawText(Format("Num: %d",sig:GetNW2Int("ControllersNumber",0)),"Trebuchet24",10,220,color_black)
-                                draw.DrawText(Format("Controller logic: %s",sig:GetNW2Bool("BlockedByController",false) and "Y" or "N"),"Trebuchet24",5,240,color_black)
-                                draw.DrawText(Format("Autostop: %s",not sig.ARSOnly and sig.AutostopPresent and (sig:GetNW2Bool("Autostop") and "Up" or "Down") or "No present"),"Trebuchet24",5,260,color_black)
-                                draw.DrawText(Format("2/6: %s",sig:GetNW2Bool("2/6",false) and "Y" or "N"),"Trebuchet24",5,280,color_black)
-                                draw.DrawText(Format("FreeBS: %d",sig:GetNW2Int("FreeBS")),"Trebuchet24",5,300,color_black)
+                                draw.DrawText("AB info","Trebuchet24",5,160,Color(200,0,0,255))
+                                draw.DrawText(Format("Occupied: %s",sig:GetNW2Bool("Occupied",false) and "Y" or "N"),"Trebuchet24",5,180,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Linked to controller: %s",sig:GetNW2Bool("LinkedToController",false) and "Y" or "N"),"Trebuchet24",5,200,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Num: %d",sig:GetNW2Int("ControllersNumber",0)),"Trebuchet24",10,220,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Controller logic: %s",sig:GetNW2Bool("BlockedByController",false) and "Y" or "N"),"Trebuchet24",5,240,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Autostop: %s",not sig.ARSOnly and sig.AutostopPresent and (sig:GetNW2Bool("Autostop") and "Up" or "Down") or "No present"),"Trebuchet24",5,260,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("2/6: %s",sig:GetNW2Bool("2/6",false) and "Y" or "N"),"Trebuchet24",5,280,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("FreeBS: %d",sig:GetNW2Int("FreeBS")),"Trebuchet24",5,300,Color(0, 0, 0, 255))
 
-                                draw.DrawText("ARS info","Trebuchet24",5,335,Color_200_0_0_255)
+                                draw.DrawText("ARS info","Trebuchet24",5,335,Color(200,0,0,255))
                                 local num = 0
                                 for i,tbl in pairs(ars) do
                                     if not tbl then continue end
                                     if sig:GetNW2Bool("CurrentARS"..(i-1),false) then
-                                        draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color_0_100_0_255)
-                                        draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color_0_100_0_255)
+                                        draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color(0,100,0,255))
+                                        draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color(0,100,0,255))
                                     else
-                                        draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,color_black)
-                                        draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,color_black)
+                                        draw.DrawText(Format("(% s)",tbl[1]),"Trebuchet24",5,355+num*20,Color(0, 0, 0, 255))
+                                        draw.DrawText(Format("%s",tbl[2]),"Trebuchet24",105,355+num*20,Color(0, 0, 0, 255))
                                     end
                                     num = num+1
                                 end
                                 if sig:GetNW2Bool("CurrentARS325",false) or sig:GetNW2Bool("CurrentARS325_2",false) then
-                                    draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color_0_100_0_255)
-                                    draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color_0_100_0_255)
+                                    draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color(0,100,0,255))
+                                    draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color(0,100,0,255))
                                 else
-                                    draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,color_black)
-                                    draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,color_black)
+                                    draw.DrawText("(325 Hz)","Trebuchet24",5,355+num*20,Color(0, 0, 0, 255))
+                                    draw.DrawText(Format("LN:%s Apr0:%s",sig:GetNW2Bool("CurrentARS325",false) and "Y" or "N",sig:GetNW2Bool("CurrentARS325_2",false) and "Y" or "N"),"Trebuchet24",105,355+num*20,Color(0, 0, 0, 255))
                                 end
 
                                 if not sig.ARSOnly then
-                                    draw.DrawText("Signal info","Trebuchet24",250,160,Color_200_0_0_255)
+                                    draw.DrawText("Signal info","Trebuchet24",250,160,Color(200,0,0,255))
                                     local ID = 0
                                     local ID2 = 0
                                     local first = true
@@ -709,12 +689,12 @@ local function enableDebug()
                                     end
                                 end
                             else
-                                draw.DrawText("No data...","Trebuchet24",5,0,color_black)
+                                draw.DrawText("No data...","Trebuchet24",5,0,Color(0, 0, 0, 255))
                             end
                         else
                             surface.SetDrawColor(sig.ARSOnly and 255 or 125, 125, 0, 255)
                             surface.DrawRect(0, 0, 364, 25)
-                            draw.DrawText("Debug disabled...","Trebuchet24",5,0,color_black)
+                            draw.DrawText("Debug disabled...","Trebuchet24",5,0,Color(0, 0, 0, 255))
                         end
                     cam.End3D2D()
                 end
