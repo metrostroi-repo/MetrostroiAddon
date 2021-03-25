@@ -178,7 +178,7 @@ function MSignalSayHook(ply, comm, fromULX)
 end
 hook.Add("PlayerSay","metrostroi-signal-say", function(ply, comm) MSignalSayHook(ply,comm) end)
 function ENT:Initialize()
-	self:SetModel("models/metrostroi/signals/mus/ars_box.mdl")
+	self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBox.model)
 	self.Sprites = {}
 	self.Sig = ""
 	self.FreeBS = 1
@@ -303,9 +303,9 @@ function ENT:PostInitalize()
 		self.GoodInvationSignal = -1
 	end
 	if self.Left then
-		self:SetModel("models/metrostroi/signals/mus/ars_box_mittor.mdl")
+		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBoxMittor.model)
 	else
-		self:SetModel("models/metrostroi/signals/mus/ars_box.mdl")
+		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBox.model)
 	end
 	self.PostInitalized = false
 
