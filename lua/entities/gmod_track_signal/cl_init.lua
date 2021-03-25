@@ -59,9 +59,9 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
     local TLM = self.TrafficLightModels[self.LightType]
     for k,v in pairs(TLM) do
         if type(v) == "string" and not k:find("long") then
-			local idx = add and v..add or v
+            local idx = add and v..add or v
             if IsValid(self.Models[1][idx]) then break else
-				local k_long = k.."_long"
+                local k_long = k.."_long"
                 if TLM[k_long] and LenseNum >= 7 then
                     self.Models[1][idx] = ClientsideModel(TLM[k_long],RENDERGROUP_OPAQUE)
                     self.LongOffset = Vector(0,0,TLM[k.."_long_pos"])
@@ -87,10 +87,10 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
         self.RN = self.RN + 1
     end
     local id = self.RN
-	local rouid = id and "rou"..id
+    local rouid = id and "rou"..id
     if rouid and not IsValid(self.Models[1][rouid]) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "2" or "") or "5")
-		local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
+        local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
         self.Models[1][rouid] = ClientsideModel(LampIndicator.model..rnadd..".mdl",RENDERGROUP_OPAQUE)
         self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2])))
         self.Models[1][rouid]:SetAngles(self:GetAngles())
@@ -100,9 +100,9 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
     end
     if notM then
         if glass then
-			local ID_glass = tostring(ID).."_glass"
+            local ID_glass = tostring(ID).."_glass"
             for i,tbl in pairs(glass) do
-				local ID_glassi = ID_glass..i
+                local ID_glassi = ID_glass..i
                 if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
                     self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
                     self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and Vector(-1,1,1) or 1)))
@@ -115,18 +115,18 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
 end
 
 function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
-	local IsStateAboveZero = State > 0
-	local IDID2 = ID..ID2
-	local IsModelValid = IsValid(self.Models[3][IDID2])
-	if IsModelValid then
+    local IsStateAboveZero = State > 0
+    local IDID2 = ID..ID2
+    local IsModelValid = IsValid(self.Models[3][IDID2])
+    if IsModelValid then
         if IsStateAboveZero then 
-			if Change then 
-				self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
-			end
+            if Change then 
+                self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
+            end
         else
             self.Models[3][IDID2]:Remove()
         end
-	elseif IsStateAboveZero then
+    elseif IsStateAboveZero then
         self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model,RENDERGROUP_OPAQUE)
         self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
         self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
@@ -134,14 +134,14 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
         self.Models[3][IDID2]:SetParent(self)
         self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
         -- self.Models[3][IDID2]:SetColor(Color(255, 255, 255, 0))
-		self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
-	end
+        self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
+    end
 end
 
 function ENT:SpawnLetter(i,model,pos,letter,double)
-	local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials.str
-	local LetMaterialsStart = LetMaterials.."let_start"
-	local LetMaterialsletter = LetMaterials..letter
+    local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials.str
+    local LetMaterialsStart = LetMaterials.."let_start"
+    local LetMaterialsletter = LetMaterials..letter
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
@@ -153,7 +153,7 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
             end
         end
     end
-	local id = i.."d"
+    local id = i.."d"
     if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
         self.Models[2][id] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
@@ -199,8 +199,8 @@ net.Receive("metrostroi-signal", function()
 end)
 
 function ENT:Think()
-	local CurTime = CurTime()
-	self:SetNextClientThink(CurTime + 0.0333)
+    local CurTime = CurTime()
+    self:SetNextClientThink(CurTime + 0.0333)
     self.PrevTime = self.PrevTime or RealTime()
     self.DeltaTime = (RealTime() - self.PrevTime)
     self.PrevTime = RealTime()
@@ -236,11 +236,11 @@ function ENT:Think()
         -- Create new clientside models
         if not self.ARSOnly then
             --SPAWN A OLD ROUTE Numbers
-			--оператор # съедает больше производительности, чем исопльзование своей переменной с хранением количества элементов в таблице
-			--поэтому добавляю каунтеры
-			--TODO вообще сравнить бы это здесь xD
+            --оператор # съедает больше производительности, чем исопльзование своей переменной с хранением количества элементов в таблице
+            --поэтому добавляю каунтеры
+            --TODO вообще сравнить бы это здесь xD
             local rn1 = {}
-			local rn1N = 0
+            local rn1N = 0
             local rn2 = {}
             self.RouteNumbers = {}
             self.SpecRouteNumbers = {}
@@ -262,13 +262,13 @@ function ENT:Think()
             end
             self.Arrow = nil
 
-			for k,v in pairs(self.SpecRouteNumbers) do
-				if not v[2] then
-					self.Arrow = k
-					self.SpecRouteNumbers = v
-					break
-				end
-			end
+            for k,v in pairs(self.SpecRouteNumbers) do
+                if not v[2] then
+                    self.Arrow = k
+                    self.SpecRouteNumbers = v
+                    break
+                end
+            end
             local LenseNum = self.Arrow and 1 or 0
             local OneLense = self.Arrow == nil
             for k,v in ipairs(self.LensesTBL) do
@@ -335,7 +335,7 @@ function ENT:Think()
                     data = self.TrafficLightModels[self.LightType][v]
                 end
                 if not data then continue end
-				local vec = Vector(0,0,data[1])
+                local vec = Vector(0,0,data[1])
                 if first then
                     first = false
                 else
@@ -343,7 +343,7 @@ function ENT:Think()
                 end
 
                 self.NamesOffset = self.NamesOffset + vec
-				local offsetAndLongOffset = offset + self.LongOffset
+                local offsetAndLongOffset = offset + self.LongOffset
                 if not self.Left or self.Double then    self:SpawnHeads(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M") end
                 if self.Left or self.Double then self:SpawnHeads((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M",true) end
                 if v ~= "M" then
@@ -455,7 +455,7 @@ function ENT:Think()
             if v ~= "M" then
                 for i = 1,#v do
                     ID2 = ID2 + 1
-					local n = tonumber(self.Sig[ID2])
+                    local n = tonumber(self.Sig[ID2])
                     if n and self.Signals[ID2].RealState ~= (n > 0) then
                         self.Signals[ID2].RealState = n > 0
                         self.Signals[ID2].Stop = CurTime + 0.5
@@ -465,7 +465,7 @@ function ENT:Think()
                     end
                     local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and (RealTime() % 1.2 > 0.4))) and not self.Signals[ID2].Stop) and 1 or 0,  0,1, 128)
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
-					local offsetAndLongOffset = offset + self.LongOffset
+                    local offsetAndLongOffset = offset + self.LongOffset
                     if not self.DoubleL then
                         self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     else
@@ -481,15 +481,15 @@ function ENT:Think()
             ID = ID + 1
         end
 
-		local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb.mdl"
-		local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
+        local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb.mdl"
+        local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
-			local rou1k = "rou1"..k
+            local rou1k = "rou1"..k
             local State1 = self:Animate(rou1k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
             local State2
             --if v[3] then
-			local rou2k = "rou2"..k
+            local rou2k = "rou2"..k
             if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
             if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
                 self.Models[3][rou1k] = ClientsideModel(v[3] and LampIndicatorModels_numb_mdl or LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
@@ -555,8 +555,8 @@ function ENT:Think()
         end
         --self.SpecRouteNumbers
     end
-	
-	return true
+    
+    return true
 end
 
 function ENT:Draw()
@@ -579,11 +579,11 @@ local ars = {
 
 
 local cols = {
-	R = Color(200,0,0),
-	Y = Color(200,200,0),
-	G = Color(0,200,0),
-	W = Color(200,200,200),
-	B = Color(0,0,200),
+    R = Color(200,0,0),
+    Y = Color(200,200,0),
+    G = Color(0,200,0),
+    W = Color(200,200,200),
+    B = Color(0,0,200),
 }
 local function enableDebug()
     if debug:GetBool() then
@@ -670,7 +670,7 @@ local function enableDebug()
                                         if v ~= "M" then
                                             for i = 1,#v do
                                                 ID2 = ID2 + 1
-												local n = tonumber(sig.Sig[ID2])
+                                                local n = tonumber(sig.Sig[ID2])
                                                 local State = n == 1 and "X" or (n == 2 and (RealTime() % 1.2 > 0.4)) and "B" or false
                                                 draw.DrawText(Format(v[i],sig:EntIndex()),"Trebuchet24",250,160 + ID*20 + ID2*20,cols[v[i]])
                                                 if State then
