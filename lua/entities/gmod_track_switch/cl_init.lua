@@ -3,9 +3,9 @@ include("shared.lua")
 local debug = GetConVar("metrostroi_drawsignaldebug")
 local function enableDebug()
     if debug:GetBool() then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiSwitchDebug",function(bDrawingDepth,bDrawingSkybox)
+        hook.Add("PreDrawEffects","MetrostroiSwitchDebug",function()
             for _,ent in pairs(ents.FindByClass("gmod_track_switch")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 512 then
+                if IsValid(ent) and LocalPlayer():GetPos():Distance(ent:GetPos()) < 512 then
 					local pos = ent:LocalToWorld(Vector(30,0,75))
 					local ang = ent:LocalToWorldAngles(Angle(0,180,90))
 					cam.Start3D2D(pos, ang, 0.25)
@@ -18,9 +18,9 @@ local function enableDebug()
             end
         end)
     else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiSwitchDebug")
+        hook.Remove("PreDrawEffects","MetrostroiSwitchDebug")
     end
 end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiSwitchDebug")
+hook.Remove("PreDrawEffects","MetrostroiSwitchDebug")
 cvars.AddChangeCallback( "metrostroi_drawsignaldebug", enableDebug)
 enableDebug()

@@ -171,7 +171,7 @@ ENT.OldRouteNumberSetup = {
 	"1234D",
 	"WKFX","LR",
 	Vector(6,0,10.5),
-	{D=4},{["F"]=0,["L"]=0,["R"]=2,W=3,K=4}
+	{D=4},{["F"]=0,["L"]=2,["R"]=0,W=3,K=4}
 }
 
 --------------------------------------------------------------------------------
@@ -294,3 +294,26 @@ ENT.SignalConverter = {
 	B = 4,
 	W = 5
 }
+
+
+for i = 0,2 do
+	--SERVER
+	ENT.TrafficLightModels[i].ArsBox = {model = "models/metrostroi/signals/mus/ars_box.mdl"}
+	ENT.TrafficLightModels[i].ArsBoxMittor = {model = "models/metrostroi/signals/mus/ars_box_mittor.mdl"}
+	
+	--CLIENT
+	ENT.TrafficLightModels[i].LampIndicator = {model = "models/metrostroi/signals/mus/light_lampindicator", Vector(0.2), Vector(1), Vector(8), Vector(-0.9,1,1), Vector(3,0,3), Vector(-1,1,0.85)}
+	ENT.TrafficLightModels[i].LampBase = {model = "models/metrostroi/signals/mus/lamp_base.mdl"}
+	ENT.TrafficLightModels[i].SignLetterSmall = {model = "models/metrostroi/signals/mus/sign_letter_small.mdl", Vector(1.5,0,0), Vector(-1.5,0,0)}
+	ENT.TrafficLightModels[i].SignLetter = {model = "models/metrostroi/signals/mus/sign_letter.mdl", z = 5.85}
+	ENT.TrafficLightModels[i].LetMaterials = {str = "models/metrostroi/signals/let/"}
+	
+	ENT.TrafficLightModels[i].RouteNumberOffset = Vector(10,0,0)
+	ENT.TrafficLightModels[i].DoubleOffset = Vector(0,0,1.62)
+	ENT.TrafficLightModels[i].RouteNumberOffset2 = Vector(0,0,7.2)
+	ENT.TrafficLightModels[i].SpecRouteNumberOffset = Vector(3,-1,3)
+	ENT.TrafficLightModels[i].RouteNumberOffset3 = Vector(10.5,0,-6)
+	ENT.TrafficLightModels[i].SpecRouteNumberOffset2 = Vector(-0.8,1,0.94)
+	ENT.TrafficLightModels[i].RouaOffset = Vector(6.2,0,24.5)
+end
+
