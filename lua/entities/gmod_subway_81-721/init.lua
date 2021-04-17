@@ -27,13 +27,13 @@ function ENT:Initialize()
 
     -- Create bogeys
     if Metrostroi.BogeyOldMap then
-        self.FrontBogey = self:CreateBogey(Vector( 320,0,-90),Angle(0,180,0),true,"720")
-        self.RearBogey  = self:CreateBogey(Vector(-320,0,-90),Angle(0,0,0),false,"720")
+        self.FrontBogey = self:CreateBogey(Vector( 320,-1,-91),Angle(0,180,0),true,"720")
+        self.RearBogey  = self:CreateBogey(Vector(-320,1,-91),Angle(0,0,0),false,"720")
         self.FrontCouple = self:CreateCouple(Vector( 413.7+6.8,0,-79),Angle(0,0,0),true,"717")
         self.RearCouple  = self:CreateCouple(Vector(-419-6.8,0,-79),Angle(0,180,0),false,"717")
     else
-        self.FrontBogey = self:CreateBogey(Vector( 320,0,-90),Angle(0,180,0),true,"720")
-        self.RearBogey  = self:CreateBogey(Vector(-320,0,-90),Angle(0,0,0),false,"720")
+        self.FrontBogey = self:CreateBogey(Vector( 320,-1,-91),Angle(0,180,0),true,"720")
+        self.RearBogey  = self:CreateBogey(Vector(-320,1,-91),Angle(0,0,0),false,"720")
         self.FrontCouple = self:CreateCouple(Vector( 420    -8,0,-79),Angle(0,0,0),true,"717")
         self.RearCouple  = self:CreateCouple(Vector(-419-6.8+8,0,-79),Angle(0,180,0),false,"717")
     end
