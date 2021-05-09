@@ -39,11 +39,13 @@ ENT.MirrorCams = {
 }
 
 ENT.AnnouncerPositions = {
+    {Vector(408,18.5,16),50,0.4}
 }
 for i=1,4 do
-    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230+37.5,47 ,44),100,0.1})
-    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230,-47,44),100,0.1})
+    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230+37.5,47 ,44),100,0.3})
+    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230,-47,44),100,0.3})
 end
+
 ENT.Cameras = {
     {Vector(407.5+10,44,20),Angle(0,180,0),"Train.722.Breakers"},
     {Vector(407.5+5,50,0),Angle(0,180,0),"Train.722.PU2_1"},
