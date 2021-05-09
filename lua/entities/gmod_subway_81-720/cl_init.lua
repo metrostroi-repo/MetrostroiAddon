@@ -45,6 +45,18 @@ ENT.AutoAnimNames = {}
 ENT.ClientSounds = {}
 --------------------------------------------------------------------------------
 ENT.ClientPropsInitialized = false
+local strength = {
+    [0] = 0.86,
+    [1] = 0.29,
+    [2] = 0.71,
+    [3] = 0.71,
+    [4] = 0.57,
+    [5] = 0.71,
+    [6] = 0.86,
+    [7] = 0.43,
+    [8] = 1.00,
+    [9] = 0.86,
+}
 ENT.ButtonMap["PUU"] = {
     pos = Vector(480.5-0.5,41,-19.4+2.0), --446 -- 14 -- -0,5
     ang = Angle(0,-90,50),
@@ -56,6 +68,7 @@ ENT.ButtonMap["PUU"] = {
     buttons = {
         {ID = "!DoorsClosed",x=45.5, y=30.5, radius=8, tooltip = "Двери закрыты",model = {
             lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",var="DoorsClosed",z=-7, color=Color(120,255,50)},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-2},
         }},
         {ID = "StandToggle",x=96, y=30.5, radius=15, tooltip = "Стоянка",model = {
             model = "models/metrostroi_train/81-720/tumbler1.mdl",z=-5, ang=180,
@@ -68,6 +81,7 @@ ENT.ButtonMap["PUU"] = {
             lcolor=Color(200,150,60),lz = 16,lbright=2,lfov=140,lfar=16,lnear=8,lshadows=0},
             var="Ticker",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(200,150,60),z=0},
         }},
         {ID = "KAHToggle",x=137.5+37.83*2, y=30.5, radius=15, tooltip = "КАХ",model = {
             model = "models/metrostroi_train/81-720/buttons/b5.mdl",z=6,
@@ -75,6 +89,7 @@ ENT.ButtonMap["PUU"] = {
             lcolor=Color(160,255,220),lz = 10,lbright=2,lfov=155,lfar=16,lnear=8,lshadows=0},
             var="KAH",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(160,255,220),z=0},
         }},
         {ID = "KAHkToggle",x=137.5+37.83*2-20, y=30.5+10, w=40,h=20, tooltip="Крышка кнопки КАХ\nKAH button cover", model = {
             model = "models/metrostroi_train/81/krishka.mdl", ang = 0, z = 1,
@@ -90,6 +105,7 @@ ENT.ButtonMap["PUU"] = {
             lcolor=Color(255,80,100),lz = 10,lbright=2,lfov=155,lfar=16,lnear=8,lshadows=0},
             var="ALS",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,80,100),z=0},
         }},
         {ID = "ALSkToggle",x=137.5+37.83*3-20, y=30.5+10, w=40,h=20, tooltip="Крышка кнопки АЛС\nALS button cover", model = {
             model = "models/metrostroi_train/81/krishka.mdl", ang = 0, z = 1,
@@ -106,6 +122,7 @@ ENT.ButtonMap["PUU"] = {
         }},
         {ID = "!HVoltage",x=137.5+37.83*5, y=30.5, radius=8, tooltip = "Сеть контактная",model = {
             lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",var="HVoltage",z=-7, color=Color(255,120,50)},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(255,120,50),z=-2},
         }},
         {ID = "PassSchemeToggle",x=137.5+37.83*6, y=30.5, radius=15, tooltip = "Табло наддверное",model = {
             model = "models/metrostroi_train/81-720/buttons/b4.mdl",z=6,
@@ -113,6 +130,7 @@ ENT.ButtonMap["PUU"] = {
             lcolor=Color(255,255,255),lz = 16,lbright=2,lfov=140,lfar=16,lnear=8,lshadows=0},
             var="PassScheme",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,255,255),z=0},
         }},
         {ID = "EmergencyCompressorSet",x=138+37.83*7, y=30.5, radius=15, tooltip = "Компрессор резервный",model = {
             model = "models/metrostroi_train/81-720/buttons/b7.mdl",z=7,
@@ -145,6 +163,7 @@ ENT.ButtonMap["PUU"] = {
             lcolor=Color(50,150,200),lz = 16,lbright=2,lfov=140,lfar=4,lnear=2,lshadows=0},
             var="R_Announcer",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(50,150,200),z=0},
         }},
         {ID = "R_LineToggle",x=566.63+35.75*2, y=30.5, radius=15, tooltip = "Линия",model = {
             model = "models/metrostroi_train/81-720/buttons/b3.mdl",z=6,--blue
@@ -152,6 +171,7 @@ ENT.ButtonMap["PUU"] = {
             lcolor=Color(50,150,200),lz = 16,lbright=2,lfov=140,lfar=4,lnear=2,lshadows=0},
             var="R_Line",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(50,150,200),z=0},
         }},
         {ID = "R_EmerSet",x=566.63+35.5*3, y=30.5, radius=15, tooltip = "Связь экстренная",model = {
             model = "models/metrostroi_train/81-720/buttons/b3.mdl",z=6,--blue
@@ -226,6 +246,7 @@ ENT.ButtonMap["PUL"] = {
             lcolor=Color(255,255,255),lz = 16,lbright=2,lfov=140,lfar=16,lnear=8,lshadows=0},
             var="DoorSelectL",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,255,255),z=0},
         }},
         {ID = "DoorSelectRToggle",x=78.5, y=79.5, radius=15, tooltip = "Выбор правых дверей",model = {
             model = "models/metrostroi_train/81-720/buttons/b4.mdl",z=-6,
@@ -233,6 +254,7 @@ ENT.ButtonMap["PUL"] = {
             lcolor=Color(255,255,255),lz = 16,lbright=2,lfov=140,lfar=16,lnear=8,lshadows=0},
             var="DoorSelectR",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,255,255),z=0},
         }},
         {ID = "DoorBlockToggle",x=65, y=126.5, radius=15, tooltip = "Блокировка дверей",model = {
             model = "models/metrostroi_train/81-720/buttons/b6.mdl",z=-6,
@@ -240,9 +262,11 @@ ENT.ButtonMap["PUL"] = {
             lcolor=Color(255,80,100),lz = 16,lbright=2,lfov=140,lfar=16,lnear=8,lshadows=0},
             var="DoorBlock",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,80,100),z=0},
         }},
         {ID = "!DoorLeftLamp",x=47, y=149, radius=8, tooltip = "Работа кнопки левых дверей",model = {
             lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",var="DoorLeftLamp",z=-3, color=Color(120,255,50)},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-1},
         }},
 
         {ID = "DoorLeftSet",x=49, y=197, radius=15, tooltip = "Левые двери",model = {
@@ -267,6 +291,7 @@ ENT.ButtonMap["PUR"] = {
             lamp = {model = "models/metrostroi_train/81-720/buttons/l1.mdl",var="AccelRateLamp",anim=true,
             lcolor=Color(255,255,255),lz = 16,lbright=2,lfov=140,lfar=16,lnear=8,lshadows=0},
             sndvol = 0.3, snd = function(val) return val and "button_square_press" or "button_square_release" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,255,255),z=0},
         }},
         {ID = "EmerBrakeAddSet",x=58.5, y=79.5, radius=15, tooltip = "(резервный) Тормоз",model = {
             model = "models/metrostroi_train/81-720/buttons/b2.mdl",z=-6,
@@ -285,6 +310,7 @@ ENT.ButtonMap["PUR"] = {
             var="EmerBrake",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
             tooltipFunc = function(ent) return Format("%s%s",ent:GetPackedBool("EmerBrakeWork") and Metrostroi.GetPhrase("Train.Buttons.Active").."," or "",Metrostroi.GetPhrase(ent:GetPackedBool("EmerBrake") and "Train.Buttons.On" or "Train.Buttons.Off")) end,
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,80,100),z=0},
         }},
         {ID = "EmergencyBrakeToggle",x=188, y=79.5, radius=15, tooltip = "Тормоз экстренный",model = {
             model = "models/metrostroi_train/81-720/tumbler2.mdl",z=-2, ang=180,
@@ -298,6 +324,7 @@ ENT.ButtonMap["PUR"] = {
             lcolor=Color(80,255,100),lz = 16,lbright=2,lfov=140,lfar=4,lnear=2,lshadows=0},
             var="DoorClose",speed=12, vmin=0, vmax=1,
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
+            sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(80,255,100),z=0},
         }},
         {ID = "AttentionMessageSet",x=58.5, y=119, radius=15, tooltip = "Восприятие сообщения",model = {
             model = "models/metrostroi_train/81-720/buttons/b6.mdl",z=-6,
@@ -326,6 +353,7 @@ ENT.ButtonMap["PUR"] = {
         }},
         {ID = "!DoorRightLamp",x=108.5, y=144, radius=8, tooltip = "Работа кнопки правых дверей",model = {
             lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",var="DoorRightLamp",z=-3, color=Color(120,255,50)},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-1},
         }},
     }
 }
@@ -465,21 +493,27 @@ ENT.ButtonMap["IGLAButtons"] = {
         {ID = "IGLA2DSet",x=65, y=53, w=12, h=7, tooltip="ИГЛА: Вторая кнопка вниз"},
         {ID = "!IGLASR",x=17.9, y=10.5, radius=3, tooltip="ИГЛА: SR", model = {
             lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLASR",color=Color(175,250,20),z=-3.5},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-1},
         }},
         {ID = "!IGLARX",x=27.5, y=10.5, radius=3, tooltip="ИГЛА: RX", model = {
             lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLARX",color=Color(255,56,30),z=-3.5},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(255,56,30),z=-1},
         }},
         {ID = "!IGLAErr",x=40.5, y=10.5, radius=3, tooltip="ИГЛА: Отказ", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLAErr",color=Color(255,168,000),z=-3.5},
+            lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLAErr",color=Color(255,168,0),z=-3.5},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(255,168,0),z=-1},
         }},
         {ID = "!IGLAOSP",x=50, y=10.5, radius=3, tooltip="ИГЛА: ОСП", model = {
             lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLAOSP",color=Color(175,250,20),z=-3.5},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-1},
         }},
         {ID = "!IGLAPI",x=59.5, y=10.5, radius=3, tooltip="ИГЛА: ПИ", model = {
             lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLAPI",color=Color(255,56,30),z=-3.5},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(255,56,30),z=-1},
         }},
         {ID = "!IGLAOff",x=69, y=10.5, radius=3, tooltip="ИГЛА: Откл", model = {
             lamp = {speed=16,model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl", var="IGLAOff",color=Color(255,56,30),z=-3.5},
+            sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(255,56,30),z=-1},
         }},
     }
 }
