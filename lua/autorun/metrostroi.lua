@@ -129,6 +129,16 @@ function Metrostroi.AddSkin(category,name,tbl)
         Table.name = nil
         tbl = Table
     end
+    if CLIENT and category!="cab" and tbl.textures then
+        local find
+        for k,v in pairs(tbl.textures) do
+            if not file.Exists("materials/"..v..".vtf","GAME") then
+                find = true
+                ErrorNoHalt(Format("Metrostroi: %s texture: %s, not found. Check folder and addons!\n",category,v))
+            end
+        end
+        if find then return end
+    end
     if not Metrostroi.Skins[category] then
         print(Format("Metrostroi: Added a %s skin category",category))
         Metrostroi.Skins[category] = {}
