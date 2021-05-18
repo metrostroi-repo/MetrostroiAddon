@@ -153,6 +153,7 @@ function ENT:Initialize()
     self.MotorPowerSound = 0
     self.SmoothAngleDelta = 0
     self.CurrentBrakeSqueal = 0
+    if math.random()>0.5 then self.SoundNames["brake_loop4"] = math.random()>0.5 and self.SoundNames["brake2_loop1"] or self.SoundNames["brake2_loop2"] end
     self:ReinitializeSounds()
 end
 
