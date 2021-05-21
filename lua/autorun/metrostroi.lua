@@ -129,7 +129,7 @@ function Metrostroi.AddSkin(category,name,tbl)
         Table.name = nil
         tbl = Table
     end
-    if CLIENT and category!="cab" and tbl.textures then
+    if CLIENT and tbl.textures then
         local find
         for k,v in pairs(tbl.textures) do
             if not file.Exists("materials/"..v..".vtf","GAME") then
