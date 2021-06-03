@@ -918,58 +918,18 @@ ENT.ClientProps["sunprotectors"] = {
     hide = 2,
 }
 
----G Type only preview
----Delete later
-ENT.ClientProps["Gglass"] = {
-    model = "models/metrostroi_train/81-701/glass.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hide = 2,
-}
-
-ENT.ClientProps["GBluelamp"] = {
-    model = "models/metrostroi_train/81-701/blue_lamp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hide = 2,
-}
-
-ENT.ClientProps["GBluelamp2"] = {
-    model = "models/metrostroi_train/81-701/green_lamp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hide = 2,
-}
-
-ENT.ClientProps["GBluelamp3"] = {
-    model = "models/metrostroi_train/81-701/red_lamp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hide = 2,
-}
----Delete here
-
 ENT.ClientProps["mirrors"] = {
     model = "models/metrostroi_train/81-702/mirrors_d.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     hide = 2,
 }
-
---[[ENT.ClientProps["salon2"] = {
+ENT.ClientProps["salon2"] = {
     model = "models/metrostroi_train/81-702/81-702_cabine.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     hide = 2,
-}]]
-
-ENT.ClientProps["salon2"] = {
-    model = "models/metrostroi_train/81-701/81-701_salon.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hide = 2,
 }
-
 ENT.ClientProps["Lamps_pult"] = {
     model = "models/metrostroi_train/equipment/lamp_gauges_d.mdl",
     pos = Vector(0,0,0),
