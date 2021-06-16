@@ -145,8 +145,8 @@ ENT.ButtonMap["PU2"] = {
             sndvol = 0.4, snd = function(val,val2) return val2 == 1 and "switch_panel_mid" or val and "switch_panel_up" or "switch_panel_down" end,
             sndmin = 90, sndmax = 1e3,
         }},
-        {ID="GlassCleaner+",x=35+50*4-16, y=45-18*0-20, w=32,h=20, tooltip="Стеклоочиститель(вверх)",tooltipFunc = function(ent) return ent:GetPackedRatio("GlassCleaner") > 0 and math.floor(ent:GetPackedRatio("GlassCleaner")*2) or Metrostroi.GetPhrase("Train.Buttons.Off") end},
-        {ID="GlassCleaner-",x=35+50*4-16, y=45-18*0, w=32,h=20, tooltip="Стеклоочиститель(вниз)",tooltipFunc = function(ent) return ent:GetPackedRatio("GlassCleaner") > 0 and math.floor(ent:GetPackedRatio("GlassCleaner")*2) or Metrostroi.GetPhrase("Train.Buttons.Off") end},
+        {ID="GlassCleaner+",x=35+50*4-16, y=45-18*0-20, w=32,h=20, tooltip="Стеклоочиститель(вверх)",tooltipFunc = function(ent) return ent:GetPackedRatio("GlassCleaner") > 0 and tostring(math.floor(ent:GetPackedRatio("GlassCleaner")*2)) or Metrostroi.GetPhrase("Train.Buttons.Off") end},
+        {ID="GlassCleaner-",x=35+50*4-16, y=45-18*0, w=32,h=20, tooltip="Стеклоочиститель(вниз)",tooltipFunc = function(ent) return ent:GetPackedRatio("GlassCleaner") > 0 and tostring(math.floor(ent:GetPackedRatio("GlassCleaner")*2)) or Metrostroi.GetPhrase("Train.Buttons.Off") end},
         {ID = "EmergencyBrakeTPlusKToggle",         x=35+50*5+4-20, y=45-18*0-4-30, w=40,h=20, tooltip="Крышка кнопки Аварийный тормоз \"Т+\"", model = {
             plomb = {var="EmergencyBrakeTPlusKPl", ID="EmergencyBrakeTPlusKPl",},
             var="EmergencyBrakeTPlusK",speed=8,min=1,max=0, disable="EmergencyBrakeTPlusSet",
