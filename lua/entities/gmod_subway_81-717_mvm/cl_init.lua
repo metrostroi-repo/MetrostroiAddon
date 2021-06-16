@@ -778,8 +778,8 @@ ENT.ButtonMap["Block7"] = {
             model = "models/metrostroi_train/81-502/buttons/button_717_3.mdl",
             var="KDP",speed=16,min=1,max=0,z=-2,
             lamp = {model = "models/metrostroi_train/81-717/buttons/lamp_button_1.mdl",anim=true,var="DoorsRightL",speed=9,z=2.2,color=Color(255,130,80),
-                lcolor=Color(255,110,40),lz = lz,lfov=165,lbright=145,lfar=16,lnear=8,lshadows=0},
-            sprite = {bright=0.2,size=.5,scale=0.1,z=5,color=Color(255,130,80)},
+            lcolor=Color(255,110,40),lz = 10,lfov=145,lfar=16,lnear=8,lshadows=0},
+            sprite = {bright=0.2,size=.485,scale=0.1,z=5,color=Color(255,130,80)},
             sndvol = 0.07,snd = function(val) return val and "button3_on" or "button3_off" end,sndmin = 60,sndmax = 1e3/3,sndang = Angle(-90,0,0),
         }},
         {ID = "KDPKToggle",x=70,y=140,w=40,h=20,tooltip="",model = {
