@@ -24,8 +24,8 @@ function SWEP:PrimaryAttack()
 	tr.filter = function(ent) if (ent:GetClass() == "func_door" or ent:GetClass() == "func_button") and ent:GetName():find("adminlock") then return true end end
 	local trace = util.TraceLine( tr )
 	if not trace.Hit or not IsValid(trace.Entity) then return end
-	trace.Entity:Fire("Toggle","","")
-	trace.Entity:Fire("Press","","")
+	trace.Entity:Fire("Toggle","")
+	trace.Entity:Fire("Press","")
 
 	self:SetNextPrimaryFire( CurTime()+0.5)
 end
