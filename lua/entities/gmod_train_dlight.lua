@@ -15,13 +15,13 @@ function ENT:Initialize()
     self.ID = 817200-MetrostroiDLights
     MetrostroiDLights = MetrostroiDLights + 3
 
-    self.Strength = 1
-    self.Color = Color(255,220,80)
-    self.Brightness = 1
+    self.Strength = self.Strength or 1
+    self.Color = self.Color or Color(255,220,80)
+    self.Brightness = self.Brightness or 1
 
-    self.AffectW = true
+    if self.AffectW == nil then self.AffectW = true end
 
-    self:SetSize(512)
+    self:SetSize(self.Size or 512)
 
     self:MakeDLight()
 end
