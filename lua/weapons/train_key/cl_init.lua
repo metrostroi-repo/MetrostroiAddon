@@ -27,11 +27,11 @@ SWEP.IronSightsPos = Vector(3.64, 0, 2.2)
 SWEP.IronSightsAng = Vector(0, 0, 0)
 --ViewModel
 SWEP.VElements = {
-	["Reverser"] = { type = "Model", model = "models/metrostroi/81-717/reverser.mdl", bone = "ValveBiped.Bip01_R_Hand", rel = "", pos = Vector(3.93, 1.121, -7.674), angle = Angle(86.043, 163.841, 0), size = Vector(1.7, 1.7, 1.7), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
+	["Reverser"] = { type = "Model", model = "models/metrostroi_train/reversor/reversor_classic.mdl", bone = "ValveBiped.Bip01_R_Hand", rel = "", pos = Vector(4.93, 1.421, -7), angle = Angle(-4, 96, -95), size = Vector(1.1, 1.1, 1.1), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
 }
 --WorldModel
 SWEP.WElements = {
-	["Reverser"] = { type = "Model", model = "models/metrostroi/81-717/reverser.mdl", bone = "ValveBiped.Bip01_R_Hand", rel = "", pos = Vector(4.177, 1.758, -6.042), angle = Angle(90, 0, 0), size = Vector(1.722, 1.722, 1.722), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
+	["Reverser"] = { type = "Model", model = "models/metrostroi_train/reversor/reversor_classic.mdl", bone = "ValveBiped.Bip01_R_Hand", rel = "", pos = Vector(4.93-1, 1.421+1.5, -6.374+1), angle = Angle(-106+90+180, 175, -111+190), size = Vector(1, 1, 1), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
 }
 
 

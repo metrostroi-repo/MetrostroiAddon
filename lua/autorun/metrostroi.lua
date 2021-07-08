@@ -16,6 +16,9 @@ if SERVER then
     util.AddNetworkString("metrostroi-cabin-button")
     util.AddNetworkString("metrostroi-cabin-reset")
     util.AddNetworkString("metrostroi-panel-touch")
+    
+    util.PrecacheModel("models/metrostroi_train/reversor/reversor_classic.mdl")
+    util.PrecacheModel("models/metrostroi_train/reversor/reversor_gold.mdl")
 
     --[[resource_AddDir("materials/metrostroi/props")
     resource_AddDir("materials/models/metrostroi_signs")
