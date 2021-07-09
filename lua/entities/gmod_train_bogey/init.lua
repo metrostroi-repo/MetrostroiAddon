@@ -3,6 +3,7 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
+util.AddNetworkString("metrostroi_spark_check")
 
 local DECOUPLE_TIMEOUT      = 2     -- Time after decoupling furing wich a bogey cannot couple
 local COUPLE_MAX_DISTANCE   = 20    -- Maximum distance between couple offsets
@@ -459,31 +460,11 @@ function ENT:CheckVoltage(dT)
             if dt < 1.0 then volume = 0.43 end
             if i == 1 then sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",self:LocalToWorld(self.PantLPos),65,math.random(90,120),volume) end
             if i == 2 then sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",self:LocalToWorld(self.PantRPos),65,math.random(90,120),volume) end
-
-            -- Sparking probability
-            local probability = math.Clamp(1-(self.MotorPower/2),0,1)
-            if math.random() > probability then
-                local effectdata = EffectData()
-                if i == 1 then effectdata:SetOrigin(self:LocalToWorld(self.PantLPos)) end
-                if i == 2 then effectdata:SetOrigin(self:LocalToWorld(self.PantRPos)) end
-                effectdata:SetNormal(Vector(0,0,-1))
-                util.Effect("stunstickimpact", effectdata, true, true)
-
-                local light = ents.Create("light_dynamic")
-                light:SetPos(effectdata:GetOrigin())
-                light:SetKeyValue("_light","100 220 255")
-                light:SetKeyValue("style", 0)
-                light:SetKeyValue("distance", 256)
-                light:SetKeyValue("brightness", 5)
-                light:Spawn()
-                light:Fire("TurnOn","","0")
-                light.Time = CurTime()
-                timer.Simple(0.1,function()
-                    SafeRemoveEntity(light)
-                end)
-                sound.Play("subway_trains/bogey/spark.mp3",effectdata:GetOrigin(),75,math.random(100,150),volume)
-                --self.Train:PlayOnce("zap",sound_source,0.7*volume,50+math.random(90,120))
-            end
+            net.Start("metrostroi_spark_check")
+                net.WriteEntity(self)
+                net.WriteVector(i == 1 and self.PantLPos or self.PantRPos)
+                net.WriteInt(self.MotorPower*50,10)
+            net.Broadcast()
         end
     end
     -- Voltage spikes
