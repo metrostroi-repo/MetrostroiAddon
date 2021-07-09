@@ -150,7 +150,6 @@ function ENT:SetSoundState(sound,volume,pitch,name,level )
 end
 
 function ENT:Initialize()
-    self.MotorPower = 0
     self.MotorPowerSound = 0
     self.SmoothAngleDelta = 0
     self.CurrentBrakeSqueal = 0
@@ -349,31 +348,6 @@ function ENT:Think()
     self:SetSoundState("flangeb",(0.3+soundsmul*0.7)*(speed_mod)*math.Clamp(f3*modulation,0,1),pitch40)
     self:SetSoundState("flange1",(0.3+soundsmul*0.7)*(speed_mod)*f1*modulation,pitch40)
     self:SetSoundState("flange2",(0.3+soundsmul*0.7)*(speed_mod)*f1,pitch40)
-    
-    -- Sparking probability
-    -- local probability = math.Clamp(1-(self.MotorPower/2),0,1)
-    -- print(probability)
-    -- if math.random() > probability then
-        -- local effectdata = EffectData()
-        -- if i == 1 then effectdata:SetOrigin(self:LocalToWorld(self.PantLPos)) end
-        -- if i == 2 then effectdata:SetOrigin(self:LocalToWorld(self.PantRPos)) end
-        -- effectdata:SetNormal(Vector(0,0,-1))
-        -- util.Effect("stunstickimpact", effectdata, true, true)
-
-        -- local light = ents.Create("light_dynamic")
-        -- light:SetPos(effectdata:GetOrigin())
-        -- light:SetKeyValue("_light","100 220 255")
-        -- light:SetKeyValue("style", 0)
-        -- light:SetKeyValue("distance", 256)
-        -- light:SetKeyValue("brightness", 5)
-        -- light:Spawn()
-        -- light:Fire("TurnOn","","0")
-        -- light.Time = CurTime()
-        -- timer.Simple(0.1,function()
-            -- SafeRemoveEntity(light)
-        -- end)
-        -- sound.Play("subway_trains/bogey/spark.mp3",effectdata:GetOrigin(),75,math.random(100,150),volume)
-    -- end
 end
 
 
