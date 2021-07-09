@@ -439,26 +439,22 @@ net.Receive("metrostroi-bogey-menu",function()
     }
 end)
 
-net.Receive("metrostroi_spark_check",function()
+net.Receive("metrostroi_spark",function()
     local ent = net.ReadEntity()
     if not IsValid(ent) then return end
     local PantPos = net.ReadVector()
-    local motorPower = net.ReadInt(10)/50
-    local probability = math.Clamp(1-(motorPower/2),0,1)
-    if math.random() > probability then
-        local effectdata = EffectData()
-        effectdata:SetOrigin(ent:LocalToWorld(PantPos))
-        effectdata:SetNormal(Vector(0,0,-1))
-        util.Effect("stunstickimpact", effectdata, true, true)
-        
-        local light = ents.CreateClientside("gmod_train_dlight")
-        light:SetPos(effectdata:GetOrigin())
-        light:SetDColor(Color(100,220,255))
-        light:SetSize(256)
-        light:SetBrightness(5)
-        light:SetLightStrength(1)
-        light:Spawn()
-        SafeRemoveEntityDelayed(light,0.1)
-        sound.Play("subway_trains/bogey/spark.mp3",effectdata:GetOrigin(),75,math.random(100,150),volume)
-    end
+    
+    local effectdata = EffectData()
+    effectdata:SetOrigin(ent:LocalToWorld(PantPos))
+    effectdata:SetNormal(Vector(0,0,-1))
+    util.Effect("stunstickimpact", effectdata, true, true)
+    
+    local light = ents.CreateClientside("gmod_train_dlight")
+    light:SetPos(effectdata:GetOrigin())
+    light:SetDColor(Color(100,220,255))
+    light:SetSize(256)
+    light:SetBrightness(5)
+    light:Spawn()
+    SafeRemoveEntityDelayed(light,0.1)
+    sound.Play("subway_trains/bogey/spark.mp3",effectdata:GetOrigin(),75,math.random(100,150),volume)
 end)

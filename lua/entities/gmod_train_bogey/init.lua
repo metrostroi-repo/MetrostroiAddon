@@ -3,7 +3,7 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
-util.AddNetworkString("metrostroi_spark_check")
+util.AddNetworkString("metrostroi_spark")
 
 local DECOUPLE_TIMEOUT      = 2     -- Time after decoupling furing wich a bogey cannot couple
 local COUPLE_MAX_DISTANCE   = 20    -- Maximum distance between couple offsets
@@ -460,11 +460,14 @@ function ENT:CheckVoltage(dT)
             if dt < 1.0 then volume = 0.43 end
             if i == 1 then sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",self:LocalToWorld(self.PantLPos),65,math.random(90,120),volume) end
             if i == 2 then sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",self:LocalToWorld(self.PantRPos),65,math.random(90,120),volume) end
-            net.Start("metrostroi_spark_check")
-                net.WriteEntity(self)
-                net.WriteVector(i == 1 and self.PantLPos or self.PantRPos)
-                net.WriteInt(self.MotorPower*50,10)
-            net.Broadcast()
+            
+            -- Sparking probability
+            if math.random() > math.Clamp(1-(self.MotorPower/2),0,1) then
+                net.Start("metrostroi_spark")
+                    net.WriteEntity(self)
+                    net.WriteVector(i == 1 and self.PantLPos or self.PantRPos)
+                net.Broadcast()
+            end
         end
     end
     -- Voltage spikes
