@@ -533,12 +533,12 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     --Metrostroi.Current = Metrostroi.Current + Iperson
 
     -- Check if exceeded global maximum current
-    if Metrostroi.Current > GetConVarNumber("metrostroi_current_limit") then
+    if Metrostroi.Current > GetConVar("metrostroi_current_limit"):GetInt() then
         Metrostroi.VoltageRestoreTimer = CurTime() + 7.0
         print(Format("[!] Power feed protection tripped: current peaked at %.1f A",Metrostroi.Current))
     end
 
-    local voltage = math.max(0,GetConVarNumber("metrostroi_voltage"))
+    local voltage = math.max(0,GetConVar("metrostroi_voltage"):GetInt())
 
     -- Calculate new voltage
     local Rfeed = 0.03 --25

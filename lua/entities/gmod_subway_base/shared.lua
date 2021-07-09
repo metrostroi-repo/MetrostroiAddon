@@ -229,7 +229,7 @@ function ENT:CreateBASSSound(name,callback,noblock,onerr)
 			if err ~= 41 then
 				MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s\n",name,err,errName))
 				if onerr then callback(false) end
-			elseif GetConVarNumber("metrostroi_drawdebug") ~= 0 then
+			elseif GetConVar("metrostroi_drawdebug"):GetInt() ~= 0 then
 				MsgC(Color(255,255,0),Format("Sound:%s\n\tBASS_ERROR_UNKNOWN (it's normal),ErrCode:%s, ErrName:%s\n",name,err,errName))
 				self:CreateBASSSound(name,callback)
 			end
@@ -461,7 +461,7 @@ else
 							if err == 4 or err == 37 then self.StopSounds = true end
 							if err ~= 41 then
 								MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s\n",name,err,errName))
-							elseif GetConVarNumber("metrostroi_drawdebug") ~= 0 then
+							elseif GetConVar("metrostroi_drawdebug"):GetInt() ~= 0 then
 								MsgC(Color(255,255,0),Format("Sound:%s\n\tBASS_ERROR_UNKNOWN (it's normal),ErrCode:%s, ErrName:%s\n",name,err,errName))
 								--self:PlayOnce(soundid,location,range,pitch,randoff)
 							end

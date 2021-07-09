@@ -69,7 +69,7 @@ end
 local nextthink = 0
 local function think()
 	if CurTime() < nextthink then return end
-	nextthink = CurTime() + GetConVarNumber("metrostroi_debugger_update_interval")
+	nextthink = CurTime() + GetConVar("metrostroi_debugger_update_interval"):GetFloat()
 	--Loop over clients and their ents and send the collected data
 
 	--Check for new entity variables
