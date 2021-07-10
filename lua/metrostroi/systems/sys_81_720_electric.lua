@@ -31,9 +31,6 @@ function TRAIN_SYSTEM:Initialize()
     self.Battery80V = 0.0
 
     -- Resistances
-    self.R1 = 1e9
-    self.R2 = 1e9
-    self.R3 = 1e9
     self.Rs1 = 1e9
     self.Rs2 = 1e9
 
@@ -61,8 +58,6 @@ function TRAIN_SYSTEM:Initialize()
     self.T2 = 25
     self.P1 = 0
     self.P2 = 0
-    self.Overheat1 = 0
-    self.Overheat2 = 0
 
     -- Total energy used by train
     self.ElectricEnergyUsed = 0 -- joules
@@ -370,7 +365,6 @@ end
 function TRAIN_SYSTEM:SolvePowerCircuits(Train,dT,iter)
     self.Rs1 = Train.BPTI.RVResistance
     self.Rs2 = Train.BPTI.RVResistance
-
     -- Calculate total resistance of engines winding
     local RwAnchor = Train.Engines.Rwa*2 -- Double because each set includes two engines
     local RwStator = Train.Engines.Rws*2
@@ -447,18 +441,6 @@ function TRAIN_SYSTEM:SolvePowerCircuits(Train,dT,iter)
         self.Istator13 = -I2
         self.Istator24 = -I1
     end
-
-    -- Calculate power and heating
-    local K = 12.0*1e-5
-    local H = (10.00+(15.00*Train.Engines.Speed/80.0))*1e-3
-    self.P1 = (self.IR1^2)*self.R1
-    self.P2 = (self.IR2^2)*self.R2
-    self.T1 = (self.T1 + self.P1*K*dT - (self.T1-25)*H*dT)
-    self.T2 = (self.T2 + self.P2*K*dT - (self.T2-25)*H*dT)
-    self.Overheat1 = math.min(1-1e-12,
-        self.Overheat1 + math.max(0,(math.max(0,self.T1-750.0)/400.0)^2)*dT )
-    self.Overheat2 = math.min(1-1e-12,
-        self.Overheat2 + math.max(0,(math.max(0,self.T2-750.0)/400.0)^2)*dT )
 
     -- Energy consumption
     self.ElectricEnergyUsed = self.ElectricEnergyUsed + math.max(0,self.EnergyChange)*dT
