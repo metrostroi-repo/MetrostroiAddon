@@ -1485,7 +1485,7 @@ function ENT:Think()
 
     local typ = self:GetNW2Int("AnnType",1)
     self:HidePanel("RRI",typ~=1)
-    self:HidePanel("RRIScreen",typ~=1 or self.CurrentCamera ~= 6)
+    self:HidePanel("RRIScreen",typ~=1 or self.CurrentCamera ~= 7)
     self:ShowHide("E_informator",typ==1)
     self:HidePanel("ASNP",typ~=2)
     self:HidePanel("ASNPScreen",typ~=2)
