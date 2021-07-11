@@ -147,6 +147,18 @@ ENT.ClientProps["Ema_salon2"] = {
     ang = Angle(0,0,0),
     hide = 2.0
 }
+ENT.ClientProps["sosd_model"] = {
+    model = "models/metrostroi_train/81-502/502_sosd.mdl",
+    pos = Vector(10,0,0),
+    ang = Angle(0,0,0),
+    hide = 2.0
+}
+ENT.ClientProps["sosd_lamp"] = {
+    model = "models/metrostroi_train/81-717/sosd_lamp.mdl",
+    pos = Vector(10,0,0),
+    ang = Angle(0,0,0),
+    hide = 2.0
+}
 ENT.ClientProps["osp_label"] = {
 	model = "models/metrostroi_train/81-717/labels/label_spb1.mdl",
 	pos = Vector(381.722321,-42.139999,36.999210),
@@ -1995,7 +2007,7 @@ ENT.ClientProps["WhiteLights"] = {
 ENT.Lights = {
     [1] = { "headlight",        Vector(475,0,-20), Angle(0,0,0), Color(169,130,88), brightness = 3 ,fov = 90, texture = "models/metrostroi_train/equipment/headlight",shadows = 1,headlight=true},
     [2] = { "headlight",        Vector(465,0,45), Angle(-20,0,0), Color(255,0,0), fov=164 ,brightness = 0.3, farz=250,texture = "models/metrostroi_train/equipment/headlight2",shadows = 0,backlight=true},
-    [20] = { "headlight",       Vector( 425,-56,-70),Angle(0,-90,0),Color(255,220,180),brightness = 0.3,distance = 300 ,fov=120,shadows = 1, texture="effects/flashlight/soft", hidden="Ema_salon2" },
+    ["SOSD"] = { "headlight",   Vector(436,-56,-74),Angle(0,-90,0),Color(255,220,180),brightness = 0.3,distance = 300 ,fov=120,shadows = 1, texture="effects/flashlight/soft", hidden="Ema_salon2" },
     [21] = { "headlight",       Vector(445,-55,40), Angle(75, 70,45), Color(190, 130, 88), fov=125,farz=80,brightness = 1.5,shadows = 1, texture = "models/metrostroi_train/equipment/headlight", hidden="Lamps_pult"},
 	[22] = { "headlight",       Vector(440,-60,31), Angle(20, 25,0), Color(200, 140, 98), fov=120,farz=100,brightness = 1,shadows = 1, texture = "models/metrostroi_train/equipment/headlight2", hidden="Lamps_pult"},
      -- Interior
@@ -2087,7 +2099,10 @@ function ENT:Think()
         self:SetLightPower(12, half1 > 0, half1*0.4+half2*0.6)
         self:SetLightPower(13, half1 > 0, half1*0.9+half2*0.1)
     end
-    self:SetLightPower(20,self:GetPackedBool("SOSD"))
+    
+    local sosd = self:Animate("SOSD",self:GetPackedBool("SOSD") and 1 or 0,0,1,6,false)
+    self:ShowHideSmooth("sosd_lamp",sosd)
+    self:SetLightPower("SOSD",sosd>0,sosd)
 
     -- Parking brake animation
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
