@@ -54,10 +54,6 @@ function TRAIN_SYSTEM:Initialize()
     self.IR1 = self.Itotal
     self.IR2 = self.Itotal
     self.IRT2 = self.Itotal
-    self.T1 = 25
-    self.T2 = 25
-    self.P1 = 0
-    self.P2 = 0
 
     -- Total energy used by train
     self.ElectricEnergyUsed = 0 -- joules
