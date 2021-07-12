@@ -990,10 +990,6 @@ ENT.Spawner = {
                     ent.BV:TriggerInput("Enable",1)
                 end)
             end
-            ent.Pneumatic.RightDoorState = val==4 and {1,1,1,1} or {0,0,0,0}
-            ent.Pneumatic.DoorRight = val==4
-            ent.Pneumatic.LeftDoorState = val==4 and {1,1,1,1} or {0,0,0,0}
-            ent.Pneumatic.DoorLeft = val==4
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
