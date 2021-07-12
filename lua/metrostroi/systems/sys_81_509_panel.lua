@@ -4,7 +4,7 @@
 -- Copyright (C) 2013-2019 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_508_Panel")
+Metrostroi.DefineSystem("81_509_Panel")
 
 function TRAIN_SYSTEM:Initialize()
     -- Выключатель батареи (ВБ)

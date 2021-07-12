@@ -1,7 +1,7 @@
 ENT.Type            = "anim"
 ENT.Base            = "gmod_subway_base"
 
-ENT.PrintName       = "Em508 (81-508)"
+ENT.PrintName       = "Em509 (81-509)"
 ENT.Author          = ""
 ENT.Contact         = ""
 ENT.Purpose         = ""
@@ -569,7 +569,7 @@ function ENT:InitializeSystems()
     -- Пневмосистема 81-703
     self:LoadSystem("Pneumatic","81_703_Pneumatic")
     -- Панель управления Е
-    self:LoadSystem("Panel","81_508_Panel")
+    self:LoadSystem("Panel","81_509_Panel")
     -- Everything else
     self:LoadSystem("Battery")
     self:LoadSystem("Horn")
@@ -587,7 +587,7 @@ function ENT:InitializeSystems()
     self:LoadSystem("IGLA_PCBK")
 
     self:LoadSystem("ALSCoil")
-    self:LoadSystem("UKS","81_508_UKS")
+    self:LoadSystem("UKS","81_509_UKS")
 end
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("Type",self.Electric.Em)
@@ -595,7 +595,7 @@ end
 
 ENT.SubwayTrain = {
     Type = "E",
-    Name = "81-508",
+    Name = "81-509",
     WagType = 0,
     ARS = {
         NoEPK = true,
@@ -605,7 +605,7 @@ ENT.SubwayTrain = {
     },
     EKKType = 703,
 }
-ENT.NumberRanges = {{3001,3100},{3301,3400},{3501,3699},{4701,4750},{4851,4900}}
+ENT.NumberRanges = {{3967,3975},{6017,6026},{6144,6145},{6154,6158},{6165,6169},{6176,6179},{6186,6191},{6196,6202},{6213,6213},{6222,6225},{6232,6235},{6243,6245}}
 
 ENT.Spawner = {
     model = {
@@ -618,7 +618,7 @@ ENT.Spawner = {
     },
     interim = "gmod_subway_ezh1",
     func = function(ent,i,maxi)
-        if ent:GetClass() == "gmod_subway_em508" then
+        if ent:GetClass() == "gmod_subway_em509" then
             ent.VU:TriggerInput("Set",1)
             ent.UAVA:TriggerInput("Set",0)
             ent.Plombs.VU = nil
