@@ -2136,16 +2136,6 @@ function ENT:Think()
         self:HidePanel("Lamps2_1",typ ~= 3)
         self:HidePanel("Lamps2_2",typ ~= 3)
         self:ShowHide("speed_o",typ ~= 3)
-        self:HidePanel("RCAV3",typ==1)
-        self:HidePanel("RCAV4",typ==1)
-        self:HidePanel("RCAV5",typ==1)
-        self:HidePanel("RCARS",typ~=1)
-        self:HidePanel("RCBPS",typ~=1)
-        self:ShowHide("rcars_wrench",typ == 1)
-        self:ShowHide("rcbps_wrench",typ == 1)
-        self:ShowHide("rcav3_wrench",typ == 1)
-        self:ShowHide("rcav4_wrench",typ ~= 1)
-        self:ShowHide("rcav5_wrench",typ ~= 1)
     end
     local light_04 = self:Animate("light_04",self:GetPackedBool("ARS_04") and 1 or 0,0,1,5,false)
     local light_0  = self:Animate("light_0" ,self:GetPackedBool("ARS_00") and 1 or 0,0,1,5,false)
@@ -2170,6 +2160,16 @@ function ENT:Think()
         self:ShowHideSmooth("panel2_80", light_70)
     end
     if typ == 1 then
+        self:HidePanel("RCAV3",true)
+        self:HidePanel("RCAV4",true)
+        self:HidePanel("RCAV5",true)
+
+        self:ShowHide("rcav3_wrench",false)
+        self:HidePanel("RCARS",false)
+        self:HidePanel("RCBPS",false)
+        self:ShowHide("rcav4_wrench",false)
+        self:ShowHide("rcav5_wrench",false)    
+    
         self:ShowHide("rcars_wrench",self.RCARSResetTime and CurTime()-self.RCARSResetTime<1.5)
         self:ShowHide("rcbps_wrench",self.RCBPSResetTime and CurTime()-self.RCBPSResetTime<1.5)
         if IsValid(self.ClientEnts.rcars_wrench) and self.Anims.RCARSToggle then
@@ -2188,6 +2188,15 @@ function ENT:Think()
             self.LastRCBPSValue = self:GetPackedBool("RCBPS")
         end
     else
+        self:HidePanel("RCAV3",false)
+        self:HidePanel("RCAV4",false)
+        self:HidePanel("RCAV5",false)
+
+        self:ShowHide("rcars_wrench",false)
+        self:ShowHide("rcbps_wrench",false)
+        self:HidePanel("RCARS",true)
+        self:HidePanel("RCBPS",true)
+    
         self:ShowHide("rcav3_wrench",self.RCAV3ResetTime and CurTime()-self.RCAV3ResetTime<1.5)
         self:ShowHide("rcav4_wrench",self.RCAV4ResetTime and CurTime()-self.RCAV4ResetTime<1.5)
         self:ShowHide("rcav5_wrench",self.RCAV5ResetTime and CurTime()-self.RCAV5ResetTime<1.5)
