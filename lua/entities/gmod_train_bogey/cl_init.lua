@@ -151,6 +151,7 @@ end
 
 function ENT:Initialize()
     self.MotorPowerSound = 0
+    self.PlayTime = { 0, 0 }
     self.SmoothAngleDelta = 0
     self.CurrentBrakeSqueal = 0
     self:ReinitializeSounds()
@@ -437,4 +438,34 @@ net.Receive("metrostroi-bogey-menu",function()
         havepb=net.ReadBool(),
         pbdisabled=net.ReadBool(),
     }
+end)
+
+net.Receive("metrostroi_bogey_contact",function()
+    local ent = net.ReadEntity()
+    if not IsValid(ent) then return end
+    local PantNum = net.ReadUInt(1)+1
+    local PantPos = net.ReadVector()
+    local Spark = net.ReadUInt(1) > 0
+    
+    local dt = CurTime() - ent.PlayTime[PantNum]
+    ent.PlayTime[PantNum] = CurTime()
+    
+    local volume = 0.53
+    if dt < 1.0 then volume = 0.43 end
+    sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",ent:LocalToWorld(PantPos),65,math.random(90,120),volume)
+    
+    if not Spark then return end
+    local effectdata = EffectData()
+    effectdata:SetOrigin(ent:LocalToWorld(PantPos))
+    effectdata:SetNormal(Vector(0,0,-1))
+    util.Effect("stunstickimpact", effectdata, true, true)
+    
+    local light = ents.CreateClientside("gmod_train_dlight")
+    light:SetPos(effectdata:GetOrigin())
+    light:SetDColor(Color(100,220,255))
+    light:SetSize(256)
+    light:SetBrightness(5)
+    light:Spawn()
+    SafeRemoveEntityDelayed(light,0.1)
+    sound.Play("subway_trains/bogey/spark.mp3",effectdata:GetOrigin(),75,math.random(100,150),volume)
 end)
