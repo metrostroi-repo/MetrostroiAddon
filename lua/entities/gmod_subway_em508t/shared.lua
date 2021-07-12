@@ -27,8 +27,8 @@ local function GetDoorPosition(i,k)
 end
 
 ENT.MirrorCams = {
-    Vector(441,72,15),Angle(1,0 or 180,0),90 or 15,
-    Vector(441,-72,15),Angle(1,0 or 180,0),90 or 15,
+    Vector(441,72,15),Angle(1,180,0),15,
+    Vector(441,-72,15),Angle(1,180,0),15,
 }
 
 ENT.AnnouncerPositions = {
