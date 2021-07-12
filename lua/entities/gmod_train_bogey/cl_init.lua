@@ -151,6 +151,7 @@ end
 
 function ENT:Initialize()
     self.MotorPowerSound = 0
+    self.PlayTime = { 0, 0 }
     self.SmoothAngleDelta = 0
     self.CurrentBrakeSqueal = 0
     self:ReinitializeSounds()
@@ -439,11 +440,21 @@ net.Receive("metrostroi-bogey-menu",function()
     }
 end)
 
-net.Receive("metrostroi_spark",function()
+net.Receive("metrostroi_bogey_contact",function()
     local ent = net.ReadEntity()
     if not IsValid(ent) then return end
+    local PantNum = net.ReadUInt(1)+1
     local PantPos = net.ReadVector()
+    local Spark = net.ReadUInt(1) > 0
     
+    local dt = CurTime() - ent.PlayTime[PantNum]
+    ent.PlayTime[PantNum] = CurTime()
+    
+    local volume = 0.53
+    if dt < 1.0 then volume = 0.43 end
+    sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",ent:LocalToWorld(PantPos),65,math.random(90,120),volume)
+    
+    if not Spark then return end
     local effectdata = EffectData()
     effectdata:SetOrigin(ent:LocalToWorld(PantPos))
     effectdata:SetNormal(Vector(0,0,-1))

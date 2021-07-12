@@ -3,7 +3,7 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
-util.AddNetworkString("metrostroi_spark")
+util.AddNetworkString("metrostroi_bogey_contact")
 
 local DECOUPLE_TIMEOUT      = 2     -- Time after decoupling furing wich a bogey cannot couple
 local COUPLE_MAX_DISTANCE   = 20    -- Maximum distance between couple offsets
@@ -118,7 +118,6 @@ function ENT:Initialize()
     self.Voltage = 0
     self.VoltageDrop = 0
     self.DropByPeople = 0
-    self.PlayTime = { 0, 0 }
     self.ContactStates = { false, false }
     self.DisableContacts = false
     self.DisableContactsManual = false
@@ -450,26 +449,16 @@ function ENT:CheckVoltage(dT)
         if state ~= self.ContactStates[i] then
             self.ContactStates[i] = state
             if not state then continue end
-
-            self.VoltageDrop = -40*(0.5 + 0.5*math.random())
-
-            local dt = CurTime() - self.PlayTime[i]
-            self.PlayTime[i] = CurTime()
-
-            local volume = 0.53
-            if dt < 1.0 then volume = 0.43 end
-            if i == 1 then sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",self:LocalToWorld(self.PantLPos),65,math.random(90,120),volume) end
-            if i == 2 then sound.Play("subway_trains/bogey/tr_"..math.random(1,5)..".wav",self:LocalToWorld(self.PantRPos),65,math.random(90,120),volume) end
             
-            -- Sparking probability
-            if math.random() > math.Clamp(1-(self.MotorPower/2),0,1) then
-                net.Start("metrostroi_spark")
-                    net.WriteEntity(self)
-                    net.WriteVector(i == 1 and self.PantLPos or self.PantRPos)
-                net.Broadcast()
-            end
+            net.Start("metrostroi_bogey_contact")
+                net.WriteEntity(self) -- Bogey
+                net.WriteUInt(i-1,1) -- PantNum
+                net.WriteVector(i == 1 and self.PantLPos or self.PantRPos) -- PantPos
+                net.WriteUInt((math.random() > math.Clamp(1-(self.MotorPower/2),0,1)) and 1 or 0,1) -- Sparking probability
+            net.Broadcast()
         end
     end
+
     -- Voltage spikes
     self.VoltageDrop = math.max(-30,math.min(30,self.VoltageDrop + (0 - self.VoltageDrop)*10*dT))
 
