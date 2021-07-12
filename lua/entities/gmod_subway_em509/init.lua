@@ -6,7 +6,7 @@ ENT.BogeyDistance = 650 -- Needed for gm trainspawner
 
 --"DURASelectMain","DURASelectAlternate","DURAToggleChannel","DURAPowerToggle",
 ENT.SyncTable = {
-    "VB","AV","VU","VU1","VU2","VU3","RST", "50V", "KU8","KU10","KU10R","KU9","KU2","KU1","KU1","KU11","KU4","KU5","UV1","KU6","KU7","KU6K","KU7K","KU14","KU15","UV1","KU16",
+    "VB","AV","VU","VU1","VU2","VU3","RST", "50V", "KU8","KU10","KU10R","KU9","KU2","KU1","KU1","KU11","KU13","KU3","KU4","KU5","UV1","KU6","KU7","KU6K","KU7K","KU14","KU15","UV1","KU16",
     "PanelLamp","OtklAVU","KRR","HPass",
     "R_ASNPMenu","R_ASNPUp","R_ASNPDown","R_ASNPOn",
     "RRIEnable","RRIAmplifier",
