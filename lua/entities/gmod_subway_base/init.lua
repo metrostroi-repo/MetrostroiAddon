@@ -86,6 +86,10 @@ function ENT:PostEntityPaste(ply,ent,createdEntities)
 end
 
 --------------------------------------------------------------------------------
+local C_MaxWagons = GetConVar("metrostroi_maxwagons")
+local C_MaxTrains = GetConVar("metrostroi_maxtrains")
+local C_MaxTrainsOnPly = GetConVar("metrostroi_maxtrains_onplayer")
+
 function ENT:Initialize()
     self.Joints = {}
     self.JointPositions = {}
@@ -2001,15 +2005,15 @@ end
 function ENT:SpawnFunction(ply, tr,className,rotate,func)
     --MaxTrains limit
     if self.ClassName ~= "gmod_subway_base" and not self.NoTrain then
-        local Limit1 = math.min(2,GetConVar("metrostroi_maxwagons"):GetInt())*GetConVar("metrostroi_maxtrains_onplayer"):GetInt()-1
-        local Limit2 = math.max(0,GetConVar("metrostroi_maxwagons"):GetInt()-2)*GetConVar("metrostroi_maxtrains_onplayer"):GetInt()-1
+        local Limit1 = math.min(2,C_MaxWagons:GetInt())*C_MaxTrainsOnPly:GetInt()-1
+        local Limit2 = math.max(0,C_MaxWagons:GetInt()-2)*C_MaxTrainsOnPly:GetInt()-1
 
-        if Metrostroi.TrainCount() > GetConVar("metrostroi_maxtrains"):GetInt()*GetConVar("metrostroi_maxwagons"):GetInt()-1 then
+        if Metrostroi.TrainCount() > C_MaxTrains:GetInt()*C_MaxWagons:GetInt()-1 then
             ply:LimitHit("train_limit")
             --Metrostroi.LimitMessage(ply)
             return
         end
-        if Metrostroi.TrainCountOnPlayer(ply) > GetConVar("metrostroi_maxwagons"):GetInt()*GetConVar("metrostroi_maxtrains_onplayer"):GetInt()-1 then
+        if Metrostroi.TrainCountOnPlayer(ply) > C_MaxWagons:GetInt()*C_MaxTrainsOnPly:GetInt()-1 then
             ply:LimitHit("train_limit")
             --Metrostroi.LimitMessage(ply)
             return

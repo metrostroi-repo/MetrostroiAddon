@@ -17,7 +17,7 @@ function ulx.wagoncount( calling_ply )
         for k,v in pairs(Metrostroi.TrainClasses) do
             if  v == "gmod_subway_base" then continue end
             local ents = ents.FindByClass(v)
-            for k2,v2 in pairs(ents) do -- Удалить GetNetworkedEntity? Заменить на GetNWEntity, как сказано в GMod Wiki?
+            for k2,v2 in pairs(ents) do
                 N[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = (N[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] or 0) + 1
             end
         end
