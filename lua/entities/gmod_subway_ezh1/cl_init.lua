@@ -1057,7 +1057,7 @@ function ENT:Think()
             else
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 6*self.DeltaTime,0,1)
             end
-            self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.8+self.DoorLoopStates[id]*0.2)
+            self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.66+self.DoorLoopStates[id]*0.2)
             local n_l = "door"..i.."x"..k--.."a"
             --local n_r = "door"..i.."x"..k.."b"
             local dlo = 1
