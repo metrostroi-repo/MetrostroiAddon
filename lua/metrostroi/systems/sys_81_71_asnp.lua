@@ -762,7 +762,7 @@ function TRAIN_SYSTEM:Think()
         self.ASNPTimer = CurTime()-math.Rand(-0.3,0.3)
     end
     if self.State == -1 and self.ASNPTimer and CurTime()-self.ASNPTimer > 1 then
-        self.State = Metrostroi.ASNPSetup and 1 or -2
+        self.State = Metrostroi.ASNPSetup and #Metrostroi.ASNPSetup > 0 and 1 or -2
     end
     if Power and self.State > -1  then
         for k,v in pairs(self.TriggerNames) do
@@ -772,7 +772,7 @@ function TRAIN_SYSTEM:Think()
             end
         end
     end
-    if not Metrostroi.ASNPSetup and self.State > 0 then
+    if (not Metrostroi.ASNPSetup or Metrostroi.ASNPSetup and #Metrostroi.ASNPSetup == 0) and self.State > 0 then
         self.State = -2
     end
     local PSWork = Train.Panel.PassSchemeControl and Train.Panel.PassSchemeControl>0 and self.State==7
