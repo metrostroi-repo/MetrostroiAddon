@@ -137,6 +137,8 @@ function TRAIN_SYSTEM:Think(dT)
         Train:WriteTrainWire(30,self.BTB*S["RU"]*C(Panel.Controller<=-1))
 
         Panel.V4 = (S["RVnE"]*C(Train.KRO.Value~=1)+S["RU"])*Train.SF6.Value
+        Train:WriteTrainWire(11,Panel.V4*Train.ParkingBrake.Value)
+        Train:WriteTrainWire(31,Panel.V4*(1-Train.ParkingBrake.Value))
 
         Train:WriteTrainWire(-8,BO*min(1,(S["RV"]+S["RU"]))*Train.SF7.Value)
         Train:WriteTrainWire(9,W[8]*(1-self.CabActive)*C(Train.VRU.Value==1)*Train.SF7.Value)
