@@ -2758,7 +2758,7 @@ function ENT:Think()
 
     self:SetLightPower(30,headlight > 0,headlight)
     self:SetLightPower(31,headlight > 0,headlight)
-    self:SetLightPower(32,headlight > 0 and (mask == 2 or mask == 3),headlight)
+    self:SetLightPower(32,headlight > 0 and mask > 4,headlight)
 
     local newBortlamps = self:GetNW2Bool("NewBortlamps")
     local Bortlamp_w = self:Animate("Bortlamp_w",self:GetPackedBool("DoorsW") and 1 or 0,0,1,16,false)
