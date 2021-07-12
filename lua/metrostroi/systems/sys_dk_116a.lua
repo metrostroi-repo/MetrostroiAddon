@@ -43,7 +43,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "BogeyMoment" }
+    return { "BogeyMoment", "E24" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
