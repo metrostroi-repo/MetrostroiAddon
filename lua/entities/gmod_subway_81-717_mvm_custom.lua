@@ -84,7 +84,6 @@ ENT.Spawner = {
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_Radio:TriggerInput("Set",val==1 and 1 or 0)
-                ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.BPSNon:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 ent.VMK:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 ent.ARS:TriggerInput("Set",(ent.Plombs.RC1 and val==1 and first) and 1 or 0)
@@ -101,7 +100,12 @@ ENT.Spawner = {
                 ent.FrontDoor = val==4
                 ent.RearDoor = val==4
             end
-            if val == 1 then ent.BV:TriggerInput("Enable",1) end
+            if val == 1 then
+                timer.Simple(1,function()
+                    if not IsValid(ent) then return end
+                    ent.BV:TriggerInput("Enable",1)
+                end)
+            end
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
