@@ -967,7 +967,6 @@ ENT.Spawner = {
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_Radio:TriggerInput("Set",val==1 and 1 or 0)
-                ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.BPSNon:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 ent.VMK:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 ent.ARS:TriggerInput("Set",(ent.Plombs.RC1 and val==1 and first) and 1 or 0)
