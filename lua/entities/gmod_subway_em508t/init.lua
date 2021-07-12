@@ -13,6 +13,7 @@ ENT.SyncTable = {
     "DriverValveBLDisconnect","DriverValveTLDisconnect",
     "RearBrakeLineIsolation","RearTrainLineIsolation",
     "FrontBrakeLineIsolation","FrontTrainLineIsolation",
+    "EmergencyBrakeValve",
     "GV",
 }
 
@@ -93,7 +94,7 @@ function ENT:Initialize()
         [KEY_PAD_5] = "PneumaticBrakeSet5",
 
         [KEY_SPACE] = "PBSet",
-        [KEY_BACKSPACE] = "EmergencyBrake",
+        [KEY_BACKSPACE] = {"EmergencyBrake",helper="EmergencyBrakeValveToggle"},
 
         [KEY_PAD_ENTER] = "KVWrenchKV",
         [KEY_PAD_0] = "DriverValveDisconnect",
