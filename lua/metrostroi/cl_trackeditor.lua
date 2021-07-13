@@ -95,7 +95,7 @@ local function OpenConfigWindow()
 	
 	--Main frame
 	local Frame = vgui.Create("DFrame")
-	Frame:SetPos(surface.ScreenWidth()/5,surface.ScreenHeight()/3)
+	Frame:SetPos(ScrW()/5,ScrH()/3)
 	Frame:SetSize(250,400)
 	Frame:SetTitle("Metrostroi Track Recorder")
 	Frame:SetVisible(true)
@@ -117,7 +117,7 @@ local function OpenConfigWindow()
 	--Label for path recording panel
 	local PathL = AddLabel(PathPanel,"Path Recording")
 	PathL:Dock(TOP)
-	PathL:SetDark(true)
+	PathL:SetTextColor(Color(3,3,3))
 	
 	--Start/stop buttons
 	local b1 = AddButton(PathPanel,"metrostroi_trackeditor_start","Start","Start recording a new path")
@@ -135,7 +135,7 @@ local function OpenConfigWindow()
 	--Label for save/load panel
 	local FileL = AddLabel(LoadPanel,"Save/load to file")
 	FileL:Dock(TOP)
-	FileL:SetDark(true)
+	FileL:SetTextColor(Color(3,3,3))
 	
 	--Save/load buttons
 	local b1 = AddButton(LoadPanel,"metrostroi_trackeditor_load","Load","Load the map's track data file")

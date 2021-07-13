@@ -212,10 +212,10 @@ function TRAIN_SYSTEM:Think(dT)
 				self.Signal0	= ars:GetARS(0,Train) or ars:GetARS(2,Train)
 				self.Special	= ars:Get325HzAproove0() and not ars:GetARS(2,Train)
 				self.NoFreq		= ars:GetARS(1,Train) or not (self.Signal80 or self.Signal70 or self.Signal60 or self.Signal40 or self.Signal0)
-				if GetConVarNumber("metrostroi_ars_printnext") == Train:EntIndex() then RunConsoleCommand("say",ars.Name,tostring(arsback and arsback.Name),tostring(ars.NextSignalLink and ars.NextSignalLink.Name or "unknown"),tostring(pos.node1.path.id),tostring(Metrostroi.TrainDirections[Train])) end
+				if GetConVar("metrostroi_ars_printnext"):GetInt() == Train:EntIndex() then RunConsoleCommand("say",ars.Name,tostring(arsback and arsback.Name),tostring(ars.NextSignalLink and ars.NextSignalLink.Name or "unknown"),tostring(pos.node1.path.id),tostring(Metrostroi.TrainDirections[Train])) end
 				self.RealNoFreq = not (self.Signal80 or self.Signal70 or self.Signal60 or self.Signal40 or self.Signal0)
 			else
-				if GetConVarNumber("metrostroi_ars_printnext") == Train:EntIndex() then RunConsoleCommand("say","LOSE SIGNAL",tostring(pos and pos.node1.path.id or "unknown"),tostring(Metrostroi.TrainDirections[Train])) end
+				if GetConVar("metrostroi_ars_printnext"):GetInt() == Train:EntIndex() then RunConsoleCommand("say","LOSE SIGNAL",tostring(pos and pos.node1.path.id or "unknown"),tostring(Metrostroi.TrainDirections[Train])) end
 				if (self.CheckedNF  and self.CheckedNF > 1) or (self.CheckedNF == 0 and self.NoFreq) or self.RealNoFreq then
 					self.Alert = nil
 					self.Signal80 = false

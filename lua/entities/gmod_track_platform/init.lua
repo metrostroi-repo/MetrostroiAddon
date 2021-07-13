@@ -140,7 +140,7 @@ function ENT:Initialize()
 end
 
 function ENT:OnRemove()
-    timer.Destroy("metrostroi_station_announce_"..self:EntIndex())
+    timer.Remove("metrostroi_station_announce_"..self:EntIndex())
 end
 
 --------------------------------------------------------------------------------

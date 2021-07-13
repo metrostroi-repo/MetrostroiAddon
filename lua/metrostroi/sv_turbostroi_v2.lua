@@ -173,8 +173,8 @@ if Turbostroi and not TURBOSTROI then
         cvars.AddChangeCallback("turbostroi_train_cores", function(cvar, old, value)
             Turbostroi.SetSTAffinityMask(tonumber(value) or 254) -- 0 - disabled --NEWTURBOSTROI
         end, "turbostroi")
-        Turbostroi.SetMTAffinityMask(GetConVarNumber("turbostroi_main_cores") or 1) -- CPU5 CPU4 on 6 core --NEWTURBOSTROI
-        Turbostroi.SetSTAffinityMask(GetConVarNumber("turbostroi_train_cores") or 254) -- 0 - disabled --NEWTURBOSTROI
+        Turbostroi.SetMTAffinityMask(GetConVar("turbostroi_main_cores"):GetInt() or 1) -- CPU5 CPU4 on 6 core --NEWTURBOSTROI
+        Turbostroi.SetSTAffinityMask(GetConVar("turbostroi_train_cores"):GetInt() or 254) -- 0 - disabled --NEWTURBOSTROI
         Turbostroi.SetSimulationFPS(FPS)
         hook.Add("Think", "Turbostroi_Think", function()
             if not Turbostroi then return end

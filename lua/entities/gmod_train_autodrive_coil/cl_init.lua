@@ -1,7 +1,7 @@
 include("shared.lua")
 
 function ENT:Initialize()
-    self.CanDraw = GetConVarNumber("metrostroi_drawsignaldebug")>0
+    self.CanDraw = GetConVar("metrostroi_drawsignaldebug"):GetInt()>0
     for k,v in pairs(self.ValidModels) do
         if v==self:GetModel() then
             self.CanDraw = true

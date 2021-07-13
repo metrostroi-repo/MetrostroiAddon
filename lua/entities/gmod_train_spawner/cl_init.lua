@@ -86,10 +86,10 @@ local function CreateList(name,text,tbl,OnSelect,stbl)
 	end
 	List.ID = table.insert(VGUI,function(val, disabled, reset)
 		if reset then
-			if List.Disable then List:SetDisabled(false) end
+			if List.Disable then List:SetEnabled(true) end
 		elseif val or disabled then
 			if val ~= nil then List:ChooseOptionID(val) end
-			List:SetDisabled(disabled)
+			List:SetEnabled(not disabled)
 			List.Disable = disabled
 		else
 			ListLabel:Remove()
@@ -138,12 +138,12 @@ local function CreateSlider(name,decimals,min,max,text,OnSelect,stbl)
 	end
 	Slider.ID = table.insert(VGUI,function(val, disabled, reset)
 	  if reset then
-	    if Slider.Disable then Slider:SetDisabled(false) Slider.Disable = nil end
+	    if Slider.Disable then Slider:SetEnabled(true) Slider.Disable = nil end
 	    return
 	  end
 		if val or disabled then
 			if val ~= nil then Slider:SetValue(val) end
-			Slider:SetDisabled(disabled)
+			Slider:SetEnabled(not disabled)
 			Slider.Disable = disabled
 			return
 		end
@@ -183,12 +183,12 @@ local function CreateCheckBox(name,text,OnSelect,stbl)
 	end
 	CB.ID = table.insert(VGUI,function(val, disabled, reset)
 	  if reset then
-	    if CB.Disable then CB:SetDisabled(false) CB.Disable = nil end
+	    if CB.Disable then CB:SetEnabled(true) CB.Disable = nil end
 	    return
 	  end
 		if val or disabled then
 			if val ~= nil then CB:SetValue(val) end
-			CB:SetDisabled(disabled)
+			CB:SetEnabled(not disabled)
 			CB.Disable = disabled
 			return
 		end
@@ -521,7 +521,7 @@ end
 local function createFrame()
 	MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
 	MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
-	--if GetConVarString("gmod_toolmode") == "train_spawner" then RunConsoleCommand("gmod_toolmode", "weld") end
+	--if GetConVar("gmod_toolmode"):GetString() == "train_spawner" then RunConsoleCommand("gmod_toolmode", "weld") end
 	if IsValid(frame) then return end
 	Pos = 0
 	VGUI = {}
@@ -564,7 +564,7 @@ local function createFrame()
 
 	spawn.DoClick = function()
 		--[[
-		local Tool = GetConVarString("gmod_toolmode")
+		local Tool = GetConVar("gmod_toolmode"):GetString()
 		if Tool == "train_spawner" then Tool = "weld" end
 		RunConsoleCommand("train_spawner_oldT", Tool)
 		RunConsoleCommand("train_spawner_oldW", LocalPlayer():GetActiveWeapon():GetClass())

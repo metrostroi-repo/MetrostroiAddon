@@ -135,7 +135,7 @@ function TRAIN_SYSTEM:Think(dT)
                 --if self.NoFreqTimer and CurTime()-self.NoFreqTimer > 2 then self.NoFreqTimer = false end
                 --self.NoFreq = (NoFreq and self.NoFreqTimer == false) and 1 or 0
                 self.NoFreq = NoFreq and 1 or 0
-                if GetConVarNumber("metrostroi_ars_printnext") == Train:GetWagonNumber() then RunConsoleCommand("say",ars.Name,tostring(arsback and arsback.Name),tostring(ars.NextSignalLink and ars.NextSignalLink.Name or "unknown"),tostring(pos.node1.path.id),tostring(Metrostroi.TrainDirections[Train])) end
+                if GetConVar("metrostroi_ars_printnext"):GetInt() == Train:GetWagonNumber() then RunConsoleCommand("say",ars.Name,tostring(arsback and arsback.Name),tostring(ars.NextSignalLink and ars.NextSignalLink.Name or "unknown"),tostring(pos.node1.path.id),tostring(Metrostroi.TrainDirections[Train])) end
             elseif self.Enabled > 0 then
                 if self.NoFreqTimer == nil then self.NoFreqTimer = CurTime() end
 

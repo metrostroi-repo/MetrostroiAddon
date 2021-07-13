@@ -637,7 +637,7 @@ hook.Add("PostDrawOpaqueRenderables", "metrostroi-draw-stopmarker",function()
     prevTime = RealTime()
 
     -- Skip if disabled
-    if GetConVarNumber("metrostroi_stop_helper") ~= 1 then return end
+    if GetConVar("metrostroi_stop_helper"):GetInt() ~= 1 then return end
 
     -- Get train
     local train = LocalPlayer().InMetrostroiTrain

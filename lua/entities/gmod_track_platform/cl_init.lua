@@ -383,7 +383,7 @@ end
 -- Make sure entity is not drawn
 --------------------------------------------------------------------------------
 function ENT:Draw()
-    if GetConVarNumber("metrostroi_drawsignaldebug") ~= 1 then return end
+    if GetConVar("metrostroi_drawsignaldebug"):GetInt() ~= 1 then return end
     local platformStart = self:GetNW2Vector("PlatformStart",false)
     local platformEnd = self:GetNW2Vector("PlatformEnd",false)
 

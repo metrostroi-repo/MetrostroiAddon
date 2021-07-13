@@ -550,7 +550,7 @@ function Metrostroi.ScanTrack(itype,node,func,x,dir,checked)
     end
 
     -- Show the scanned path
-    --[[if GetConVarNumber("metrostroi_drawdebug") == 1 then
+    --[[if GetConVar("metrostroi_drawdebug"):GetInt() == 1 then
         local T = CurTime()
         timer.Simple(0.05 + math.random()*0.05,function()
             if node.next then

@@ -1047,7 +1047,7 @@ function ENT:Think()
         end
     end
 
-    if (GetConVarNumber("metrostroi_disablecamaccel") == 0) then
+    if (GetConVar("metrostroi_disablecamaccel"):GetInt() == 0) then
         self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Float("Accel",0)+1)/2),0,1, 4, 1)*30-15)
     else
         self.HeadAcceleration = 0
@@ -2262,8 +2262,8 @@ hook.Add("Think","metrostroi-cabin-panel",function()
         end
 
         -- Tooltips
-        local ttdelay = GetConVarNumber("metrostroi_tooltip_delay")
-        if GetConVarNumber("metrostroi_disablehovertext") == 0 and ttdelay and ttdelay >= 0 then
+        local ttdelay = GetConVar("metrostroi_tooltip_delay"):GetFloat()
+        if GetConVar("metrostroi_disablehovertext"):GetInt() == 0 and ttdelay and ttdelay >= 0 then
             local button = findAimButton(ply,train)
             --print(train.ClientProps[button.ID].button)
             if button and
@@ -2291,7 +2291,7 @@ hook.Add("Think","metrostroi-cabin-panel",function()
                         toolTipText = toolTipText..newTT
                         toolTipPosition = Metrostroi.GetPhrase(newTTpos)
                     end]]
-                    if GetConVarNumber("metrostroi_disablehovertextpos") == 0 and button.tooltipState and button.tooltip then
+                    if GetConVar("metrostroi_disablehovertextpos"):GetInt() == 0 and button.tooltipState and button.tooltip then
                         toolTipText = toolTipText..button.tooltipState(train)
                     end
                 end
@@ -2525,7 +2525,7 @@ local ppMat = Material("pp/blurx")
 hook.Add( "HUDPaint", "metrostroi-draw-crosshair-tooltip", function()
     --if not drawCrosshair then return end
     if IsValid(LocalPlayer()) then
-        local scrX,scrY = surface.ScreenWidth(),surface.ScreenHeight()
+        local scrX,scrY = ScrW(),ScrH()
 
         if canDrawCrosshair then
             surface.DrawCircle(scrX/2,scrY/2,4.1,drawCrosshair and Color(255,0,0) or Color(255,255,150))

@@ -564,7 +564,7 @@ function TOOL:BuildCPanelCustom()
     if not CPanel then return end
     --("signalling_signaldata",util.TableToJSON(tool.Signal))
     --tool.Type = GetConVarNumber("signalling_type") or 1
-    tool.RouteType = GetConVarNumber("signalling_routetype") or 1
+    tool.RouteType = GetConVar("signalling_routetype"):GetInt() or 1
     CPanel:ClearControls()
     CPanel:SetPadding(0)
     CPanel:SetSpacing(0)
@@ -1497,9 +1497,9 @@ end
 TOOL.NotBuilt = true
 function TOOL:Think()
     if CLIENT and (self.NotBuilt or NeedUpdate) then
-        self.Signal = self.Signal or util.JSONToTable(string.Replace(GetConVarString("signalling_signaldata"),"'","\"")) or {}
-        self.Sign = self.Sign or util.JSONToTable(string.Replace(GetConVarString("signalling_signdata"),"'","\"")) or {}
-        self.Auto = self.Auto or util.JSONToTable(string.Replace(GetConVarString("signalling_autodata"),"'","\"")) or {}
+        self.Signal = self.Signal or util.JSONToTable(string.Replace(GetConVar("signalling_signaldata"):GetString(),"'","\"")) or {}
+        self.Sign = self.Sign or util.JSONToTable(string.Replace(GetConVar("signalling_signdata"):GetString(),"'","\"")) or {}
+        self.Auto = self.Auto or util.JSONToTable(string.Replace(GetConVar("signalling_autodata"):GetString(),"'","\"")) or {}
         self:SendSettings()
         self:BuildCPanelCustom()
         self.NotBuilt = nil
@@ -1507,7 +1507,8 @@ function TOOL:Think()
     end
 end
 function TOOL.BuildCPanel(panel)
-    panel:AddControl("Header", { Text = "#Tool.signalling.name", Description = "#Tool.signalling.desc" })
+    panel:SetName("#Tool.signalling.name")
+    panel:Help("#Tool.signalling.desc")
     if not self then return end
     self:BuildCPanelCustom()
 end
