@@ -2766,7 +2766,7 @@ function TRAIN_SYSTEM:Think(dT)
                 dist = 3072-self.Distance
                 opv =  true
             else
-                dist = self.StationTable.dist_last_end-self.Distance
+                dist = (self.StationTable.dist_last_end or 3072)-self.Distance
                 local opvDist = self.StationTable.isHorlift and 0.45 or 3
                 opv =  self.Distance > self.StationTable.dist_last_start
                 if not opv then
