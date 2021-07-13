@@ -42,6 +42,8 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("S1","Relay","") --Двери
 
     self.V4 = false --Включение РУ
+    
+    self.ParkingBrake = -1
 
     self.K1 = false
     self.K2 = false
@@ -436,10 +438,18 @@ function TRAIN_SYSTEM:Think(dT)
     else
         self:equalizePressure(dT,"BrakeCylinderPressure", 0.0, 2.00)
     end
-    if Train.BUKV.ParkingBrake==0  then
-        self:equalizePressure(dT,"ParkingBrakePressure", self.TrainLinePressure, 0.4,1,nil,0.5)
-    else
+    if Train:ReadTrainWire(11)*(1-Train:ReadTrainWire(31)) == 1 then
+        self.ParkingBrake = 1
+    elseif Train:ReadTrainWire(31)*(1-Train:ReadTrainWire(11)) == 1 then
+        self.ParkingBrake = 0
+    elseif Train:ReadTrainWire(11)+Train:ReadTrainWire(31) == 2 then
+        self.ParkingBrake = -1 --блокировка
+    end
+    
+    if self.ParkingBrake == 1 then
         self:equalizePressure(dT,"ParkingBrakePressure", 0, 0.4,1,nil,0.5)
+    elseif self.ParkingBrake == 0 then
+        self:equalizePressure(dT,"ParkingBrakePressure", self.TrainLinePressure, 0.4,1,nil,0.5)
     end
     Train:SetPackedRatio("ParkingBrakePressure_dPdT",self.ParkingBrakePressure_dPdT+0.02)
     trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeCylinderPressure_dPdT + self.ParkingBrakePressure_dPdT)
