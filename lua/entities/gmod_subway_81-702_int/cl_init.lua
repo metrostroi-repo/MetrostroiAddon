@@ -1014,6 +1014,10 @@ function ENT:UpdateWagonNumber()
         end
     end
 end
+
+local controller = {
+    0,0.1,0.2,0.44,0.665,0.76,0.855
+}
 --------------------------------------------------------------------------------
 function ENT:Think()
     self.BaseClass.Think(self)
@@ -1103,7 +1107,7 @@ function ENT:Think()
 
     -- Simulate pressure gauges getting stuck a little
     self:Animate("brake",1-self:GetPackedRatio("CranePosition"),0.00, 0.48,  256,24)
-    self:Animate("controller",self:GetPackedRatio("ControllerPosition"),0.148, 0.333,  2,false)
+    self:Animate("controller",controller[self:GetNW2Int("ControllerPosition",0)+1],0.148, 0.333,  2,false)
     self:Animate("reverser",self:GetPackedRatio("ReverserPosition"),0.6, 0.4,  4,false)
     self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.62,0.495,45,3)
     self:Animate("rcureverser",self:GetPackedBool("RCUPosition") and 1 or 0,0,0.5,3,false)
