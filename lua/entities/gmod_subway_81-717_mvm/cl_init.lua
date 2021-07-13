@@ -2758,7 +2758,7 @@ function ENT:Think()
 
     self:SetLightPower(30,headlight > 0,headlight)
     self:SetLightPower(31,headlight > 0,headlight)
-    self:SetLightPower(32,headlight > 0 and (mask == 2 or mask == 3),headlight)
+    self:SetLightPower(32,headlight > 0 and mask > 4,headlight)
 
     local newBortlamps = self:GetNW2Bool("NewBortlamps")
     local Bortlamp_w = self:Animate("Bortlamp_w",self:GetPackedBool("DoorsW") and 1 or 0,0,1,16,false)
@@ -2942,6 +2942,7 @@ function ENT:Think()
             self.LightsOverride[31][2] = Vector(465,45 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , 52)
         end
+        self.MaskType = mask
     end
     --self:ShowHide("mask141_lvz",mask and lvz)
     self:ShowHide("1:KVTSet",not lvz)
@@ -2951,16 +2952,16 @@ function ENT:Think()
     if mask <= 2 then
         self:ShowHideSmooth("Headlights22_1",HL1)
         self:ShowHideSmooth("Headlights22_2",HL2)
-    elseif mask < 4 then
+    elseif mask <= 4 then
+        self:ShowHideSmooth("Headlights22_glass_1",HL1)
+        self:ShowHideSmooth("Headlights22_glass_2",HL2)
+    elseif mask <= 6 then
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask < 6 then
+    elseif mask <= 8 then
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask < 8 then
-        self:ShowHideSmooth("Headlights222_1",HL1)
-        self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask < 9 then
+    elseif mask <= 10 then
         self:ShowHideSmooth("Headlights141_1",HL1)
         self:ShowHideSmooth("Headlights141_2",HL2)
     end
