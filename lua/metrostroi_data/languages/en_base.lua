@@ -21,6 +21,14 @@ Workshop.ErrorEnhancers     = This addon contains a graphic enhancers that may i
 Workshop.Error1             = This addon contain an old script code of the Metrostroi that conflicts with current. May be "Scripts errors" and unstable work of the addon.
 Workshop.ErrorOld           = Old models detected (81-702 and 81-717 old models). Check and remove old metrostroi content files, remove "cache", "download" and "downloads" folders from "garrysmod" folder.
 
+#Station list GUI
+StationList.Title           = Station list
+StationList.Name            = Name
+StationList.NamePos         = Position
+StationList.Select          = Select station
+StationList.Teleport        = Teleport
+StationList.NoConfig        = This map is not configured
+
 #Client settings
 Panel.Admin             = Admin
 Panel.RequireThirdRail  = Require third rail
