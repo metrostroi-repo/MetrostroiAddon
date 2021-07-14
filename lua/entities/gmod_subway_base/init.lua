@@ -792,7 +792,10 @@ end]]
 --------------------------------------------------------------------------------
 function ENT:LeaderReadTrainWire(id)
     if self.TrainWireOverrides[id] then return  self.TrainWireOverrides[id] end
-    if self.TrainWireOutside[id] then return self.TrainWireOutside[id] end
+    local w = self.TrainWireOutside[id]
+    if w then
+        if isnumber(w) then return w elseif (self.TrainWireTurbostroi[tonumber(w)] or 0) > 0 then return 1 end
+    end
     return (self.TrainWireTurbostroi[id] or 0)+(self.TrainWireWriters[id] or 0)
 end
 

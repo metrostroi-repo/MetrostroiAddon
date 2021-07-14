@@ -321,7 +321,7 @@ concommand.Add("metrostroi_fail", function(ply, _, args)
     if train then
         if IsValid(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"Generating random failure in your train!")
-            print("Player "..tostring(ply).." generated random failure in train "..train:EntIndex())
+            print(tostring(ply).." generated random failure in train "..train:EntIndex())
         else
             print("Generating random failure in train "..train:EntIndex())
         end
@@ -355,7 +355,7 @@ concommand.Add("metrostroi_fail_reset", function(ply, _, args)
     if #trainList > 0 then
         if IsValid(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"Reset all failures in your train!")
-            print("Player "..tostring(ply).." reset all failures in train "..trainList[1]:EntIndex())
+            print(tostring(ply).." reset all failures in train "..trainList[1]:EntIndex())
         else
             print("Reset all failures in train "..trainList[1]:EntIndex())
         end
@@ -390,14 +390,15 @@ concommand.Add("metrostroi_wire", function(ply, _, args)
     if train then
         if IsValid(ply) then
             args[1] = tonumber(args[1])
-            if not args[1] then ply:PrintMessage(HUD_PRINTCONSOLE,"Argument must be a number") return end
-            ply:PrintMessage(HUD_PRINTCONSOLE,"sets outside power in train wire"..args[1].."!")
-            print("Player "..tostring(ply).." sets outside power in train "..args[1].." wire failure in train "..train:EntIndex())
+            if not args[1] then ply:PrintMessage(HUD_PRINTCONSOLE,"1st argument must be a number") return end
+            if args[2] and not tonumber(args[2]) then ply:PrintMessage(HUD_PRINTCONSOLE,"2nd argument must be a number") return end
+            ply:PrintMessage(HUD_PRINTCONSOLE,"sets outside power in train wire"..args[1]..(args[2] and "(from "..args[2].." wire)" or "").."!")
+            print(tostring(ply).." sets outside power in train "..args[1].." wire"..(args[2] and "(from "..args[2].." wire)" or "").." failure in train "..train:EntIndex())
         else
             print("sets outside power in train wire "..train:EntIndex())
         end
         --if train.WriteTrainWire then train:WriteTrainWire(args[1],1) end
-        train.TrainWireOutside[args[1]] = 1
+        train.TrainWireOutside[args[1]] = args[2] and args[2] or 1
         --if train.WriteTrainWire then train:WriteTrainWire(args[1],1) end
     else
         if IsValid(ply) then
@@ -427,7 +428,7 @@ concommand.Add("metrostroi_wire_reset", function(ply, _, args)
     if #trainList > 0 then
         if IsValid(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"reset wire outside power in train!")
-            print("Player "..tostring(ply).." reset outside power in train ")
+            print(tostring(ply).." reset outside power in train ")
         else
             print("Reset outside power in trains ")
         end
@@ -453,7 +454,7 @@ concommand.Add("metrostroi_can", function(ply, _, args)
     if tonumber(args[4]) then value = tonumber(args[4]) end
     local srcid = tonumber(args[5])
     ply:PrintMessage(HUD_PRINTCONSOLE,"Hacking CAN!")
-    print(Format("Player %s hack CAN(%s->%s:%s %s=%s)",ply,srcid,system,id,name,value))
+    print(Format("%s hack CAN(%s->%s:%s %s=%s)",ply,srcid,system,id,name,value))
     train:CANWrite("Hacker",srcid or train:GetWagonNumber(),system,id,name,value)
 end)
 
