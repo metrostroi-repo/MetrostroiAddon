@@ -1,4 +1,5 @@
 local CATEGORY_NAME = "Metrostroi"
+if SERVER then util.AddNetworkString("metrostroi_stations_gui") end
 
 ------------------------------ Wagons ------------------------------
 local waittime = 10
@@ -413,87 +414,94 @@ traunfuck:addParam{ type=ULib.cmds.PlayersArg }
 traunfuck:defaultAccess( ULib.ACCESS_ADMIN )
 traunfuck:help( "Trainfucks a player." )
 
-
-function ulx.tps( calling_ply,station )
-        station = string.PatternSafe(station:lower())
-
-        --Обработка сообщений вида станция:номер для станций, которые имеют несоклько позиций
-        local add = 0
-        if station:find("[^:]+:%d+$") then
-            local st,en = station:find(":%d+$")
-            add = tonumber(station:sub(st+1,en))
-            station = station:sub(1,st-1)
-        end
-
-        --Проверка на наличие таблицы
-        if not Metrostroi.StationConfigurations then ULib.tsayError( calling_ply, "This map is not configured", true ) return end
-
-        --Создание массива найденых станций по индкесу станции или куска имени
-        local st = {}
-        for k,v in pairs(Metrostroi.StationConfigurations) do
-            if not v.positions then continue end
-            if v.names then
-                for _,stat in pairs(v.names) do
-                    if stat:lower():find(station) then
-                        table.insert(st,k)
-                        break
-                    end
+function ulx.tps(calling_ply,station)
+    station = string.PatternSafe(station:lower())
+    
+    -- Check stations table
+    if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply,"This map is not configured",true) return end
+    if not IsValid(calling_ply) then return end
+    
+    -- Open GUI with station list
+    if station == "" then
+        net.Start("metrostroi_stations_gui")
+        net.Send(calling_ply)
+        return
+    end
+    
+    -- For input station like [Station name]:[Position]
+    local posID
+    if station:find("[^:]+:%w+$")then
+        local st,en = station:find(":%w+$")
+        posID = tostring(station:sub(st+1,en))
+        station = station:sub(1,st-1)
+    end
+    
+    -- Search input pattern
+    local st = {}
+    for k,v in pairs(Metrostroi.StationConfigurations) do
+        if not v.positions then continue end
+        if v.names then
+            for _,stat in pairs(v.names) do
+                if stat:lower():find(station) then
+                    table.insert(st,k)
+                    break
                 end
             end
-            if tostring(k):find(station) then
-                table.insert(st,k)
-            end
         end
-
-        if #st == 0 then
-            ULib.tsayError( calling_ply, Format("Station not found %s",station), true )
-            return
-        elseif #st > 1 then
-            ULib.tsayError( calling_ply,  Format("More than 1 station for name %s:",station), true )
-            for k,v in pairs(st) do
-                local tbl = Metrostroi.StationConfigurations[v]
-                if tbl.names and tbl.names[1] then
-                    ULib.tsayError( calling_ply, Format("\t%s=%s",v,tbl.names[1]), true )
-                else
-                    ULib.tsayError( calling_ply, Format("\t%s",k), true )
-                end
-            end
-            ULib.tsayError( calling_ply, "Enter a more specific name or station ID", true )
-            return
+        if tostring(k):find(station) then
+            table.insert(st,k)
         end
-        local key = st[1]
-        st = Metrostroi.StationConfigurations[key]
-        local ptbl
-        if add > 0 then
-            local pos = st.positions
-            ptbl = pos[math.min(#pos,add+1)]
-        else
-            ptbl = st.positions and st.positions[1]
-        end
-        if IsValid(calling_ply) then
-            if ptbl and ptbl[1] then
-                if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
-                calling_ply.ulx_prevpos = calling_ply:GetPos()--ulx return
-                calling_ply.ulx_prevang = calling_ply:EyeAngles()
-                calling_ply:SetPos(ptbl[1])
-                calling_ply:SetAngles(ptbl[2])
-                calling_ply:SetEyeAngles(ptbl[2])
-                ulx.fancyLogAdmin( calling_ply, "#A teleported to #s", st.names and st.names[1] or key)
+    end
+    
+    -- Output same stations
+    if #st == 0 then
+        ULib.tsayError( calling_ply, Format("Station not found %s",station), true )
+        return
+    elseif #st > 1 then
+        ULib.tsayError( calling_ply,  Format("More than 1 station for name %s:",station), true )
+        for k,v in pairs(st) do
+            local tbl = Metrostroi.StationConfigurations[v]
+            if tbl.names and tbl.names[1] then
+                ULib.tsayError( calling_ply, Format("\t%s = %s",v,tbl.names[1]), true )
             else
-                ULib.tsayError( calling_ply, "Configuration error for station "..key, true )
-                ulx.fancyLogAdmin( calling_ply, "Configuration error for station #s", key)
-            end
-
-        else
-            if ptbl and ptbl[1] then
-                print(Format("DEBUG1:Teleported to %s(%s) pos:%s ang:%s",st.names and st.names[1] or key,key,ptbl[1],ptbl[2]))
-            else
-                ulx.fancyLogAdmin( calling_ply, "Configuration error for station #s", station:gsub("^%l", string.upper))
+                ULib.tsayError( calling_ply, Format("\t%s",k), true )
             end
         end
+        ULib.tsayError( calling_ply, "Enter a more specific name or station ID", true )
+        return
+    end
+    
+    -- Set target position
+    local ID = st[1] 
+    st = Metrostroi.StationConfigurations[ID]
+    local ptbl
+    if posID then
+        for k,v in pairs(st.positions) do
+            if tostring(k):find(posID) then
+                ptbl = v
+            end
+        end
+    else
+        ptbl = st.positions and st.positions[1]
+    end
+    
+    -- Teleport
+    if ptbl and ptbl[1] then
+        if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
+        calling_ply.ulx_prevpos = calling_ply:GetPos()
+        calling_ply.ulx_prevang = calling_ply:EyeAngles()
+        calling_ply:SetPos(ptbl[1])
+        calling_ply:SetAngles(ptbl[2])
+        calling_ply:SetEyeAngles(ptbl[2])
+        ulx.fancyLogAdmin( calling_ply, "#A teleported to #s", st.names and st.names[1] or ID)
+    else
+        ULib.tsayError( calling_ply, "Configuration error for station "..ID, true )
+        ulx.fancyLogAdmin( calling_ply, "Configuration error for station #s", ID)
+    end
 end
-local tps = ulx.command( "Metrostroi", "ulx station", ulx.tps, "!station" )
-tps:addParam{ type=ULib.cmds.StringArg, hint="Station or station number", ULib.cmds.takeRestOfLine }
+
+local tps = ulx.command( "Metrostroi", "ulx station", ulx.tps, {"!station","!stations"} )
+tps:addParam{ type=ULib.cmds.StringArg, hint="Station or station number", ULib.cmds.optional }
 tps:defaultAccess( ULib.ACCESS_ALL )
 tps:help( "Teleport between stations." )
 
