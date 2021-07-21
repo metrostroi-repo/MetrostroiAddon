@@ -614,4 +614,4 @@ ENT.SubwayTrain = {
     },
     EKKType = 710,
 }
-ENT.NumberRanges = {{5560,5999}}
+ENT.NumberRanges = {{6398,6874},{6992,7091}}
