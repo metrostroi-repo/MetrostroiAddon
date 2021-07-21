@@ -275,8 +275,8 @@ function ENT:Think()
     self:SetPackedRatio("RRP",math.Clamp(TW18^1.2,0,1))
 
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
-    if self.ManualBrake < 0.001 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
-    if self.ManualBrake > 0.999 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle < 0.001 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle > 0.999 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
 
