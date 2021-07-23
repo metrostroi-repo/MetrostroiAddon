@@ -180,9 +180,9 @@ ENT.ButtonMap["Main"] = {
             var="KB",speed=16,vmin=1,vmax=0,
             sndvol = 0.10, snd = function(val) return val and "button3_on" or "button2_off" end,sndmin = 60, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
-        {ID = "RKLamp",         x=292, y=61+1, radius=20, tooltip="", model = {
+        {ID = "!LKVT",         x=292, y=61+1, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_kblamp.mdl", skin = 2, z = 5,-- color = Color(60,255,255),
-            lamp = {model = "models/metrostroi_train/81-710/ezh3_kblamp2.mdl",z = 5-4,color = Color(255,150,150), var="LRK",
+            lamp = {model = "models/metrostroi_train/81-710/ezh3_kblamp2.mdl",z = 5-4,color = Color(255,150,150), var="LKVT",
             lcolor=Color(255,50,20),lz = 20,lbright=2,lfov=130,lfar=16,lnear=8,lshadows=0},
             sprite = {bright=0.4,size=0.25,scale=0.07,color=Color(255,50,20),z=6}
         }},

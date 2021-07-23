@@ -118,7 +118,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     Panel.RRP = S["U2"]*T[18]
 
-    Train.Panel.Sequence = ARS.GE*Train.BSM_GE.Value*(1-Train.BSM_RNT.Value)
+    Panel.LKVT = ARS.GE*Train.BSM_GE.Value*(1-Train.BSM_RNT.Value)
 
     local RCU = KV.RCU
 
