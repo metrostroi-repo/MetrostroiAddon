@@ -1012,7 +1012,7 @@ ENT.Spawner = {
             ent[v]:TriggerInput("Set",val and 1 or 0)
         end
     end,function(CB,VGUI)
-        VGUI.SwitchesR:SetDisabled(not CB:GetChecked())
+        VGUI.SwitchesR:SetEnabled(CB:GetChecked())
         if not CB:GetChecked() then
             VGUI.SwitchesR:SetValue(false)
         end

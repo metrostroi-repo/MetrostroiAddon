@@ -1,19 +1,7 @@
---Helper function for common use
-local function AddBox(panel,cmd,str)
-    panel:AddControl("CheckBox",{Label=str, Command=cmd})
-end
---Helper function for common use
-local function AddTextBox(panel,cmd,str)
-    panel:AddControl("TextBox",{Label=str, Command=cmd})
-end
-local function AddSlider(panel,cmd,str,min,max,fl)
-    panel:AddControl("Slider",{Label=str, Command=cmd,min=min,max=max,type=fl and "float"})
-end
 -- Build admin panel
 local function AdminPanel(panel)
     if not LocalPlayer():IsAdmin() then return end
-    AddBox(panel,"metrostroi_train_requirethirdrail",Metrostroi.GetPhrase("Panel.RequireThirdRail"))
-    --panel:AddControl("CheckBox",{Label="Trains require 3rd rail", Command = "metrostroi_train_requirethirdrail"})
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.RequireThirdRail"),"metrostroi_train_requirethirdrail")
 end
 -- Build regular client panel
 local function ClientPanel(panel)
@@ -36,24 +24,23 @@ local function ClientPanel(panel)
     if Metrostroi.HasPhrase("AuthorTextMetadmin") then
         panel:ControlHelp(Metrostroi.GetPhrase("AuthorTextMetadmin"))
     end
-
-
-    AddBox(panel,"metrostroi_drawcams",Metrostroi.GetPhrase("Panel.DrawCams"))
-    AddBox(panel,"metrostroi_disablehud",Metrostroi.GetPhrase("Panel.DisableHUD"))
-    AddBox(panel,"metrostroi_disablecamaccel",Metrostroi.GetPhrase("Panel.DisableCamAccel"))
-    AddBox(panel,"metrostroi_disablehovertext",Metrostroi.GetPhrase("Panel.DisableHoverText"))
-    AddBox(panel,"metrostroi_disablehovertextpos",Metrostroi.GetPhrase("Panel.DisableHoverTextP"))
-    AddBox(panel,"metrostroi_screenshotmode",Metrostroi.GetPhrase("Panel.ScreenshotMode"))
-    AddBox(panel,"metrostroi_shadows1",Metrostroi.GetPhrase("Panel.ShadowsHeadlight"))
-    AddBox(panel,"metrostroi_shadows3",Metrostroi.GetPhrase("Panel.RedLights"))
-    AddBox(panel,"metrostroi_shadows2",Metrostroi.GetPhrase("Panel.ShadowsOther"))
-    AddBox(panel,"metrostroi_shadows4",Metrostroi.GetPhrase("Panel.PanelLights"))
-    AddBox(panel,"metrostroi_sprites",Metrostroi.GetPhrase("Panel.PanelSprites"))
+    
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DrawCams"),"metrostroi_drawcams")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DisableHUD"),"metrostroi_disablehud")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DisableCamAccel"),"metrostroi_disablecamaccel")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DisableHoverText"),"metrostroi_disablehovertext")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DisableHoverTextP"),"metrostroi_disablehovertextpos")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.ScreenshotMode"),"metrostroi_screenshotmode")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.ShadowsHeadlight"),"metrostroi_shadows1")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.RedLights"),"metrostroi_shadows3")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.ShadowsOther"),"metrostroi_shadows2")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.PanelLights"),"metrostroi_shadows4")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.PanelSprites"),"metrostroi_sprites")
     local DRouteNumber = panel:TextEntry(Metrostroi.GetPhrase("Panel.RouteNumber"),"metrostroi_route_number")
-    AddBox(panel,"metrostroi_minimizedshow",Metrostroi.GetPhrase("Panel.MinimizedShow"))
-    AddSlider(panel,"metrostroi_cabfov",Metrostroi.GetPhrase("Panel.FOV"),65,100)
-    AddSlider(panel,"metrostroi_cabz",Metrostroi.GetPhrase("Panel.Z"),-10,10,true)
-    AddSlider(panel,"metrostroi_renderdistance",Metrostroi.GetPhrase("Panel.RenderDistance"),960,3072)
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.MinimizedShow"),"metrostroi_minimizedshow")
+    panel:NumSlider(Metrostroi.GetPhrase("Panel.FOV"),"metrostroi_cabfov",65,100)
+    panel:NumSlider(Metrostroi.GetPhrase("Panel.Z"),"metrostroi_cabz",-10,10)
+    panel:NumSlider(Metrostroi.GetPhrase("Panel.RenderDistance"),"metrostroi_renderdistance",960,3072)
     panel:Button(Metrostroi.GetPhrase("Panel.ReloadClient"),"metrostroi_reload_client",true)
 
     function DRouteNumber:OnChange()
@@ -72,14 +59,12 @@ local function ClientAdvanced(panel)
     panel:SetPadding(0)
     panel:SetSpacing(0)
     panel:Dock( FILL )
-    AddBox(panel,"metrostroi_drawdebug",Metrostroi.GetPhrase("Panel.DrawDebugInfo"))
-    AddBox(panel,"metrostroi_drawsignaldebug",Metrostroi.GetPhrase("Panel.DrawSignalDebugInfo"))
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DrawDebugInfo"),"metrostroi_drawdebug")
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.DrawSignalDebugInfo"),"metrostroi_drawsignaldebug")
     panel:Button(Metrostroi.GetPhrase("Panel.CheckAddons"),"metrostroi_addons_check")
     panel:Button(Metrostroi.GetPhrase("Panel.ReloadLang"),"metrostroi_language_reload",true)
-    AddSlider(panel,"metrostroi_softdrawmultipier",Metrostroi.GetPhrase("Panel.SoftDraw"),25,400)
-    AddBox(panel,"metrostroi_language_softreload",Metrostroi.GetPhrase("Panel.SoftReloadLang"))
-    --panel:AddControl("combobox","metrostroi_language",{Label="Language", options = {"Русский","Английский"}})
-    --panel:AddControl("Checkbox",{Label="Draw debugging info", Command = "metrostroi_drawdebug"})
+    panel:NumSlider(Metrostroi.GetPhrase("Panel.SoftDraw"),"metrostroi_softdrawmultipier",25,400)
+    panel:CheckBox(Metrostroi.GetPhrase("Panel.SoftReloadLang"),"metrostroi_language_softreload")
 end
 
 hook.Add("PopulateToolMenu", "Metrostroi cpanel", function()

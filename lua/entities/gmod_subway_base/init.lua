@@ -86,6 +86,10 @@ function ENT:PostEntityPaste(ply,ent,createdEntities)
 end
 
 --------------------------------------------------------------------------------
+local C_MaxWagons = GetConVar("metrostroi_maxwagons")
+local C_MaxTrains = GetConVar("metrostroi_maxtrains")
+local C_MaxTrainsOnPly = GetConVar("metrostroi_maxtrains_onplayer")
+
 function ENT:Initialize()
     self.Joints = {}
     self.JointPositions = {}
@@ -128,7 +132,7 @@ function ENT:Initialize()
     -- Initialize highspeed interface
     self:InitializeHighspeedLayout()
     -- Add telemetry recording module if required
-    if GetConVarNumber("metrostroi_write_telemetry") == 1 then
+    if GetConVar("metrostroi_write_telemetry"):GetInt() == 1 then
         self:LoadSystem("Telemetry")
     end
     self:LoadSystem("FailSim")
@@ -2001,15 +2005,15 @@ end
 function ENT:SpawnFunction(ply, tr,className,rotate,func)
     --MaxTrains limit
     if self.ClassName ~= "gmod_subway_base" and not self.NoTrain then
-        local Limit1 = math.min(2,GetConVarNumber("metrostroi_maxwagons"))*GetConVarNumber("metrostroi_maxtrains_onplayer")-1
-        local Limit2 = math.max(0,GetConVarNumber("metrostroi_maxwagons")-2)*GetConVarNumber("metrostroi_maxtrains_onplayer")-1
+        local Limit1 = math.min(2,C_MaxWagons:GetInt())*C_MaxTrainsOnPly:GetInt()-1
+        local Limit2 = math.max(0,C_MaxWagons:GetInt()-2)*C_MaxTrainsOnPly:GetInt()-1
 
-        if Metrostroi.TrainCount() > GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_maxwagons")-1 then
+        if Metrostroi.TrainCount() > C_MaxTrains:GetInt()*C_MaxWagons:GetInt()-1 then
             ply:LimitHit("train_limit")
             --Metrostroi.LimitMessage(ply)
             return
         end
-        if Metrostroi.TrainCountOnPlayer(ply) > GetConVarNumber("metrostroi_maxwagons")*GetConVarNumber("metrostroi_maxtrains_onplayer")-1 then
+        if Metrostroi.TrainCountOnPlayer(ply) > C_MaxWagons:GetInt()*C_MaxTrainsOnPly:GetInt()-1 then
             ply:LimitHit("train_limit")
             --Metrostroi.LimitMessage(ply)
             return

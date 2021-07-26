@@ -25,7 +25,7 @@ function ulx.wagoncount( calling_ply )
             ulx.fancyLog("#s wagons have #s",v,(type(k) == "Player" and IsValid(k)) and k:GetName() or k)
         end
     end
-    ulx.fancyLog("Max trains: #s.\nMax wagons: #s.\nMax trains per player: #s", GetConVarNumber("metrostroi_maxtrains"), GetConVarNumber("metrostroi_maxwagons"), GetConVarNumber("metrostroi_maxtrains_onplayer"))
+    ulx.fancyLog("Max trains: #s.\nMax wagons: #s.\nMax trains per player: #s", GetConVar("metrostroi_maxtrains"):GetInt(), GetConVar("metrostroi_maxwagons"):GetInt(), GetConVar("metrostroi_maxtrains_onplayer"):GetInt())
 end
 local wagons = ulx.command( CATEGORY_NAME, "ulx trains", ulx.wagoncount, "!trains" )
 wagons:defaultAccess( ULib.ACCESS_ALL )
@@ -384,7 +384,7 @@ end
 function ulx.trainfuck(calling_ply, target_plys)
     local affected_plys = {}
 
-    local gm = GetConVarNumber("sbox_godmode")
+    local gm = GetConVar("sbox_godmode"):GetInt()
     if gm > 0 then RunConsoleCommand("sbox_godmode",0) end
     for i=1, #target_plys do
         local v = target_plys[ i ]
