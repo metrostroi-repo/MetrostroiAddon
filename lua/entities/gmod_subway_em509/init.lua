@@ -286,8 +286,8 @@ function ENT:Think()
     self:SetPackedBool("V1",Panel.V1 > 0)
     self:SetPackedBool("UKS",Panel.UKSb == 0 and Panel.UKS > 0 or Panel.UKSb > 0 and CurTime()%0.4>0.2)
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
-    if self.ManualBrake < 0.001 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
-    if self.ManualBrake > 0.999 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle < 0.001 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle > 0.999 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
 
