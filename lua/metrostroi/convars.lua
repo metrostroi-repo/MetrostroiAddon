@@ -21,6 +21,9 @@ Metrostroi.SignalDebugCV = GetConVar("metrostroi_signal_debug")
 if SERVER then
     util.AddNetworkString("metrostroi_expel_passengers")
     CreateConVar("metrostroi_ars_printnext",0,FCVAR_NONE,"Prints next signal to console on wagon with entered number")
+    CreateConVar("metrostroi_maxtrains",3,{FCVAR_ARCHIVE},"Maximum of allowed trains")
+    CreateConVar("metrostroi_maxwagons",3,{FCVAR_ARCHIVE},"Maximum of allowed wagons in 1 train")
+    CreateConVar("metrostroi_maxtrains_onplayer",1,{FCVAR_ARCHIVE},"Maximum of allowed trains by player")
 
 
     local function BrokeAndSet(button,state,ply,train)
