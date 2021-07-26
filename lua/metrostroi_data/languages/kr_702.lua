@@ -36,7 +36,7 @@ Common.703.KRR                  = KRR: RK를 첫번째 위치로 회전
 Common.703.RUT                  = RUT 조정 (가속력 감소)
 Common.707.SEQ                  = 가변 저항 제어기 동작 표시등
 Common.707.TAH                  = TAH: 비상 운전 모드 (ARS 미사용 주행)
-Common.710.RK                   = 가변 저항 제어기가 중간 위치에 있음
+Common.710.LKVT                 = LKVT: 제동 확인 버튼 신호
 
 Common.710.SAMMSchemeOff        = SAMM 정지 버튼
 Common.710.SAMMStart            = SAMM 시작 버튼
@@ -556,7 +556,7 @@ Entities.gmod_subway_ezh3.Buttons.Main.V5Set            = @[Common.703.LOff]
 Entities.gmod_subway_ezh3.Buttons.Main.KU11Set          = @[Common.703.KSD]
 Entities.gmod_subway_ezh3.Buttons.Main.KVTSet           = @[Common.ARS.KVT]
 Entities.gmod_subway_ezh3.Buttons.Main.KBSet            = @[Common.ARS.KB]
-Entities.gmod_subway_ezh3.Buttons.Main.RKLamp           = @[Common.710.RK]
+Entities.gmod_subway_ezh3.Buttons.Main.!LKVT            = @[Common.710.LKVT]
 Entities.gmod_subway_ezh3.Buttons.Main.ARSToggle        = @[Common.ALL.ARS]
 Entities.gmod_subway_ezh3.Buttons.Main.R_UNchToggle     = @[Common.ALL.UNCh]
 Entities.gmod_subway_ezh3.Buttons.Main.V2Toggle         = @[Common.ALL.VUD]

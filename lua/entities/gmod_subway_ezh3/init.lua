@@ -303,7 +303,7 @@ function ENT:Think()
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
 
-    self:SetPackedBool("LRK",Panel.Sequence > 0)
+    self:SetPackedBool("LKVT",Panel.LKVT > 0)
     self:SetPackedBool("KT",Panel.KT > 0)
     self:SetPackedBool("AVU",Panel.AVU > 0.5)
     self:SetPackedBool("RingEnabled",Panel.Ring > 0.5)
