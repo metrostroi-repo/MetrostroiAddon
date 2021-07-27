@@ -1287,6 +1287,7 @@ ENT.ClientProps["ezh3_lamp1"] = {
     model = "models/metrostroi_train/81-710/ezh3_lamposv1.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
+    color = Color(215,255,255),
     hideseat = 1.0,
 }
 ENT.ClientProps["ezh3_lamp2"] = {
@@ -1517,8 +1518,8 @@ ENT.Lights = {
     [31]  = { "light",           Vector(465+5  ,   45, -37), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02", size = 2 },
     [32]  = { "light",           Vector(465+5  ,   0, 48), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02", size = 2 },
 
-    ezh3_lamp1 = {"light", Vector(451,-33.5,47.2), Angle(0,0,0),Color(252, 157, 77),brightness = 0.35,scale = 0.4, texture = "sprites/light_glow02", hidden = "ezh3_lamp1"},
-    ezh3_lamp2 = {"light", Vector(404,1.2,56), Angle(0,0,0),Color(252, 157, 77),brightness = 0.25,scale = 0.3, texture = "sprites/light_glow02", hidden = "ezh3_lamp2"},
+    ezh3_lamp1 = {"light", Vector(451,-33.5,47.2), Angle(0,0,0),Color(255,220,180),brightness = 0.35,scale = 0.4, texture = "sprites/light_glow02", hidden = "ezh3_lamp1"},
+    ezh3_lamp2 = {"light", Vector(404,1.2,56), Angle(0,0,0),Color(255,220,180),brightness = 0.25,scale = 0.3, texture = "sprites/light_glow02", hidden = "ezh3_lamp2"},
 }
 function ENT:Initialize()
     self.BaseClass.Initialize(self)
