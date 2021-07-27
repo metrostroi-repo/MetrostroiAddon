@@ -2599,13 +2599,13 @@ ENT.Lights = {
     [4] = { "headlight",        Vector(365,-51,50), Angle(50,40,-0), Color(206,135,80), hfov=80, vfov=80,farz=100,brightness = 6,shadows=1, hidden="salon"},
 
     -- Manometers
-    [40] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(255,125,25),farz = 8,nearz = 2,shadows = 1,brightness = 1,fov = 145,hidden = "pult_mvm_classic"},
-    [41] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(255,125,25),farz = 8,nearz = 2,shadows = 1,brightness = 1,fov = 140,hidden = "pult_mvm_classic"},
-    [42] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(255,125,25),farz = 8,nearz = 2,shadows = 0,brightness = 1.5,fov = 120,hidden = "pult_mvm_classic"},
-    [43] = { "headlight",Vector(451.9-3,3.6+1,3.35+0.5),Angle(0,-90,0),Color(255,125,25),farz = 8,nearz = 2,shadows = 0,brightness = 1.5,fov = 80,hidden = "pult_mvm_classic"},
+    [40] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(255,125,25),farz = 7,nearz = 2,shadows = 1,brightness = 1,fov = 145,hidden = "pult_mvm_classic"},
+    [41] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(255,125,25),farz = 7,nearz = 2,shadows = 1,brightness = 1,fov = 140,hidden = "pult_mvm_classic"},
+    [42] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(255,125,25),farz = 7,nearz = 2,shadows = 0,brightness = 1.5,fov = 120,hidden = "pult_mvm_classic"},
+    [43] = { "headlight",Vector(451.9-3,3.6+1,3.35+0.5),Angle(0,-90,0),Color(255,125,25),farz = 7,nearz = 2,shadows = 0,brightness = 1.5,fov = 80,hidden = "pult_mvm_classic"},
     -- Voltmeter
-    [44] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(255,145,25),farz = 10,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
-    [45] = { "headlight",Vector(450.273468,-32.306019,18.236823),Angle(-12.000000,25.541767,-90.600349),Color(255,125,25),farz = 10,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
+    [44] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(255,145,25),farz = 5.05,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
+    [45] = { "headlight",Vector(450.273468,-32.306019,18.036823),Angle(-12.000000,25.541767,-90.600349),Color(255,125,25),farz = 5.05,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
 
     -- Reverse
     [8] = { "light",Vector(460,-45, 52), Angle(0,0,0), Color(255,50,50),     brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02", size=2},
