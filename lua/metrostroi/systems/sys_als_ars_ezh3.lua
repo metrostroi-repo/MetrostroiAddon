@@ -186,11 +186,11 @@ function TRAIN_SYSTEM:Think(dT)
     Train.BSM_KSR1:TriggerInput("Set",S["KSR"])
     Train.BSM_KSR2:TriggerInput("Set",S["KSR"])
 
-    Train.BSM_BR1:TriggerInput("Set",S["SRPower"]*Train.PB.Value*((Train.BSM_BR1.Value+Train.BSM_SIR5.Value)*(1-Train.BSM_BR2.Value)))
+    Train.BSM_BR1:TriggerInput("Set",S["SRPower"]*Train.KVT.Value*((Train.BSM_BR1.Value+Train.BSM_SIR5.Value)*(1-Train.BSM_BR2.Value)))
     Train.BSM_BR2:TriggerInput("Set",S["SRPower"]*Train.PB.Value*((Train.BSM_BR2.Value+(1-Train.BSM_SIR5.Value))*(1-Train.BSM_BR1.Value)))
 
 
-    Train.BSM_RNT:TriggerInput("Set",self.ALS*(Train.BSM_BR1.Value+Train.BSM_BR2.Value+Train.KVT.Value+Train.BSM_RNT.Value*(Train.BSM_KSR1.Value*Train.BSM_KSR2.Value+Train.BSM_KRT.Value)))
+    Train.BSM_RNT:TriggerInput("Set",self.ALS*(Train.BSM_BR1.Value+Train.BSM_BR2.Value+Train.BSM_RNT.Value*(Train.BSM_KSR1.Value*Train.BSM_KSR2.Value+Train.BSM_KRT.Value)))
     self.Ring = self.GE*(1-Train.BSM_RNT.Value)*(1-Train.BSM_RVV.Value)
 
     S["LUDS"] = S["SRPower"]*Train.BSM_SR1.Value*Train.BSM_SR2.Value
