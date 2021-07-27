@@ -535,9 +535,11 @@ function ENT:TrainSpawnerUpdate()
 
     local pneumoPow = 0.8+(math.random()^1.55)*0.4
     if IsValid(self.FrontBogey) then
+        self.FrontBogey:SetNW2Int("SquealType",math.floor(math.random(4,7)))
         self.FrontBogey.PneumaticPow = pneumoPow
     end
     if IsValid(self.RearBogey) then
+        self.RearBogey:SetNW2Int("SquealType",math.floor(math.random(4,7)))
         self.RearBogey.PneumaticPow = pneumoPow
     end
     self.Pneumatic.VDLoud = math.random()<0.06 and 0.9+math.random()*0.2

@@ -247,9 +247,9 @@ function ENT:Initialize()
     self.Lamps = {
         broken = {},
     }
-    local rand = math.random() > 0.8 and 1 or math.random(0.95,0.99)
+    local rand = math.random() > 0.95 and 1 or math.random(0.95,0.99)
     for i = 1,12 do
-        if math.random() > rand then self.Lamps.broken[i] = math.random() > 0.5 end
+        if math.random() > rand then self.Lamps.broken[i] = math.random() > 0.7 end
     end
 
     self:SetNW2Int("Type",self:GetNW2Int("Type",3))
