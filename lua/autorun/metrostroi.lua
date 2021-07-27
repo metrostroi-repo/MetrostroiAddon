@@ -135,7 +135,7 @@ function Metrostroi.AddSkin(category,name,tbl)
     if CLIENT and tbl.textures then
         local find
         for k,v in pairs(tbl.textures) do
-            if not file.Exists("materials/"..v..".vtf","GAME") then
+            if not file.Exists("materials/"..v..".vmt","GAME") then
                 find = true
                 ErrorNoHalt(Format("Metrostroi: %s texture: %s, not found. Check folder and addons!\n",category,v))
             end
