@@ -623,7 +623,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train:WriteTrainWire(10,BO*Train.A56.Value)
     --B->A44->KMMK->23
     Train:WriteTrainWire(23,S["B3"]*Train.RezMK.Value)
-    S["10AT"] = T[10]*Train.A29.Value*(1-Train.AVU.Value)
+    S["10AT"] = T[10]*Train.A11.Value*(1-Train.AVU.Value)
     Panel.AVU = S["10AT"]
 
     if isKSD then
