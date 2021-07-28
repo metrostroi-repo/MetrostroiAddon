@@ -177,16 +177,13 @@ function MSignalSayHook(ply, comm, fromULX)
 			comm = comm:sub(8,-1):upper()
 			comm = string.Explode(":",comm)
             if comm[1] == sig.Name then
-                if not sig.PassOcc then return end
-                sig.PassOccEnabled = true
+                if sig.PassOccDisabled then sig.PassOccDisabled = false end
             end
         elseif comm:sub(1,8) == "!sdisao " then
 			comm = comm:sub(9,-1):upper()
 			comm = string.Explode(":",comm)
             if comm[1] == sig.Name then
-                if sig.PassOccEnabled then
-                    sig.PassOccEnabled = false
-                end
+                sig.PassOccDisabled = sig.FreeBS == 0
             end
         end
 	end
@@ -384,7 +381,7 @@ function ENT:CheckOccupation()
 		end
 		if self.OccupiedByNowOld ~= self.OccupiedByNow then
 			self.InvationSignal = false
-            self.PassOccEnabled = false
+            self.PassOccDisabled = false
 			self.OccupiedByNowOld = self.OccupiedByNow
 		end
 	else
@@ -430,7 +427,7 @@ function ENT:ARSLogic(tim)
 	end
 	if self.OldRoute ~= self.Route then
 		self.InvationSignal = false
-		self.PassOccEnabled = false
+		self.PassOccDisabled = false
 		self.OldRoute = self.Route
 	end
 	--Removing NSL
@@ -485,7 +482,7 @@ function ENT:ARSLogic(tim)
 		elseif self.Routes[self.Route].ARSCodes then
 			local ARSCodes = self.Routes[self.Route].ARSCodes
 			self.ARSNextSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSSpeedLimit or tonumber(ARSCodes[1])
-			self.ARSSpeedLimit = tonumber(ARSCodes[math.min(#ARSCodes, (self.PassOccEnabled and 1 or self.FreeBS+1))]) or 0
+			self.ARSSpeedLimit = tonumber(self.PassOccDisabled and 1 or ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
 			if self.InvationSignal and self.ARSSpeedLimit == 2 then self.ARSSpeedLimit = 1 end
 		end
 	end
