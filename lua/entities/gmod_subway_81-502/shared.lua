@@ -119,7 +119,7 @@ function ENT:InitializeSounds()
     self.SoundPositions["lk4_on"] = self.SoundPositions["lk2_on"]
     self.SoundPositions["lk4_off"] = self.SoundPositions["lk2_off"]
 
-    self.SoundNames["compressor"] = {loop=1.79,"subway_trains/717/compressor/compressor_717_start2.wav","subway_trains/717/compressor/compressor_717_loop2.wav", "subway_trains/717/compressor/compressor_717_stop2.wav"}
+    self.SoundNames["compressor"] = {loop=1.79,"subway_trains/ezh/compressor/ezh_compressor_start.wav","subway_trains/ezh/compressor/ezh_compressor_loop.wav", "subway_trains/ezh/compressor/ezh_compressor_end.wav"}
     self.SoundPositions["compressor"] = {485,1e9,Vector(-118,-40,-66),0.80}
     self.SoundNames["compressor_reflection"] = {"subway_trains/common/junk/junk_background2.wav"}
     self.SoundPositions["compressor_reflection"] = {150,1e9,Vector(300,0,0)}
@@ -484,7 +484,7 @@ ENT.SubwayTrain = {
     EKKType = 703,
     NoFrontEKK=true,
 }
-ENT.NumberRanges = {{6047,6353}}
+ENT.NumberRanges = {{6047,6065},{6338,6397},{6558,6632},{6966,7201}}
 ---[[
 ENT.Spawner = {
     model = {
