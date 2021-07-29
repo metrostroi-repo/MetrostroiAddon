@@ -182,9 +182,9 @@ function MSignalSayHook(ply, comm, fromULX)
         elseif comm:sub(1,8) == "!sdisao " then
 			comm = comm:sub(9,-1):upper()
 			comm = string.Explode(":",comm)
-            if comm[1] == sig.Name then
+            if comm[1] == sig.Name and sig.Routes then
                 local ARSCodes = sig.Routes[sig.Route].ARSCodes
-                sig.PassOccDisabled = ARSCodes and sig.FreeBS and sig.FreeBS == 0 and tonumber(ARSCodes[math.min(#ARSCodes, sig.FreeBS+1)]) == 2
+                sig.PassOccDisabled = ARSCodes and sig.FreeBS and tonumber(ARSCodes[math.min(#ARSCodes, sig.FreeBS+1)]) == 2
             end
         end
 	end
