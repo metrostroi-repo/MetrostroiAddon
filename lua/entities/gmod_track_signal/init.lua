@@ -173,20 +173,20 @@ function MSignalSayHook(ply, comm, fromULX)
 			if comm[1] == sig.Name then
 				sig.InvationSignal = false
 			end
-        elseif comm:sub(1,7) == "!senao " then
-            comm = comm:sub(8,-1):upper()
-            comm = string.Explode(":",comm)
-            if comm[1] == sig.Name then
-                if sig.PassOccDisabled then sig.PassOccDisabled = false end
-            end
-        elseif comm:sub(1,8) == "!sdisao " then
-            comm = comm:sub(9,-1):upper()
-            comm = string.Explode(":",comm)
-            if comm[1] == sig.Name and sig.Routes then
-                local ARSCodes = sig.Routes[sig.Route].ARSCodes
-                sig.PassOccDisabled = ARSCodes and sig.FreeBS and tonumber(ARSCodes[math.min(#ARSCodes, sig.FreeBS+1)]) == 2
-            end
-        end
+		elseif comm:sub(1,7) == "!senao " then
+			comm = comm:sub(8,-1):upper()
+			comm = string.Explode(":",comm)
+			if comm[1] == sig.Name then
+				if sig.PassOccDisabled then sig.PassOccDisabled = false end
+			end
+		elseif comm:sub(1,8) == "!sdisao " then
+			comm = comm:sub(9,-1):upper()
+			comm = string.Explode(":",comm)
+			if comm[1] == sig.Name and sig.Routes then
+				local ARSCodes = sig.Routes[sig.Route].ARSCodes
+				sig.PassOccDisabled = ARSCodes and sig.FreeBS and tonumber(ARSCodes[math.min(#ARSCodes, sig.FreeBS+1)]) == 2
+			end
+		end
 	end
 end
 hook.Add("PlayerSay","metrostroi-signal-say", function(ply, comm) MSignalSayHook(ply,comm) end)
@@ -484,8 +484,8 @@ function ENT:ARSLogic(tim)
 			local ARSCodes = self.Routes[self.Route].ARSCodes
 			self.ARSNextSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSSpeedLimit or tonumber(ARSCodes[1])
             self.ARSSpeedLimit = tonumber(self.PassOccDisabled and 1 or ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
-            if self.InvationSignal and self.ARSSpeedLimit == 2 then self.ARSSpeedLimit = 1 end
-            if self.PassOccDisabled and tonumber(ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) ~= 2 then self.PassOccDisabled = false end
+			if self.InvationSignal and self.ARSSpeedLimit == 2 then self.ARSSpeedLimit = 1 end
+			if self.PassOccDisabled and tonumber(ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) ~= 2 then self.PassOccDisabled = false end
         end
 	end
 	if self.NextSignalLink ~= false and (self.Occupied or not self.NextSignalLink or not self.NextSignalLink.FreeBS) then
