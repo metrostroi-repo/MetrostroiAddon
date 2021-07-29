@@ -560,7 +560,7 @@ end
 local senao = ulx.command( CATEGORY_NAME, "ulx senao", ulx.senao, "!senao" )
 senao:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
 senao:defaultAccess( ULib.ACCESS_ALL )
-senao:help( "Enable pass occupation" )
+senao:help( "Enable absolutely stop signal" )
 
 function ulx.sdisao( calling_ply, arg )
     MSignalSayHook(calling_ply,"!sdisao "..arg, true)
@@ -568,4 +568,4 @@ end
 local sdisao = ulx.command( CATEGORY_NAME, "ulx sdisao", ulx.sdisao, "!sdisao" )
 sdisao:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
 sdisao:defaultAccess( ULib.ACCESS_ALL )
-sdisao:help( "Disable pass occupation" )
+sdisao:help( "Disable absolutely stop signal" )
