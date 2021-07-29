@@ -382,7 +382,7 @@ function ENT:CheckOccupation()
 		end
 		if self.OccupiedByNowOld ~= self.OccupiedByNow then
 			self.InvationSignal = false
-            self.PassOccDisabled = false
+			self.PassOccDisabled = false
 			self.OccupiedByNowOld = self.OccupiedByNow
 		end
 	else
@@ -428,7 +428,7 @@ function ENT:ARSLogic(tim)
 	end
 	if self.OldRoute ~= self.Route then
 		self.InvationSignal = false
-        self.PassOccDisabled = false
+		self.PassOccDisabled = false
 		self.OldRoute = self.Route
 	end
 	--Removing NSL
