@@ -483,7 +483,7 @@ function ENT:ARSLogic(tim)
 		elseif self.Routes[self.Route].ARSCodes then
 			local ARSCodes = self.Routes[self.Route].ARSCodes
 			self.ARSNextSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSSpeedLimit or tonumber(ARSCodes[1])
-            self.ARSSpeedLimit = tonumber(self.PassOccDisabled and 1 or ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
+            		self.ARSSpeedLimit = tonumber(self.PassOccDisabled and 1 or ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
 			if self.InvationSignal and self.ARSSpeedLimit == 2 then self.ARSSpeedLimit = 1 end
 			if self.PassOccDisabled and tonumber(ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) ~= 2 then self.PassOccDisabled = false end
         end
