@@ -301,7 +301,7 @@ ENT.ButtonMap["AV1"] = {
 
 ENT.ClientProps["tab"] = {
     model = "models/metrostroi_train/Equipment/tab.mdl",
-    pos = Vector(12.0-0.4,-1,-2),
+    pos = Vector(12.0-0.4,0,-2),
     ang = Angle(0,0,0),
     skin = 0,
     hide = 2,
@@ -1067,7 +1067,7 @@ ENT.ClientProps["door2"] = {
 
 ENT.ClientProps["door3"] = {
     model = "models/metrostroi_train/81-703/81-703_door_interior_a.mdl",
-    pos = Vector(395.6,-16,-8,5),
+    pos = Vector(395.6,-15,-8,5),
     ang = Angle(0.000000,90.000000,0.000000),
     hide = 2,
 }
@@ -1383,7 +1383,7 @@ function ENT:Think()
             else
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 6*self.DeltaTime,0,1)
             end
-            self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.8+self.DoorLoopStates[id]*0.2)
+            self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.66+self.DoorLoopStates[id]*0.2)
             local n_l = "door"..i.."x"..k--.."a"
             --local n_r = "door"..i.."x"..k.."b"
             local dlo = 1

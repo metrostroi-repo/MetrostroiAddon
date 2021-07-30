@@ -95,9 +95,9 @@ function Metrostroi.HTTPRequest(request)
 		if status and (status ~= "timeout") then
 			local data = string.Explode("\r\n\r\n",http_data)
 			table.remove(data,1)
-			local content = string.Implode("\n\n",data)
+			local content = table.concat(data,"\n\n")
 			
-			timer.Destroy("Metrostroi_HTTPRequest")
+			timer.Remove("Metrostroi_HTTPRequest")
 			onSuccess(content)
 		end
 	end)

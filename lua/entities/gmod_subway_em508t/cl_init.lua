@@ -176,6 +176,17 @@ ENT.ButtonMap["VU"] = {
     }
 }
 
+ENT.ButtonMap["Stopkran"] = {
+    pos = Vector(461.6,27,3),
+    ang = Angle(0,-90,90),
+    width = 200,
+    height = 1300,
+    scale = 0.1/2,
+        buttons = {
+            {ID = "EmergencyBrakeValveToggle",x=0, y=0, w=200, h=1300, tooltip="", tooltip="",tooltip="",states={"Train.Buttons.Closed","Train.Buttons.Opened"},var="EmergencyBrakeValve"},
+    }
+}
+
 ENT.ButtonMap["VU14"] = {
     pos = Vector(467,25.15-1,36.5),
     ang = Angle(0,270,90),
@@ -313,8 +324,8 @@ ENT.ButtonMap["HVMeters"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!EnginesCurrent", x=0,y=0,w=66,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesCurrent"),ent:GetPackedRatio("EnginesCurrent")*1000-500) end},
-        {ID = "!EnginesVoltage", x=0,y=69,w=66,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesVoltage"),ent:GetPackedRatio("EnginesVoltage")*1000) end},
+        {ID = "!EnginesVoltage", x=0,y=0,w=66,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesVoltage"),ent:GetPackedRatio("EnginesVoltage")*1000) end},
+        {ID = "!EnginesCurrent", x=0,y=69,w=66,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesCurrent"),ent:GetPackedRatio("EnginesCurrent")*1000-500) end},
     }
 }
 
@@ -610,6 +621,14 @@ ENT.ClientProps["train_disconnect"] = {
     ang = Angle(7,79,-90),
     hideseat = 0.2,
 }
+
+ENT.ClientProps["EmergencyBrakeValve"] = {
+    model = "models/metrostroi_train/81-710/ezh3_stopkran.mdl",
+    pos = Vector(454+10.34,24.45,-2.39),
+    ang = Angle(0,180,0),
+    hideseat = 0.2,
+}
+
 ENT.ClientProps["parking_brake"] = {
     model = "models/metrostroi_train/81-703/cabin_parking.mdl",
     pos = Vector(449.118378+7.6,33.493385+2,-14.713276),
@@ -692,8 +711,8 @@ ENT.ClientProps["salon"] = {
     hide = 2.0,
 }
 ENT.ClientProps["salon2"] = {
-    model = "models/metrostroi_train/81-703/81-703_Underwagon.mdl",
-    pos = Vector(-23.5,0,-191),
+    model = "models/metrostroi_train/81-508/81-508_underwagon.mdl",
+    pos = Vector(0.2,0,-18),
     ang = Angle(0,0,0),
     hide = 2.0,
 }
@@ -993,6 +1012,7 @@ function ENT:Think()
 
     self:Animate("brake_disconnect",self:GetPackedBool("DriverValveBLDisconnect") and 1 or 0,0.5,0.25,  4,false)
     self:Animate("train_disconnect",self:GetPackedBool("DriverValveTLDisconnect") and 1 or 0,0.5,0.25,  4,false)
+    self:Animate("EmergencyBrakeValve", self:GetPackedBool("EmergencyBrakeValve") and 1 or 0,0.5,0, 7, false)
 
     self:Animate("brake", self:GetPackedRatio("CranePosition"), 0.00, 0.48,  256,nil)
     self:Animate("controller",self:GetPackedRatio("ControllerPosition"),0, 0.31,  2,false)

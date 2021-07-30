@@ -2,6 +2,8 @@
 --local TOOL = player.GetBySteamID("STEAM_0:1:31566374"):GetTool("train_spawner")
 TOOL.AddToMenu = false
 
+local C_MaxWagons = GetConVar("metrostroi_maxwagons")
+
 if CLIENT then
     language.Add("Tool.train_spawner.name", "Train Spawner")
     language.Add("Tool.train_spawner.desc", "Spawn a train")
@@ -162,7 +164,7 @@ function TOOL:Think()
                 e.GetDirtLevel = function() return 0.25 end
             end
             hook.Add("Think",self.GhostEntities[1],function()
-                if not IsValid(self.Owner:GetActiveWeapon()) or self.Owner:GetActiveWeapon():GetClass()~="gmod_tool" or GetConVarString("gmod_toolmode") ~= "train_spawner" then
+                if not IsValid(self.Owner:GetActiveWeapon()) or self.Owner:GetActiveWeapon():GetClass()~="gmod_tool" or GetConVar("gmod_toolmode"):GetString() ~= "train_spawner" then
                     self:OnRemove()
                 end
             end)
@@ -440,12 +442,12 @@ function TOOL:LeftClick(trace)
     end
     if not self.AllowSpawn or not self.Train then return end
     if SERVER then
-        if self.Settings.WagNum > GetConVarNumber("metrostroi_maxwagons") then
-            self.Settings.WagNum = GetConVarNumber("metrostroi_maxwagons")
+        if self.Settings.WagNum > C_MaxWagons:GetInt() then
+            self.Settings.WagNum = C_MaxWagons:GetInt()
         end
 
-        if Metrostroi.TrainCountOnPlayer(self:GetOwner()) + self.Settings.WagNum > GetConVarNumber("metrostroi_maxtrains_onplayer")*GetConVarNumber("metrostroi_maxwagons")
-            or Metrostroi.TrainCount() + self.Settings.WagNum > GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_maxwagons") then
+        if Metrostroi.TrainCountOnPlayer(self:GetOwner()) + self.Settings.WagNum > GetConVar("metrostroi_maxtrains_onplayer"):GetInt()*C_MaxWagons:GetInt()
+            or Metrostroi.TrainCount() + self.Settings.WagNum > GetConVar("metrostroi_maxtrains"):GetInt()*C_MaxWagons:GetInt() then
                 self:GetOwner():LimitHit("train_limit")
             return true
         end
@@ -500,7 +502,8 @@ function TOOL:RightClick(trace)
 end
 
 function TOOL.BuildCPanel(panel)
-    panel:AddControl("Header", { Text = "#Tool.train_spawner.name", Description = "#Tool.train_spawner.desc" })
+    panel:SetName("#Tool.train_spawner.name")
+    panel:Help("#Tool.train_spawner.desc")
 end
 
 if SERVER then

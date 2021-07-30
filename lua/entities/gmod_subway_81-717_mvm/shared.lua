@@ -967,7 +967,6 @@ ENT.Spawner = {
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_Radio:TriggerInput("Set",val==1 and 1 or 0)
-                ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.BPSNon:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 ent.VMK:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 ent.ARS:TriggerInput("Set",(ent.Plombs.RC1 and val==1 and first) and 1 or 0)
@@ -990,10 +989,6 @@ ENT.Spawner = {
                     ent.BV:TriggerInput("Enable",1)
                 end)
             end
-            ent.Pneumatic.RightDoorState = val==4 and {1,1,1,1} or {0,0,0,0}
-            ent.Pneumatic.DoorRight = val==4
-            ent.Pneumatic.LeftDoorState = val==4 and {1,1,1,1} or {0,0,0,0}
-            ent.Pneumatic.DoorLeft = val==4
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
@@ -1017,7 +1012,7 @@ ENT.Spawner = {
             ent[v]:TriggerInput("Set",val and 1 or 0)
         end
     end,function(CB,VGUI)
-        VGUI.SwitchesR:SetDisabled(not CB:GetChecked())
+        VGUI.SwitchesR:SetEnabled(CB:GetChecked())
         if not CB:GetChecked() then
             VGUI.SwitchesR:SetValue(false)
         end

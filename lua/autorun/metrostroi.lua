@@ -16,6 +16,9 @@ if SERVER then
     util.AddNetworkString("metrostroi-cabin-button")
     util.AddNetworkString("metrostroi-cabin-reset")
     util.AddNetworkString("metrostroi-panel-touch")
+    
+    util.PrecacheModel("models/metrostroi_train/reversor/reversor_classic.mdl")
+    util.PrecacheModel("models/metrostroi_train/reversor/reversor_gold.mdl")
 
     --[[resource_AddDir("materials/metrostroi/props")
     resource_AddDir("materials/models/metrostroi_signs")
@@ -98,7 +101,7 @@ end
 ------------------------
 -- Metrostroi version --
 ------------------------
-Metrostroi.Version = 1537278077
+Metrostroi.Version = 1623941696
 Metrostroi.Loaded = false
 
 --------------------------------------------------------------------------------
@@ -129,10 +132,10 @@ function Metrostroi.AddSkin(category,name,tbl)
         Table.name = nil
         tbl = Table
     end
-    if CLIENT and category!="cab" and tbl.textures then
+    if CLIENT and tbl.textures then
         local find
         for k,v in pairs(tbl.textures) do
-            if not file.Exists("materials/"..v..".vtf","GAME") then
+            if not file.Exists("materials/"..v..".vmt","GAME") then
                 find = true
                 ErrorNoHalt(Format("Metrostroi: %s texture: %s, not found. Check folder and addons!\n",category,v))
             end

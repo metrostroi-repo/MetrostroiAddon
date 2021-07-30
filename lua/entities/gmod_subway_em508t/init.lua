@@ -13,6 +13,7 @@ ENT.SyncTable = {
     "DriverValveBLDisconnect","DriverValveTLDisconnect",
     "RearBrakeLineIsolation","RearTrainLineIsolation",
     "FrontBrakeLineIsolation","FrontTrainLineIsolation",
+    "EmergencyBrakeValve",
     "GV",
 }
 
@@ -93,7 +94,7 @@ function ENT:Initialize()
         [KEY_PAD_5] = "PneumaticBrakeSet5",
 
         [KEY_SPACE] = "PBSet",
-        [KEY_BACKSPACE] = "EmergencyBrake",
+        [KEY_BACKSPACE] = {"EmergencyBrake",helper="EmergencyBrakeValveToggle"},
 
         [KEY_PAD_ENTER] = "KVWrenchKV",
         [KEY_PAD_0] = "DriverValveDisconnect",
@@ -246,8 +247,8 @@ function ENT:Think()
     self:SetPackedBool("GRP",Panel.GRP > 0)
     self:SetPackedBool("SD",Panel.SD > 0)
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
-    if self.ManualBrake < 0.001 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
-    if self.ManualBrake > 0.999 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle < 0.001 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle > 0.999 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
 

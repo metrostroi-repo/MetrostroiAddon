@@ -147,6 +147,18 @@ ENT.ClientProps["Ema_salon2"] = {
     ang = Angle(0,0,0),
     hide = 2.0
 }
+ENT.ClientProps["sosd_model"] = {
+    model = "models/metrostroi_train/81-502/502_sosd.mdl",
+    pos = Vector(10,0,0),
+    ang = Angle(0,0,0),
+    hide = 2.0
+}
+ENT.ClientProps["sosd_lamp"] = {
+    model = "models/metrostroi_train/81-717/sosd_lamp.mdl",
+    pos = Vector(10,0,0),
+    ang = Angle(0,0,0),
+    hide = 2.0
+}
 ENT.ClientProps["osp_label"] = {
 	model = "models/metrostroi_train/81-717/labels/label_spb1.mdl",
 	pos = Vector(381.722321,-42.139999,36.999210),
@@ -1995,7 +2007,7 @@ ENT.ClientProps["WhiteLights"] = {
 ENT.Lights = {
     [1] = { "headlight",        Vector(475,0,-20), Angle(0,0,0), Color(169,130,88), brightness = 3 ,fov = 90, texture = "models/metrostroi_train/equipment/headlight",shadows = 1,headlight=true},
     [2] = { "headlight",        Vector(465,0,45), Angle(-20,0,0), Color(255,0,0), fov=164 ,brightness = 0.3, farz=250,texture = "models/metrostroi_train/equipment/headlight2",shadows = 0,backlight=true},
-    [20] = { "headlight",       Vector( 425,-56,-70),Angle(0,-90,0),Color(255,220,180),brightness = 0.3,distance = 300 ,fov=120,shadows = 1, texture="effects/flashlight/soft", hidden="Ema_salon2" },
+    ["SOSD"] = { "headlight",   Vector(436,-56,-74),Angle(0,-90,0),Color(255,220,180),brightness = 0.3,distance = 300 ,fov=120,shadows = 1, texture="effects/flashlight/soft", hidden="Ema_salon2" },
     [21] = { "headlight",       Vector(445,-55,40), Angle(75, 70,45), Color(190, 130, 88), fov=125,farz=80,brightness = 1.5,shadows = 1, texture = "models/metrostroi_train/equipment/headlight", hidden="Lamps_pult"},
 	[22] = { "headlight",       Vector(440,-60,31), Angle(20, 25,0), Color(200, 140, 98), fov=120,farz=100,brightness = 1,shadows = 1, texture = "models/metrostroi_train/equipment/headlight2", hidden="Lamps_pult"},
      -- Interior
@@ -2087,7 +2099,10 @@ function ENT:Think()
         self:SetLightPower(12, half1 > 0, half1*0.4+half2*0.6)
         self:SetLightPower(13, half1 > 0, half1*0.9+half2*0.1)
     end
-    self:SetLightPower(20,self:GetPackedBool("SOSD"))
+    
+    local sosd = self:Animate("SOSD",self:GetPackedBool("SOSD") and 1 or 0,0,1,6,false)
+    self:ShowHideSmooth("sosd_lamp",sosd)
+    self:SetLightPower("SOSD",sosd>0,sosd)
 
     -- Parking brake animation
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
@@ -2136,16 +2151,6 @@ function ENT:Think()
         self:HidePanel("Lamps2_1",typ ~= 3)
         self:HidePanel("Lamps2_2",typ ~= 3)
         self:ShowHide("speed_o",typ ~= 3)
-        self:HidePanel("RCAV3",typ==1)
-        self:HidePanel("RCAV4",typ==1)
-        self:HidePanel("RCAV5",typ==1)
-        self:HidePanel("RCARS",typ~=1)
-        self:HidePanel("RCBPS",typ~=1)
-        self:ShowHide("rcars_wrench",typ == 1)
-        self:ShowHide("rcbps_wrench",typ == 1)
-        self:ShowHide("rcav3_wrench",typ == 1)
-        self:ShowHide("rcav4_wrench",typ ~= 1)
-        self:ShowHide("rcav5_wrench",typ ~= 1)
     end
     local light_04 = self:Animate("light_04",self:GetPackedBool("ARS_04") and 1 or 0,0,1,5,false)
     local light_0  = self:Animate("light_0" ,self:GetPackedBool("ARS_00") and 1 or 0,0,1,5,false)
@@ -2170,6 +2175,16 @@ function ENT:Think()
         self:ShowHideSmooth("panel2_80", light_70)
     end
     if typ == 1 then
+        self:HidePanel("RCAV3",true)
+        self:HidePanel("RCAV4",true)
+        self:HidePanel("RCAV5",true)
+
+        self:ShowHide("rcav3_wrench",false)
+        self:HidePanel("RCARS",false)
+        self:HidePanel("RCBPS",false)
+        self:ShowHide("rcav4_wrench",false)
+        self:ShowHide("rcav5_wrench",false)    
+    
         self:ShowHide("rcars_wrench",self.RCARSResetTime and CurTime()-self.RCARSResetTime<1.5)
         self:ShowHide("rcbps_wrench",self.RCBPSResetTime and CurTime()-self.RCBPSResetTime<1.5)
         if IsValid(self.ClientEnts.rcars_wrench) and self.Anims.RCARSToggle then
@@ -2188,6 +2203,15 @@ function ENT:Think()
             self.LastRCBPSValue = self:GetPackedBool("RCBPS")
         end
     else
+        self:HidePanel("RCAV3",false)
+        self:HidePanel("RCAV4",false)
+        self:HidePanel("RCAV5",false)
+
+        self:ShowHide("rcars_wrench",false)
+        self:ShowHide("rcbps_wrench",false)
+        self:HidePanel("RCARS",true)
+        self:HidePanel("RCBPS",true)
+    
         self:ShowHide("rcav3_wrench",self.RCAV3ResetTime and CurTime()-self.RCAV3ResetTime<1.5)
         self:ShowHide("rcav4_wrench",self.RCAV4ResetTime and CurTime()-self.RCAV4ResetTime<1.5)
         self:ShowHide("rcav5_wrench",self.RCAV5ResetTime and CurTime()-self.RCAV5ResetTime<1.5)

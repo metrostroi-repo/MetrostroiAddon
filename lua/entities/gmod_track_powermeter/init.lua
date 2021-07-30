@@ -20,7 +20,7 @@ function ENT:Use(ply)
 		RunConsoleCommand("metrostroi_voltage",Metrostroi.OldVoltage ~= 0 and Metrostroi.OldVoltage or 750)
 		Metrostroi.OldVoltage = 0
 	else
-		Metrostroi.OldVoltage = GetConVarNumber("metrostroi_voltage")
+		Metrostroi.OldVoltage = GetConVar("metrostroi_voltage"):GetInt()
 		RunConsoleCommand("metrostroi_voltage",0)
 		Metrostroi.Voltage = 0
 		Metrostroi.VoltageOffByPlayerUse = true

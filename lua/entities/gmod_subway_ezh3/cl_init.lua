@@ -180,9 +180,9 @@ ENT.ButtonMap["Main"] = {
             var="KB",speed=16,vmin=1,vmax=0,
             sndvol = 0.10, snd = function(val) return val and "button3_on" or "button2_off" end,sndmin = 60, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
-        {ID = "RKLamp",         x=292, y=61+1, radius=20, tooltip="", model = {
+        {ID = "!LKVT",         x=292, y=61+1, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_kblamp.mdl", skin = 2, z = 5,-- color = Color(60,255,255),
-            lamp = {model = "models/metrostroi_train/81-710/ezh3_kblamp2.mdl",z = 5-4,color = Color(255,150,150), var="LRK",
+            lamp = {model = "models/metrostroi_train/81-710/ezh3_kblamp2.mdl",z = 5-4,color = Color(255,150,150), var="LKVT",
             lcolor=Color(255,50,20),lz = 20,lbright=2,lfov=130,lfar=16,lnear=8,lshadows=0},
             sprite = {bright=0.4,size=0.25,scale=0.07,color=Color(255,50,20),z=6}
         }},
@@ -276,25 +276,25 @@ ENT.ButtonMap["Main"] = {
             var="R_G",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-        }},--[[
+        }},
         {ID = "Custom1Toggle",   x=600, y=80, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-2,
             var="Custom1",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "Custom2Set",  x=600+25, y=80, radius=20, tooltip="", model = {
+        {ID = "Custom2Toggle",  x=600+25, y=80, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-2,
             var="Custom2",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "Custom3Set",  x=600+50, y=80, radius=20, tooltip="", model = {
+        {ID = "Custom3Toggle",  x=600+50, y=80, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-2,
             var="Custom3",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-        }},--]]
+        }},
         {ID = "!AnnPlay", x=693-25, y=61+2+48, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_slc77.mdl", z = -4.1,
             --lamp = {model = "models/metrostroi_train/81/lamp_on.mdl",skin = 2, var="AnnPlay"}
@@ -1179,8 +1179,8 @@ ENT.ClientProps["salon3"] = {
     hide = 2.0,
 }
 ENT.ClientProps["salon2"] = {
-    model = "models/metrostroi_train/81-703/81-703_Underwagon.mdl",
-    pos = Vector(-23.5,0,-191),
+    model = "models/metrostroi_train/81-508/81-508_underwagon.mdl",
+    pos = Vector(0.2,0,-18),
     ang = Angle(0,0,0),
     hide = 2.0,
 }
@@ -1287,6 +1287,7 @@ ENT.ClientProps["ezh3_lamp1"] = {
     model = "models/metrostroi_train/81-710/ezh3_lamposv1.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
+    color = Color(215,255,255),
     hideseat = 1.0,
 }
 ENT.ClientProps["ezh3_lamp2"] = {
@@ -1517,8 +1518,8 @@ ENT.Lights = {
     [31]  = { "light",           Vector(465+5  ,   45, -37), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 1.5, texture = "sprites/light_glow02", size = 2 },
     [32]  = { "light",           Vector(465+5  ,   0, 48), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02", size = 2 },
 
-    ezh3_lamp1 = {"light", Vector(451,-33.5,47.2), Angle(0,0,0),Color(252, 157, 77),brightness = 0.35,scale = 0.4, texture = "sprites/light_glow02", hidden = "ezh3_lamp1"},
-    ezh3_lamp2 = {"light", Vector(404,1.2,56), Angle(0,0,0),Color(252, 157, 77),brightness = 0.25,scale = 0.3, texture = "sprites/light_glow02", hidden = "ezh3_lamp2"},
+    ezh3_lamp1 = {"light", Vector(451,-33.5,47.2), Angle(0,0,0),Color(255,220,180),brightness = 0.35,scale = 0.4, texture = "sprites/light_glow02", hidden = "ezh3_lamp1"},
+    ezh3_lamp2 = {"light", Vector(404,1.2,56), Angle(0,0,0),Color(255,220,180),brightness = 0.25,scale = 0.3, texture = "sprites/light_glow02", hidden = "ezh3_lamp2"},
 }
 function ENT:Initialize()
     self.BaseClass.Initialize(self)

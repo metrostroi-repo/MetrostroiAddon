@@ -78,7 +78,7 @@ function TRAIN_SYSTEM:Initialize()
     self.RRP = 0
     self.TW18 = 0
     self.SD = 0
-    self.Sequence = 0
+    self.LKVT = 0
     self.Headlights1 = 0
     self.Headlights2 = 0
     self.RedLights = 0
@@ -110,5 +110,5 @@ function TRAIN_SYSTEM:Initialize()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "V1","GRP","RRP","TW18","SD","Sequence","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","Ring","KT","AnnouncerPlaying","AVU","PanelLights","GaugeLights","VPR","AR04","AR0","AR40","AR60","AR70","AR80","KT","KVD","CBKIPower","PCBKPower"}
+    return { "V1","GRP","RRP","TW18","SD","LKVT","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","Ring","KT","AnnouncerPlaying","AVU","PanelLights","GaugeLights","VPR","AR04","AR0","AR40","AR60","AR70","AR80","KT","KVD","CBKIPower","PCBKPower"}
 end

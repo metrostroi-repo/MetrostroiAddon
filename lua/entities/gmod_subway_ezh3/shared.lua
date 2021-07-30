@@ -633,7 +633,7 @@ ENT.SubwayTrain = {
     },
     EKKType = 710,
 }
-ENT.NumberRanges = {{5560,5999}}
+ENT.NumberRanges = {{5561,5999},{9000,9049}}
 
 ENT.Spawner = {
     model = {

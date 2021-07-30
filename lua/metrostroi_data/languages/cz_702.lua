@@ -41,7 +41,7 @@ Common.703.KRR                  = KRR: Tlačítko obracení reversů do první p
 Common.703.RUT                  = Regulace RUT (pomalejší akcelerace)
 Common.707.SEQ                  = Kontrolka rotování reostatu kontroléru
 Common.707.TAH                  = TAH: Nouzová jízda bez ARS
-Common.710.RK                   = Reostat kontroléru je ve střední poloze
+Common.710.LKVT                 = LKVT: Kontrolka tlačítko bdělosti
 
 Common.710.SAMMSchemeOff        = SAMM: Tlačítko vypnutí trakce RAV
 Common.710.SAMMStart            = SAMM: Tlačítko aktivace RAV
@@ -564,7 +564,7 @@ Entities.gmod_subway_ezh3.Buttons.Main.V5Set            = @[Common.703.LOff]
 Entities.gmod_subway_ezh3.Buttons.Main.KU11Set          = @[Common.703.KSD]
 Entities.gmod_subway_ezh3.Buttons.Main.KVTSet           = @[Common.ARS.KVT]
 Entities.gmod_subway_ezh3.Buttons.Main.KBSet            = @[Common.ARS.KB]
-Entities.gmod_subway_ezh3.Buttons.Main.RKLamp           = @[Common.710.RK]
+Entities.gmod_subway_ezh3.Buttons.Main.!LKVT            = @[Common.710.LKVT]
 Entities.gmod_subway_ezh3.Buttons.Main.ARSToggle        = @[Common.ALL.ARS]
 Entities.gmod_subway_ezh3.Buttons.Main.R_UNchToggle     = @[Common.ALL.UNCh]
 Entities.gmod_subway_ezh3.Buttons.Main.V2Toggle         = @[Common.ALL.VUD]
@@ -583,6 +583,9 @@ Entities.gmod_subway_ezh3.Buttons.Main.KU10Set          = @[Common.ALL.KRP]
 Entities.gmod_subway_ezh3.Buttons.Main.RSTToggle        = @[Common.ALL.VPR]
 Entities.gmod_subway_ezh3.Buttons.Main.R_GToggle        = @[Common.ALL.GCab]
 Entities.gmod_subway_ezh3.Buttons.Main.!AnnPlay         = @[Common.ALL.AnnPlay]
+Entities.gmod_subway_ezh3.Buttons.Main.Custom1Toggle    = @[Common.ALL.Unsused1]
+Entities.gmod_subway_ezh3.Buttons.Main.Custom2Toggle    = @[Common.ALL.Unsused1]
+Entities.gmod_subway_ezh3.Buttons.Main.Custom3Toggle    = @[Common.ALL.Unsused1]
 
 Entities.gmod_subway_ezh3.Buttons.HelperPanel.V6Set         = @[Common.ALL.KDL]
 Entities.gmod_subway_ezh3.Buttons.HelperPanel.V3Toggle       = @[Common.ALL.VUD2]

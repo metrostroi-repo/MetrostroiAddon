@@ -5,13 +5,10 @@ include("shared.lua")
 util.AddNetworkString "MetrostroiTrainSpawner"
 util.AddNetworkString "MetrostroiTrainCount"
 util.AddNetworkString "MetrostroiMaxWagons"
-CreateConVar("metrostroi_maxtrains",3,{FCVAR_ARCHIVE},"Maximum of allowed trains")
-CreateConVar("metrostroi_maxwagons",3,{FCVAR_ARCHIVE},"Maximum of allowed wagons in 1 train")
-CreateConVar("metrostroi_maxtrains_onplayer",1,{FCVAR_ARCHIVE},"Maximum of allowed trains by player")
 local function MaxWagonsChangeCallback()
-	SetGlobalInt("metrostroi_maxtrains",GetConVarNumber("metrostroi_maxtrains"))
-	SetGlobalInt("metrostroi_maxtrains_onplayer",GetConVarNumber("metrostroi_maxtrains_onplayer"))
-	SetGlobalInt("metrostroi_maxwagons",GetConVarNumber("metrostroi_maxwagons"))
+	SetGlobalInt("metrostroi_maxtrains",GetConVar("metrostroi_maxtrains"):GetInt())
+	SetGlobalInt("metrostroi_maxtrains_onplayer",GetConVar("metrostroi_maxtrains_onplayer"):GetInt())
+	SetGlobalInt("metrostroi_maxwagons",GetConVar("metrostroi_maxwagons"):GetInt())
 	timer.Simple(0,function()
 		net.Start("MetrostroiMaxWagons")
 		net.Broadcast()

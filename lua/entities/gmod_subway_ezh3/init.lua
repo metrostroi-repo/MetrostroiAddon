@@ -298,12 +298,12 @@ function ENT:Think()
     self:SetPackedBool("SD",Panel.SD > 0)
 
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
-    if self.ManualBrake < 0.001 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
-    if self.ManualBrake > 0.999 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle < 0.001 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle > 0.999 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
 
-    self:SetPackedBool("LRK",Panel.Sequence > 0)
+    self:SetPackedBool("LKVT",Panel.LKVT > 0)
     self:SetPackedBool("KT",Panel.KT > 0)
     self:SetPackedBool("AVU",Panel.AVU > 0.5)
     self:SetPackedBool("RingEnabled",Panel.Ring > 0.5)

@@ -164,6 +164,8 @@ function TRAIN_SYSTEM:Initialize()
     self.Selected = 1
 
     self.Keyboard = false
+    self.Sound = true
+    self.SoundTimer = false
 
     self.Station = ""
     self.Path = ""
@@ -1224,32 +1226,32 @@ if CLIENT then
     local bios_splash = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/bios_splash")
     local splash = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/splash")
     local splash_egg = surface.GetTextureID("models/metrostroi_train/81-717/screens/pa/splash_egg")
-    local snds = {
-        [-3] = "http://pollitto.ru/other/files/NEW/shit/apdisco.wav",
-        [-2] = "http://pollitto.ru/other/files/NEW/shit/master_warning.wav",
-        [-1] = "http://pollitto.ru/other/files/NEW/shit/terrain_n.wav",
-        [-0.01] = "http://pollitto.ru/other/files/NEW/shit/mini.wav",
-        [1.02] = "http://pollitto.ru/other/files/NEW/shit/5ft.wav",
-        [3.05] = "http://pollitto.ru/other/files/NEW/shit/10ft.wav",
-        [6.10] = "http://pollitto.ru/other/files/NEW/shit/20ft.wav",
-        [9.14] = "http://pollitto.ru/other/files/NEW/shit/30ft.wav",
-        [12.19] = "http://pollitto.ru/other/files/NEW/shit/40ft.wav",
-        [15.24] = "http://pollitto.ru/other/files/NEW/shit/50ft.wav",
-        [30.48] = "http://pollitto.ru/other/files/NEW/shit/100ft.wav",
-        [60.96] = "http://pollitto.ru/other/files/NEW/shit/200ft.wav",
-        [91.44] = "http://pollitto.ru/other/files/NEW/shit/300ft.wav",
-        [100] = "http://pollitto.ru/other/files/NEW/shit/alt_alert.wav",
-        [121.92] = "http://pollitto.ru/other/files/NEW/shit/400ft.wav",
-        [152.40] = "http://pollitto.ru/other/files/NEW/shit/500ft.wav",
-        [304.80] = "http://pollitto.ru/other/files/NEW/shit/1000ft.wav",
-        [762] = "http://pollitto.ru/other/files/NEW/shit/2500ft.wav",
-        ["caution"] = "http://pollitto.ru/other/files/NEW/shit/toconfigwarn.wav",
-        ["belts"] = "http://pollitto.ru/other/files/NEW/shit/belts.wav",
-        ["smoking"] = "http://pollitto.ru/other/files/NEW/shit/smoking.wav",
-        ["pullup"] = "http://pollitto.ru/other/files/NEW/shit/whoopwhoop.wav",
-        ["tl_flaps"] = "http://pollitto.ru/other/files/NEW/shit/too_low_flaps.wav",
-        ["tl_terrain"] = "http://pollitto.ru/other/files/NEW/shit/too_low_terrain.wav",
-    }
+    -- local snds = {
+        -- [-3] = "http://pollitto.ru/other/files/NEW/shit/apdisco.wav",
+        -- [-2] = "http://pollitto.ru/other/files/NEW/shit/master_warning.wav",
+        -- [-1] = "http://pollitto.ru/other/files/NEW/shit/terrain_n.wav",
+        -- [-0.01] = "http://pollitto.ru/other/files/NEW/shit/mini.wav",
+        -- [1.02] = "http://pollitto.ru/other/files/NEW/shit/5ft.wav",
+        -- [3.05] = "http://pollitto.ru/other/files/NEW/shit/10ft.wav",
+        -- [6.10] = "http://pollitto.ru/other/files/NEW/shit/20ft.wav",
+        -- [9.14] = "http://pollitto.ru/other/files/NEW/shit/30ft.wav",
+        -- [12.19] = "http://pollitto.ru/other/files/NEW/shit/40ft.wav",
+        -- [15.24] = "http://pollitto.ru/other/files/NEW/shit/50ft.wav",
+        -- [30.48] = "http://pollitto.ru/other/files/NEW/shit/100ft.wav",
+        -- [60.96] = "http://pollitto.ru/other/files/NEW/shit/200ft.wav",
+        -- [91.44] = "http://pollitto.ru/other/files/NEW/shit/300ft.wav",
+        -- [100] = "http://pollitto.ru/other/files/NEW/shit/alt_alert.wav",
+        -- [121.92] = "http://pollitto.ru/other/files/NEW/shit/400ft.wav",
+        -- [152.40] = "http://pollitto.ru/other/files/NEW/shit/500ft.wav",
+        -- [304.80] = "http://pollitto.ru/other/files/NEW/shit/1000ft.wav",
+        -- [762] = "http://pollitto.ru/other/files/NEW/shit/2500ft.wav",
+        -- ["caution"] = "http://pollitto.ru/other/files/NEW/shit/toconfigwarn.wav",
+        -- ["belts"] = "http://pollitto.ru/other/files/NEW/shit/belts.wav",
+        -- ["smoking"] = "http://pollitto.ru/other/files/NEW/shit/smoking.wav",
+        -- ["pullup"] = "http://pollitto.ru/other/files/NEW/shit/whoopwhoop.wav",
+        -- ["tl_flaps"] = "http://pollitto.ru/other/files/NEW/shit/too_low_flaps.wav",
+        -- ["tl_terrain"] = "http://pollitto.ru/other/files/NEW/shit/too_low_terrain.wav",
+    -- }
 
     local UPD = 10
     function TRAIN_SYSTEM:PAMScreen(Train)
@@ -1282,81 +1284,75 @@ if CLIENT then
             if state == 3.5 then State35(Train) end
             if state == 4 then State4(Train) end
             if state == 5 then
-                --[[
-                if LocalPlayer():GetName() ~= "MrMeowpestMan" then
-                    if not self.Sounds or self.SoundsTemp ~= UPD then
-                        if self.Sounds then for i,snd in pairs(self.Sounds) do snd:Stop() end end
-                        self.Sounds = {}
-                        for i, sndU in pairs(snds) do
-                            sound.PlayURL ( sndU, "3d noplay noblock", function( snd )
-                                if ( IsValid( snd ) ) then
-                                    self.Sounds[i] = snd
-                                    print(snd)
-                                else
-                                    print("???")
-                                end
-                            end )
-                        end
-                        self.SoundsTemp = UPD
-                    end
-                    for i,snd in pairs(self.Sounds) do
-                        if IsValid(snd) then
-                            snd:SetPos(self.Train:LocalToWorld(Vector(450,22,0)))
-                        end
-                    end
-                    local sndId
-                    local s = Train:GetNW2Float("PAM:S")--/0.3048
-                    for i,snd in pairs(self.Sounds) do
-                        if type(i) == "number" and s <= i and (not sndId or sndId > i) then sndId = i end
-                    end
-                    if self.CurrentSound ~= sndId then
-                        if sndId then
-                            print(self.Sounds[sndId])
-                            self.Sounds[sndId]:SetTime(0)
-                            self.Sounds[sndId]:Play()
-                        end
-                        self.CurrentSound = sndId
-                    end
-                    if self.Sounds.caution and not self.Caution and self.Train:GetNW2Bool("PAM:OXT") then
-                        self.Sounds.caution:SetTime(0)
-                        self.Sounds.caution:Play()
-                        self.Caution = CurTime()
-                    elseif self.Caution and CurTime()-self.Caution > 2 then
-                        self.Caution = false
-                    end
+                -- if Train:GetNW2String("PAM:DriverNumber","") == "0737" then -- GPWS easter egg
+                    -- if not self.Sounds or self.SoundsTemp ~= UPD then
+                        -- if self.Sounds then for i,snd in pairs(self.Sounds) do snd:Stop() end end
+                        -- self.Sounds = {}
+                        -- for i, sndU in pairs(snds) do
+                            -- sound.PlayURL ( sndU, "3d noplay noblock", function( snd )
+                                -- if ( IsValid( snd ) ) then
+                                    -- self.Sounds[i] = snd
+                                -- end
+                            -- end )
+                        -- end
+                        -- self.SoundsTemp = UPD
+                    -- end
+                    -- for i,snd in pairs(self.Sounds) do
+                        -- if IsValid(snd) then
+                            -- snd:SetPos(self.Train:LocalToWorld(Vector(443.60,20.10,-4.30)))
+                        -- end
+                    -- end
+                    -- local sndId
+                    -- local s = Train:GetNW2Float("PAM:S")--/0.3048
+                    -- for i,snd in pairs(self.Sounds) do
+                        -- if type(i) == "number" and s <= i and (not sndId or sndId > i) then sndId = i end
+                    -- end
+                    -- if self.CurrentSound ~= sndId then
+                        -- if sndId then
+                            -- self.Sounds[sndId]:SetTime(0)
+                            -- self.Sounds[sndId]:Play()
+                        -- end
+                        -- self.CurrentSound = sndId
+                    -- end
+                    -- if self.Sounds.caution and not self.Caution and self.Train:GetNW2Bool("PAM:OXT") then
+                        -- self.Sounds.caution:SetTime(0)
+                        -- self.Sounds.caution:Play()
+                        -- self.Caution = CurTime()
+                    -- elseif self.Caution and CurTime()-self.Caution > 2 then
+                        -- self.Caution = false
+                    -- end
 
-                    if self.Sounds.pullup and not self.PullUp and Train:GetNW2Int("PAM:Vf") > 1 then
-                        self.Sounds.pullup:SetTime(0)
-                        self.Sounds.pullup:Play()
-                        self.PullUp = true
-                    elseif self.PullUp and Train:GetNW2Int("PAM:Vf") == 0 then
-                        self.PullUp = false
-                    end
-                    self.SpeedLimitSmoking = self.SpeedLimitSmoking or Train:GetNW2Int("PAM:SpeedLimit")
-                    if self.Sounds.smoking and Train:GetNW2Int("PAM:SpeedLimit") ~= self.SpeedLimitSmoking then
-                        if Train:GetNW2Int("PAM:SpeedLimit") > self.SpeedLimitSmoking then
-                            self.Sounds.smoking:SetTime(0)
-                            self.Sounds.smoking:Play()
-                        else
-                            self.Sounds.belts:SetTime(0)
-                            self.Sounds.belts:Play()
-                        end
-                        self.SpeedLimitSmoking = Train:GetNW2Int("PAM:SpeedLimit")
-                    end
-                    local canPlayTLFlaps = Train:GetNW2Int("PAM:KVMode") >= -1 and Train:GetNW2Int("PAM:Vf") > 0 and not Train:GetNW2Bool("PAM:LPT")
-                    if self.Sounds.tl_flaps and not self.TLFlaps and (50 <= s and s <= 100) and canPlayTLFlaps  then
-                        self.Sounds.tl_flaps:SetTime(0)
-                        self.Sounds.tl_flaps:Play()
-                        self.TLFlaps = CurTime()
-                    elseif self.Sounds.tl_terrain and not self.TLFlaps and s < 50 and canPlayTLFlaps then
-                        self.Sounds.tl_terrain:SetTime(0)
-                        self.Sounds.tl_terrain:Play()
-                        self.TLFlaps = CurTime()
-                    elseif self.TLFlaps and CurTime()-self.TLFlaps > 1.5 then
-                        self.TLFlaps = false
-                    end
-                end
-                --]]
+                    -- if self.Sounds.pullup and not self.PullUp and Train:GetNW2Int("PAM:Vf") > 1 then
+                        -- self.Sounds.pullup:SetTime(0)
+                        -- self.Sounds.pullup:Play()
+                        -- self.PullUp = true
+                    -- elseif self.PullUp and Train:GetNW2Int("PAM:Vf") == 0 then
+                        -- self.PullUp = false
+                    -- end
+                    -- self.SpeedLimitSmoking = self.SpeedLimitSmoking or Train:GetNW2Int("PAM:SpeedLimit")
+                    -- if self.Sounds.smoking and Train:GetNW2Int("PAM:SpeedLimit") ~= self.SpeedLimitSmoking then
+                        -- if Train:GetNW2Int("PAM:SpeedLimit") > self.SpeedLimitSmoking then
+                            -- self.Sounds.smoking:SetTime(0)
+                            -- self.Sounds.smoking:Play()
+                        -- else
+                            -- self.Sounds.belts:SetTime(0)
+                            -- self.Sounds.belts:Play()
+                        -- end
+                        -- self.SpeedLimitSmoking = Train:GetNW2Int("PAM:SpeedLimit")
+                    -- end
+                    -- local canPlayTLFlaps = Train:GetNW2Int("PAM:KVMode") >= -1 and Train:GetNW2Int("PAM:Vf") > 0 and not Train:GetNW2Bool("PAM:LPT")
+                    -- if self.Sounds.tl_flaps and not self.TLFlaps and (50 <= s and s <= 100) and canPlayTLFlaps  then
+                        -- self.Sounds.tl_flaps:SetTime(0)
+                        -- self.Sounds.tl_flaps:Play()
+                        -- self.TLFlaps = CurTime()
+                    -- elseif self.Sounds.tl_terrain and not self.TLFlaps and s < 50 and canPlayTLFlaps then
+                        -- self.Sounds.tl_terrain:SetTime(0)
+                        -- self.Sounds.tl_terrain:Play()
+                        -- self.TLFlaps = CurTime()
+                    -- elseif self.TLFlaps and CurTime()-self.TLFlaps > 1.5 then
+                        -- self.TLFlaps = false
+                    -- end
+                -- end
 
                 State5(Train)
             end

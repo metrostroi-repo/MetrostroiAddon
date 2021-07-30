@@ -87,12 +87,16 @@ end
 
 function TOOL.BuildCPanel(panel)
 	panel = panel or controlpanel.Get("switch")
-	panel:AddControl("Header", { Text = "#Tool.switch.name", Description = "#Tool.switch.desc" })
-	panel:AddControl("TextBox", { Label = "Name", Command = "switch_name" })
-	panel:AddControl("ComboBox", { Label = "Channel", Options = {None={switch_channel = 0},["1"] ={switch_channel = 1},["2"] ={switch_channel = 2}}})
-	panel:AddControl("Checkbox", { Label = "Locked", Command = "switch_locked" })
-	panel:AddControl("Checkbox", { Label = "Controllable", Command = "switch_controllable" })
-	panel:AddControl("Checkbox", { Label = "Invert", Command = "switch_invert" })
+    panel:SetName("#Tool.switch.name")
+    panel:Help("#Tool.switch.desc")
+	panel:TextEntry("Name","switch_name")
+    local CBChannel = panel:ComboBox( "Channel", "switch_channel" )
+    CBChannel:AddChoice("None",0)
+    CBChannel:AddChoice("1",1)
+    CBChannel:AddChoice("2",2)
+    panel:CheckBox("Locked","switch_locked")
+    panel:CheckBox("Controllable","switch_controllable")
+    panel:CheckBox("Invert","switch_invert")
 end
 
 

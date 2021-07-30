@@ -9,7 +9,7 @@ end
 
 
 Metrostroi.Languages = Metrostroi.Languages or {}
-Metrostroi.ChoosedLang = GetConVarString("metrostroi_language")
+Metrostroi.ChoosedLang = GetConVar("metrostroi_language"):GetString()
 function Metrostroi.GetPhrase(phrase)
     if Metrostroi.CurrentLanguageTable and not Metrostroi.CurrentLanguageTable[phrase] then
         MsgC(Color(255,0,0),"No phrase:",Color(0,255,0),phrase,"\n")
@@ -28,17 +28,17 @@ end
 if not file.Exists("metrostroi_data","DATA") then file.CreateDir("metrostroi_data") end
 if not file.Exists("metrostroi_data/languages","DATA") then file.CreateDir("metrostroi_data/languages") end
 local function debugmsg(...)
-    if GetConVarNumber("metrostroi_drawdebug") == 0 then return end
+    if GetConVar("metrostroi_drawdebug"):GetInt() == 0 then return end
     MsgC(...)
     MsgC("\n")
 end
 local function errmsg(...)
-    if GetConVarNumber("metrostroi_drawdebug") == 0 then return end
+    if GetConVar("metrostroi_drawdebug"):GetInt() == 0 then return end
     MsgC(...)
     ErrorNoHalt("\n")
 end
 local function errnhmsg(...)
-    if GetConVarNumber("metrostroi_drawdebug") == 0 then return end
+    if GetConVar("metrostroi_drawdebug"):GetInt() == 0 then return end
     ErrorNoHalt(...)
 end
 function Metrostroi.LoadLanguage(lang,force)
@@ -139,7 +139,7 @@ function Metrostroi.LoadLanguage(lang,force)
             debugmsg(Color(255,0,255),"Add language ",lang," phrase:\t",Color(0,255,0),id,Color(255,0,255),"=",Color(0,255,0),phrase)
         end
     end
-    if force or GetConVarNumber("metrostroi_language_softreload")~=1 then
+    if force or GetConVar("metrostroi_language_softreload"):GetInt()~=1 then
         RunConsoleCommand("spawnmenu_reload")
         hook.Run( "GameContentChanged" )
     end
@@ -304,7 +304,7 @@ local function reloadLang()
 
     Metrostroi.LoadLanguage(Metrostroi.ChoosedLang)
     if not Metrostroi.CurrentLanguageTable then
-        Metrostroi.ChoosedLang = GetConVarString("gmod_language")
+        Metrostroi.ChoosedLang = GetConVar("gmod_language"):GetString()
         if not Metrostroi.Languages[Metrostroi.ChoosedLang] then Metrostroi.ChoosedLang = "en" end
         RunConsoleCommand("metrostroi_language",Metrostroi.ChoosedLang)
     end

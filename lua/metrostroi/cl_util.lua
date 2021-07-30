@@ -427,7 +427,7 @@ function Metrostroi.GenerateClientProps()
                         self.Lights[lname] = { "headlight",
                             Metrostroi.PositionFromPanel(id,config.pos or buttons.ID,(config.z or 0.2)+(lconfig.z or 0.2)+(lconfig.lz or 0.2),(config.x or 0)+(lconfig.x or 0)+(lconfig.lx or 0),(config.y or 0)+(lconfig.y or 0)+(lconfig.ly or 0)),
                             Metrostroi.AngleFromPanel(id,lconfig.lang or lconfig.ang or config.ang)+Angle(90,0,0),
-                            lconfig.lcolor,farz = lconfig.lfarz or 8,nearz = lconfig.lnearz or 1,shadows = lconfig.lshadows or 1,brightness = lconfig.lbright or 1,fov = lconfig.lfov,texture=lconfig.ltex or "effects/flashlight/soft",panellight=true,
+                            lconfig.lcolor,farz = lconfig.lfar or 8,nearz = lconfig.lnear or 1,shadows = lconfig.lshadows or 1,brightness = lconfig.lbright or 1,fov = lconfig.lfov,texture=lconfig.ltex or "effects/flashlight/soft",panellight=true,
                             hidden = lname,
                         }
                         --[[self.ClientProps[lname.."TEST"] = {
@@ -637,7 +637,7 @@ hook.Add("PostDrawOpaqueRenderables", "metrostroi-draw-stopmarker",function()
     prevTime = RealTime()
 
     -- Skip if disabled
-    if GetConVarNumber("metrostroi_stop_helper") ~= 1 then return end
+    if GetConVar("metrostroi_stop_helper"):GetInt() ~= 1 then return end
 
     -- Get train
     local train = LocalPlayer().InMetrostroiTrain

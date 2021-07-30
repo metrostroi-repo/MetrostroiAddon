@@ -238,8 +238,8 @@ function ENT:Think()
     self:SetPackedBool("GRP",self.Panel.GRP > 0)
     self:SetPackedBool("SD",self.Panel.SD > 0)
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0
-    if self.ManualBrake < 0.001 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
-    if self.ManualBrake > 0.999 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle < 0.001 and self.ManualBrake < self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
+    if self.TrueBrakeAngle > 0.999 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
 
@@ -256,7 +256,7 @@ function ENT:Think()
     -- Feed packed floats
     self:SetNW2Int("WrenchMode",self.KVWrenchMode)
     self:SetPackedRatio("CranePosition", 1-Pneumatic.DriverValvePosition/7)
-    self:SetPackedRatio("ControllerPosition", (self.KV.ControllerPosition+3)/7)
+    self:SetNW2Int("ControllerPosition", self.KV.ControllerPosition+3)
     self:SetPackedRatio("ReverserPosition", 1-(self.KV.ReverserPosition+1)/2)
     self:SetPackedBool("RCUPosition", self.KV.RCU > 0)
     self:SetPackedRatio("BLPressure", Pneumatic.ReservoirPressure/16.0)

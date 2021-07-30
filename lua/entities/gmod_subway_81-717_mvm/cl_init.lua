@@ -778,8 +778,8 @@ ENT.ButtonMap["Block7"] = {
             model = "models/metrostroi_train/81-502/buttons/button_717_3.mdl",
             var="KDP",speed=16,min=1,max=0,z=-2,
             lamp = {model = "models/metrostroi_train/81-717/buttons/lamp_button_1.mdl",anim=true,var="DoorsRightL",speed=9,z=2.2,color=Color(255,130,80),
-                lcolor=Color(255,110,40),lz = lz,lfov=165,lbright=145,lfar=16,lnear=8,lshadows=0},
-            sprite = {bright=0.2,size=.5,scale=0.1,z=5,color=Color(255,130,80)},
+            lcolor=Color(255,110,40),lz = 10,lfov=145,lfar=16,lnear=8,lshadows=0},
+            sprite = {bright=0.2,size=.485,scale=0.1,z=5,color=Color(255,130,80)},
             sndvol = 0.07,snd = function(val) return val and "button3_on" or "button3_off" end,sndmin = 60,sndmax = 1e3/3,sndang = Angle(-90,0,0),
         }},
         {ID = "KDPKToggle",x=70,y=140,w=40,h=20,tooltip="",model = {
@@ -2599,13 +2599,13 @@ ENT.Lights = {
     [4] = { "headlight",        Vector(365,-51,50), Angle(50,40,-0), Color(206,135,80), hfov=80, vfov=80,farz=100,brightness = 6,shadows=1, hidden="salon"},
 
     -- Manometers
-    [40] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(255,125,25),farz = 8,nearz = 2,shadows = 1,brightness = 1,fov = 145,hidden = "pult_mvm_classic"},
-    [41] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(255,125,25),farz = 8,nearz = 2,shadows = 1,brightness = 1,fov = 140,hidden = "pult_mvm_classic"},
-    [42] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(255,125,25),farz = 8,nearz = 2,shadows = 0,brightness = 1.5,fov = 120,hidden = "pult_mvm_classic"},
-    [43] = { "headlight",Vector(451.9-3,3.6+1,3.35+0.5),Angle(0,-90,0),Color(255,125,25),farz = 8,nearz = 2,shadows = 0,brightness = 1.5,fov = 80,hidden = "pult_mvm_classic"},
+    [40] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(255,125,25),farz = 7,nearz = 2,shadows = 1,brightness = 1,fov = 145,hidden = "pult_mvm_classic"},
+    [41] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(255,125,25),farz = 7,nearz = 2,shadows = 1,brightness = 1,fov = 140,hidden = "pult_mvm_classic"},
+    [42] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(255,125,25),farz = 7,nearz = 2,shadows = 0,brightness = 1.5,fov = 120,hidden = "pult_mvm_classic"},
+    [43] = { "headlight",Vector(451.9-3,3.6+1,3.35+0.5),Angle(0,-90,0),Color(255,125,25),farz = 7,nearz = 2,shadows = 0,brightness = 1.5,fov = 80,hidden = "pult_mvm_classic"},
     -- Voltmeter
-    [44] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(255,145,25),farz = 10,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
-    [45] = { "headlight",Vector(450.273468,-32.306019,18.236823),Angle(-12.000000,25.541767,-90.600349),Color(255,125,25),farz = 10,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
+    [44] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(255,145,25),farz = 5.05,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
+    [45] = { "headlight",Vector(450.273468,-32.306019,18.036823),Angle(-12.000000,25.541767,-90.600349),Color(255,125,25),farz = 5.05,nearz = 2,shadows = 1,brightness = 1,fov = 100,hidden = "pult_mvm_classic" },
 
     -- Reverse
     [8] = { "light",Vector(460,-45, 52), Angle(0,0,0), Color(255,50,50),     brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02", size=2},
@@ -2758,7 +2758,7 @@ function ENT:Think()
 
     self:SetLightPower(30,headlight > 0,headlight)
     self:SetLightPower(31,headlight > 0,headlight)
-    self:SetLightPower(32,headlight > 0 and (mask == 2 or mask == 3),headlight)
+    self:SetLightPower(32,headlight > 0 and mask > 4,headlight)
 
     local newBortlamps = self:GetNW2Bool("NewBortlamps")
     local Bortlamp_w = self:Animate("Bortlamp_w",self:GetPackedBool("DoorsW") and 1 or 0,0,1,16,false)
@@ -2942,6 +2942,7 @@ function ENT:Think()
             self.LightsOverride[31][2] = Vector(465,45 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , 52)
         end
+        self.MaskType = mask
     end
     --self:ShowHide("mask141_lvz",mask and lvz)
     self:ShowHide("1:KVTSet",not lvz)
@@ -2951,16 +2952,16 @@ function ENT:Think()
     if mask <= 2 then
         self:ShowHideSmooth("Headlights22_1",HL1)
         self:ShowHideSmooth("Headlights22_2",HL2)
-    elseif mask < 4 then
+    elseif mask <= 4 then
+        self:ShowHideSmooth("Headlights22_glass_1",HL1)
+        self:ShowHideSmooth("Headlights22_glass_2",HL2)
+    elseif mask <= 6 then
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask < 6 then
+    elseif mask <= 8 then
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask < 8 then
-        self:ShowHideSmooth("Headlights222_1",HL1)
-        self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask < 9 then
+    elseif mask <= 10 then
         self:ShowHideSmooth("Headlights141_1",HL1)
         self:ShowHideSmooth("Headlights141_2",HL2)
     end

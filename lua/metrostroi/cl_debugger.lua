@@ -405,7 +405,7 @@ end
 
 local function OpenConfigWindow()
 	local Panel = vgui.Create("DFrame")
-	Panel:SetPos(surface.ScreenWidth()/5,surface.ScreenHeight()/3)
+	Panel:SetPos(ScrW()/5,ScrH()/3)
 	Panel:SetSize(250,250)
 	Panel:SetTitle("Metrostroi Debugger Config")
 	Panel:SetVisible(true)
@@ -414,13 +414,10 @@ local function OpenConfigWindow()
 
 	Panel:MakePopup()
 
-	List = vgui.Create("DPanelList",Panel)
+	List = vgui.Create("DScrollPanel",Panel)
 
 	List:SetPos(10,30)
 	List:SetSize(200,200)
-	List:SetSpacing(5)
-	List:EnableHorizontal(false)
-	List:EnableVerticalScrollbar(true)
 
 	for k,v in pairs(Debugger.DisplayGroups) do
 		local Box = vgui.Create("DCheckBoxLabel")
@@ -431,6 +428,8 @@ local function OpenConfigWindow()
 			Box:SetValue(0)
 		end -- TODO: Do this nicer somehow
 		Box:SizeToContents()
+        Box:Dock(TOP)
+        Box:DockMargin(0,2,0,2)
 		List:AddItem(Box)
 		Box.OnChange = function() EnableGroup(v,Box:GetChecked()) end
 	end
@@ -590,7 +589,7 @@ end
 
 --Checks if we haven't gotten data from entid in a while
 local function isTimedOut(id)
-	local timeout = GetConVarNumber("metrostroi_debugger_data_timeout")
+	local timeout = GetConVar("metrostroi_debugger_data_timeout"):GetFloat()
 	return timeout ~= nil and timeout > 0 and CurTime() - Debugger.EntDataTime[id] > timeout
 end
 
@@ -618,7 +617,7 @@ hook.Add( "HUDPaint", "metrostroi-draw-system-debugger", function()
 	if Debugger.EntData ~= nil then
 		local localy = 15 --+ 65
 
-		if GetConVarNumber("developer") then
+		if GetConVar("developer"):GetInt() then
 			localy = 77
 		end
 
