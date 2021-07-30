@@ -276,25 +276,25 @@ ENT.ButtonMap["Main"] = {
             var="R_G",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-        }},--[[
+        }},
         {ID = "Custom1Toggle",   x=600, y=80, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-2,
             var="Custom1",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "Custom2Set",  x=600+25, y=80, radius=20, tooltip="", model = {
+        {ID = "Custom2Toggle",  x=600+25, y=80, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-2,
             var="Custom2",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "Custom3Set",  x=600+50, y=80, radius=20, tooltip="", model = {
+        {ID = "Custom3Toggle",  x=600+50, y=80, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-2,
             var="Custom3",speed=16,
             sndvol = 1, snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-        }},--]]
+        }},
         {ID = "!AnnPlay", x=693-25, y=61+2+48, radius=20, tooltip="", model = {
             model = "models/metrostroi_train/81-710/ezh3_slc77.mdl", z = -4.1,
             --lamp = {model = "models/metrostroi_train/81/lamp_on.mdl",skin = 2, var="AnnPlay"}
