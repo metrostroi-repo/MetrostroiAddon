@@ -370,7 +370,7 @@ function TRAIN_SYSTEM:Think(dT)
         local TLDisconnect = self.DisconnectType and Train.DriverValveTLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
         -- 013: 1 Overcharge
         if (self.RealDriverValvePosition == 1) and BLDisconnect and (TLDisconnect or self.BrakeLinePressure > self.TrainLinePressure) then
-            self:equalizePressure(dT,"BrakeLinePressure", self.TrainLinePressure, pr_speed)
+            self:equalizePressure(dT,"BrakeLinePressure", math.min(6.0,self.TrainLinePressure), pr_speed)
         end
 
         -- 013: 2 Normal pressure
