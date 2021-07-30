@@ -2898,27 +2898,27 @@ ENT.Lights = {
     [32]  = { "light",           Vector(455  ,   0, 52), Angle(0,0,0), Color(255,220,180), brightness = 0.2, scale = 2.5, texture = "sprites/light_glow02", changable = true, size = 2},
 
     -- Manometers
-    [40] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(255,130,25),farz = 8,nearz = 2,shadows = 1,brightness = 1,fov = 145, hidden = "Controller_body" },
-    [41] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(255,130,25),farz = 8,nearz = 2,shadows = 1,brightness = 1,fov = 140, hidden = "Controller_body" },
-    [42] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(255,130,25),farz = 8,nearz = 2,shadows = 0,brightness = 1.5,fov = 120, hidden = "Controller_body" },
+    [40] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(255,130,25),farz = 7,nearz = 2,shadows = 1,brightness = 1,fov = 145, hidden = "Controller_body" },
+    [41] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(255,130,25),farz = 7,nearz = 2,shadows = 1,brightness = 1,fov = 140, hidden = "Controller_body" },
+    [42] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(255,130,25),farz = 7,nearz = 2,shadows = 0,brightness = 1.5,fov = 120, hidden = "Controller_body" },
     -- Voltmeter
-    [44] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(255,130,25),farz = 10,nearz = 2,shadows = 1,brightness = 1,fov = 100, hidden = "Controller_body" },
-    [45] = { "headlight",Vector(450.273468,-32.306019,18.236823),Angle(-12.000000,25.541767,-90.600349),Color(255,130,25),farz = 10,nearz = 2,shadows = 1,brightness = 1,fov = 100, hidden = "Controller_body" },
+    [44] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(255,130,25),farz = 5.05,nearz = 2,shadows = 1,brightness = 1,fov = 100, hidden = "Controller_body" },
+    [45] = { "headlight",Vector(450.273468,-32.306019,18.236823),Angle(-12.000000,25.541767,-90.600349),Color(255,130,25),farz = 5.05,nearz = 2,shadows = 1,brightness = 1,fov = 100, hidden = "Controller_body" },
 
-    [46] = { "headlight",Vector(452,-32.2,12+3.5),Angle(60,-30,180),Color(255,130,25),farz = 8,nearz = 2,shadows = 0,brightness = 1,fov = 130, hidden = "Controller_body" },
-    [47] = { "headlight",Vector(454.3,-28.3,12+3.5),Angle(60,-30,180),Color(255,130,25),farz = 8,nearz = 2,shadows = 0,brightness = 1,fov = 130, hidden = "Controller_body" },
+    [46] = { "headlight",Vector(452,-32.2,12+3.5),Angle(60,-30,180),Color(255,130,25),farz = 4,nearz = 2,shadows = 0,brightness = 1,fov = 130, hidden = "Controller_body" },
+    [47] = { "headlight",Vector(454.3,-28.3,12+3.5),Angle(60,-30,180),Color(255,130,25),farz = 4,nearz = 2,shadows = 0,brightness = 1,fov = 130, hidden = "Controller_body" },
 
 
     -- Manometers
-    [50] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(200,200,255),farz = 8,nearz = 2,shadows = 1,brightness = 2,fov = 145, hidden = "Controller_body" },
-    [51] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(200,200,255),farz = 8,nearz = 2,shadows = 1,brightness = 2,fov = 140, hidden = "Controller_body" },
-    [52] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(200,200,255),farz = 8,nearz = 2,shadows = 0,brightness = 2.5,fov = 120, hidden = "Controller_body" },
+    [50] = { "headlight",Vector(451.9,-13.5,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062) ,Color(200,200,255),farz = 7,nearz = 2,shadows = 1,brightness = 2,fov = 145, hidden = "Controller_body" },
+    [51] = { "headlight",Vector(451.8,-21,-2+5.35),Angle(52.571899-15-5,-129.269775+25+15,49.853062),Color(200,200,255),farz = 7,nearz = 2,shadows = 1,brightness = 2,fov = 140, hidden = "Controller_body" },
+    [52] = { "headlight",Vector(450.3,13.1,-4.4+5.35),Angle(-136.613632-33,-95.636734-28,137.434570),Color(200,200,255),farz = 7,nearz = 2,shadows = 0,brightness = 2.5,fov = 120, hidden = "Controller_body" },
     -- Voltmeter
     [54] = { "headlight",Vector(450.273468,-32.306019,13.236823),Angle(-18.000000,25.541767,-90.600349),Color(200,200,255),farz = 10,nearz = 2,shadows = 1,brightness = 2,fov = 100, hidden = "Controller_body" },
     [55] = { "headlight",Vector(450.273468,-32.306019,18.236823),Angle(-12.000000,25.541767,-90.600349),Color(200,200,255),farz = 10,nearz = 2,shadows = 1,brightness = 2,fov = 100, hidden = "Controller_body" },
 
-    [56] = { "headlight",Vector(452,-32.2,12+3.5),Angle(60,-30,180),Color(200,200,255),farz = 8,nearz = 2,shadows = 0,brightness = 2,fov = 130, hidden = "Controller_body" },
-    [57] = { "headlight",Vector(454.3,-28.3,12+3.5),Angle(60,-30,180),Color(200,200,255),farz = 8,nearz = 2,shadows = 0,brightness = 2,fov = 130, hidden = "Controller_body" },
+    [56] = { "headlight",Vector(452,-32.2,12+3.5),Angle(60,-30,180),Color(200,200,255),farz = 4,nearz = 2,shadows = 0,brightness = 2,fov = 130, hidden = "Controller_body" },
+    [57] = { "headlight",Vector(454.3,-28.3,12+3.5),Angle(60,-30,180),Color(200,200,255),farz = 4,nearz = 2,shadows = 0,brightness = 2,fov = 130, hidden = "Controller_body" },
 
     [70] = { "headlight",Vector( 425,-56,-70),Angle(0,-90,0),Color(255,220,180),brightness = 0.3,distance = 300 ,fov=120,shadows = 1, texture="effects/flashlight/soft", hidden = "Controller_body" },
 
