@@ -327,7 +327,7 @@ Entities.gmod_subway_81-718.Buttons.VPU.SAP39Toggle  = @[Common.ALL.GCab]
 Entities.gmod_subway_81-718.Buttons.VPU.SBP22Set     = @[Common.718.SBP22]
 Entities.gmod_subway_81-718.Buttons.VPU.SBP6Set      = @[Common.718.KDPR]
 Entities.gmod_subway_81-718.Buttons.VPU.SBP4Set      = @[Common.718.KDLR]
-Entities.gmod_subway_81-718.Buttons.VPU.SAP14Toggle  = @[Common.ARS.Freq] @[Common.ARS.FreqU]
+Entities.gmod_subway_81-718.Buttons.VPU.SAP14Toggle  = @[Common.ARS.Freq]
 Entities.gmod_subway_81-718.Buttons.VPU.SAP26Toggle  = @[Common.718.UOS]
 Entities.gmod_subway_81-718.Buttons.VPU.SAP24Toggle  = @[Common.ALL.VOVT]
 

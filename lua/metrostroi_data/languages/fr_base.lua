@@ -111,7 +111,7 @@ Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
 Train.Buttons.04             = NF #NEW
 Train.Buttons.BCPressure     = %.1f bar #NEW
-Train.Buttons.BLTLPressure   = TL: %.1f BL:%.1f bar #NEW
+Train.Buttons.BLTLPressure   = TL: %.1f bar BL:%.1f bar #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Base de métro

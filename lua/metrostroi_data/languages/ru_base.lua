@@ -123,7 +123,7 @@ Train.Buttons.SpeedLimitNext = %s км/ч
 Train.Buttons.Acceleration   = % 4.2f м/с
 Train.Buttons.04             = ОЧ
 Train.Buttons.BCPressure     = %.1f кгс/см²
-Train.Buttons.BLTLPressure   = НМ: %.1f\nТМ: %.1f кгс/см²
+Train.Buttons.BLTLPressure   = НМ: %.1f кгс/см²\nТМ: %.1f кгс/см²
 Train.Buttons.Locked         = Заблокирован
 Train.Buttons.Unlocked       = Разблокирован
 
