@@ -1549,7 +1549,7 @@ function ENT:UpdateWagonNumber()
             leftNum:SetSkin(num)
         end
         if IsValid(rightNum) then
-            rightNum:SetPos(self:LocalToWorld(Vector(-280-i*6.6-3*6.6/2,-66.2,-26)))
+            rightNum:SetPos(self:LocalToWorld(Vector(-280-i*6.6-3*6.6/2,-66.4,-26)))
             rightNum:SetSkin(num)
         end
     end
