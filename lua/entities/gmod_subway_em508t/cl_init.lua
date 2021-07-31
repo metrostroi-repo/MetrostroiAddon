@@ -925,11 +925,11 @@ function ENT:UpdateWagonNumber()
         local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
         local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
         if IsValid(leftNum) then
-            leftNum:SetPos(self:LocalToWorld(Vector(295+i*6.6-4*6.6/2,69,-26)))
+            leftNum:SetPos(self:LocalToWorld(Vector(295+i*6.6-4*6.6/2,68.8,-26)))
             leftNum:SetSkin(num)
         end
         if IsValid(rightNum) then
-            rightNum:SetPos(self:LocalToWorld(Vector(-280-i*6.6-4*6.6/2,-66.6,-26)))
+            rightNum:SetPos(self:LocalToWorld(Vector(-280-i*6.6-4*6.6/2,-66.1,-26)))
             rightNum:SetSkin(num)
         end
     end
