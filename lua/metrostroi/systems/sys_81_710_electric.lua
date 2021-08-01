@@ -59,14 +59,14 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["10AK"] = BO*Train.VU.Value
     --10AK->AV --FIXME SAMM
     S["U2"] = S["10AK"]*KV["U2-10AK"]
-    S["7G"] = BO*KV["7D-7G"]
+    S["F7"] = BO*(KV["F-F7"]+KRU["11/3-FR1"])
     Train:WriteTrainWire(1,S["10AK"]*KV["10AK-1"]*Train.R1_5.Value+KRU["1/3-ZM31"]*-10) --FIXME KRU
     Train:WriteTrainWire(2,S["U2"]*KV["U2-2"]+KRU["2/3-ZM31"]*-10+ARS["2"]*RUM) --FIXME ARS SAMM KRU
     Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+KRU["3/3-ZM31"]*-10) --FIXME SAMM KRU
     Train:WriteTrainWire(4,S["10AK"]*KV["U2-4"])
     Train:WriteTrainWire(5,S["10AK"]*KV["U2-5"]+KRU["5/3-ZM31"]*-10*(1-Train.KRR.Value)+BO*KRU["14/1-B3"]*Train.KRR.Value)
     Train:WriteTrainWire(6,S["10AK"]*Train.RVT.Value)--FIXME ARS SAMM
-    Train:WriteTrainWire(8,BO*KV["10-8"]+S["7G"]*(1-Train.RPB.Value)*(1-Train.VAH.Value)+ARS["8"]*RUM)--FIXME ARS
+    Train:WriteTrainWire(8,BO*KV["10-8"]+S["F7"]*(1-Train.RPB.Value)*(1-Train.VAH.Value)+ARS["8"]*RUM)--FIXME ARS
     Train:WriteTrainWire(9,ARS["48"]*RUM)
     Train:WriteTrainWire(14,BO*KV["10-14A"]*KV["14A-14B"]*(ARS["33D"]*RUM+(1-RUM)))--FIXME ARS SAMM
     Train:WriteTrainWire(17,S["10AK"]*KV["10AK-17"]*Train.KU9.Value)--FIXME SAMM
@@ -99,8 +99,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     end
     Panel.AnnouncerPlaying = T[13]
 
-    ARS.ALS  = S["7G"]*Train.ALS.Value*RUM
-    ARS.GE = S["7G"]*Train.ARS.Value*RUM
+    ARS.ALS  = S["F7"]*Train.ALS.Value*RUM
+    ARS.GE = S["F7"]*Train.ARS.Value*RUM
     ARS.DAR = S["10AK"]*Train.BUM_RET.Value*RUM
     ARS.DA = S["10AK"]*Train.BUM_RET.Value*RUM
     Train.BLPM.Power = ARS.ALS
@@ -114,7 +114,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train.BSM_KRH:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*RUM)
     Train.BSM_KRO:TriggerInput("Set",S["10AK"]*KV["10AK-1"]*RUM)
 
-    Train.RPB:TriggerInput("Set",S["7G"]*(Train.PB.Value+ARS.GE*RUM))
+    Train.RPB:TriggerInput("Set",S["F7"]*(Train.PB.Value+ARS.GE*RUM))
 
     Panel.RRP = S["U2"]*T[18]
 
@@ -227,7 +227,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train:WriteTrainWire(27,BO*Train.V4.Value)
     Train:WriteTrainWire(28,BO*Train.V5.Value)
     Panel.GRP = BO*Train.RPvozvrat.Value
-    S["F7"] = BO*(KV["F-F7"]+KRU["11/3-FR1"])
     Panel.Headlights1 = S["F7"]
     Panel.Headlights2 = S["F7"]*Train.VU14.Value
     Panel.RedLights = BO*KV["B2-F1"]
