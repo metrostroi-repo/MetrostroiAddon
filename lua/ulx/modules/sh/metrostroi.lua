@@ -558,7 +558,7 @@ function ulx.senao( calling_ply, arg )
     MSignalSayHook(calling_ply,"!senao "..arg, true)
 end
 local senao = ulx.command( CATEGORY_NAME, "ulx senao", ulx.senao, "!senao" )
-senao:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+senao:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
 senao:defaultAccess( ULib.ACCESS_ALL )
 senao:help( "Enable absolute stop signal" )
 
@@ -566,6 +566,6 @@ function ulx.sdisao( calling_ply, arg )
     MSignalSayHook(calling_ply,"!sdisao "..arg, true)
 end
 local sdisao = ulx.command( CATEGORY_NAME, "ulx sdisao", ulx.sdisao, "!sdisao" )
-sdisao:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sdisao:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
 sdisao:defaultAccess( ULib.ACCESS_ALL )
 sdisao:help( "Disable absolute stop signal" )
