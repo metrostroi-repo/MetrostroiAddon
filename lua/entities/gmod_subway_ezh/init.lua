@@ -461,6 +461,7 @@ function ENT:OnButtonPress(button,ply)
     if (self.KVWrenchMode == 2) and (button == "KVReverserDown") then self.KRU:TriggerInput("Down",1) end
     if (self.KVWrenchMode == 2) and (button == "KVSetX1B") then self.KRU:TriggerInput("SetX1",1) end
     if (self.KVWrenchMode == 2) and (button == "KVSetX2") then self.KRU:TriggerInput("SetX2",1) end
+    if (self.KVWrenchMode == 2) and (button == "KVSetX3") then self.KRU:TriggerInput("SetX3",1) end
     if (self.KVWrenchMode == 2) and (button == "KVSet0") then self.KRU:TriggerInput("Set0",1) end
 
     if button == "KVSetT1B" then
