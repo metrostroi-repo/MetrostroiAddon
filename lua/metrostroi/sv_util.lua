@@ -393,7 +393,7 @@ concommand.Add("metrostroi_wire", function(ply, _, args)
             if not args[1] then ply:PrintMessage(HUD_PRINTCONSOLE,"1st argument must be a number") return end
             if args[2] and not tonumber(args[2]) then ply:PrintMessage(HUD_PRINTCONSOLE,"2nd argument must be a number") return end
             ply:PrintMessage(HUD_PRINTCONSOLE,"sets outside power in train wire"..args[1]..(args[2] and "(from "..args[2].." wire)" or "").."!")
-            print(tostring(ply).." sets outside power in train "..args[1].." wire"..(args[2] and "(from "..args[2].." wire)" or "").." failure in train "..train:EntIndex())
+            print(tostring(ply).." sets outside power in train "..args[1].." wire"..(args[2] and "(from "..args[2].." wire)" or "").." failure in train number "..train:GetWagonNumber())
         else
             print("sets outside power in train wire "..train:EntIndex())
         end
@@ -427,12 +427,17 @@ concommand.Add("metrostroi_wire_reset", function(ply, _, args)
 
     if #trainList > 0 then
         if IsValid(ply) then
-            ply:PrintMessage(HUD_PRINTCONSOLE,"reset wire outside power in train!")
-            print(tostring(ply).." reset outside power in train ")
+			if args[1] and not tonumber(args[1]) then ply:PrintMessage(HUD_PRINTCONSOLE,"Argument must be a number") return end
+            ply:PrintMessage(HUD_PRINTCONSOLE,"reset "..(args[1] and args[1].." " or "").."wire outside power in train!")
+            print(tostring(ply).." reset "..(args[1] and args[1].." wire " or "").."outside power in train ")
         else
             print("Reset outside power in trains ")
-        end
-        for _,v in pairs(trainList) do v.TrainWireOutside = {} end
+        end	
+		if args[1] then
+			for _,v in pairs(trainList) do v.TrainWireOutside[tonumber(args[1])] = nil end
+		else
+			for _,v in pairs(trainList) do v.TrainWireOutside = {} end
+		end
     else
         if IsValid(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"You must be inside a train!")
