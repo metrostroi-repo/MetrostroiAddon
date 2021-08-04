@@ -2651,7 +2651,7 @@ function ENT:SetLightPower(index,power,brightness)
             light:SetEnableShadows(false)
         end
         if (lightData.shadows or 0)>0 then
-            light:SetFarZ(math.max(lightData.farz or 2048,8))
+            light:SetFarZ(math.max(lightData.farz or 2048,10))
         else
             light:SetFarZ(lightData.farz or 2048)
         end
