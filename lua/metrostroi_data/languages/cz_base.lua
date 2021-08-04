@@ -111,7 +111,7 @@ Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
 Train.Buttons.04             = NF #NEW
 Train.Buttons.BCPressure     = %.1f kgf/cm² #NEW #FIXME bar?
-Train.Buttons.BLTLPressure   = TL: %.1f BL:%.1f kgf/cm² #NEW #FIXME bar?
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm² BL:%.1f kgf/cm² #NEW #FIXME bar?
 
 #Train entities
 Entities.gmod_subway_base.Name        = Vozová základna

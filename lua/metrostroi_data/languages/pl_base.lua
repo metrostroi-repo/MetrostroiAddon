@@ -113,7 +113,7 @@ Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
 Train.Buttons.04             = NF #NEW (no frequency)
 Train.Buttons.BCPressure     = %.1f bar
-Train.Buttons.BLTLPressure   = TL: %.1f\nBL: %.1f bar #NEW (TL: Train line, BL: Brake line acronyms)
+Train.Buttons.BLTLPressure   = TL: %.1f bar\nBL: %.1f bar #NEW (TL: Train line, BL: Brake line acronyms)
 Train.Buttons.Locked         = Locked #NEW
 Train.Buttons.Unlocked       = Unlocked #NEW
 
