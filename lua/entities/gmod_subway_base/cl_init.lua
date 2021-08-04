@@ -2645,37 +2645,28 @@ function ENT:SetLightPower(index,power,brightness)
         --light:SetLocalAngles(lightData[3])
 
         -- Set parameters
-        --light:SetKeyValue("enableshadows", lightData.shadows or 1)
         if lightData.headlight and self.HeadlightShadows or not lightData.headlight and self.OtherShadows then
             light:SetEnableShadows((lightData.shadows or 0)>0)
         else
             light:SetEnableShadows(false)
         end
-        --light:SetKeyValue("farz", lightData.farz or 2048)
-        light:SetFarZ(lightData.farz or 2048)
-        --light:SetKeyValue("nearz", lightData.nearz or 16)
+        if (lightData.shadows or 0)>0 then
+            light:SetFarZ(math.max(lightData.farz or 2048,8))
+        else
+            light:SetFarZ(lightData.farz or 2048)
+        end
         light:SetNearZ(lightData.nearz or 16)
-        --light:SetKeyValue("lightfov", lightData.fov or 120)
         if lightData.fov then light:SetFOV(lightData.fov or 120) end
         if lightData.hfov then light:SetHorizontalFOV(lightData.hfov) end
         if lightData.vfov then light:SetVerticalFOV(lightData.vfov or 120) end
         light:SetOrthographic(false)
         -- Set Brightness
-        --local brightness = brightness * (lightData.brightness or 1.25)
         light:SetBrightness(brightness * (lightData.brightness or 1.25))
-        --[[light:SetKeyValue("lightcolor",
-            Format("%i %i %i 255",
-                lightData[4].r*brightness,
-                lightData[4].g*brightness,
-                lightData[4].b*brightness
-            )
-        )]]
         light:SetColor(lightData[4])
         light:SetTexture(lightData.texture or "effects/flashlight001")
 
         -- Turn light on
         light:Update() --"effects/flashlight/caustics"
-        --light:Input("SpotlightTexture",nil,nil,lightData.texture or "effects/flashlight001")
         self.GlowingLights[index] = light
     elseif lightData[1] == "dynamiclight" then
         local light = ents.CreateClientside("gmod_train_dlight")
@@ -2687,7 +2678,6 @@ function ENT:SetLightPower(index,power,brightness)
 
         -- Set parameters
         light:SetDColor(lightData[4])
-        --light:SetKeyValue("style", 0)
         light:SetSize(lightData.distance)
         light:SetBrightness(lightData.brightness or 2)
         light:SetLightStrength(brightness)
