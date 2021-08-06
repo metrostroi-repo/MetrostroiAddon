@@ -141,5 +141,7 @@ function ENT:AcceptInput( input, activator, called, data )
 		sig.RouteNumberReplace = data
 	elseif input == "ResetRouteNumber" then
 		sig.RouteNumberReplace = data
+	elseif input == "SetFreeBS" then
+		sig.FreeBS = tonumber(data) or 0
 	end
 end
