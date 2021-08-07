@@ -918,7 +918,7 @@ ENT.ButtonMap["Block2_2"] = {
     buttons = {
         {ID = "!Speedometer1",x=109,y=18.5,w=13,h=22,tooltip="",model = {
             name="SSpeed2",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
-            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end,
+            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
                 if not ent:GetPackedBool("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*10)%10]
@@ -926,7 +926,7 @@ ENT.ButtonMap["Block2_2"] = {
         }},
         {ID = "!Speedometer2",x=121,y=18.5,w=13,h=22,tooltip="",model = {
             name="SSpeed1",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
-            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end,
+            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
                 if not ent:GetPackedBool("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*100)%10]
@@ -1033,7 +1033,7 @@ ENT.ButtonMap["Block2_3"] = {
 
     hideseat=0.2,
     buttons = {
-        {ID = "!Speedometer",x=110,y=25,w = 95,h = 50,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end},
+        {ID = "!Speedometer",x=110,y=25,w = 95,h = 50,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end},
         {ID = "!LSD",x=42.5,y=16+17.9*0,w = 35,h = 15,tooltip="",model = {
             lamp = {model = "models/metrostroi_train/81-717/lamps/oldars_lsd.mdl",z=6,ang=90,var="SD",speed=6}
         }},
@@ -1129,7 +1129,7 @@ ENT.ButtonMap["Block2_1"] = {
     buttons = {
         {ID = "!Speedometer1",x=59.5,y=35.5,w=12,h=20,tooltip="",model = {
             name="RSpeed2",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
-            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end,
+            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
                 if not ent:GetPackedBool("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*10)%10]
@@ -1137,7 +1137,7 @@ ENT.ButtonMap["Block2_1"] = {
         }},
         {ID = "!Speedometer2",x=70.5,y=35.5,w=12,h=20,tooltip="",model = {
             name="RSpeed1",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
-            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end,
+            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
                 if not ent:GetPackedBool("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*100)%10]
