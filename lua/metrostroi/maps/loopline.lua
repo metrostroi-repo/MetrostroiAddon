@@ -272,14 +272,14 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             652,"Парк",
             arr = {{"station_m","park_arr_m",0.1,"things_m"},{"arr_park_f",0.1,"objects_f"}},
             dep = {{"doors_closing_m","metrostroiteley_next_m"},{"doors_closing_f","next_pervoaprelskaya_f"}},
-            have_inrerchange = true,
+            have_interchange = true,
         },]]
         {
             653,"Метростроителей","Metrostroiteley",
             arr = {{"station_m","metrostroiteley_arr_m",0.1,"objects_m"},{"arr_metrostroiteley_f","skip_park_f",0.1,"things_f"}},
             dep = {{"doors_closing_m","morskaya_m"},{"doors_closing_f","next_pervoaprelskaya_f"}},
             not_last_c = {nil, "not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
         {
             654,"Морская","Marine",
@@ -298,7 +298,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             not_last = {3,"train_goes_to_m","slavnaya_strana_next_m"},
             not_last_f = {3,"to_slavnaya_strana_f"},
             not_last_c = {nil, "not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
         {
             656,"Пионерская","Pionerskaya",
@@ -308,7 +308,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             not_last = {3,"train_goes_to_m","pionerskaya_next_m"},
             not_last_f = {3,"to_pionerskaya_f"},
             not_last_c = {nil, "not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
     },
 })
@@ -403,14 +403,14 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             652,"Парк",
             arr = {{"station_m","park_arr_m",0.1,"things_m"},{"arr_park_f",0.1,"objects_f"}},
             dep = {{"doors_closing_m","metrostroiteley_next_m"},{"doors_closing_f","next_pervoaprelskaya_f"}},
-            have_inrerchange = true,
+            have_interchange = true,
         },]]
         {
             653,"Метростроителей","Metrostroiteley",
             arr = {{"station_m","metrostroiteley_arr_m",0.1,"objects_m"},{"arr_metrostroiteley_f","skip_park_f",0.1,"things_f"}},
             dep = {{"doors_closing_m","morskaya_m"},{"doors_closing_f","next_pervoaprelskaya_f"}},
             not_last_c = {nil, "not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
         {
             654,"Морская","Marine",
@@ -429,7 +429,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             not_last = {3,"train_goes_to_m","slavnaya_strana_next_m"},
             not_last_f = {3,"to_slavnaya_strana_f"},
             not_last_c = {nil, "not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
         {
             656,"Пионерская","Pionerskaya",
@@ -439,7 +439,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             not_last = {3,"train_goes_to_m","pionerskaya_next_m"},
             not_last_f = {3,"to_pionerskaya_f"},
             not_last_c = {nil, "not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
     },
 })
@@ -491,7 +491,7 @@ Metrostroi.SetRRIAnnouncer({
             653,"Метростроителей","Metrostroiteley",
             arr = {{"arr_metrostroiteley",0.1,"objects"},{"arr_metrostroiteley","skip_park",0.1,"things"}},
             dep = {{"next_morskaya"},{"next_pervoaprelskaya"}},
-            have_inrerchange = true,
+            have_interchange = true,
         },
         {
             654,"Морская","Marine",
@@ -506,7 +506,7 @@ Metrostroi.SetRRIAnnouncer({
             dep = {{"next_pionerskaya"},{"next_morskaya"}},
             arrlast = {nil,{"arr_slavnaya_strana",0.5,"last",2,"things",2,"deadlock"}},
             not_last = {3,"to_slavnaya_strana"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
         {
             656,"Пионерская","Pionerskaya",
@@ -514,7 +514,7 @@ Metrostroi.SetRRIAnnouncer({
             dep = {{"next_pervoaprelskaya"},{"next_slavnaya_strana"}},
             arrlast = {{"arr_pionerskaya",0.5,"last",2,"things",2,"deadlock"},{"arr_pionerskaya",0.5,"last",2,"things",2,"deadlock"}},
             not_last = {3,"to_pionerskaya"},
-            have_inrerchange = true,
+            have_interchange = true,
         },
     },
 })

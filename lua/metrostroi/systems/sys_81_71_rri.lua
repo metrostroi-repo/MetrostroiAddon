@@ -257,7 +257,7 @@ function TRAIN_SYSTEM:Play()
     if lastst and not stbl.ignorelast then self:AnnQueue(-1) end
     self:AnnQueue(message)
     --local stbl = self.CurrentTable[self.Train:GetNW2Int("Announcer",1)][self.Line][self.Station]
-    if self.LastStation > 0 and not self.Arrived and self.Station ~= last and tbl[last].not_last and (stbl.have_inrerchange or math.abs(last-self.Station) <= 3) then
+    if self.LastStation > 0 and not self.Arrived and self.Station ~= last and tbl[last].not_last and (stbl.have_interchange or math.abs(last-self.Station) <= 3) then
         local ltbl = tbl[last]
         if stbl.not_last_c then
             local patt = stbl.not_last_c[path]

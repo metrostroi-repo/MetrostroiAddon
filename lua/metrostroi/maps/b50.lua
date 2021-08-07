@@ -196,7 +196,7 @@ Metrostroi.SetRRIAnnouncer({
             dep = {{ "next_elektrosila"}, { "next_novoarmeyskaya",0.1,"handrails"}},
             arrlast = {{"arr_komsomolskaya", 0.5, "last"}, {"arr_komsomolskaya", 0.5, "last"}, "komsomolskaya"},
             not_last = {3, "to_komsomolskaya"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             116,"Elektrosila",
@@ -282,7 +282,7 @@ Metrostroi.SetRRIAnnouncer({
             dep = {{ "next_elektrosila"}, { "next_novoarmeyskaya",0.1,"handrails"}},
             arrlast = {{"arr_komsomolskaya", 0.5, "last"}, {"arr_komsomolskaya", 0.5, "last"}, "komsomolskaya"},
             not_last = {3, "to_komsomolskaya"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             116,"Elektrosila",
@@ -508,7 +508,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors=true,
         },
         {
@@ -632,7 +632,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors=true,
         },
         {
@@ -877,7 +877,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors=true,
         },
         {
@@ -1001,7 +1001,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             not_last = {3, "train_goes_to_m", "komsomolskaya_m"},
             not_last_f = {3, "to_komsomolskaya_f"},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors=true,
         },
         {
