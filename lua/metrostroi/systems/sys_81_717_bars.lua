@@ -180,16 +180,14 @@ function TRAIN_SYSTEM:Think(dT)
         self.BR1 = self.KB>0 and (self.BR1 or self.ROCh) and not self.BR2
         self.KSR = not self.OnTimer and ((self.KSR or self.RNT) and self.RSS or self.R2O and (self.BR1 and self.ROCh or self.BR2))
         self.OldF5 = self.F5>0
-        
         self.RUVD = (self.RUVD or self.KRH==0) and self.KSR
+        self.RNT = (self.BR1 or self.BR2) or self.RNT and (self.KSR or KRT and (not self.RUVD or self.R2O))
+        
         if not self.RUVD--[[  and self.ROCh--]]  then
             if not self.BrakeTimer then self.BrakeTimer = CurTime() end
         elseif self.BrakeTimer then
             self.BrakeTimer = false
         end
-
-        self.RNT = (self.BR1 or self.BR2) or self.RNT and (self.KSR or KRT and (not self.RUVD or self.R2O))
-        
         self.PTR = (self.BrakeTimer and (self.DA==0 --[[ or not self.ROCh--]]  or CurTime()-self.BrakeTimer > 1.5))
         if not self.RNT or (not self.RUVD or self.RO and self.KRH==0) and self.KT==0 then
             if not self.EKTimer then self.EKTimer = CurTime() end
