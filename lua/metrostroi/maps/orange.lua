@@ -428,7 +428,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arr = {{"station_m","slavnaya_strana_arr_m"}, "arr_slavnaya_strana_f"},
             dep = {{"doors_closing_m","litiyevaya_next_m",0.1,"politeness_m"}, {"doors_closing_f","next_aeroport_f"}},
             not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             --male<->female
@@ -436,7 +436,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arr = {{"station_m","litiyevaya_arr_m"}, {"station_m","litiyevaya_arr_m"}},
             dep = {{"doors_closing_f","next_arsenal_f"}, {"doors_closing_f","next_slavnaya_strana_f",0.1,"objects_f"}},
             not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             455, "Арсенал","Arsenal",
@@ -452,7 +452,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             not_last = {3,"train_goes_to_m","park_m"},
             not_last_f = {3,"to_park_f"},
             not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors = true,
         },
         {
@@ -467,7 +467,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arr = {"arr_vhe_f", {"station_m","vhe_m"}},
             dep = {{"doors_closing_f","next_imeni_uollesa_brina_f",0.1,"exit_f"}, {"doors_closing_m","gcfscape_m"}},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             451, "У. Брина","W. Breen",
@@ -603,7 +603,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arr = {{"station_m","slavnaya_strana_arr_m"}, "arr_slavnaya_strana_f"},
             dep = {{"doors_closing_m","litiyevaya_next_m",0.1,"politeness_m"}, {"doors_closing_f","next_aeroport_f"}},
             not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             --male<->female
@@ -611,7 +611,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arr = {{"station_m","litiyevaya_arr_m"}, {"station_m","litiyevaya_arr_m"}},
             dep = {{"doors_closing_f","next_arsenal_f"}, {"doors_closing_f","next_slavnaya_strana_f",0.1,"objects_f"}},
             not_last_c = {nil,"not_last_f"},spec_last_c = {nil,"spec_last_f"}, spec_wait_c = {nil,"spec_wait_f"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             455, "Арсенал","Arsenal",
@@ -628,7 +628,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             not_last_f = {3,"to_park_f"},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
             right_doors = true,
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             453, "GCFScape",
@@ -642,7 +642,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arr = {"arr_vhe_f", {"station_m","vhe_m"}},
             dep = {{"doors_closing_f","next_imeni_uollesa_brina_f",0.1,"exit_f"}, {"doors_closing_m","gcfscape_m"}},
             not_last_c = {"not_last_f"},spec_last_c = {"spec_last_f"}, spec_wait_c = {"spec_wait_f"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             451, "У. Брина","W. Breen",
@@ -722,14 +722,14 @@ Metrostroi.SetRRIAnnouncer({
             457, "Славная стр.","Glorius c.",
             arr = {"arr_slavnaya_strana", "arr_slavnaya_strana"},
             dep = {{"next_litiyevaya",0.1,"politeness"}, "next_aeroport"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             --male<->female
             456, "Литиевая","Lithium",
             arr = {"arr_litiyevaya", "arr_litiyevaya"},
             dep = {"next_arsenal", {"next_slavnaya_strana",0.1,"objects"}},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             455, "Арсенал","Arsenal",
@@ -742,7 +742,7 @@ Metrostroi.SetRRIAnnouncer({
             dep = {{"next_gcfscape"}, {"next_arsenal",0.1,"objects"}},
             arrlast = {{"arr_park",0.5,"last"}, {"arr_park",0.5,"last"}},
             not_last = {3,"to_park"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             453, "GCFScape",
@@ -753,7 +753,7 @@ Metrostroi.SetRRIAnnouncer({
             452, "VHE",
             arr = {"arr_vhe", "arr_vhe"},
             dep = {{"next_imeni_uollesa_brina",0.1,"exit"}, "next_gcfscape"},
-            have_inrerchange = true
+            have_interchange = true
         },
         {
             451, "У. Брина","W. Breen",

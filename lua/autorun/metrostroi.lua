@@ -190,6 +190,13 @@ Metrostroi.AnnouncementsASNP = {}
 Metrostroi.ASNPSetup = {}
 function Metrostroi.AddANSPAnnouncer(name,soundtable,datatable)
     if not soundtable or not datatable then return end
+    for k,v in pairs(datatable) do
+        if not istable(v) then continue end
+        for k2,stbl in pairs(v) do
+            if not istable(stbl) then continue end
+            if stbl.have_inrerchange then stbl.have_interchange = true end
+        end
+    end
     for k,v in pairs(Metrostroi.AnnouncementsASNP) do
         if v.name == name then
             Metrostroi.AnnouncementsASNP[k] = soundtable
@@ -251,6 +258,13 @@ Metrostroi.RRISetup = {}
 function Metrostroi.SetRRIAnnouncer(soundtable,datatable)
     if not soundtable or not datatable then return end
     Metrostroi.AnnouncementsRRI = {soundtable}
+    for k,v in pairs(datatable) do
+        if not istable(v) then continue end
+        for k2,stbl in pairs(v) do
+            if not istable(stbl) then continue end
+            if stbl.have_inrerchange then stbl.have_interchange = true end
+        end
+    end
     Metrostroi.RRISetup = datatable
 
     print("Metrostroi: Set RRI announcer.")

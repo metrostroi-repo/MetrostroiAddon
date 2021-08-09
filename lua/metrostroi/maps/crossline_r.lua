@@ -168,7 +168,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
             arr = {{"station_m","politehnicheskaya_arr_m",0.2,"things_m"},{"arr_politehnicheskaya_f",0.2,"objects_f"}},
             dep = {{"doors_closing_m","prospekt_suvorova_m"},{"doors_closing_f","next_park_kultury_f"}},
             not_last_c = {nil,"not_last_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors=true,
         },
         {
@@ -364,7 +364,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
             arr = {{"station_m","politehnicheskaya_arr_m",0.2,"things_m"},{"arr_politehnicheskaya_f",0.2,"objects_f"}},
             dep = {{"doors_closing_m","prospekt_suvorova_m"},{"doors_closing_f","next_park_kultury_f"}},
             not_last_c = {nil,"not_last_f"},
-            have_inrerchange = true,
+            have_interchange = true,
             right_doors=true,
         },
         {
