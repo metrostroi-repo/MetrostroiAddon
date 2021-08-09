@@ -402,7 +402,7 @@ function ENT:ARSLogic(tim)
 		if self.Occupied or not self.NextSignalLink or not self.NextSignalLink.FreeBS then
 			self.FreeBS = 0
 		else
-			self.FreeBS = math.min(10,self.NextSignalLink.FreeBS + 1)
+			self.FreeBS = math.min(30,self.NextSignalLink.FreeBS + 1) -- old 10 freebs - костыль
 		end
 		if self.FreeBS - (self.OldBSState or self.FreeBS) > 1 then
 			local Free = self.FreeBS
