@@ -1433,11 +1433,11 @@ ENT.ButtonMap["Block2"] = {
 
         {ID = "!SpeedFact1",x=133.1,y=73.6,w=23.7,h=8,tooltip="",model = {
             name="SpeedFact1",model = "models/metrostroi_train/81-717/lamps/indicators.mdl",z=0.15,color=Color(175,250,20),skin=10,ang=90,
-            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end
+            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end
         }},
         {ID = "!SpeedFact2",x=133.1+23.7,y=73.6,w=23.7,h=8,tooltip="",model = {
             name="SpeedFact2",model = "models/metrostroi_train/81-717/lamps/indicators.mdl",z=0.15,color=Color(175,250,20),skin=10,ang=90,
-            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end
+            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end
         }},
 
         {ID = "!ARSL20",x=140,y=83,w=5,h=10,tooltip="",model = {

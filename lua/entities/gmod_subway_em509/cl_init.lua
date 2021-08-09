@@ -184,14 +184,14 @@ ENT.ButtonMap["Lamps"] = {
             lamp = {model = "",bscale=Vector(1.2,0.6,1),z = -45,var="RP",getfunc = function(ent) return math.Clamp((ent:GetPackedRatio("RRP")-0.45)*7,0,1) end}
         }},
         {ID = "!Speedometer1",x=110-6+12,y=9,w=50-24,h=50,tooltip="",model = {
-            name="Speed2",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(250,50,20),skin=0,z=-40,ang=Angle(0,0,-90),            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end,
+            name="Speed2",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(250,50,20),skin=0,z=-40,ang=Angle(0,0,-90),            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(250,50,20),aa=true,getfunc= function(ent)
                 if not ent:GetPackedBool("V1") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*10)%10]
             end},
         }},
         {ID = "!Speedometer2",x=110+6+12,y=9,w=50-24,h=50,tooltip="",model = {
-            name="Speed1",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(250,50,20),skin=0,z=-40,ang=Angle(0,0,-90),            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end,
+            name="Speed1",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(250,50,20),skin=0,z=-40,ang=Angle(0,0,-90),            tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(250,50,20),aa=true,getfunc= function(ent)
                 if not ent:GetPackedBool("V1") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*100)%10]

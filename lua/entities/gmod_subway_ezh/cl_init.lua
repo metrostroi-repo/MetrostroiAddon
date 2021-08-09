@@ -1045,7 +1045,7 @@ ENT.ButtonMap["Speedometer"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!Speedometer", x=0, y=0, w=100, h=70, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end},
+        {ID = "!Speedometer", x=0, y=0, w=100, h=70, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end},
     }
 }
 
