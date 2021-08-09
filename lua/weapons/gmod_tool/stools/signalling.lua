@@ -71,7 +71,7 @@ if CLIENT then
     language.Add("Tool.signalling.name", "Signalling Tool")
     language.Add("Tool.signalling.desc", "Adds and modifies signalling equipment (ARS/ALS) or signs")
     language.Add("Tool.signalling.0", "Primary: Spawn/update selected signalling entity (point at the inner side of rail)\nReload: Copy ARS/light settings\nSecondary: Remove")
-    language.Add("Undone_signalling", "Undone ARS/signalling equipment")
+    --language.Add("Undone_signalling", "Undone ARS/signalling equipment")
 end
 
 function TOOL:SpawnSignal(ply,trace,param)
@@ -128,10 +128,10 @@ function TOOL:SpawnSignal(ply,trace,param)
             if not found then
                 ent:Spawn()
                 -- Add to undo
-                undo.Create("signalling")
+                --[[undo.Create("signalling")
                     undo.AddEntity(ent)
                     undo.SetPlayer(ply)
-                undo.Finish()
+                undo.Finish()]]
             end
             ent.SignalType = self.Signal.Type-1
             ent.ARSOnly = self.Signal.ARSOnly
@@ -199,10 +199,10 @@ function TOOL:SpawnSign(ply,trace,param)
             if not found then
                 ent:Spawn()
                 -- Add to undo
-                undo.Create("signalling")
+                --[[undo.Create("signalling")
                     undo.AddEntity(ent)
                     undo.SetPlayer(ply)
-                undo.Finish()
+                undo.Finish()]]
             end
             ent.SignType = self.Sign.Type
             ent.YOffset = self.Sign.YOffset
@@ -420,10 +420,10 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
         if not found then
             ent:Spawn()
             -- Add to undo
-            undo.Create("signalling")
+            --[[undo.Create("signalling")
                 undo.AddEntity(ent)
                 undo.SetPlayer(ply)
-            undo.Finish()
+            undo.Finish()]]
         end
         return ent
     end
