@@ -1,5 +1,5 @@
 return [[
-#Base text for English language
+#Base text for Korean language
 
 [kr]
 lang        = 한국어                           #Full language name
@@ -131,6 +131,16 @@ Spawner.Close                           = 닫기
 Spawner.Trains1                         = 현재 열차 수
 Spawner.Trains2                         = 최대 량수 (길이)
 Spawner.WagNum                          = 열차 량수 (길이)
+Spawner.PresetTitle                     = 프리셋
+Spawner.Preset.New                      = 새로 만들기
+Spawner.Preset.Unsaved                  = 현재 저장
+Spawner.Preset.NewTooltip               = 만들려면
+Spawner.Preset.UpdateTooltip            = 업데이트
+Spawner.Preset.RemoveTooltip            = 제거
+Spawner.Presets.NamePlaceholder         = 사전 설정 이름
+Spawner.Presets.Name                    = 제목
+Spawner.Presets.NameError               = 이름 오류
+Spawner.Preset.NotSelected              = 사전 설정이 선택되지 않았습니다
 Common.Spawner.Texture      = 차량 외부 도색
 Common.Spawner.PassTexture  = 차량 내부 인테리어
 Common.Spawner.CabTexture   = 운전대 텍스쳐
