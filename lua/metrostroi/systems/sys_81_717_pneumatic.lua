@@ -164,6 +164,7 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         local HaveUAVA = not self.Train.SubwayTrain or not self.Train.SubwayTrain.ARS or not self.Train.SubwayTrain.ARS.NoUAVA
         if HaveUAVA and self.Train.UAVA.Value == 0 then
             self.EmergencyValve = true
+            self.Train.UAVAC:TriggerInput("Set",0)
             if value > 0 then RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName()) end
         end
     end
