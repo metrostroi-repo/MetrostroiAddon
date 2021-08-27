@@ -28,7 +28,6 @@ function ENT:Initialize()
 end
 
 function ENT:OnRemove()
-    print(12323)
 	self:RemoveModels()
 	--self.LightType = 0
 	--hook.Remove("PostDrawOpaqueRenderables")

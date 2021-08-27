@@ -75,7 +75,7 @@ function TRAIN_SYSTEM:Play(dep)
             self:AnnQueue(math.Rand(0.0,0.2))
             if self.Noise then self:AnnQueue{"noise_start",self.Noise} else self:AnnQueue("noise_end") end
             self:AnnQueue{math.Rand(0.0,0.2), stbl.tone or "tone"}
-            if lastst then self:AnnQueue{-1} end
+            if lastst and not stbl.ignorelast then self:AnnQueue{-1} end
             self:AnnQueue(msg)
             self:AnnQueue{math.Rand(0.1,0.4),"noise_end","buzz_end_upo"}
             if self.Clicks then self:AnnQueue("click2") end
