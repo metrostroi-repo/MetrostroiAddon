@@ -368,8 +368,8 @@ ENT.ClientSounds["RearBrakeLineIsolation"] = {{"RearBrake",function() return "di
 ENT.ClientSounds["RearTrainLineIsolation"] = {{"RearTrain",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
 
 ENT.ButtonMap["GV"] = {
-    pos = Vector(170-3-9.5+22,50+20,-60+2+5),
-    ang = Angle(0,225-15,90),
+    pos = Vector(-165,-50+20-40,-60+2),
+    ang = Angle(0,225-15-180,90),
     width = 260,
     height = 260,
     scale = 0.1,
@@ -384,20 +384,21 @@ ENT.ButtonMap["GV"] = {
 }
 ENT.ClientProps["gv"] = {
     model = "models/metrostroi/81-717/gv.mdl",
-    pos = Vector(153.5-3-9.5+22,36+20,-78+2+5),
-    ang = Angle(-90,90,-90),
+    pos = Vector(-153.5,36+20-115,-78+3),
+    ang = Angle(-90,90-180,-90),
+    color = Color(150,255,255),
     hide = 0.5,
 }
 ENT.ClientProps["gv_wrench"] = {
     model = "models/metrostroi_train/reversor/reversor_classic.mdl",
     pos = ENT.ClientProps["gv"].pos,
-    ang = Angle(-90,0,0),
+    ang = Angle(-90,180,0),
     hide = 0.5,
 }
 
 ENT.ButtonMap["AirDistributor"] = {
-    pos = Vector(-185,-68,-50),
-    ang = Angle(0,0,90),
+    pos = Vector(185,68,-50),
+    ang = Angle(0,180,90),
     width = 170,
     height = 80,
     scale = 0.1,
