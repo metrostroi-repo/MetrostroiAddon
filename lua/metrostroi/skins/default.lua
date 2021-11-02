@@ -667,15 +667,7 @@ Metrostroi.AddSkin("pass","Def_717MSKWhite",{
     random = true,
 })
 Metrostroi.AddSkin("pass","Def_717MSKWood",{
-    name = "Wood interior 1",
-    typ = "81-717_msk",
-    textures = {
-        color_blue = "models/metrostroi_train/81-717/color_wood",
-    },
-    random = true,
-})
-Metrostroi.AddSkin("pass","Def_717MSKWood2",{
-    name = "Wood interior 2",
+    name = "Wood interior",
     typ = "81-717_msk",
     textures = {
         color_blue = "models/metrostroi_train/81-717/color_wood2",
@@ -683,8 +675,8 @@ Metrostroi.AddSkin("pass","Def_717MSKWood2",{
     random = true,
 })
 
-Metrostroi.AddSkin("pass","Def_717MSKWood4",{
-    name = "Wood interior 3",
+Metrostroi.AddSkin("pass","Def_717MSKWood3",{
+    name = "Wood interior 2",
     typ = "81-717_msk",
     textures = {
         color_blue = "models/metrostroi_train/81-717/color_wood4",
@@ -692,7 +684,7 @@ Metrostroi.AddSkin("pass","Def_717MSKWood4",{
     random = true,
 })
 
-Metrostroi.AddSkin("pass","Def_717MSKWood3",{
+Metrostroi.AddSkin("pass","Def_717MSKWood2",{
     name = "Light-Wood interior",
     typ = "81-717_msk",
     textures = {
