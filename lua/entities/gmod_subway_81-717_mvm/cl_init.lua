@@ -227,6 +227,18 @@ ENT.ClientProps["Headlights222_2"] = {
     ang = Angle(0,0,0),
     nohide=true,
 }
+ENT.ClientProps["Headlights222_glass_1"] = {
+    model = "models/metrostroi_train/81-717/lamps/headlights_222_glass_group1.mdl",
+    pos = Vector(0,0,0),
+    ang = Angle(0,0,0),
+    nohide=true,
+}
+ENT.ClientProps["Headlights222_glass_2"] = {
+    model = "models/metrostroi_train/81-717/lamps/headlights_222_glass_group2.mdl",
+    pos = Vector(0,0,0),
+    ang = Angle(0,0,0),
+    nohide=true,
+}
 ENT.ClientProps["Headlights141_1"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_141_group1.mdl",
     pos = Vector(0,0,0),
@@ -2933,6 +2945,8 @@ function ENT:Think()
         self:ShowHideSmooth("Headlights22_2",0)
         self:ShowHideSmooth("Headlights22_glass_1",0)
         self:ShowHideSmooth("Headlights22_glass_2",0)
+        self:ShowHideSmooth("Headlights222_glass_1",0)
+        self:ShowHideSmooth("Headlights222_glass_2",0)
         if mask >= 9 then
             self.LightsOverride[30][2] = Vector(465,-48, -23.5)
             self.LightsOverride[31][2] = Vector(465,48 , -23.5)
@@ -2959,8 +2973,8 @@ function ENT:Think()
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
     elseif mask <= 8 then
-        self:ShowHideSmooth("Headlights222_1",HL1)
-        self:ShowHideSmooth("Headlights222_2",HL2)
+        self:ShowHideSmooth("Headlights222_glass_1",HL1)
+        self:ShowHideSmooth("Headlights222_glass_2",HL2)
     elseif mask <= 10 then
         self:ShowHideSmooth("Headlights141_1",HL1)
         self:ShowHideSmooth("Headlights141_2",HL2)
