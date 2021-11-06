@@ -451,6 +451,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
             Panel.L1 = T[57]
         end
         Panel.M8 = S["V2"]*Train.PVK.Value
+		Train.RPvozvrat.VozRpPressed = T[17]~=0
 
         local ASNP_VV = Train.ASNP_VV
         ASNP_VV.Power = BO*Train.AS1.Value*Train.R_ASNPOn.Value
