@@ -11,7 +11,7 @@ ENT.SyncTable = {
     "AV3","AV4","AV5","A81","AV6","A80","A18",
     "VB","GV",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake",
-    "A84","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP"
+    "A84","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP","EmergencyBrakeValve"
 }
 
 function ENT:Initialize()
