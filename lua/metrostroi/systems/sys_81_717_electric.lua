@@ -451,6 +451,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
             Panel.L1 = T[57]
         end
         Panel.M8 = S["V2"]*Train.PVK.Value
+		Train.RPvozvrat.VozRpPressed = T[17]~=0
 
         local ASNP_VV = Train.ASNP_VV
         ASNP_VV.Power = BO*Train.AS1.Value*Train.R_ASNPOn.Value
@@ -617,7 +618,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Train.BV:TriggerInput("Disable",T[71]*Train.A66.Value)
         Panel.PCBKPower = T[10]
     end
-    Train.RPvozvrat:TriggerInput("Open",S["17A"]) --FIXME Mayve more right RP code
+    Train.RPvozvrat:TriggerInput("Open",S["17A"]) --FIXME Mayve more right RP code (I kinda fixed it but not in this line :v)
     --
     --Вспом цепи
     Train:WriteTrainWire(10,BO*Train.A56.Value)
