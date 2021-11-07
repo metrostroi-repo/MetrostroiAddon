@@ -70,7 +70,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local KV = Train.KV
     local KRU = Train.KRU
     local Panel = Train.Panel
-    Panel.V1 = BO
+    Panel.V1 = T[10]
     local RC1 = Train.RC1.Value
     local ARS = Train.ALS_ARS
     local RC2,AVI,AVO
