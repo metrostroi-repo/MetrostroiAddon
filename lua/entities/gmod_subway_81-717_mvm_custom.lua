@@ -110,6 +110,7 @@ ENT.Spawner = {
             ent._SpawnerStarted = val
         end
         ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
-        if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end
+		ent.Pneumatic.BrakeLinePressure = val == 4 and 5.1 or val == 1 and 2.3 or math.min(ent.Pneumatic.TrainLinePressure+0.25,math.random()*4)
+		ent.Pneumatic.WorkingChamberPressure = val ~= 1 and ent.Pneumatic.BrakeLinePressure or 5.1
     end},
 }
