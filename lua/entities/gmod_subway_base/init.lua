@@ -794,7 +794,7 @@ end]]
 function ENT:LeaderReadTrainWire(id)
     if self.TrainWireOverrides[id] then return  self.TrainWireOverrides[id] end
     if self.TrainWireOutside[id] then
-        return (self.TrainWireOutsideFrom[id] and self.TrainWireTurbostroi[self.TrainWireOutsideFrom[id]] or 1)*self.TrainWireOutside[id]
+        return (self.TrainWireOutsideFrom[id] and (self.TrainWireTurbostroi[self.TrainWireOutsideFrom[id]] or 0) or 1)*self.TrainWireOutside[id]
     end
     return (self.TrainWireTurbostroi[id] or 0)+(self.TrainWireWriters[id] or 0)
 end
