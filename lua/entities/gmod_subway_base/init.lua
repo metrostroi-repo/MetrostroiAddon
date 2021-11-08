@@ -245,6 +245,7 @@ function ENT:Initialize()
     -- Overrides for train wire values from wiremod interface and special concommand
     self.TrainWireOverrides = {}
     self.TrainWireOutside = {}
+    self.TrainWireOutsideFrom = {}
 
 
     -- Is this train 'odd' or 'even' in coupled set
@@ -792,9 +793,8 @@ end]]
 --------------------------------------------------------------------------------
 function ENT:LeaderReadTrainWire(id)
     if self.TrainWireOverrides[id] then return  self.TrainWireOverrides[id] end
-    local w = self.TrainWireOutside[id]
-    if w then
-        if isnumber(w) then return w elseif (self.TrainWireTurbostroi[tonumber(w)] or 0) > 0 then return 1 end
+    if self.TrainWireOutside[id] then
+        return (self.TrainWireOutsideFrom[id] and self.TrainWireTurbostroi[self.TrainWireOutsideFrom[id]] or 1)*self.TrainWireOutside[id]
     end
     return (self.TrainWireTurbostroi[id] or 0)+(self.TrainWireWriters[id] or 0)
 end

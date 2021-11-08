@@ -392,13 +392,15 @@ concommand.Add("metrostroi_wire", function(ply, _, args)
             args[1] = tonumber(args[1])
             if not args[1] then ply:PrintMessage(HUD_PRINTCONSOLE,"1st argument must be a number") return end
             if args[2] and not tonumber(args[2]) then ply:PrintMessage(HUD_PRINTCONSOLE,"2nd argument must be a number") return end
+            args[2] = tonumber(args[2])
             ply:PrintMessage(HUD_PRINTCONSOLE,"sets outside power in train wire"..args[1]..(args[2] and "(from "..args[2].." wire)" or "").."!")
             print(tostring(ply).." sets outside power in train "..args[1].." wire"..(args[2] and "(from "..args[2].." wire)" or "").." failure in train number "..train:GetWagonNumber())
         else
             print("sets outside power in train wire "..train:EntIndex())
         end
         --if train.WriteTrainWire then train:WriteTrainWire(args[1],1) end
-        train.TrainWireOutside[args[1]] = args[2] and args[2] or 1
+        train.TrainWireOutside[args[1]] = 1
+        train.TrainWireOutsideFrom[args[1]] = args[2]
         --if train.WriteTrainWire then train:WriteTrainWire(args[1],1) end
     else
         if IsValid(ply) then
@@ -433,10 +435,17 @@ concommand.Add("metrostroi_wire_reset", function(ply, _, args)
         else
             print("Reset outside power in trains ")
         end	
+        args[1] = tonumber(args[1])
         if args[1] then
-            for _,v in pairs(trainList) do v.TrainWireOutside[tonumber(args[1])] = nil end
+            for _,v in pairs(trainList) do 
+                v.TrainWireOutside[args[1]] = nil 
+                v.TrainWireOutsideFrom[args[1]] = nil
+            end
         else
-            for _,v in pairs(trainList) do v.TrainWireOutside = {} end
+            for _,v in pairs(trainList) do
+                v.TrainWireOutside = {} 
+                v.TrainWireOutsideFrom = {}
+            end
         end
     else
         if IsValid(ply) then
