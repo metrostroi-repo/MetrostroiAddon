@@ -12,7 +12,26 @@ end
 print("[!] RailNetwork initialized!")
 -- NEW API
 local ffi = require("ffi")
-local C = ffi.load("gmsv_turbostroi_win32")
+local OSName = "gmsv_turbostroi_"
+
+if jis.os == "Windows" then
+	OSName = OSName.."win"
+	if jit.arch == "x86"
+		OSName = OSName.."86"
+	else
+		OSName = OSName.."64"
+	end
+elseif jit.os == "Linux" then
+	OSName = OSName.."linux"
+	if jit.arch == "x86"
+		OSName = OSName.."86"
+	else
+		OSName = OSName.."64"
+	end
+end
+
+local C = ffi.load(OSName)
+
 ffi.cdef[[
 bool RnThreadSendMessage(int ent_id, int id, const char* name, double value);
 ]]
