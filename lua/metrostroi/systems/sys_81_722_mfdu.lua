@@ -272,8 +272,8 @@ if SERVER then
                     lineSel = 2
                 else
                     if self.Selected == 1 then self.RouteN = self.RouteN or self.RouteNumber        self.RouteNumber = self.RouteN end
-                    if self.Selected == 2 then self.StationN = self.StationN or self.StationNumber  self.StationNumber = self.StationN end
-                    if self.Selected == 3 then self.DriverN = self.DriverN or self.DriverNumber     self.DriverNumber = self.DriverN end
+                    elseif self.Selected == 2 then self.StationN = self.StationN or self.StationNumber  self.StationNumber = self.StationN end
+                    elseif self.Selected == 3 then self.DriverN = self.DriverN or self.DriverNumber     self.DriverNumber = self.DriverN end
                     if self.NewActive then
                         if Train.BUKP.Prepared == true then
                             Train.BUKP.Active = 1-Train.BUKP.Active
