@@ -284,7 +284,7 @@ local function EditCSEnts()
 			set = set..Format("\tbodygroup = %d,\n",bodygroup)
 		end
 		set = set.."}\n"
-		print(set)
+		-- print(set)
 	end,"Print settings","Print LUA part to clipboard and print it")
 	PrSet:Dock(RIGHT)
 end
