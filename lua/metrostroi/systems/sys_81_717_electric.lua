@@ -521,7 +521,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Train.KSH2:TriggerInput("Set",S["1R"])
         P:TriggerInput("PP",S["3A"]*Train.LK5.Value*C(RK==18)*S["ZR"])--1A-1D
     else
-        S["1M"] = C(1<=RK and RK<=5)*S["3A"]+T[10]*Train.KSH2.Value
+        S["1M"] = C(1<=RK and RK<=5)*S["3A"]+S["10A"]*Train.KSH2.Value
         S["1R"] = (S["1A"]*C(RK==1)*P.PS + S["1M"]*P.PP)*S["ZR"]
         Train.KSH1:TriggerInput("Set",S["1R"])
         Train.KSH2:TriggerInput("Set",S["1R"])
