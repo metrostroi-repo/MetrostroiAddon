@@ -453,7 +453,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Panel.M8 = S["V2"]*Train.PVK.Value
 
         local ASNP_VV = Train.ASNP_VV
-        ASNP_VV.Power = BO*Train.AS1.Value*Train.R_ASNPOn.Value
+        ASNP_VV.Power = T[10]*Train.R_ASNPOn.Value
         ASNP_VV.AmplifierPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_UNch.Value*Train.A26.Value
         Train:WriteTrainWire(13,ASNP_VV.AmplifierPower)
         Train:WriteTrainWire(-13,ASNP_VV.AmplifierPower*Train.PowerSupply.X2_2)
