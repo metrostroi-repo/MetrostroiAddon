@@ -177,6 +177,9 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("KV3","Relay","Switch",{bass=true})
     self.Train:LoadSystem("R1","Relay","Switch",{bass=true,close_time=2.3})
 
+    self.Train:LoadSystem("C1","Relay","Switch",{bass=true,close_time=5.0})
+    self.Train:LoadSystem("VKST","Relay","Switch",{bass=true,normally_closed=true})
+
     self.V1 = 0
     self.LUDS = 0
     self.RedLight2 = 0
@@ -234,6 +237,8 @@ function TRAIN_SYSTEM:Initialize()
 
     self.CBKIPower = 0
     self.PCBKPower = 0
+    
+    self.IST = 0
 end
 
 
@@ -241,7 +246,8 @@ function TRAIN_SYSTEM:Outputs()
     return { "V1","LUDS","RedLight2","RedLight1","Headlights1","Headlights2","EqLights","CabLights","EqLights","PanelLights","CabinLight","EmergencyLights","MainLights","DoorsLeft","DoorsRight","DoorsW","GreenRP","BrW","AVU","LKVP","RZP","KUP","BrT","LSN","Ring","SD","LST","LVD","LhRK","KVC","SD","TW18", "KT","LEKK",
              "LKVD","LN","RS","OneFreq","AR04","AR0","AR40","AR60","AR70","AR80","L1","M1_3","M4_7","M8",
              "AnnouncerPlaying","AnnouncerBuzz","VPR",
-             "CBKIPower","PCBKPower"}
+             "CBKIPower","PCBKPower",
+             "IST"}
 end
 TRAIN_SYSTEM.AVMap = {
     "A11","A17","A44","A26","AR63","A61",

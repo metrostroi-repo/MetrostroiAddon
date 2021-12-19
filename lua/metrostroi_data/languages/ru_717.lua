@@ -63,6 +63,8 @@ Common.717.RZPL                 = РЗП: Сработка реле защиты
 Common.717.VPAOn                = ВПА: Включение поездной аппаратуры
 Common.717.VPAOff               = ВПА: Отключение поездной аппаратуры
 Common.717.VZD                  = ВЗД: Выключатель закрытия дверей
+Common.717.VKST                 = ВКСТ: Выключатель контроля состояния тормозов 
+Common.717.IST                  = ИСТ: Индикатор состояния тормозов
 
 Common.717.A53                  = А53: Контактор вспомогательных цепей
 Common.717.A56                  = А56: Аккумуляторная батарея
@@ -333,6 +335,8 @@ Entities.gmod_subway_81-717_mvm.Buttons.Block7.VAHToggle                = @[Comm
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KRPSet                   = @[Common.ALL.KRP]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KAHSet                   = @[Common.ALL.KAH]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KAHKToggle               = @[Common.ALL.KAHK]
+Entities.gmod_subway_81-717_mvm.Buttons.Block7.VKSTToggle               = @[Common.717.VKST]
+Entities.gmod_subway_81-717_mvm.Buttons.Block7.!IST                     = @[Common.717.IST]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.!PNT                     = @[Common.ALL.BrT]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KDPSet                   = @[Common.ALL.KDP]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KDPKToggle               = @[Common.ALL.KDPK]
