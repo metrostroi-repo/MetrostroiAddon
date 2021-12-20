@@ -181,7 +181,6 @@ Spawner.Close                           = Zavřít
 Spawner.Trains1                         = Max. počet vozů v soupravě
 Spawner.Trains2                         = Na hráče
 Spawner.WagNum                          = Počet vozů
-Spawner.PresetTitle                     = Presety
 Common.Spawner.Texture      = Textura vozu
 Common.Spawner.PassTexture  = Textura interiéru
 Common.Spawner.CabTexture   = Textura kabiny
