@@ -175,8 +175,13 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         local HaveUAVA = not self.Train.SubwayTrain or not self.Train.SubwayTrain.ARS or not self.Train.SubwayTrain.ARS.NoUAVA
         if HaveUAVA and self.Train.UAVA.Value == 0 then
             self.EmergencyValve = true
-            self.Train.UAVAC:TriggerInput("Set",0)
-            if value > 0 then RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName()) end
+            if value ~= 2 then
+				self.Train.UAVAC:TriggerInput("Set",0)
+				if not self.Train.autosaid then
+					self.Train.autosaid = true
+					RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName())
+				end
+			end
         end
     end
 end
@@ -317,7 +322,9 @@ function TRAIN_SYSTEM:Think(dT)
     self.ParkingBrakePressure_dPdT = 0.0
 	self.WorkingChamberPressure_dPdT = 0.0
 
-	self.KM013offset = self.KM013offset or math.random()*0.2 + 5.0		--регулировочное давление
+	local rnd = math.random(1,10)
+	local offs = 0.1
+	self.KM013offset = self.KM013offset or math.Clamp(5.1 + (rnd >= 3 and rnd <= 7 and offs or -offs),5.0,5.2)
 
     -- Reduce pressure for brake line
     self.TrainToBrakeReducedPressure = math.min(self.KM013offset,self.TrainLinePressure) -- * 0.725)
@@ -328,11 +335,10 @@ function TRAIN_SYSTEM:Think(dT)
     local HaveEPK = not Train.SubwayTrain or not Train.SubwayTrain.ARS or not Train.SubwayTrain.ARS.NoEPK
 
     local BLDisconnect,pr_speed = true,1
-	---[[ работа срывного клапана
-	if Train.AutostopValve.Value ~= 0 then
-		if self.BrakeLinePressure > 1.86 then self:TriggerInput("Autostop",1) end
-		Train.AutostopValve.Value = 0
-	end--]]
+	-- работа срывного клапана
+	if Train.AutostopValve.Value > 0 then
+		self:TriggerInput("Autostop",self.BrakeLinePressure > 1.86 and 1 or 2)	--value == 2 — просто открыть срывной клапан без размыкания контактов УАВА
+	end
 
     if self.ValveType == 1 then
         BLDisconnect = Train.DriverValveBLDisconnect.Value > 0
@@ -459,13 +465,14 @@ function TRAIN_SYSTEM:Think(dT)
     if self.EmergencyValveDisable then--and (self.BrakeLinePressure-self.OldBrakeLinePressure)>0.01 then
         self.EmergencyValveDisable=false
         self.EmergencyValve=false
+		Train.autosaid=false
     end
     self.OldBrakeLinePressure = self.BrakeLinePressure
     local leak = 0
     if self.EmergencyValve then
 		local leakst = BLDisconnect and math.max(0.3,math.log(80*self.BrakeLinePressure - 200,3)) or 1.1*(Train:GetWagonCount())*math.Clamp(self.BrakeLinePressure/4,0,1)
         leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst)--,false,false,10)
-        if (self.BrakeLinePressure < 1.82 or Train.UAVA.Value > 0) then
+        if Train.UAVA.Value > 0 or (self.BrakeLinePressure < 1.82 and Train.AutostopValve.Value == 0) then	--пока держим ЛКМ нажатой, срывной клапан открыт
             self.EmergencyValveDisable = true
         end
         self.Leak = true
