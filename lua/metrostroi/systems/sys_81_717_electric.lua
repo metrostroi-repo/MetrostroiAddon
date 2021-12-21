@@ -88,7 +88,11 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["F7"] = S["F"]*KV["F-F7"]+S["14b"]*KRU["11/3-FR1"]
 
     Train:WriteTrainWire(5,S["10AK"]*KV["10AK-5"] + KRU["5/3-ZM31"]*-10)
-    Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"] + --[[max(0,min(1,T[4])*KV["4-0"]*-10)]]KV["4-0"]*-10)
+    Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"])  --[[max(0,min(1,T[4])*KV["4-0"]*-10)KV["4-0"]*-10]]
+	if T[4]*KV["4-0"] ~= 0 then
+		Train.A54:TriggerInput("Set",0)
+		Train:WriteTrainWire(5,0)
+	end
     --Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"]*(1-T[4]*KV["4-0"]*-10))
 
     Panel.LST = T[6]*Train.A40.Value
@@ -451,6 +455,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
             Panel.L1 = T[57]
         end
         Panel.M8 = S["V2"]*Train.PVK.Value
+		Train.RPvozvrat.VozRpPressed = T[17]~=0
 
         local ASNP_VV = Train.ASNP_VV
         ASNP_VV.Power = BO*Train.AS1.Value*Train.R_ASNPOn.Value
