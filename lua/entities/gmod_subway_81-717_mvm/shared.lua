@@ -441,11 +441,11 @@ function ENT:InitializeSounds()
     self.SoundPositions["rear_isolation"] = {300,1e9,Vector(-456, 0,-63),1}
 
     self.SoundNames["crane013_brake"] = {loop=true,"subway_trains/common/pneumatic/release_2.wav"}
-    self.SoundPositions["crane013_brake"] = {80,1e9,Vector(431.5,-20.3,-12),0.86}
+    self.SoundPositions["crane013_brake"] = {400,1e9,Vector(431.5,-20.3,-12),0.86}
     self.SoundNames["crane013_brake2"] = {loop=true,"subway_trains/common/pneumatic/013_brake2.wav"}
-    self.SoundPositions["crane013_brake2"] = {80,1e9,Vector(431.5,-20.3,-12),0.86}
+    self.SoundPositions["crane013_brake2"] = {400,1e9,Vector(431.5,-20.3,-12),0.86}
     self.SoundNames["crane013_brake_l"] = {loop=true,"subway_trains/common/pneumatic/013_brake_loud2.wav"}
-    self.SoundPositions["crane013_brake_l"] = {80,1e9,Vector(431.5,-20.3,-12),0.7}
+    self.SoundPositions["crane013_brake_l"] = {400,1e9,Vector(431.5,-20.3,-12),0.7}
     self.SoundNames["crane013_release"] = {loop=true,"subway_trains/common/pneumatic/013_release.wav"}
     self.SoundPositions["crane013_release"] = {80,1e9,Vector(431.5,-20.3,-12),0.4}
     self.SoundNames["crane334_brake_high"] = {loop=true,"subway_trains/common/pneumatic/334_brake.wav"}
@@ -975,6 +975,7 @@ ENT.Spawner = {
                 ent.L_3:TriggerInput("Set",val==1 and 1 or 0)
                 ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.EPK:TriggerInput("Set",(ent.Plombs.RC1 and val==1) and 1 or 0)
+				ent.DriverValveDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
                 _LastSpawner=CurTime()
                 ent.CabinDoor = val==4 and first
                 ent.PassengerDoor = val==4
