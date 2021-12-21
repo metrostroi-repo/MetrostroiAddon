@@ -200,6 +200,10 @@ function ENT:Initialize()
             ID = "AirDistributorDisconnectToggle",
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
+        {
+            ID = "AutostopValveToggle",
+            Pos = Vector(377, -66, -50), Radius = 20,
+        },
     }
 
     local vX = Angle(0,-90-0.2,56.3):Forward() -- For ARS panel
