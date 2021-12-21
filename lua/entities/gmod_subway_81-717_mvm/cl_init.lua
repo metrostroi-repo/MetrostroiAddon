@@ -2098,7 +2098,7 @@ ENT.ButtonMap["AutostopValve"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "AutostopValveToggle",x=0,y=0,w= 130,h = 40,tooltip="Сорвать срывной клапан"},
+        {ID = "AutostopValveSet",x=0,y=0,w= 130,h = 40,tooltip="Сорвать срывной клапан"},
     }
 }
 
