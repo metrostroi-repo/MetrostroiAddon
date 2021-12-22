@@ -3206,7 +3206,7 @@ function ENT:Think()
     self:SetSoundState("rolling_high2"  ,rol70*rollings,rol70p) --70
 
     self.ReleasedPdT = math.Clamp(self.ReleasedPdT + 2*(-self:GetPackedRatio("BrakeCylinderPressure_dPdT",0)-0.8*self.ReleasedPdT)*dT,0,1)
-    local release1 = math.Clamp((1.1*self.ReleasedPdT-0.1)/0.32,0,8)^2
+    local release1 = math.Clamp((1.1*self.ReleasedPdT-0.1)/0.48,0,8)^2
     self:SetSoundState("release1",release1,1)
     self:SetSoundState("release2",(math.Clamp(0.3-release1,0,0.3)/0.3)*(release1/0.3),1.0)
     local parking_brake = self:GetPackedRatio("ParkingBrakePressure_dPdT",0)
