@@ -546,7 +546,8 @@ function TRAIN_SYSTEM:Think(dT)
                 end
                 self.BePN2 = true
         else
-            self.PN2 = math.max(0,self.PN2-math.exp(1.2*(self.BrakeCylinderPressure - self.GN2Offset))*0.2)
+            --self.PN2 = math.max(0,self.PN2-0.7*math.exp(3.0*(self.BrakeCylinderPressure - self.GN2Offset - self.WeightLoadRatio*1.3)+1.6))
+            self.PN2 = 0.3*math.exp(0.8*(self.BrakeCylinderPressure - dT) - 1) - 0.16
         end
         local targetPres = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - (self.BrakeLinePressure < 3.6 and self.BrakeLinePressure*self.WorkingChamberPressure/6.5 or self.BrakeLinePressure*1.028))) + (self.BrakeLinePressure_dPdT < 0 and self.WeightLoadRatio*1.3 or 0))
         --local targetPres = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - (self.BrakeLinePressure < 3.56 and (self.BrakeLinePressure - 3)*5.56 or self.BrakeLinePressure*1.028)) + (self.BrakeLinePressure_dPdT < 0 and self.WeightLoadRatio*1.3 or 0)))
@@ -565,7 +566,6 @@ function TRAIN_SYSTEM:Think(dT)
         end
         if self.BrakeCylinderValve == 1 then
             self:equalizePressure(dT,"BrakeCylinderPressure", math.min(self.GN2Offset + self.WeightLoadRatio*1.3,targetPressure), 1, (self.BrakeLinePressure > (self.KM013offset+0.1)) and (self.PN2 == 0) and (self.PN1 == 0) and 1.0 or 3.5, nil, (self.BrakeLinePressure_dPdT > 0.1) and (0.8+math.Clamp((1 - self.BrakeCylinderPressure)*0.8,0,1.2)) or 1)
-            --self:equalizePressure(dT,"BrakeCylinderPressure", math.min(self.GN2Offset + self.WeightLoadRatio*1.3,targetPressure), 0.5+math.Clamp((self.BrakeCylinderPressure-0.5)/2.8,0,0.9), (self.BrakeLinePressure > (self.KM013offset+0.1)) and (self.PN2 == 0) and (self.PN1 == 0) and 0.8 or 3.5, nil, (self.BrakeLinePressure_dPdT > 0.1) and (0.8+math.Clamp((1 - self.BrakeCylinderPressure)*0.8,0,1)) or 1)
         end
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeCylinderPressure_dPdT*0.5)
     elseif Train.AirDistributorDisconnect.Value ~= 0 then
