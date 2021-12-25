@@ -546,7 +546,8 @@ function TRAIN_SYSTEM:Think(dT)
                 end
                 self.BePN2 = true
         else
-            self.PN2 = math.max(0,self.PN2-0.7*math.exp(3.0*(self.BrakeCylinderPressure - self.GN2Offset - self.WeightLoadRatio*1.3)+1.6))
+            --self.PN2 = math.max(0,self.PN2-0.7*math.exp(3.0*(self.BrakeCylinderPressure - self.GN2Offset - self.WeightLoadRatio*1.3)+1.6))
+            self.PN2 = 0.3*math.exp(0.8*(self.BrakeCylinderPressure - dT) - 1) - 0.16
         end
         local targetPres = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - (self.BrakeLinePressure < 3.6 and self.BrakeLinePressure*self.WorkingChamberPressure/6.5 or self.BrakeLinePressure*1.028))) + (self.BrakeLinePressure_dPdT < 0 and self.WeightLoadRatio*1.3 or 0))
         --local targetPres = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - (self.BrakeLinePressure < 3.56 and (self.BrakeLinePressure - 3)*5.56 or self.BrakeLinePressure*1.028)) + (self.BrakeLinePressure_dPdT < 0 and self.WeightLoadRatio*1.3 or 0)))
