@@ -268,8 +268,10 @@ function ENT:Initialize()
     -- Passenger related data (must be set by derived trains to allow boarding)
     self.LeftDoorsOpen = false
     --self.LeftDoorsBlocked = false
+    self.PrevLeftDoorsOpening = false
     self.RightDoorsOpen = false
     --self.RightDoorsBlocked = false
+    self.PrevRightDoorsOpening = false
 
     -- Get default train mass
     if IsValid(self:GetPhysicsObject()) then
