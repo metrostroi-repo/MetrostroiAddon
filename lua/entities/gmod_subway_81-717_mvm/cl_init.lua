@@ -155,38 +155,8 @@ ENT.ClientProps["handrails_new"] = {
     hide=1.5,
 }
 
-ENT.ClientProps["mask22_mvm_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_22_wp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
 ENT.ClientProps["mask22_mvm"] = {
     model = "models/metrostroi_train/81-717/mask_22.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask22_glass"] = {
-    model = "models/metrostroi_train/81-717/mask_22_glass.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask22_glass_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_22_glass_wp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask222_glass"] = {
-    model = "models/metrostroi_train/81-717/mask_222_glass.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask222_glass_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_222_glass_wp.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     nohide=true,
@@ -209,12 +179,6 @@ ENT.ClientProps["mask141_mvm"] = {
     ang = Angle(0,0,0),
     nohide=true,
 }
-ENT.ClientProps["mask141_mvm_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_141_wp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
 ENT.ClientProps["Headlights222_1"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_222_group1.mdl",
     pos = Vector(0,0,0),
@@ -223,18 +187,6 @@ ENT.ClientProps["Headlights222_1"] = {
 }
 ENT.ClientProps["Headlights222_2"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_222_group2.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights222_glass_1"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_222_glass_group1.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights222_glass_2"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_222_glass_group2.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     nohide=true,
@@ -259,18 +211,6 @@ ENT.ClientProps["Headlights22_1"] = {
 }
 ENT.ClientProps["Headlights22_2"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_22_group1.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights22_glass_1"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_22_glass_group2.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights22_glass_2"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_22_glass_group1.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     nohide=true,
@@ -2756,7 +2696,7 @@ function ENT:Think()
     self:SetLightPower(44,self:GetPackedBool("PanelLights"))
     self:SetLightPower(45,self:GetPackedBool("PanelLights"))
 
-    local mask = self:GetNW2Int("MaskType",2)--self:GetNW2Bool("Mask")
+    local mask = self:GetNW2Int("MaskType",1)--self:GetNW2Bool("Mask")
     local HL1 = self:Animate("Headlights1",self:GetPackedBool("Headlights1") and 1 or 0,0,1,6,false)
     local HL2 = self:Animate("Headlights2",self:GetPackedBool("Headlights2") and 1 or 0,0,1,6,false)
     local RL = self:Animate("RedLights_a",self:GetPackedBool("RedLights") and 1 or 0,0,1,6,false)
@@ -2926,16 +2866,10 @@ function ENT:Think()
     self:SetLightPower("Lamp_RTM2",dot5 and lamps_rtm > 0,lamps_rtm)
 
     if self.MaskType ~= mask then
-        self:ShowHide("mask22_mvm_wp",mask==1)
-        self:ShowHide("mask22_mvm",mask==2)
-        self:ShowHide("mask22_glass_wp",mask==3)
-        self:ShowHide("mask22_glass",mask==4)
-        self:ShowHide("mask222_mvm_wp",mask==5)
-        self:ShowHide("mask222_mvm",mask==6)
-        self:ShowHide("mask222_glass_wp",mask==7)
-        self:ShowHide("mask222_glass",mask==8)
-        self:ShowHide("mask141_mvm_wp",mask==9)
-        self:ShowHide("mask141_mvm",mask==10)
+        self:ShowHide("mask22_mvm",mask==1)
+        self:ShowHide("mask222_mvm_wp",mask==2)
+        self:ShowHide("mask222_mvm",mask==3)
+        self:ShowHide("mask141_mvm",mask==4)
 
         self:ShowHideSmooth("Headlights222_1",0)
         self:ShowHideSmooth("Headlights222_2",0)
@@ -2943,15 +2877,11 @@ function ENT:Think()
         self:ShowHideSmooth("Headlights141_2",0)
         self:ShowHideSmooth("Headlights22_1",0)
         self:ShowHideSmooth("Headlights22_2",0)
-        self:ShowHideSmooth("Headlights22_glass_1",0)
-        self:ShowHideSmooth("Headlights22_glass_2",0)
-        self:ShowHideSmooth("Headlights222_glass_1",0)
-        self:ShowHideSmooth("Headlights222_glass_2",0)
-        if mask >= 9 then
+        if mask == 4 then
             self.LightsOverride[30][2] = Vector(465,-48, -23.5)
             self.LightsOverride[31][2] = Vector(465,48 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , -23.5)
-        elseif mask < 9 then
+        elseif mask < 4 then
             self.LightsOverride[30][2] = Vector(465,-45, -23.5)
             self.LightsOverride[31][2] = Vector(465,45 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , 52)
@@ -2963,19 +2893,13 @@ function ENT:Think()
     self:ShowHide("1:KVTRSet",not lvz)
     self:ShowHide("2:KVTSet",lvz)
     self:ShowHide("2:KVTRSet",lvz)
-    if mask <= 2 then
+    if mask == 1 then
         self:ShowHideSmooth("Headlights22_1",HL1)
         self:ShowHideSmooth("Headlights22_2",HL2)
-    elseif mask <= 4 then
-        self:ShowHideSmooth("Headlights22_glass_1",HL1)
-        self:ShowHideSmooth("Headlights22_glass_2",HL2)
-    elseif mask <= 6 then
+    elseif mask <= 3 then
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask <= 8 then
-        self:ShowHideSmooth("Headlights222_glass_1",HL1)
-        self:ShowHideSmooth("Headlights222_glass_2",HL2)
-    elseif mask <= 10 then
+    elseif mask == 4 then
         self:ShowHideSmooth("Headlights141_1",HL1)
         self:ShowHideSmooth("Headlights141_2",HL2)
     end

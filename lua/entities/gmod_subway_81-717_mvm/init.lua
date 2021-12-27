@@ -444,7 +444,7 @@ function ENT:TrainSpawnerUpdate()
         local tex = typ[5] and typ[5][math.random(1,#typ[5])] or "Def_717MSKWhite"
         self:SetNW2String("PassTexture",tex)
         local mask = typ[6]==true or  typ[6] and typ[6](num,tex)
-        self:SetNW2Int("MaskType",mask and 6 or 1)
+        self:SetNW2Int("MaskType",mask and 3 or 1)
         self:SetNW2String("CabTexture",typ[7] and ((lvz and math.random()>0.2) and "Def_ClassicY" or "Def_ClassicG") or ((lvz and math.random()>0.2) and "Def_HammeriteY" or "Def_HammeriteG"))
         local ARSchance = math.random()
         self:SetNW2Int("ARSType",(not mask and not self.Dot5 and not lvz or ARSchance>0.8) and (ARSchance>0.93 and 5 or 4) or ARSchance>0.54 and (ARSchance>0.75 and 3 or 2) or 1)
