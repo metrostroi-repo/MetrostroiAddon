@@ -214,7 +214,23 @@ typedef struct {
 } thread_msg;
 thread_msg ThreadRecvMessage(void* p);
 ]]
-local TS = ffi.load("gmsv_turbostroi_win32")
+
+local OSName = "gmsv_turbostroi_"
+
+if jis.os == "Windows" then
+	OSName = OSName.."win"
+elseif jit.os == "Linux" then
+	OSName = OSName.."linux"
+end
+
+if jit.arch == "x86"
+	OSName = OSName.."32"
+else
+	OSName = OSName.."64"
+end
+
+
+local TS = ffi.load(OSName)
 
 Metrostroi = {}
 local dataCache = {wires = {},wiresW = {},wiresL = {}}
