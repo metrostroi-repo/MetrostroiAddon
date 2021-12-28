@@ -14,20 +14,16 @@ print("[!] RailNetwork initialized!")
 local ffi = require("ffi")
 local OSName = "gmsv_turbostroi_"
 
-if jit.os == "Windows" then
+if jis.os == "Windows" then
 	OSName = OSName.."win"
-	if jit.arch == "x86"
-		OSName = OSName.."32"
-	else
-		OSName = OSName.."64"
-	end
 elseif jit.os == "Linux" then
 	OSName = OSName.."linux"
-	if jit.arch == "x86"
-		OSName = OSName.."32"
-	else
-		OSName = OSName.."64"
-	end
+end
+
+if jit.arch == "x86"
+	OSName = OSName.."32"
+else
+	OSName = OSName.."64"
 end
 
 local C = ffi.load(OSName)
