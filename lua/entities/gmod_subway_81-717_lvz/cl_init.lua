@@ -51,12 +51,6 @@ ENT.ClientProps["salon"] = {
     ang = Angle(0,0,0),
     hide=2,
 }
-ENT.ClientProps["salon_add"] = {
-    model = "models/metrostroi_train/81-717/717_spb_features.mdl",
-    pos = Vector(-48.5,0,0),
-    ang = Angle(0,0,0),
-    hide=2,
-}
 ENT.ClientProps["osp_label"] = {
     model = "models/metrostroi_train/81-717/labels/label_spb1.mdl",
     pos = Vector(374.470795,42.140141,53.182781),

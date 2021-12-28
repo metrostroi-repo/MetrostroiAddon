@@ -57,7 +57,6 @@ ENT.Spawner = {
     Metrostroi.Skins.GetTable("PassTexture","Spawner.PassTexture",false,"pass"),
     Metrostroi.Skins.GetTable("CabTexture","Spawner.CabTexture",false,"cab"),
     {},
-    {"BodyType","Spawner.717.BodyType","List",{"Spawner.717.Common.Random","Spawner.717.Common.Standart","Spawner.717.Common.Old"}},
     {"SeatType","Spawner.717.SeatType","List",{"Spawner.717.Common.Random","Spawner.717.Common.Old","Spawner.717.Common.New","Spawner.717.Common.NewBlue"}},
     {},
     {"SpawnMode","Spawner.717.SpawnMode","List",{"Spawner.717.SpawnMode.Full","Spawner.717.SpawnMode.Deadlock","Spawner.717.SpawnMode.NightDeadlock","Spawner.717.SpawnMode.Depot"}, nil,function(ent,val,rot,i,wagnum,rclk)
