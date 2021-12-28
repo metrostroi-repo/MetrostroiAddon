@@ -12,7 +12,6 @@ function Metrostroi.NextWagonID()
 end
 
 Metrostroi.UsedNumbers = Metrostroi.UsedNumbers or {}
-hook.Add("EntityRemoved","WagonNumberRemove",Metrostroi.RemoveNumber)
 function Metrostroi.RemoveNumber(ent)
     if IsValid(ent) and ent.WagonNumber then
         local typ = ent.SubwayTrain and ent.SubwayTrain.Type or ent:GetClass()
@@ -22,6 +21,7 @@ function Metrostroi.RemoveNumber(ent)
         tbl[ent.WagonNumber] = nil
     end
 end
+hook.Add("EntityRemoved","WagonNumberRemove",Metrostroi.RemoveNumber)
 function Metrostroi.GenerateNumber(train,tbl,func,retry)
     Metrostroi.RemoveNumber(train)
     if not tbl or not IsValid(train) then return 0 end
