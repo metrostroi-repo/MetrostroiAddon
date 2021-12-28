@@ -63,6 +63,8 @@ Common.717.RZPL                 = RZP: Power supply protection relay
 Common.717.VPAOn                = VPA: Enable train unit
 Common.717.VPAOff               = VPA: Disable train unit
 Common.717.VZD                  = VZD: Door control toggle (close doors)
+Common.717.VKST                 = VKST: Brake status control toggle
+Common.717.IST                  = IST: Brake status indicator
 
 Common.717.A53                  = A53: Auxiliary circuits contactor
 Common.717.A56                  = A56: Battery
@@ -333,6 +335,8 @@ Entities.gmod_subway_81-717_mvm.Buttons.Block7.VAHToggle                = @[Comm
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KRPSet                   = @[Common.ALL.KRP]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KAHSet                   = @[Common.ALL.KAH]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KAHKToggle               = @[Common.ALL.KAHK]
+Entities.gmod_subway_81-717_mvm.Buttons.Block7.VKSTToggle               = @[Common.717.VKST]
+Entities.gmod_subway_81-717_mvm.Buttons.Block7.!IST                     = @[Common.717.IST]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.!PNT                     = @[Common.ALL.BrT]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KDPSet                   = @[Common.ALL.KDP]
 Entities.gmod_subway_81-717_mvm.Buttons.Block7.KDPKToggle               = @[Common.ALL.KDPK]

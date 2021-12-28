@@ -766,6 +766,16 @@ ENT.ButtonMap["Block7"] = {
             var="KRP",speed=16,vmin=1,vmax=0,
             sndvol = 0.07,snd = function(val) return val and "button1_on" or "button1_off" end,sndmin = 60,sndmax = 1e3/3,sndang = Angle(-90,0,0),
         }},
+        {ID = "VKSTToggle",x=28,y=58,radius=20,tooltip="",model = {
+            model = "models/metrostroi_train/81-710/ezh3_tumbler_pp250.mdl",ang = 180,z=-2,
+            var="VKST",speed=16,
+            sndvol = 1,snd = function(val) return val and "switch_on" or "switch_off" end,
+            sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
+        }}, 
+        {ID = "!IST", x=43, y=58, radius=8, tooltip="", model = {
+            lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",z = -2,color = Color(255,50,45), var="ISTLamp"},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,50,45),z=-1.4,}
+        }},        
         {ID = "KAHSet",x=43,y=88,radius=20,tooltip="",model = {
             model = "models/metrostroi_train/81-710/ezh3_button_black.mdl",z = -2,
             var="KAH",speed=16,vmin=1,vmax=0,
@@ -775,7 +785,7 @@ ENT.ButtonMap["Block7"] = {
         {ID = "KAHKToggle",x=23,y=98,w=40,h=20,tooltip="",model = {
             model = "models/metrostroi_train/81/krishka.mdl",ang = 0,z = -1,
             var="KAHK",speed=8,min=0.43,max=0.685,disable="KAHSet",
-            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=135,x=-17,y=-45,z=-0,var="KAHPl",ID="KAHPl",},
+            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=80,x=15,y=-49,z=-0,var="KAHPl",ID="KAHPl",},
             sndvol = 1,snd = function(val) return val and "kr_close" or "kr_open" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
             noTooltip = true,
@@ -808,6 +818,12 @@ ENT.ButtonMap["Block7"] = {
             sprite = {bright=0.2,size=.5,scale=0.03,z=20,color=Color(255,130,90)},
         }},
     }
+}
+ENT.ClientProps["VKSTIST"] = {
+    model = "",
+    pos = Vector(0,0,0),
+    ang = Angle(0,0,0),
+    hideseat = 0.5,
 }
 
 ENT.ButtonMap["Block1"] = {
@@ -3305,6 +3321,9 @@ function ENT:Think()
             self:SetSoundState("vent"..i,self.VentG2,1)
         end
     end
+    
+    self:SetSoundState("IST", self:GetPackedBool("IST") and 1 or 0, 0.95)
+    
     if self.RingType ~= self:GetNW2Int("RingType",1) then
         self.RingType = self:GetNW2Int("RingType",1)
         self:SetSoundState(self.RingName,0,0)
