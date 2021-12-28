@@ -177,7 +177,7 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("KV3","Relay","Switch",{bass=true})
     self.Train:LoadSystem("R1","Relay","Switch",{bass=true,close_time=2.3})
 
-    self.Train:LoadSystem("C1","Relay","Switch",{bass=true,close_time=5.0})
+    self.Train:LoadSystem("C1","Relay","Switch",{bass=true,close_time=4.5+math.random()})
     self.Train:LoadSystem("VKST","Relay","Switch",{bass=true,normally_closed=true})
 
     self.V1 = 0
