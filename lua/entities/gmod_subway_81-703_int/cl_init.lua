@@ -1149,7 +1149,7 @@ function ENT:Think()
         self:ShowHideSmooth("bortlamp2_y",em and 1 or 0)
     end
     if em then
-        local Bortlamp_w = em and self:Animate("Bortlamp_w",self:GetPackedBool("SD") and 0 or 1,0,1,16,false) or 0
+        local Bortlamp_w = em and self:Animate("Bortlamp_w",self:GetPackedBool("SD") and 1 or 0,0,1,16,false) or 0
         local Bortlamp_g = em and self:Animate("Bortlamp_g",self:GetPackedBool("GRP") and 1 or 0,0,1,16,false) or 0
         local Bortlamp_y = em and self:Animate("Bortlamp_y",self:GetPackedBool("BrY") and 1 or 0,0,1,16,false) or 0
         self:ShowHide("bortlamps1",em)
