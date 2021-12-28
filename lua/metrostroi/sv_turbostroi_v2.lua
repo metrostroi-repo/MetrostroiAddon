@@ -79,10 +79,10 @@ if Turbostroi and not TURBOSTROI then
             if IsValid(Player(index)) then
                 if value==0 then
                     Player(index):PrintMessage( HUD_PRINTCONSOLE, "--START" )
-                    print("--START")
+                    -- print("--START")
                 end
                 Player(index):PrintMessage( HUD_PRINTCONSOLE, system )
-                print(system)
+                -- print(system)
             end
         end,
     }
@@ -155,7 +155,7 @@ if Turbostroi and not TURBOSTROI then
             if not IsValid(ply) or not ply:IsSuperAdmin() then return end
             local train = ply:GetTrain()
             if IsValid(train) then
-                print(cmd:sub(1,2),cmd:sub(3,4))
+                -- print(cmd:sub(1,2),cmd:sub(3,4))
                 SendMessage(train,6,cmd:sub(1,255),cmd:sub(256,511),ply:UserID(),0)
             end
         end)

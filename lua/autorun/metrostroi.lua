@@ -174,7 +174,7 @@ function Metrostroi.AddSkin(category,name,tbl)
             if not texture or not texture.defaults then return end
             for k,v in pairs(texture.defaults) do
                 local id = VGUI[k].ID
-                print(List:GetOptionData(List:GetSelectedID()),id,VGUI[id],v)
+                -- print(List:GetOptionData(List:GetSelectedID()),id,VGUI[id],v)
                 if id and VGUI[id] then
                     VGUI[id](v,true)
                 end
