@@ -220,14 +220,14 @@ local OSName = "gmsv_turbostroi_"
 if jis.os == "Windows" then
 	OSName = OSName.."win"
 	if jit.arch == "x86"
-		OSName = OSName.."86"
+		OSName = OSName.."32"
 	else
 		OSName = OSName.."64"
 	end
 elseif jit.os == "Linux" then
 	OSName = OSName.."linux"
 	if jit.arch == "x86"
-		OSName = OSName.."86"
+		OSName = OSName.."32"
 	else
 		OSName = OSName.."64"
 	end
