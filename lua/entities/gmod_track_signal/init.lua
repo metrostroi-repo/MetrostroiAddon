@@ -200,6 +200,7 @@ function ENT:Initialize()
 	self.PostInitalized = true
 
 	self.Controllers = nil
+	self.OccupiedOld = false;
 end
 
 function ENT:PreInitalize()
@@ -688,6 +689,10 @@ function ENT:Think()
 				end
 			end
 		end
+	end
+	if self.Occupied ~= self.OccupiedOld then
+		hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
+		self.OccupiedOld = self.Occupied
 	end
 	if self.Controllers then
 		for k,v in pairs(self.Controllers) do
