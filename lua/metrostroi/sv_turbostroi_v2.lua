@@ -217,13 +217,13 @@ thread_msg ThreadRecvMessage(void* p);
 
 local OSName = "gmsv_turbostroi_"
 
-if jis.os == "Windows" then
+if jit.os == "Windows" then
 	OSName = OSName.."win"
 elseif jit.os == "Linux" then
 	OSName = OSName.."linux"
 end
 
-if jit.arch == "x86"
+if jit.arch == "x86" then
 	OSName = OSName.."32"
 else
 	OSName = OSName.."64"
