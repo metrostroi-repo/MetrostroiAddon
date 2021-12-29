@@ -201,6 +201,7 @@ function ENT:Initialize()
 
 	self.Controllers = nil
 	self.OccupiedOld = false;
+	self.ControllerLogicCheckOccupied = false;
 end
 
 function ENT:PreInitalize()
@@ -645,12 +646,15 @@ function ENT:Think()
 		end
 	else
 		local number = self.RouteNumberReplace or ""
-		--[[self.PrevTime = self.PrevTime or 0
-		if (CurTime() - self.PrevTime) > 1.0 then
-			self.PrevTime = CurTime()+math.random(0.5,1.5)
-			self:ARSLogic(self.PrevTime - CurTime())
-			self:CheckOccupation()
-		end]]
+		if self.ControllerLogicCheckOccupied then
+			self.PrevTime = self.PrevTime or 0
+			if (CurTime() - self.PrevTime) > 1.0 then
+				self.PrevTime = CurTime() + math.random(0.5,1.5)
+				if self.Node and self.TrackPosition then
+					self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", self)
+				end
+			end
+		end
 		--[[
 		if self.MU or self.ARSOnly or self.RouteNumberSetup and self.RouteNumberSetup ~= "" or self.RouteNumber and self.RouteNumber ~= "" then
 			if self.NextSignalLink then
