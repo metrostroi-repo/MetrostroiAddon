@@ -335,8 +335,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
     local BD = 1-Train.BD.Value
     if isKVL then
         Train:WriteTrainWire(15,T[-15]*Train.RD.Value)
-        Panel.SD = T[-15]*T[15]
         Train.RD:TriggerInput("Set",BO*Train.BD.Value)
+        Panel.SD = BO*BD
     else
         Train:WriteTrainWire(15,BD*(1-Train.KU11.Value))
         Panel.SD = (S["D1"]+BO*Train.KU11.Value)*(T[15]*(1-Train.KU11.Value)+BD)
