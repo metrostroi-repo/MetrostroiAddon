@@ -86,8 +86,9 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train:WriteTrainWire(20,S["U2"]*KV["U2-20"]+(BO*Train.RO2.Value))
     else
         if isE then 
-			Train:WriteTrainWire(14,BO*KV["10-14B"]*KV["14-14B"])
-		end
+            Train:WriteTrainWire(14,BO*KV["10-14B"]*KV["14-14B"])
+        end
+
         Train:WriteTrainWire(1,S["10AK"]*Train.R1_5.Value)
         Train:WriteTrainWire(2,S["U2"]*KV["U2-2"])
         Train:WriteTrainWire(3,S["U2"]*KV["U2-3"])
