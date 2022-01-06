@@ -482,8 +482,8 @@ Entities.gmod_subway_ezh1.Buttons.VU.VUToggle         = @[Common.ALL.VU]
 Entities.gmod_subway_ezh1.Buttons.HelperPanel.KU13Set         = @[Common.ALL.KDL]
 Entities.gmod_subway_ezh1.Buttons.HelperPanel.KU3Toggle       = @[Common.ALL.VUD2]
 
-Entities.gmod_subway_ezh1.Buttons.Main.!GRP             = @[Common.ALL.RRP]
-Entities.gmod_subway_ezh1.Buttons.Main.!RRP             = @[Common.ALL.GRP]
+Entities.gmod_subway_ezh1.Buttons.Main.!GRP             = @[Common.ALL.GRP]
+Entities.gmod_subway_ezh1.Buttons.Main.!RRP             = @[Common.ALL.RRP]
 Entities.gmod_subway_ezh1.Buttons.Main.!SD              = @[Common.703.SD]
 
 Entities.gmod_subway_ezh1.Buttons.ParkingBrake.ParkingBrakeLeft                           = @[Common.703.ParkingBrakeLeft]
