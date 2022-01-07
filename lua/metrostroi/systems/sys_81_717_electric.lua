@@ -747,7 +747,11 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["12A"] = T[12]*Train.A12.Value
     if isLVZ then
         if isPA then AVI.ZD = S[16] end
-        Train:WriteTrainWire(31,S[31]*(Train.KDL.Value*(1-RC2))+S["D1"]*Train.VDL.Value+AVO["31"]*RC2 + S["12A"]*Train.A31.Value)
+        if isKSD then
+            Train:WriteTrainWire(31,S[31]*(Train.KDL.Value*(1-RC2))+(S["D1"]+T[16]*Train.VUD1.Value)*Train.VDL.Value+AVO["31"]*RC2 + S["12A"]*Train.A31.Value)
+        else
+            Train:WriteTrainWire(31,S[31]*(Train.KDL.Value*(1-RC2))+(S["D1"]+T[16]*Train.VUD1.Value*Train.VUD2.Value)*Train.VDL.Value+AVO["31"]*RC2 + S["12A"]*Train.A31.Value)
+        end        
         Train:WriteTrainWire(32,S[32]*(Train.KDP.Value)*(1-RC2)+AVO["32"]*RC2 + S["12A"]*Train.A32.Value)
     elseif not isDot2 then
         Train:WriteTrainWire(31,S[31]*(Train.KDL.Value+Train.KDLR.Value+Train.VDL.Value)*(Train.ASNP.K1+(1-Train.VBD.Value)) + S["12A"]*Train.A31.Value)
