@@ -735,10 +735,9 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         S[31] = S[31]*(1-Train.VUD1.Value)
         S[32] = S[32]*(1-Train.VUD1.Value)
     else
-        S["D16"] = Train.VUD1.Value*Train.VUD2.Value
-        S[31] = (S["D1"]+T[16]*S["D16"])*(1-Train.DoorSelect.Value)
-        S[32] = (S["D1"]+T[16]*S["D16"])*Train.DoorSelect.Value
-        Train:WriteTrainWire(16,S["D1"]*S["D16"])
+        Train:WriteTrainWire(16,S["D1"]*(Train.VUD1.Value*Train.VUD2.Value))
+        S[31] = S["D1"]*(1-Train.DoorSelect.Value)
+        S[32] = S["D1"]*Train.DoorSelect.Value
     end
     Train:WriteTrainWire(12,S["D1"]*Train.KRZD.Value)
     Panel.DoorsLeft = S[31]
