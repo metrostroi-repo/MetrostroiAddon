@@ -3029,15 +3029,17 @@ function ENT:Think()
         self:ShowHideSmooth("Headlights222_2",0)
         self:ShowHideSmooth("Headlights22_1",0)
         self:ShowHideSmooth("Headlights22_2",0)
-        --[[if mask == 3 then
+        print(mask)
+        if mask == 3 then
             self.LightsOverride[30][2] = Vector(465,-48, -23.5)
             self.LightsOverride[31][2] = Vector(465,48 , -23.5)
-            self.LightsOverride[32][2] = Vector(465,0  , -23.5)
+            self.LightsOverride[32][2] = Vector(465,0  , 52.5)
         elseif mask < 3 then
             self.LightsOverride[30][2] = Vector(465,-45, -23.5)
             self.LightsOverride[31][2] = Vector(465,45 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , 52)
-        end]]
+        end
+        self.MaskType = mask
     end
 
     local HL1 = self:Animate("Headlights1",self:GetPackedBool("Headlights1") and 1 or 0,0,1,6,false)
