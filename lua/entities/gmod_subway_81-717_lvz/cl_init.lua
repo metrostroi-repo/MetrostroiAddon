@@ -3029,7 +3029,6 @@ function ENT:Think()
         self:ShowHideSmooth("Headlights222_2",0)
         self:ShowHideSmooth("Headlights22_1",0)
         self:ShowHideSmooth("Headlights22_2",0)
-        print(mask)
         if mask == 3 then
             self.LightsOverride[30][2] = Vector(465,-48, -23.5)
             self.LightsOverride[31][2] = Vector(465,48 , -23.5)
