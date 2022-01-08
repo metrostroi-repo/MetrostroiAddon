@@ -677,10 +677,10 @@ function TRAIN_SYSTEM:Think(dT)
     ----------------------------------------------------------------------------
     if self.DriverValveDisconnectPrevious ~= Train.DriverValveDisconnect.Value then
         self.DriverValveDisconnectPrevious = Train.DriverValveDisconnect.Value
-        if self.DriverValveDisconnectPrevious == 0 then
+        if self.DriverValveDisconnectPrevious == 0 and self.TrainLinePressure>1 then
             self.DVDOffTimer = CurTime()
             Train:PlayOnce("pneumo_disconnect2","cabin",0.9)
-        else
+        elseif self.TrainLinePressure>1 then
             self.DVDOffTimer = nil
             Train:PlayOnce("pneumo_disconnect1","cabin",0.9)
         end
