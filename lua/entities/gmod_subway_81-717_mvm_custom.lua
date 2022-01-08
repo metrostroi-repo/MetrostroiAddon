@@ -55,7 +55,7 @@ ENT.Spawner = {
         return Schemes
     end},
     {},
-    {"MaskType","Spawner.717.MaskType","List",{"2-2","2-2 (M)","2-2 Glass","2-2 Glass (M)","2-2-2","2-2-2 (M)","2-2-2 Glass","2-2-2 Glass (M)","1-4-1","1-4-1 (M)"}},
+    {"MaskType","Spawner.717.MaskType","List",{"2-2 (M)","2-2-2","2-2-2 (M)","1-4-1 (M)"}},
     {"Cran","Spawner.717.CranType","List",{"334","013"}},
     {"Announcer","Spawner.717.Announcer","List",function()
         local Announcer = {}

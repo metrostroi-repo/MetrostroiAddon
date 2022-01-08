@@ -59,7 +59,7 @@ function TRAIN_SYSTEM:Think(dT)
     local speed = Train.ALSCoil.Speed
     --vv При торможении смещение на 2км\ч vv
     ----[[
-    if true or self.SpeedDec then
+    if self.SpeedDec then
         Train.BIS_R1:TriggerInput("Set", self.Power*inrange(speed,5.5,11.5 ,3.5 ,14.0 ,Train.BIS_R1.Value > 0))
         Train.BIS_R2:TriggerInput("Set", self.Power*inrange(speed,10 ,21.5 ,8.2 ,25.7 ,Train.BIS_R2.Value > 0))
         Train.BIS_R3:TriggerInput("Set", self.Power*inrange(speed,20 ,31.5 ,17.6,35.7 ,Train.BIS_R3.Value > 0))

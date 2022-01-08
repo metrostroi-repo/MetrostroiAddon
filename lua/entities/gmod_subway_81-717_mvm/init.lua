@@ -11,7 +11,7 @@ ENT.SyncTable = {
     "VZ1","VUD1","KDL","KDLR","KDLK","KDP","KDLRK","DoorSelect",
     "KRZD","R_VPR","VozvratRP","AVU","KVP","ConverterProtection","RZP",--"SP","GreenRP",
     "KSN","ARS","ARSR","ALS","OtklAVU","OtklBV","OtklBVK","OVT","L_1","L_2","L_3","VP","DIPoff",
-    "VMK","BPSNon","RezMK","ARS13","L_4","VUS","VAH","VAD","KRP",
+    "VMK","BPSNon","RezMK","ARS13","L_4","VUS","VAH","VAD","KRP","VKST",
     "KAH","KAHK","KDPK",
     "A53","A56","A54","A17","A44","A39","A70","A14","A74","A26","AR63","AS1","A13","A21","A31","A32","A16","A12","A24","A49","A27","A72","A50","A29","A46","A47","A71","A7","A9","A84","A8","A52","A19","A48","A10","A22","A30","A1","A2","A3","A4","A5","A6","A18","A73","A20","A25","A11","A37","A45","A38","A51","A65","A66","A42","A43","A41","A40","A75","A76","A60","A58","A57","A59","A28",
     "AV2","AV3","AV4","AV5","AV6","AV1",
@@ -448,7 +448,7 @@ function ENT:TrainSpawnerUpdate()
         local tex = typ[5] and typ[5][math.random(1,#typ[5])] or "Def_717MSKWhite"
         self:SetNW2String("PassTexture",tex)
         local mask = typ[6]==true or  typ[6] and typ[6](num,tex)
-        self:SetNW2Int("MaskType",mask and 6 or 1)
+        self:SetNW2Int("MaskType",mask and 3 or 1)
         self:SetNW2String("CabTexture",typ[7] and ((lvz and math.random()>0.2) and "Def_ClassicY" or "Def_ClassicG") or ((lvz and math.random()>0.2) and "Def_HammeriteY" or "Def_HammeriteG"))
         local ARSchance = math.random()
         self:SetNW2Int("ARSType",(not mask and not self.Dot5 and not lvz or ARSchance>0.8) and (ARSchance>0.93 and 5 or 4) or ARSchance>0.54 and (ARSchance>0.75 and 3 or 2) or 1)
@@ -653,6 +653,8 @@ function ENT:Think()
     self:SetPackedBool("M1_3",Panel.M1_3 > 0)
     self:SetPackedBool("M4_7",Panel.M4_7 > 0)
     self:SetPackedRatio("M8",Panel.M8)
+    self:SetPackedBool("IST",Panel.IST > 0)
+    self:SetPackedBool("ISTLamp",Panel.IST > 0 and CurTime() % 0.333 > 0.166)
     self:SetNW2Int("WrenchMode",self.KVWrenchMode)
     self:SetPackedBool("ReverserPresent",self.KVWrenchMode and self.KVWrenchMode>0)
     self:SetPackedRatio("CranePosition", Pneumatic.RealDriverValvePosition)

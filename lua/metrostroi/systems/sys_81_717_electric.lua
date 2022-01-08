@@ -88,12 +88,12 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["F7"] = S["F"]*KV["F-F7"]+S["14b"]*KRU["11/3-FR1"]
 
     Train:WriteTrainWire(5,S["10AK"]*KV["10AK-5"] + KRU["5/3-ZM31"]*-10)
-    Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"])  --[[max(0,min(1,T[4])*KV["4-0"]*-10)KV["4-0"]*-10]]
-	if T[4]*KV["4-0"] ~= 0 then
+    Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"] + --[[max(0,min(1,T[4])*KV["4-0"]*-10)]]KV["4-0"]*-10)
+    if T[4]*KV["4-0"] ~= 0 then
 		Train.A54:TriggerInput("Set",0)
 		Train:WriteTrainWire(5,0)
 	end
-    --Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"]*(1-T[4]*KV["4-0"]*-10))
+	--Train:WriteTrainWire(4,S["10AK"]*KV["10AK-4"]*(1-T[4]*KV["4-0"]*-10))
 
     Panel.LST = T[6]*Train.A40.Value
     Panel.LhRK = (T[2]+T[-2])*Train.A57.Value
@@ -163,7 +163,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         ARS.NGPower = S["7D"]*RC1
         Train.BIS200.Power = T[10]*Train.A43.Value*(Train.ALS.Value+Train.ARS.Value)
         ARS.KB=T[91]*RC1+(ARS.ALS*(1-Train.BSM_GE.Value)+ARS.GE*Train.BSM_GE.Value)*Train.KVT.Value
---]]
+        --]]
         S["14bx"] = S["14b"]*Train.KRP.Value
         S["KRH"] = max(0,T[1])+S["14bx"]
         ARS.KRH = S["KRH"]*RC1
@@ -457,8 +457,12 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Panel.M8 = S["V2"]*Train.PVK.Value
 		Train.RPvozvrat.VozRpPressed = T[17]~=0
 
+        
+        Train.C1:TriggerInput("Set", T[1])
+        Panel.IST = Train.C1.Value*Train.VKST.Value*T[64]
+        
         local ASNP_VV = Train.ASNP_VV
-        ASNP_VV.Power = BO*Train.AS1.Value*Train.R_ASNPOn.Value
+        ASNP_VV.Power = T[10]*Train.R_ASNPOn.Value
         ASNP_VV.AmplifierPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_UNch.Value*Train.A26.Value
         Train:WriteTrainWire(13,ASNP_VV.AmplifierPower)
         Train:WriteTrainWire(-13,ASNP_VV.AmplifierPower*Train.PowerSupply.X2_2)
@@ -467,8 +471,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Panel.AnnouncerPlaying = T[13]
         Panel.AnnouncerBuzz = T[-13]+ASNP_VV.CabinSpeakerPower*Train.PowerSupply.X2_2
         Train:WriteTrainWire(14,S["14a"]*(Train.SOT.Value+Train.UOS.Value)*Train.KRP.Value*Train.ROT2.Value)
-
-        Panel.CBKIPower = BO*Train.A76.Value
+        Panel.PCBKPower = BO
+        Panel.CBKIPower = Panel.PCBKPower
     end
     if self.OldFLARS then
         Panel.LUDS = ARS.FMM1*Train.AIS.Value
@@ -526,7 +530,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Train.KSH2:TriggerInput("Set",S["1R"])
         P:TriggerInput("PP",S["3A"]*Train.LK5.Value*C(RK==18)*S["ZR"])--1A-1D
     else
-        S["1M"] = C(1<=RK and RK<=5)*S["3A"]+T[10]*Train.KSH2.Value
+        S["1M"] = C(1<=RK and RK<=5)*S["3A"]+S["10A"]*Train.KSH2.Value
         S["1R"] = (S["1A"]*C(RK==1)*P.PS + S["1M"]*P.PP)*S["ZR"]
         Train.KSH1:TriggerInput("Set",S["1R"])
         Train.KSH2:TriggerInput("Set",S["1R"])
@@ -620,7 +624,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     end
     if isMVM then
         Train.BV:TriggerInput("Disable",T[71]*Train.A66.Value)
-        Panel.PCBKPower = T[10]
     end
     Train.RPvozvrat:TriggerInput("Open",S["17A"]) --FIXME Mayve more right RP code
     --
@@ -856,7 +859,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Panel.VPR = BO*Train.AR63.Value*Train.R_VPR.Value+B*Train.AV3.Value*Train.R_VPR.Value
     else
         Panel.VPR = BO*Train.AR63.Value*Train.R_VPR.Value
-        Panel.PCBKPower = BO
     end
 
     --BPSN

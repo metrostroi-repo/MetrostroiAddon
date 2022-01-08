@@ -382,7 +382,6 @@ function TRAIN_SYSTEM:Think(dT)
         self:CState("CloseDoors",RR and Train.SF7.Value>0 and (Train.DoorClose.Value == 0 or (not self.CloseRing and Train.DoorClose.Value==2 or self.CloseRing and CurTime()-self.CloseRing>4)))
         self:CState("PassLight",Train.PassLight.Value>0)
         self:CState("PassVent",Train.PassVent.Value-1)
-        self:CState("ParkingBrake",Train.ParkingBrake.Value)
         if BARSPower and Train.BARS.V2 > 0 or not BARSPower and math.abs(self.Speed) < 0.5 and self.PowerCommand < 0 then
             self.StopV2 = true
         elseif self.PowerCommand > 0 then

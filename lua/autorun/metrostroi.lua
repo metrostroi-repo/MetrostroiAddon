@@ -174,7 +174,7 @@ function Metrostroi.AddSkin(category,name,tbl)
             if not texture or not texture.defaults then return end
             for k,v in pairs(texture.defaults) do
                 local id = VGUI[k].ID
-                print(List:GetOptionData(List:GetSelectedID()),id,VGUI[id],v)
+                -- print(List:GetOptionData(List:GetSelectedID()),id,VGUI[id],v)
                 if id and VGUI[id] then
                     VGUI[id](v,true)
                 end
@@ -339,7 +339,9 @@ end
 if SERVER then
     local OSes = {
         Windows = "win32",
+		Windows64 = "win64",
         Linux = "linux",
+		Linux64 = "linux64",
         BSD = "linux",
         POSIX = "linux",
         OSX = "osx",
@@ -360,8 +362,18 @@ if SERVER then
             else
                 print("Metrostroi: Turbostroi library loaded successfuly.")
             end
-        elseif jit.arch ~= "x86" then
-            ErrorNoHalt("Metrostroi: Unsupported architecture "..jit.arch..".\nTurbostroi works only on x86(32 bit) version of server\n")
+        elseif jit.arch == "x64" and OSes[jit.os.."64"] and file.Exists(Format("lua/bin/gmsv_turbostroi_%s.dll",OSes[jit.os.."64"]), "GAME") then
+			if not pcall(require,"turbostroi") then
+                if system.IsWindows() then
+                    ErrorNoHalt("======================================================\nMetrostroi: Turbostroi library can't be loaded because of missing libraries!\nCheck, that you have Microsoft visual c++ 2010 and 2017 redistributable(x64) installed\nYou can download it from:\n")
+                    MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=5555\nhttps://aka.ms/vs/15/release/vc_redist.x64.exe\n")
+                    ErrorNoHalt("======================================================\n")
+                else
+                    ErrorNoHalt("Metrostroi: Turbostroi library can't be loaded!\n")
+                end
+            else
+                print("Metrostroi: Turbostroi library loaded successfuly.")
+            end
         elseif system.IsWindows() then
             ErrorNoHalt("======================================================\nMetrostroi: Turbostroi DLL not found.\nYou can found turbostroi for Windows at \n")
             MsgC(Color(255,0,0),"https://metrostroi.net/turbostroi\n")

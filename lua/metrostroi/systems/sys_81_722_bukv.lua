@@ -276,7 +276,6 @@ function TRAIN_SYSTEM:Think()
     self.EnableMK = (not self:Get("PVU4") and self:Get("Compressor")) and 1 or 0
     self.DisableTP = (self:Get("PVU5") or self:Get("PVU6")) and 1 or 0
     self.DisablePant = (self:Get("DisablePant") or self:Get("PVU7")) and 1 or 0
-    self.ParkingBrake = self:Get("ParkingBrake")
     local vent = self:Get("PassVent") or 0
     if vent==1 then
         self.VentMode = Train.Pneumatic.WeightLoadRatio>0.6 and 2 or Train.Pneumatic.WeightLoadRatio>0.1 and 1 or 0

@@ -114,6 +114,8 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.DriverValveDisconnectPrevious = 0
 
     -- Doors state
+    self.DoorLeft = false
+    self.DoorRight = false
     if not TURBOSTROI then
         self.LeftDoorState = { 0,0,0,0 }
         self.RightDoorState = { 0,0,0,0 }

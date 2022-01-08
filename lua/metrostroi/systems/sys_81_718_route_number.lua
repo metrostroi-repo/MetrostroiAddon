@@ -59,7 +59,7 @@ else
 
         self.Reloaded = true
         local rn = Format("%03d",self.RouteNumber)
-        print(self.RouteNumber)
+        -- print(self.RouteNumber)
         for i=1,2 do
             if IsValid(scents["route"..i]) then
                 scents["route"..i]:SetSkin(rn[i])

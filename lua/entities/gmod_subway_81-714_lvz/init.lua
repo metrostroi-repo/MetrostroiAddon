@@ -266,12 +266,6 @@ function ENT:TrainSpawnerUpdate()
     else
         self:SetNW2Bool("NewSeats",self:GetNW2Int("SeatType") == 4 or self:GetNW2Int("SeatType") == 3 or self:GetNW2Int("SeatType") == 1 and math.random()>0.5)--(kvr or seats))
         self:SetNW2Bool("NewSeatsBlue",self:GetNW2Int("SeatType") == 4 or self:GetNW2Bool("NewSeats") and self:GetNW2Int("SeatType") == 1 and math.random()>0.5)
-        local typ = self:GetNW2Int("BodyType")
-        if typ==3 or typ==1 and math.random() > 0.5 then
-            self:SetModel("models/metrostroi_train/81-717/81-717_spb_int_m.mdl")
-        else
-            self:SetModel("models/metrostroi_train/81-717/81-717_spb_int.mdl")
-        end
     end
     self.Pneumatic.ValveType = self:GetNW2Int("Crane",1)+1
     self.Announcer.AnnouncerType = self:GetNW2Int("Announcer",1)

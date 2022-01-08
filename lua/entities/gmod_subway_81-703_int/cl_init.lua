@@ -1269,7 +1269,7 @@ function ENT:Think()
             else
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 6*self.DeltaTime,0,1)
             end
-            self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.66+self.DoorLoopStates[id]*0.2)
+            self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.5+self.DoorLoopStates[id]*0.2)
             local n_l = "door"..i.."x"..k--.."a"
             --local n_r = "door"..i.."x"..k.."b"
             local dlo = 1
@@ -1280,7 +1280,7 @@ function ENT:Think()
                     dlo = self.Anims[n_l].oldspeed/14
                 end
             end
-            self:Animate(n_l,state,0,1, dlo*14,false)--0.8 + (-0.2+0.4*math.random()),0)
+            self:Animate(n_l,state,0.01,1, dlo*14,false)--0.8 + (-0.2+0.4*math.random()),0)
             --self:Animate(n_r,state,0,1, dlo*14,false)--0.8 + (-0.2+0.4*math.random()),0)
         end
     end

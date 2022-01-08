@@ -155,38 +155,8 @@ ENT.ClientProps["handrails_new"] = {
     hide=1.5,
 }
 
-ENT.ClientProps["mask22_mvm_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_22_wp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
 ENT.ClientProps["mask22_mvm"] = {
     model = "models/metrostroi_train/81-717/mask_22.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask22_glass"] = {
-    model = "models/metrostroi_train/81-717/mask_22_glass.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask22_glass_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_22_glass_wp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask222_glass"] = {
-    model = "models/metrostroi_train/81-717/mask_222_glass.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["mask222_glass_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_222_glass_wp.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     nohide=true,
@@ -209,12 +179,6 @@ ENT.ClientProps["mask141_mvm"] = {
     ang = Angle(0,0,0),
     nohide=true,
 }
-ENT.ClientProps["mask141_mvm_wp"] = {
-    model = "models/metrostroi_train/81-717/mask_141_wp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
 ENT.ClientProps["Headlights222_1"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_222_group1.mdl",
     pos = Vector(0,0,0),
@@ -223,18 +187,6 @@ ENT.ClientProps["Headlights222_1"] = {
 }
 ENT.ClientProps["Headlights222_2"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_222_group2.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights222_glass_1"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_222_glass_group1.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights222_glass_2"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_222_glass_group2.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     nohide=true,
@@ -259,18 +211,6 @@ ENT.ClientProps["Headlights22_1"] = {
 }
 ENT.ClientProps["Headlights22_2"] = {
     model = "models/metrostroi_train/81-717/lamps/headlights_22_group1.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights22_glass_1"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_22_glass_group2.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    nohide=true,
-}
-ENT.ClientProps["Headlights22_glass_2"] = {
-    model = "models/metrostroi_train/81-717/lamps/headlights_22_glass_group1.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     nohide=true,
@@ -766,6 +706,16 @@ ENT.ButtonMap["Block7"] = {
             var="KRP",speed=16,vmin=1,vmax=0,
             sndvol = 0.07,snd = function(val) return val and "button1_on" or "button1_off" end,sndmin = 60,sndmax = 1e3/3,sndang = Angle(-90,0,0),
         }},
+        {ID = "VKSTToggle",x=28,y=58,radius=20,tooltip="",model = {
+            model = "models/metrostroi_train/81-710/ezh3_tumbler_pp250.mdl",ang = 180,z=-2,
+            var="VKST",speed=16,
+            sndvol = 1,snd = function(val) return val and "switch_on" or "switch_off" end,
+            sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
+        }}, 
+        {ID = "!IST", x=43, y=58, radius=8, tooltip="", model = {
+            lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",z = -2,color = Color(255,50,45), var="ISTLamp"},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,50,45),z=-1.4,}
+        }},        
         {ID = "KAHSet",x=43,y=88,radius=20,tooltip="",model = {
             model = "models/metrostroi_train/81-710/ezh3_button_black.mdl",z = -2,
             var="KAH",speed=16,vmin=1,vmax=0,
@@ -775,7 +725,7 @@ ENT.ButtonMap["Block7"] = {
         {ID = "KAHKToggle",x=23,y=98,w=40,h=20,tooltip="",model = {
             model = "models/metrostroi_train/81/krishka.mdl",ang = 0,z = -1,
             var="KAHK",speed=8,min=0.43,max=0.685,disable="KAHSet",
-            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=135,x=-17,y=-45,z=-0,var="KAHPl",ID="KAHPl",},
+            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=80,x=15,y=-49,z=-0,var="KAHPl",ID="KAHPl",},
             sndvol = 1,snd = function(val) return val and "kr_close" or "kr_open" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
             noTooltip = true,
@@ -808,6 +758,12 @@ ENT.ButtonMap["Block7"] = {
             sprite = {bright=0.2,size=.5,scale=0.03,z=20,color=Color(255,130,90)},
         }},
     }
+}
+ENT.ClientProps["VKSTIST"] = {
+    model = "",
+    pos = Vector(0,0,0),
+    ang = Angle(0,0,0),
+    hideseat = 0.5,
 }
 
 ENT.ButtonMap["Block1"] = {
@@ -2771,7 +2727,7 @@ function ENT:Think()
     self:SetLightPower(44,self:GetPackedBool("PanelLights"))
     self:SetLightPower(45,self:GetPackedBool("PanelLights"))
 
-    local mask = self:GetNW2Int("MaskType",2)--self:GetNW2Bool("Mask")
+    local mask = self:GetNW2Int("MaskType",1)--self:GetNW2Bool("Mask")
     local HL1 = self:Animate("Headlights1",self:GetPackedBool("Headlights1") and 1 or 0,0,1,6,false)
     local HL2 = self:Animate("Headlights2",self:GetPackedBool("Headlights2") and 1 or 0,0,1,6,false)
     local RL = self:Animate("RedLights_a",self:GetPackedBool("RedLights") and 1 or 0,0,1,6,false)
@@ -2941,16 +2897,10 @@ function ENT:Think()
     self:SetLightPower("Lamp_RTM2",dot5 and lamps_rtm > 0,lamps_rtm)
 
     if self.MaskType ~= mask then
-        self:ShowHide("mask22_mvm_wp",mask==1)
-        self:ShowHide("mask22_mvm",mask==2)
-        self:ShowHide("mask22_glass_wp",mask==3)
-        self:ShowHide("mask22_glass",mask==4)
-        self:ShowHide("mask222_mvm_wp",mask==5)
-        self:ShowHide("mask222_mvm",mask==6)
-        self:ShowHide("mask222_glass_wp",mask==7)
-        self:ShowHide("mask222_glass",mask==8)
-        self:ShowHide("mask141_mvm_wp",mask==9)
-        self:ShowHide("mask141_mvm",mask==10)
+        self:ShowHide("mask22_mvm",mask==1)
+        self:ShowHide("mask222_mvm_wp",mask==2)
+        self:ShowHide("mask222_mvm",mask==3)
+        self:ShowHide("mask141_mvm",mask==4)
 
         self:ShowHideSmooth("Headlights222_1",0)
         self:ShowHideSmooth("Headlights222_2",0)
@@ -2958,15 +2908,11 @@ function ENT:Think()
         self:ShowHideSmooth("Headlights141_2",0)
         self:ShowHideSmooth("Headlights22_1",0)
         self:ShowHideSmooth("Headlights22_2",0)
-        self:ShowHideSmooth("Headlights22_glass_1",0)
-        self:ShowHideSmooth("Headlights22_glass_2",0)
-        self:ShowHideSmooth("Headlights222_glass_1",0)
-        self:ShowHideSmooth("Headlights222_glass_2",0)
-        if mask >= 9 then
+        if mask == 4 then
             self.LightsOverride[30][2] = Vector(465,-48, -23.5)
             self.LightsOverride[31][2] = Vector(465,48 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , -23.5)
-        elseif mask < 9 then
+        elseif mask < 4 then
             self.LightsOverride[30][2] = Vector(465,-45, -23.5)
             self.LightsOverride[31][2] = Vector(465,45 , -23.5)
             self.LightsOverride[32][2] = Vector(465,0  , 52)
@@ -2978,19 +2924,13 @@ function ENT:Think()
     self:ShowHide("1:KVTRSet",not lvz)
     self:ShowHide("2:KVTSet",lvz)
     self:ShowHide("2:KVTRSet",lvz)
-    if mask <= 2 then
+    if mask == 1 then
         self:ShowHideSmooth("Headlights22_1",HL1)
         self:ShowHideSmooth("Headlights22_2",HL2)
-    elseif mask <= 4 then
-        self:ShowHideSmooth("Headlights22_glass_1",HL1)
-        self:ShowHideSmooth("Headlights22_glass_2",HL2)
-    elseif mask <= 6 then
+    elseif mask <= 3 then
         self:ShowHideSmooth("Headlights222_1",HL1)
         self:ShowHideSmooth("Headlights222_2",HL2)
-    elseif mask <= 8 then
-        self:ShowHideSmooth("Headlights222_glass_1",HL1)
-        self:ShowHideSmooth("Headlights222_glass_2",HL2)
-    elseif mask <= 10 then
+    elseif mask == 4 then
         self:ShowHideSmooth("Headlights141_1",HL1)
         self:ShowHideSmooth("Headlights141_2",HL2)
     end
@@ -3320,6 +3260,9 @@ function ENT:Think()
             self:SetSoundState("vent"..i,self.VentG2,1)
         end
     end
+    
+    self:SetSoundState("IST", self:GetPackedBool("IST") and 1 or 0, 0.95)
+    
     if self.RingType ~= self:GetNW2Int("RingType",1) then
         self.RingType = self:GetNW2Int("RingType",1)
         self:SetSoundState(self.RingName,0,0)

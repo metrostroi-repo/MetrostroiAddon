@@ -249,6 +249,7 @@ function ENT:Initialize()
     -- Overrides for train wire values from wiremod interface and special concommand
     self.TrainWireOverrides = {}
     self.TrainWireOutside = {}
+    self.TrainWireOutsideFrom = {}
 
 
     -- Is this train 'odd' or 'even' in coupled set
@@ -268,8 +269,10 @@ function ENT:Initialize()
     -- Passenger related data (must be set by derived trains to allow boarding)
     self.LeftDoorsOpen = false
     --self.LeftDoorsBlocked = false
+    self.PrevLeftDoorsOpening = false
     self.RightDoorsOpen = false
     --self.RightDoorsBlocked = false
+    self.PrevRightDoorsOpening = false
 
     -- Get default train mass
     if IsValid(self:GetPhysicsObject()) then
@@ -796,7 +799,9 @@ end]]
 --------------------------------------------------------------------------------
 function ENT:LeaderReadTrainWire(id)
     if self.TrainWireOverrides[id] then return  self.TrainWireOverrides[id] end
-    if self.TrainWireOutside[id] then return self.TrainWireOutside[id] end
+    if self.TrainWireOutside[id] then
+        return (self.TrainWireOutsideFrom[id] and (self.TrainWireTurbostroi[self.TrainWireOutsideFrom[id]] or 0) or 1)*self.TrainWireOutside[id]
+    end
     return (self.TrainWireTurbostroi[id] or 0)+(self.TrainWireWriters[id] or 0)
 end
 

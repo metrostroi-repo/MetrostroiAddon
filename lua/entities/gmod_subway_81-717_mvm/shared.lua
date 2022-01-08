@@ -572,6 +572,9 @@ function ENT:InitializeSounds()
     self.SoundNames["ring_old"] = {loop=0.15,"subway_trains/717/ring/ringo_start.wav","subway_trains/717/ring/ringo_loop.wav","subway_trains/717/ring/ringo_end.mp3"}
     self.SoundPositions["ring_old"] = {60,1e9,Vector(459,6,10),0.35}
 
+    self.SoundNames["IST"] = {loop=true,"subway_trains/717/ring/son17.wav"}
+    self.SoundPositions["IST"] = {60,1e9,Vector(443.8,0,-3.2),0.15}
+
     self.SoundNames["vpr"] = {loop=0.8,"subway_trains/common/other/radio/vpr_start.wav","subway_trains/common/other/radio/vpr_loop.wav","subway_trains/common/other/radio/vpr_off.wav"}
     self.SoundPositions["vpr"] = {60,1e9,Vector(420,-49 ,61),0.05}
 

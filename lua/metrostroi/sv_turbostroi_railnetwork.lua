@@ -12,7 +12,22 @@ end
 print("[!] RailNetwork initialized!")
 -- NEW API
 local ffi = require("ffi")
-local C = ffi.load("gmsv_turbostroi_win32")
+local OSName = "gmsv_turbostroi_"
+
+if jit.os == "Windows" then
+	OSName = OSName.."win"
+elseif jit.os == "Linux" then
+	OSName = OSName.."linux"
+end
+
+if jit.arch == "x86" then
+	OSName = OSName.."32"
+else
+	OSName = OSName.."64"
+end
+
+local C = ffi.load(OSName)
+
 ffi.cdef[[
 bool RnThreadSendMessage(int ent_id, int id, const char* name, double value);
 ]]
@@ -920,7 +935,7 @@ function Metrostroi.Load(name,keep_signs)
 	-- Create paths definition
 	Metrostroi.Paths = {}
 	if true then return end
-	print(type(TrackLoadedData))
+	-- print(type(TrackLoadedData))
 	for pathID,path in pairs(TrackLoadedData) do
 		local currentPath = { id = pathID }
 		Metrostroi.Paths[pathID] = currentPath
@@ -1114,7 +1129,7 @@ function Metrostroi.Load(name,keep_signs)
 		if auto then
 			for k,v in pairs(auto) do
 				local ent = ents.Create("gmod_track_autodrive_plate")
-				print(k,v,ent)
+				-- print(k,v,ent)
 				if IsValid(ent) then
 					ent:SetPos(v.Pos)
 					ent:SetAngles(v.Angles)
