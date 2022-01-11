@@ -323,7 +323,7 @@ function TRAIN_SYSTEM:Think(dT)
     self.ReservoirPressure_dPdT = 0.0
     self.BrakeCylinderPressure_dPdT = 0.0
     self.ParkingBrakePressure_dPdT = 0.0
-	self.WorkingChamberPressure_dPdT = 0.0
+    self.WorkingChamberPressure_dPdT = 0.0
 
 	local rnd = math.random(1,10)
 	local offs = 0.1
@@ -400,7 +400,7 @@ function TRAIN_SYSTEM:Think(dT)
         local TLDisconnect = self.DisconnectType and Train.DriverValveTLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
         -- 013: 1 Overcharge
         if (self.RealDriverValvePosition == 1) and BLDisconnect and (TLDisconnect or self.BrakeLinePressure > self.TrainLinePressure) then
-			self:equalizePressure(dT,"BrakeLinePressure", math.min(6.4,self.TrainLinePressure), pr_speed,pr_speed*0.35, nil, 1.0)
+		    self:equalizePressure(dT,"BrakeLinePressure", math.min(6.4,self.TrainLinePressure), pr_speed,pr_speed*0.35, nil, 1.0)
         end
 
         -- 013: 2 Normal pressure
@@ -468,13 +468,13 @@ function TRAIN_SYSTEM:Think(dT)
     if self.EmergencyValveDisable then--and (self.BrakeLinePressure-self.OldBrakeLinePressure)>0.01 then
         self.EmergencyValveDisable=false
         self.EmergencyValve=false
-		Train.autosaid=false
+	    Train.autosaid=false
     end
     self.OldBrakeLinePressure = self.BrakeLinePressure
     local leak = 0								   --math.log(80*self.BrakeLinePressure - 200,3)
     if self.EmergencyValve then					   --math.log(self.BrakeLinePressure,1.25) - 2.5
 		--local leakst = BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.5) or 1.1*(Train:GetWagonCount())*math.Clamp(self.BrakeLinePressure/4,0,1)
-		local leakst = BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.5) or math.max(1.6,math.log(0.63*self.BrakeLinePressure,1.15))
+	    local leakst = BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.5) or math.max(1.6,math.log(0.63*self.BrakeLinePressure,1.15))
         leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst*wagc/6)--,false,false,10)
         if Train.UAVA.Value > 0 or (self.BrakeLinePressure < 1.8 and Train.AutostopValve.Value == 0) then	--пока держим ЛКМ нажатой, срывной клапан открыт
             self.EmergencyValveDisable = true
@@ -518,7 +518,7 @@ function TRAIN_SYSTEM:Think(dT)
 	if self.WCChargeValve == true then
 		self:equalizePressure(dT,"WorkingChamberPressure",self.BrakeLinePressure,0.187,nil,nil,1.0)	--simulate 0.8mm hole btw BL and working chambers
 	end
-	self.AirDistributorReady = self.WorkingChamberPressure >= 2.2
+    self.AirDistributorReady = self.WorkingChamberPressure >= 2.2
     self.WCChargeValve = not ((self.WorkingChamberPressure - self.BrakeLinePressure) > 0.2 and (self.WorkingChamberPressure - self.BrakeLinePressure) < 2.5)
 	self.OverchargeReleaseValve = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
 	if self.OverchargeReleaseValve then	

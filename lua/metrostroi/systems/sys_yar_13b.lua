@@ -30,7 +30,7 @@ function TRAIN_SYSTEM:Initialize()
         latched = true,             -- RPvozvrat latches into place
         power_open = "None",        -- Power source for the open signal
         power_close = "Mechanical", -- Power source for the close signal
-		VozRpPressed = false,		-- Added to override the blocking action of the energized RP relays on RPVozvrat
+        VozRpPressed = false,		-- Added to override the blocking action of the energized RP relays on RPVozvrat
     })
 
     -- Реле времени РВ1
@@ -94,7 +94,8 @@ function TRAIN_SYSTEM:Think()
     end
     --self.RUTTarget = 250 + 150*self.Train.Pneumatic.WeightLoadRatio
     -- RPvozvrat operation
-    Train.RPvozvrat:TriggerInput("Close", not Train.RPvozvrat.VozRpPressed and
+	local A = Train.RPvozvrat.VozRpPressed ~= 0
+    Train.RPvozvrat:TriggerInput("Close", not A and
         ((Train.DR1.Value == 1.0) or
         (Train.DR2.Value == 1.0) or
         (Train.RPL.Value == 1.0) or

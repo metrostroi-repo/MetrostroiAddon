@@ -78,7 +78,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     if isMVM then
         Train:WriteTrainWire(71,S["33D"]*Train.OtklBV.Value)
     end
-	Train.RPvozvrat.VozRpPressed = T[17]~=0
+	Train.RPvozvrat.VozRpPressed = T[17]
     --Вагонная часть
     S["10A"] = BO*Train.A30.Value
     S["ZR"] = (1-Train.RRP.Value)+(B*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
