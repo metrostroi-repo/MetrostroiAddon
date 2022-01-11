@@ -627,6 +627,14 @@ local function createFrame()
 	Draw()
 end
 
+net.Receive("train_spawner_open",function()
+	local tbl = net.ReadTable()
+	local tool = LocalPlayer():GetTool("train_spawner")
+	Settings[tbl.Train] = tbl
+	Settings.Train = tbl.Train
+	tool.Settings = tbl
+	UpdateConCMD()
+end)
 net.Receive("MetrostroiTrainSpawner",createFrame)
 net.Receive("MetrostroiMaxWagons", function()
 	MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")

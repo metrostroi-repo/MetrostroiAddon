@@ -7,7 +7,7 @@ local C_MaxWagons = GetConVar("metrostroi_maxwagons")
 if CLIENT then
     language.Add("Tool.train_spawner.name", "Train Spawner")
     language.Add("Tool.train_spawner.desc", "Spawn a train")
-    language.Add("Tool.train_spawner.0", "Primary: Spawns a full train. Secondary: Reverse facing (yellow ed when facing the opposite side).")
+    language.Add("Tool.train_spawner.0", "Primary: Spawns a full train. Secondary: Reverse facing (yellow ed when facing the opposite side). Reload: Copy train settings.")
     language.Add("Undone_81-7036", "Undone 81-7036 (does not work)")
     language.Add("Undone_81-7037", "Undone 81-7037 (does not work)")
     language.Add("Undone_81-717", "Undone 81-717")
@@ -308,6 +308,7 @@ function TOOL:SpawnWagon(trace)
 
             LastRot = rot
         end
+        ent._Settings = self.Settings
         table.insert(trains,ent)
         undo.AddEntity(ent)
         --[[
@@ -336,7 +337,7 @@ function TOOL:SpawnWagon(trace)
         hook.Run("MetrostroiSpawnerUpdate",ent,self.Settings)
         ent:UpdateTextures()
         ent.FrontAutoCouple = i > 1 and i < self.Settings.WagNum
-        ent.RearAutoCouple = true
+        ent.RearAutoCouple = self.Settings.WagNum > 1
         LastEnt = ent
     end
     undo.SetPlayer(ply)
@@ -397,8 +398,23 @@ end
 
 function TOOL:Reload(trace)
     if CLIENT then return end
-    local spawner = ents.Create("gmod_train_spawner")
-    spawner:SpawnFunction(self:GetOwner())
+    if IsValid(trace.Entity) and trace.Entity._Settings then
+        local ply = self:GetOwner()
+        ply:ConCommand("gmod_tool train_spawner")
+        ply:SelectWeapon("gmod_tool")
+        local tool = ply:GetTool("train_spawner")
+        tool.AllowSpawn = true
+        tool.Settings = trace.Entity._Settings
+        local ENT = scripted_ents.Get(tool.Settings.Train)
+        if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
+        
+        net.Start("train_spawner_open")
+            net.WriteTable(tool.Settings)
+        net.Send(ply)
+        
+        local spawner = ents.Create("gmod_train_spawner")
+        spawner:SpawnFunction(ply)
+    end
 end
 function TOOL:LeftClick(trace)
     if not self.Train then return end
@@ -432,8 +448,9 @@ function TOOL:LeftClick(trace)
                     for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
                     hook.Run("MetrostroiSpawnerUpdate",ent,self.Settings)
                     ent:UpdateTextures()
+                    ent._Settings = self.Settings
                     table.insert(trains,ent)
-
+                    
                 end
                 if self.Train.Spawner.postfunc then self.Train.Spawner.postfunc(trains,self.Settings.WagNum) end
             end
