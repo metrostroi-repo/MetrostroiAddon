@@ -405,7 +405,7 @@ function TRAIN_SYSTEM:Think(dT)
 
         -- 013: 2 Normal pressure
         if (self.RealDriverValvePosition == 2) and BLDisconnect and (TLDisconnect or self.BrakeLinePressure > 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure)) then
-            self:equalizePressure(dT,"BrakeLinePressure", 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure), pr_speed,pr_speed*0.4, nil, 1.0)-- nil, 1.0)
+            self:equalizePressure(dT,"BrakeLinePressure", 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure), pr_speed,Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2 or pr_speed*0.4, nil, 1.0)-- nil, 1.0)
         end
 
         -- 013: 3 4.3 Atm
@@ -471,9 +471,8 @@ function TRAIN_SYSTEM:Think(dT)
 	    Train.autosaid=false
     end
     self.OldBrakeLinePressure = self.BrakeLinePressure
-    local leak = 0								   --math.log(80*self.BrakeLinePressure - 200,3)
-    if self.EmergencyValve then					   --math.log(self.BrakeLinePressure,1.25) - 2.5
-		--local leakst = BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.5) or 1.1*(Train:GetWagonCount())*math.Clamp(self.BrakeLinePressure/4,0,1)
+    local leak = 0
+    if self.EmergencyValve then
 	    local leakst = BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.5) or math.max(1.6,math.log(0.63*self.BrakeLinePressure,1.15))
         leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst*wagc/6)--,false,false,10)
         if Train.UAVA.Value > 0 or (self.BrakeLinePressure < 1.8 and Train.AutostopValve.Value == 0) then	--пока держим ЛКМ нажатой, срывной клапан открыт
@@ -550,11 +549,8 @@ function TRAIN_SYSTEM:Think(dT)
                 end
                 self.BePN2 = true
         elseif self.PN2 > 0.0 then
-            self.PN2 = math.max(0,self.PN2-math.exp(1.26*(self.BrakeCylinderPressure - self.GN2Offset))*2.4*dT)
-            --self.PN2 = 0.3*math.exp(0.6*(self.BrakeCylinderPressure - dT) - 1) - 0.11
+            self.PN2 = self.BrakeCylinderPressure > 0.4 and 0.2 or self.PN2 - 0.5*dT
         end
-        --local cranPres = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - self.BrakeLinePressure)*(self.BrakeLinePressure < 3.6 and (6.2 - self.WorkingChamberPressure) or 1)))---
-        --local cranPres = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - (self.BrakeLinePressure < 3.6 and (self.BrakeLinePressure - 3.0)*0.45*self.WorkingChamberPressure/(self.BrakeLinePressure - 3.0) or self.BrakeLinePressure*(self.BrakeLinePressure > 4.5 and self.BrakeLinePressure_dPdT > 0.02 and 1.06 or 1)))*(self.BrakeLinePressure > self.KM013offset and 0.6 or 1)))
         local WcBl = (self.BrakeLinePressure < 3.55 and 0.45*self.WorkingChamberPressure or self.BrakeLinePressure > 3.65 and self.BrakeLinePressure*(self.BrakeLinePressure > 4.5 and self.BrakeLinePressure_dPdT > 0.02 and 1.06 or 1))
 		self.cranPres = WcBl and math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - WcBl)*(self.BrakeLinePressure > self.KM013offset and 0.6 or 1))) or self.cranPres
         local targetPressure = (self.cranPres < (self.PN1 + self.WeightLoadRatio*0.7) and (Train.PneumaticNo1.Value == 1.0) and (self.PN1 + self.WeightLoadRatio*0.7) or self.PN1) + self.PN2 + self.cranPres
