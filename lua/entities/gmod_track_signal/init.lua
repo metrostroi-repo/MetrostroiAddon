@@ -200,6 +200,10 @@ function ENT:Initialize()
 	self.PostInitalized = true
 
 	self.Controllers = nil
+	self.OccupiedOld = false
+	self.ControllerLogicCheckOccupied = false
+	self.ControllerLogicOverride325Hz = false
+	self.Override325Hz = false
 end
 
 function ENT:PreInitalize()
@@ -345,6 +349,7 @@ function ENT:GetRS()
 	if self.OverrideTrackOccupied or not self.TwoToSix or not self.ARSSpeedLimit then return false end
 	--if self.ARSSpeedLimit == 1 or self.ARSSpeedLimit == 2 then return false end
 	if self.ARSSpeedLimit ~= 0 and self.ARSSpeedLimit== 2 then return false end
+	if self.ControllerLogic and self.ControllerLogicOverride325Hz then return self.Override325Hz end
 	return (self.ARSSpeedLimit > 4 or self.ARSSpeedLimit == 4 and self.Approve0) and (not self.ARSNextSpeedLimit or self.ARSNextSpeedLimit >= self.ARSSpeedLimit)
 end
 
@@ -644,12 +649,15 @@ function ENT:Think()
 		end
 	else
 		local number = self.RouteNumberReplace or ""
-		--[[self.PrevTime = self.PrevTime or 0
-		if (CurTime() - self.PrevTime) > 1.0 then
-			self.PrevTime = CurTime()+math.random(0.5,1.5)
-			self:ARSLogic(self.PrevTime - CurTime())
-			self:CheckOccupation()
-		end]]
+		if self.ControllerLogicCheckOccupied then
+			self.PrevTime = self.PrevTime or 0
+			if (CurTime() - self.PrevTime) > 1.0 then
+				self.PrevTime = CurTime() + math.random(0.5,1.5)
+				if self.Node and self.TrackPosition then
+					self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", self)
+				end
+			end
+		end
 		--[[
 		if self.MU or self.ARSOnly or self.RouteNumberSetup and self.RouteNumberSetup ~= "" or self.RouteNumber and self.RouteNumber ~= "" then
 			if self.NextSignalLink then
@@ -688,6 +696,10 @@ function ENT:Think()
 				end
 			end
 		end
+	end
+	if self.Occupied ~= self.OccupiedOld then
+		hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
+		self.OccupiedOld = self.Occupied
 	end
 	if self.Controllers then
 		for k,v in pairs(self.Controllers) do
