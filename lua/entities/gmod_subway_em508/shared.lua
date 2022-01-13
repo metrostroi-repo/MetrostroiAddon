@@ -1,7 +1,7 @@
 ENT.Type            = "anim"
 ENT.Base            = "gmod_subway_base"
 
-ENT.PrintName       = "Em509 (81-509)"
+ENT.PrintName       = "Em508 (81-508)"
 ENT.Author          = ""
 ENT.Contact         = ""
 ENT.Purpose         = ""
@@ -26,6 +26,25 @@ local function GetDoorPosition(i,k)
     return Vector(359.0 - 35/2 - 229.5*i,-65*(1-2*k),7.5)
 end
 
+ENT.MirrorCams = {
+    Vector(441,72,15),Angle(1,180,0),15,
+    Vector(441,-72,15),Angle(1,180,0),15,
+}
+
+ENT.AnnouncerPositions = {
+    {Vector(412,-49 ,61),80,0.4},
+    {Vector(-3,-60, 62),300,0.3},
+    {Vector(-3,60 ,62),300,0.3},
+}
+
+ENT.Cameras = {
+    {Vector(407.5+18,32,21),Angle(0,180,0),"Train.703.Breakers1"},
+    {Vector(407.5+18,50,24),Angle(5,180,0),"Train.703.Breakers2"},
+    {Vector(407.5+34,48,16),Angle(0,37,0),"Train.Common.HelpersPanel"},
+    {Vector(407.5+30,40,5) ,Angle(30,10,0),"Train.703.Parking"},
+    {Vector(450+13,0,26),Angle(60,0,0),"Train.Common.CouplerCamera"},
+}
+
 -- Setup door positions
 ENT.LeftDoorPositions = {}
 ENT.RightDoorPositions = {}
@@ -34,29 +53,6 @@ for i=0,3 do
     table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
 end
 
-ENT.AnnouncerPositions = {
-    {Vector(420,-38.2 ,35),80,0.4},
-    {Vector(-3,-60, 62),300,0.3},
-    {Vector(-3,60 ,62),300,0.3},
-}
-
-ENT.MirrorCams = {
-    Vector(441,72,8),Angle(1,180,0),15,
-    Vector(441,-72,8),Angle(1,180,0),15,
-}
-
-ENT.Cameras = {
-    {Vector(407+8.5+15,32,16) ,Angle(0,180,0),"Train.703.Breakers1"},
-    {Vector(407+8.5+13,48,21) ,Angle(0,180,0),"Train.703.Breakers2"},
-    {Vector(407+8.5+28,48,16) ,Angle(0,40,0),"Train.Common.HelpersPanel"},
-    {Vector(407+8.5+11,37,5) ,Angle(30,0,0),"Train.703.Parking"},
-    {Vector(407.5+45,-38,36),Angle(10,-5,0),"Train.Common.ASNP","ASNP"},
-    {Vector(407.5+40,-50.3,12.7),Angle(0,-30,0),"Train.Common.IGLA","IGLAButtons"},
-    {Vector(407+8.5+08,-36,15),Angle(35,180,0),"Train.Common.RRI","RRI"},
-    {Vector(407+8.5+62,40,2)  ,Angle(20,180,0),"Train.Common.RouteNumber"},
-    {Vector(407+8.5+70,2,6)   ,Angle(20,180,0),"Train.Common.LastStation"},
-    {Vector(450+8+6,0,26),Angle(60,0,0),"Train.Common.CouplerCamera"},
-}
 function ENT:InitializeSounds()
     self.BaseClass.InitializeSounds(self)
     self.SoundNames["rolling_5"] = {loop=true,"subway_trains/common/junk/junk_background3.wav"}
@@ -529,7 +525,7 @@ end
 
 function ENT:InitializeSystems()
     -- Электросистема Е
-    self:LoadSystem("Electric","81_703_Electric")
+    self:LoadSystem("Electric","81_703I_Electric")
 
     -- Токоприёмник
     self:LoadSystem("TR","TR_3B")
@@ -551,9 +547,9 @@ function ENT:InitializeSystems()
     -- Групповой переключатель положений
     self:LoadSystem("PositionSwitch","EKG_18A")
     -- Кулачковый контроллер
-    self:LoadSystem("KV","KV_40")
-    -- Контроллер резервного управления (KRP)
-    self:LoadSystem("KRU")
+    self:LoadSystem("KV","KV_35")
+    ---- Контроллер резервного управления (KRP)
+    --self:LoadSystem("KRU")
 
 
     -- Ящики с реле и контакторами
@@ -569,113 +565,33 @@ function ENT:InitializeSystems()
     -- Пневмосистема 81-703
     self:LoadSystem("Pneumatic","81_703_Pneumatic")
     -- Панель управления Е
-    self:LoadSystem("Panel","81_509_Panel")
+    self:LoadSystem("Panel","81_703_Panel")
     -- Everything else
     self:LoadSystem("Battery")
     self:LoadSystem("Horn")
 
     self:LoadSystem("Announcer","81_71_Announcer", "AnnouncementsASNP")
-    self:LoadSystem("ASNP","81_71_ASNP")
-    self:LoadSystem("ASNP_VV","81_71_ASNP_VV")
-    self:LoadSystem("RRI","81_71_RRI")
-    self:LoadSystem("RRI_VV","81_71_RRI_VV")
 
-    self:LoadSystem("IGLA_CBKI","IGLA_CBKI2")
-
-    self:LoadSystem("RouteNumber","81_71_RouteNumber",2)
-    self:LoadSystem("LastStation","81_71_LastStation","710","door1")
     self:LoadSystem("IGLA_PCBK")
 
     self:LoadSystem("ALSCoil")
-    self:LoadSystem("UKS","81_509_UKS")
 end
 function ENT:PostInitializeSystems()
-    self.Electric:TriggerInput("Type",self.Electric.Em)
+    self.Electric:TriggerInput("Type",self.Electric.Ezh)
+    if self.VU then self.VU:TriggerInput("Set",0) end
 end
 
 ENT.SubwayTrain = {
     Type = "E",
-    Name = "81-509",
-    WagType = 0,
+    Name = "81-508",
+    WagType = 2,
     ARS = {
         NoEPK = true,
+        NoUAVA = true,
     },
     ALS = {
         HaveAutostop = true,
     },
     EKKType = 703,
 }
-ENT.NumberRanges = {{3967,3975},{6017,6026},{6144,6145},{6154,6158},{6165,6169},{6176,6179},{6186,6191},{6196,6202},{6213,6213},{6222,6225},{6232,6235},{6243,6245}}
-
-ENT.Spawner = {
-    model = {
-        "models/metrostroi_train/81-703/81-703.mdl",
-        "models/metrostroi_train/81-703/703_cabine.mdl",
-        "models/metrostroi_train/81-703/703_salon.mdl",
-        {"models/metrostroi_train/81-703/81-703_Underwagon.mdl",pos=Vector(-23.5,0,-191)},
-        {"models/metrostroi_train/81-502/sun_protectors.mdl",pos=Vector(-8,0,0)},
-        {"models/metrostroi_train/81-502/mirrors_ema.mdl",pos=Vector(-7.7,0,0)},
-    },
-    interim = "gmod_subway_em508",
-    func = function(ent,i,maxi)
-        if ent:GetClass() == "gmod_subway_em509" then
-            ent.VU:TriggerInput("Set",1)
-            ent.UAVA:TriggerInput("Set",0)
-            ent.Plombs.VU = nil
-            ent.Plombs.UAVA = true
-        else
-            ent.VU:TriggerInput("Set",0)
-            ent.UAVA:TriggerInput("Set",1)
-            ent.Plombs.VU = true
-            ent.Plombs.UAVA = nil
-        end
-    end,
-    Metrostroi.Skins.GetTable("Texture","Texture",false,"train"),
-    Metrostroi.Skins.GetTable("PassTexture","PassTexture",false,"pass"),
-    Metrostroi.Skins.GetTable("CabTexture","CabTexture",false,"cab"),
-    {"Announcer","Spawner.710.Announcer","List",function()
-        local Announcer = {}
-        if Metrostroi.AnnouncementsRRI then
-            table.insert(Announcer,Metrostroi.GetPhrase("Spawner.710.RRI"))
-        end
-        for k,v in pairs(Metrostroi.AnnouncementsASNP or {}) do if not v.asnp then Announcer[k+1] = v.name or k end end
-        return Announcer
-    end, nil,function(ent,val,rot,i,wagnum,rclk)
-        if Metrostroi.AnnouncementsRRI and val==1 then
-            ent:SetNW2Int("AnnType",1)
-            ent:SetNW2Int("Announcer",1)
-        else
-            ent:SetNW2Int("Announcer",val-1)
-            ent:SetNW2Int("AnnType",2)
-        end
-    end},
-    {"SpawnMode","Spawner.Common.SpawnMode","List",{"Spawner.Common.SpawnMode.Full","Spawner.Common.SpawnMode.Deadlock","Spawner.Common.SpawnMode.NightDeadlock","Spawner.Common.SpawnMode.Depot"}, nil,function(ent,val,rot,i,wagnum,rclk)
-        if rclk then return end
-        if ent._SpawnerStarted~=val then
-            ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
-            ent.AV:TriggerInput("Set",val<=2 and 1 or 0)
-            if ent.RRI  then
-                local first = i==1 or _LastSpawner~=CurTime()
-
-                ent.VU2:TriggerInput("Set",(val<=2 and first) and 1 or 0)
-                --ent.VR:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.RRIEnable:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.RRIAmplifier:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.R_ASNPOn:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.KU1:TriggerInput("Set",(val==1 and first) and 1 or 0)
-                _LastSpawner=CurTime()
-                ent.CabinDoor = val==4 and first
-                ent.PassengerDoor = val==4
-                ent.RearDoor = val==4
-            else
-                ent.FrontDoor = val==4
-                ent.RearDoor = val==4
-            end
-            ent.GV:TriggerInput("Set",val<4 and 1 or 0)
-            ent._SpawnerStarted = val
-        end
-        if val==1 then ent.KO:TriggerInput("Close",1) else ent.KO:TriggerInput("Open",1) end
-        ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
-        if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end
-    end},
-}
+ENT.NumberRanges = {{3905,3928},{3947,3952},{3955,3961},{3976,3999},{6001,6016},{6129,6153},{6159,6164},{6171,6175},{6180,6185},{6192,6195},{6203,6231},{6236,6242},{6246,6251}}
