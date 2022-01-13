@@ -398,8 +398,8 @@ end
 
 function TOOL:Reload(trace)
     if CLIENT then return end
+    local ply = self:GetOwner()
     if IsValid(trace.Entity) and trace.Entity._Settings then
-        local ply = self:GetOwner()
         ply:ConCommand("gmod_tool train_spawner")
         ply:SelectWeapon("gmod_tool")
         local tool = ply:GetTool("train_spawner")
@@ -407,14 +407,14 @@ function TOOL:Reload(trace)
         tool.Settings = trace.Entity._Settings
         local ENT = scripted_ents.Get(tool.Settings.Train)
         if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
-        
+
         net.Start("train_spawner_open")
             net.WriteTable(tool.Settings)
         net.Send(ply)
-        
-        local spawner = ents.Create("gmod_train_spawner")
-        spawner:SpawnFunction(ply)
     end
+
+    local spawner = ents.Create("gmod_train_spawner")
+    spawner:SpawnFunction(ply)
 end
 function TOOL:LeftClick(trace)
     if not self.Train then return end
