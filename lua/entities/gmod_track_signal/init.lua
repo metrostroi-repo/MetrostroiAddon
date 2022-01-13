@@ -200,10 +200,10 @@ function ENT:Initialize()
 	self.PostInitalized = true
 
 	self.Controllers = nil
-	self.OccupiedOld = false;
-	self.ControllerLogicCheckOccupied = false;
-	self.ControllerLogicOverride325Hz = false;
-	self.Override325Hz = false;
+	self.OccupiedOld = false
+	self.ControllerLogicCheckOccupied = false
+	self.ControllerLogicOverride325Hz = false
+	self.Override325Hz = false
 end
 
 function ENT:PreInitalize()
@@ -349,7 +349,7 @@ function ENT:GetRS()
 	if self.OverrideTrackOccupied or not self.TwoToSix or not self.ARSSpeedLimit then return false end
 	--if self.ARSSpeedLimit == 1 or self.ARSSpeedLimit == 2 then return false end
 	if self.ARSSpeedLimit ~= 0 and self.ARSSpeedLimit== 2 then return false end
-	if (self.ControllerLogic and self.ControllerLogicOverride325Hz) then return self.Override325Hz end
+	if self.ControllerLogic and self.ControllerLogicOverride325Hz then return self.Override325Hz end
 	return (self.ARSSpeedLimit > 4 or self.ARSSpeedLimit == 4 and self.Approve0) and (not self.ARSNextSpeedLimit or self.ARSNextSpeedLimit >= self.ARSSpeedLimit)
 end
 
