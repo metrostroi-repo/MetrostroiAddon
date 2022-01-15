@@ -561,7 +561,7 @@ function ENT:Think()
     local power = Panel.V1 > -1.5
     local brightness = math.min(1,Panel.Headlights1)*0.60 +
                         math.min(1,Panel.Headlights2)*0.40
-    local T = {}
+    --local T = {}
 
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
@@ -590,9 +590,7 @@ function ENT:Think()
     end
 	
 	--отработка "выбивания" А54 при включении реверса вперед в обеих кабинах
-	T[4] = self:ReadTrainWire(4)
-	T[5] = self:ReadTrainWire(5)
-	if T[4]*T[5] > 0 then
+	if self:ReadTrainWire(4)*self:ReadTrainWire(5) > 0 then
 	    self.A54:TriggerInput("Set",0)
 	end
 

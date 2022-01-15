@@ -3209,9 +3209,9 @@ function ENT:Think()
         self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
     end
     local emergencyValveEPK = self:GetPackedRatio("EmergencyValveEPK_dPdT",0)
-    self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*dT,0,1)
+    self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*12*dT,0,1)
     if self.EmergencyValveEPKRamp < 0.01 then self.EmergencyValveEPKRamp = 0 end
-    self:SetSoundState("epk_brake",self.EmergencyValveEPKRamp,1.0)
+    self:SetSoundState("epk_brake",self.EmergencyValveEPKRamp,2.8)
 
 --[[
     local emergencyBrakeValve = self:GetPackedRatio("EmergencyBrakeValve_dPdT", 0)

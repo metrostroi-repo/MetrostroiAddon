@@ -450,7 +450,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
             Panel.L1 = T[57]
         end
         Panel.M8 = S["V2"]*Train.PVK.Value
-		Train.RPvozvrat.VozRpPressed = T[17]
         
         Train.C1:TriggerInput("Set", T[1])
         Panel.IST = Train.C1.Value*Train.VKST.Value*T[64]
