@@ -405,11 +405,7 @@ function TRAIN_SYSTEM:Think(dT)
 
         -- 013: 2 Normal pressure
         if (self.RealDriverValvePosition == 2) and BLDisconnect and (TLDisconnect or self.BrakeLinePressure > 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure)) then
-<<<<<<< HEAD
             self:equalizePressure(dT,"BrakeLinePressure", 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure), pr_speed,Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2 or pr_speed*0.35, nil, 1.0)-- nil, 1.0)
-=======
-            self:equalizePressure(dT,"BrakeLinePressure", 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure), pr_speed,Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2 or pr_speed*0.4, nil, 1.0)-- nil, 1.0)
->>>>>>> origin/##386,387,388,243
         end
 
         -- 013: 3 4.3 Atm
