@@ -9,7 +9,7 @@ Metrostroi.DefineSystem("BPSN")
 function TRAIN_SYSTEM:Initialize()
     self.X2 = {
         [2] = 0,
-        [3] = 0,
+        [3] = 0, --overheat protection simulation
         [4] = 0,
         [5] = 0, -- Out only
         [6] = 0,
@@ -42,7 +42,7 @@ end
 function TRAIN_SYSTEM:Think()
     local Train = self.Train
     -- Get high-voltage input
-    self.X2_1 = Train.KPP.Value * (1-Train.RZP.Value) -- P4
+    self.X2_1 = Train.KPP.Value * (1-Train.RZP.Value) * (1-self.X2[3]) -- P4
     -- Get battery input
     local XT3_1 = self.X2[5]*self.X2_1
     if Train.Electric.Aux750V*self.X2_1 > 975 then
@@ -50,7 +50,6 @@ function TRAIN_SYSTEM:Think()
         self.X2_1 = 0
         XT3_1 = 0
     end
-
     -- Check if enable signal is present
     self.Active = XT3_1>0 and 1 or 0
     self.X2_2 = Train.Electric.Aux750V*self.Active
