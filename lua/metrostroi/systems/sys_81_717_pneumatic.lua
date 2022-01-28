@@ -503,13 +503,13 @@ function TRAIN_SYSTEM:Think(dT)
     ----------------------------------------------------------------------------
     -- Fill brake cylinders
     if self.WCChargeValve == true then
-	self:equalizePressure(dT,"WorkingChamberPressure",self.BrakeLinePressure,0.187,nil,nil,1.0)	--simulate 0.8mm hole btw BL and working chambers
+	self:equalizePressure(dT,"WorkingChamberPressure",self.BrakeLinePressure,0.107,nil,nil,1.0)	--simulate 0.8mm hole btw BL and working chambers
     end
     self.AirDistributorReady = self.WorkingChamberPressure >= 2.2
     self.WCChargeValve = not ((self.WorkingChamberPressure - self.BrakeLinePressure) > 0.2 and (self.WorkingChamberPressure - self.BrakeLinePressure) < 2.5)
     self.OverchargeReleaseValve = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
     if self.OverchargeReleaseValve then	
-	self:equalizePressure(dT,"WorkingChamberPressure",0.0,0.32)	-- КЛСЗ
+	self:equalizePressure(dT,"WorkingChamberPressure",0.0,0.14)	-- КЛСЗ
     end
 
     --trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.WorkingChamberPressure_dPdT*0.2)
@@ -525,9 +525,7 @@ function TRAIN_SYSTEM:Think(dT)
                 self.PN1 = math.min(self.TrainLinePressure,self.GN1Offset)
             end
         elseif Train.PneumaticNo1.Value == 0 and self.PN1 > 0.0 then
-            --self.PN1 = math.max(0,self.PN1-math.exp(3.6*(self.BrakeCylinderPressure - self.GN1Offset))*0.12)
             self.PN1 = math.max(0,self.PN1-math.exp(3.6*(self.BrakeCylinderPressure - self.GN1Offset))*1.7*dT)
-            --self.PN1 = math.exp(8*(self.PN1 - dT) - 8.1)
         end
         -- Valve #2
         if Train.PneumaticNo2.Value == 1.0 then
@@ -539,9 +537,10 @@ function TRAIN_SYSTEM:Think(dT)
         elseif self.PN2 > 0.0 then
             self.PN2 = self.BrakeCylinderPressure > 0.4 and 0.2 or self.PN2 - 0.5*dT
         end
-        local WcBl = (self.BrakeLinePressure < 3.55 and 0.45*self.WorkingChamberPressure or self.BrakeLinePressure > 3.65 and self.BrakeLinePressure*(self.BrakeLinePressure > 4.5 and self.BrakeLinePressure_dPdT > 0.02 and 1.06 or 1))
-	self.cranPres = WcBl and math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - WcBl)*(self.BrakeLinePressure > self.KM013offset and 0.6 or 1))) or self.cranPres
-        local targetPressure = (self.cranPres < (self.PN1 + self.WeightLoadRatio*0.7) and (Train.PneumaticNo1.Value == 1.0) and (self.PN1 + self.WeightLoadRatio*0.7) or self.PN1) + self.PN2 + self.cranPres
+        local WcBl = (self.BrakeLinePressure < 3.55 and 0.45*(self.WorkingChamberPressure - 2.2) or self.BrakeLinePressure > 3.65 and self.BrakeLinePressure*(self.BrakeLinePressure > 4.5 and self.BrakeLinePressure_dPdT > 0.02 and 1.06 or 1))
+	--self.cranPres = WcBl and math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - WcBl)*(self.BrakeLinePressure > self.KM013offset and 0.6 or 1))) or self.cranPres
+        self.cranPres = WcBl and math.max(0,self.BcBl*(self.WorkingChamberPressure - WcBl)*(self.BrakeLinePressure > self.KM013offset and 0.48 or 1)) or self.cranPres
+	local targetPressure = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3, (self.cranPres < (self.PN1 + self.WeightLoadRatio*0.7) and (Train.PneumaticNo1.Value == 1.0) and (self.PN1 + self.WeightLoadRatio*0.7) or self.PN1) + self.PN2 + self.cranPres))
         if math.abs(self.BrakeCylinderPressure - targetPressure) > 0.150 then
             self.BrakeCylinderValve = 1
         end
