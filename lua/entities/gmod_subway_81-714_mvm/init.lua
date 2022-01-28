@@ -357,12 +357,12 @@ function ENT:Think()
     self:SetPackedRatio("BCPressure", Pneumatic.BrakeCylinderPressure/6.0)
 
 ----------------------------------*****************************--------------------------------
-	--10th wire voltage readout imitation depending on the BPSNs and EKK state, not on the wagon battery switch state
-	local hvcounter = 0
+    --10th wire voltage readout imitation depending on the BPSNs and EKK state, not on the wagon battery switch state
+    local hvcounter = 0
     local hvcar = nil
     local vdrop = 1.125*(#self.WagonList)
     for k,v in ipairs(self.WagonList) do
-		if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
+	if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
             hvcounter = hvcounter + 1
             hvcar = hvcar or v
             vdrop = vdrop - 1.125
@@ -373,18 +373,16 @@ function ENT:Think()
     local PCV_o = hvcounter > 0 and math.Clamp(76+(hvcar.Electric.Aux750V - 600)*8/375, 76, 84) - vdrop or self.WagonList[1].Battery.Voltage
     --imitating converter overload protection only when control circuits are energized and at least one PC on the train is off; pretty useless btw (but fun)
     local pcloadratio = #self.WagonList/(hvcounter > 0 and hvcounter or 0.5)
-    --local _a = 25*(#self.WagonList - #self.WagonList/(#self.WagonList-1))
-    local _A = 25*(6 - 6/(5.01))                                                                   --assuming one PC on 6 cars can work for 25 secs while the cars' CCs are energized
+    local _A = 25*(6 - 6/(5.01))                                          --assuming one PC on 6 cars can work for 25 secs while the cars' CCs are energized
     if pcloadratio > 1 and pcloadratio <= #self.WagonList and self.LK4.Value > 0 and self.PowerSupply.X2_2 > 0 and not self.pcrlxtimer then
         self.pcprotimer = self.pcprotimer or CurTime()
-        --if CurTime() - self.pcprotimer > _a/(pcloadratio + _a/25 - #self.WagonList) + self._pcdiff then  --hyperbolic function of PC operating time depending on load coeff
+        --hyperbolic function of PC operating time depending on load coeff
         if CurTime() - self.pcprotimer > _A/(pcloadratio - 6/5.01) then
-            --self.RZP:TriggerInput("Close",1)
             self.pcrlxtimer = CurTime()
         end
     else
         if self.pcrlxtimer then
-            if CurTime() - self.pcrlxtimer < 30 then                                                       --30 seconds relaxation time before PC overload protecion can be reset
+            if CurTime() - self.pcrlxtimer < 30 then                                  --30 seconds relaxation time before PC overload protecion can be reset
                 self.RZP:TriggerInput("Close",1)
             else
                 self.pcrlxtimer = nil
@@ -393,7 +391,7 @@ function ENT:Think()
             self.pcprotimer = nil
         end
     end
-    self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0)     --BPSN overheat protection in case of RZP button is being pressed constantly
+    self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0) 	        --BPSN overheat protection in case of RZP button is being pressed constantly
 ----------------------------------*****************************--------------------------------
     
     self:SetPackedRatio("BatteryVoltage",Panel["V1"]*PCV_o/150.0)
