@@ -992,6 +992,10 @@ ENT.Spawner = {
                     ent.BV:TriggerInput("Enable",1)
                 end)
             end
+			for _i = 1,4 do
+				ent.Pneumatic.DSprev[_i][1] = ent.Pneumatic.RightDoorState[_i]
+				ent.Pneumatic.DSprev[_i][2] = ent.Pneumatic.LeftDoorState[_i]
+			end
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
