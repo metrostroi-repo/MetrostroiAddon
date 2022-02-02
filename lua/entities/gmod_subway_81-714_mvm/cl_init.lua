@@ -1474,6 +1474,8 @@ function ENT:Think()
             end
         end
     end
+    self:SetSoundState("releasedr",-0.5*(self:GetPackedRatio("RightDoorCloseCylPressure_dPdT",0) + 0.8),1)
+    self:SetSoundState("releasedl",-0.5*(self:GetPackedRatio("LeftDoorCloseCylPressure_dPdT",0) + 0.8),1)
 
     local dT = self.DeltaTime
     local rollingi = math.min(1,self.TunnelCoeff+math.Clamp((self.StreetCoeff-0.82)/0.3,0,1))

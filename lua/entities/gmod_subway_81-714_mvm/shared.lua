@@ -215,6 +215,10 @@ function ENT:InitializeSounds()
     self.SoundPositions["release1"] = {350,1e9,Vector(-183,0,-70),1}
     self.SoundNames["release2"] = {loop=true,"subway_trains/common/pneumatic/release_low.wav"}
     self.SoundPositions["release2"] = {350,1e9,Vector(-183,0,-70),0.4}
+    self.SoundNames["releasedl"] = {loop=true,"subway_trains/common/pneumatic/release_low.wav"}
+    self.SoundPositions["releasedl"] = {350,20,Vector(282,62,12.5),1}
+    self.SoundNames["releasedr"] = {loop=true,"subway_trains/common/pneumatic/release_low.wav"}
+    self.SoundPositions["releasedr"] = {350,20,Vector(281,-62,12.8),1}
 
     self.SoundNames["parking_brake"] = {loop=true,"subway_trains/common/pneumatic/parking_brake.wav"}
     self.SoundNames["parking_brake_en"] = "subway_trains/common/pneumatic/parking_brake_stop.mp3"
