@@ -2373,7 +2373,7 @@ ENT.ButtonMap["DVR_87"] = {
     hide=0.8,
 
     buttons = {
-        {ID = "DVRDisconnectToggle", x=0, y=0, w=1000, h=300, tooltip="ДВР (разобщ.)", model = {
+        {ID = "DVRDisconnectToggle", x=0, y=0, w=1000, h=300, tooltip="DVR disconnect", model = {
             var="DVRDisconnect",sndid="disconnect_valve",--"brake_disconnect",
             sndvol = 1, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
@@ -2455,8 +2455,8 @@ ENT.ButtonMap["Doors7_8_right"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod4Set",x=298,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd4Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod4Set",x=298,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd4Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr7_8_rgh"] = {
@@ -2470,7 +2470,7 @@ ENT.ButtonMap["bldr7_8_rgh"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK4Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 4 пр.", model = {
+        {ID = "HDLK4Toggle", x=0, y=180, w=20, h=100, tooltip="lock 4th rgt", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK4",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2490,8 +2490,8 @@ ENT.ButtonMap["Doors5_6_right"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod3Set",x=306,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd3Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod3Set",x=306,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd3Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr5_6_rgh"] = {
@@ -2505,7 +2505,7 @@ ENT.ButtonMap["bldr5_6_rgh"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK3Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 3 пр.", model = {
+        {ID = "HDLK3Toggle", x=0, y=180, w=20, h=100, tooltip="lock 3rd rgt", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK3",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2525,8 +2525,8 @@ ENT.ButtonMap["Doors3_4_right"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod2Set",x=302,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd2Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod2Set",x=302,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd2Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr3_4_rgh"] = {
@@ -2540,7 +2540,7 @@ ENT.ButtonMap["bldr3_4_rgh"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK2Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 2 пр.", model = {
+        {ID = "HDLK2Toggle", x=0, y=180, w=20, h=100, tooltip="lock 2nd rgt", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK2",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2560,8 +2560,8 @@ ENT.ButtonMap["Doors1_2_right"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod1Set",x=334,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd1Set",x=15,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod1Set",x=334,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd1Set",x=15,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["Doors1_2_right_outer"] = {
@@ -2575,7 +2575,7 @@ ENT.ButtonMap["Doors1_2_right_outer"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "outerhod1Set",x=10,y=0,w= 100,h = 952,tooltip="Раздвинуть руками"},
+        {ID = "outerhod1Set",x=10,y=0,w= 100,h = 952,tooltip="manual open"},
     }
 }
 ENT.ButtonMap["bldr1_2_rgh"] = {
@@ -2589,7 +2589,7 @@ ENT.ButtonMap["bldr1_2_rgh"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK1Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 1 пр.", model = {
+        {ID = "HDLK1Toggle", x=0, y=180, w=20, h=100, tooltip="lock 1st rgt", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK1",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2608,8 +2608,8 @@ ENT.ButtonMap["Doors7_8_left"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod5Set",x=294,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd5Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod5Set",x=294,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd5Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr7_8_lft"] = {
@@ -2623,7 +2623,7 @@ ENT.ButtonMap["bldr7_8_lft"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK5Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 4 лев.", model = {
+        {ID = "HDLK5Toggle", x=0, y=180, w=20, h=100, tooltip="lock 4th lft", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK5",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2643,8 +2643,8 @@ ENT.ButtonMap["Doors5_6_left"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod6Set",x=314,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd6Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod6Set",x=314,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd6Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr5_6_lft"] = {
@@ -2658,7 +2658,7 @@ ENT.ButtonMap["bldr5_6_lft"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK6Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 3 лев.", model = {
+        {ID = "HDLK6Toggle", x=0, y=180, w=20, h=100, tooltip="lock 3rd lft", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK6",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2678,8 +2678,8 @@ ENT.ButtonMap["Doors3_4_left"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod7Set",x=294,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd7Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod7Set",x=294,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd7Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr3_4_lft"] = {
@@ -2693,7 +2693,7 @@ ENT.ButtonMap["bldr3_4_lft"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK7Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 2 лев.", model = {
+        {ID = "HDLK7Toggle", x=0, y=180, w=20, h=100, tooltip="lock 2nd lft", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK7",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2713,8 +2713,8 @@ ENT.ButtonMap["Doors1_2_left"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "hod8Set",x=306,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "hcd8Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
+        {ID = "hod8Set",x=306,y=0,w= 100,h = 1000,tooltip="open"},
+        {ID = "hcd8Set",x=0,y=0,w= 60,h = 1000,tooltip="close"},
     }
 }
 ENT.ButtonMap["bldr1_2_lft"] = {
@@ -2728,7 +2728,7 @@ ENT.ButtonMap["bldr1_2_lft"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "HDLK8Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 1 лев.", model = {
+        {ID = "HDLK8Toggle", x=0, y=180, w=20, h=100, tooltip="lock 1st lft", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
             var="HDLK8",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
@@ -2749,7 +2749,7 @@ ENT.ButtonMap["DoorReleaseExtra"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "DoorReleaseExtraToggle",x=0,y=130,w= 100,h = 30,tooltip="выкл. дверей", model = {
+        {ID = "DoorReleaseExtraToggle",x=0,y=130,w= 100,h = 30,tooltip="doors release", model = {
             var="DoorReleaseExtra",sndid="disconnect_valve",--"brake_disconnect",
             sndvol = 1, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
@@ -2776,7 +2776,7 @@ ENT.ButtonMap["DoorReleaseRight"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "DoorReleaseRightToggle",x=0,y=0,w= 100,h = 30,tooltip="выкл. дверей правых", model = {
+        {ID = "DoorReleaseRightToggle",x=0,y=0,w= 100,h = 30,tooltip="right doors release", model = {
             var="DoorReleaseRight",sndid="disconnect_valve",--"brake_disconnect",
             sndvol = 1, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
@@ -2803,7 +2803,7 @@ ENT.ButtonMap["DoorReleaseLeft"] = {
     screenHide = true,
 
     buttons = {
-        {ID = "DoorReleaseLeftToggle",x=0,y=0,w= 100,h = 30,tooltip="выкл. дверей левых", model = {
+        {ID = "DoorReleaseLeftToggle",x=0,y=0,w= 100,h = 30,tooltip="left doors release", model = {
             var="DoorReleaseLeft",sndid="disconnect_valve",--"brake_disconnect",
             sndvol = 50, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
@@ -3831,6 +3831,9 @@ function ENT:Think()
             end		
         end
     end
+    self:SetSoundState("releasedr",-0.5*(self:GetPackedRatio("RightDoorCloseCylPressure_dPdT",0) + 0.8),1)
+    self:SetSoundState("releasedl",-0.5*(self:GetPackedRatio("LeftDoorCloseCylPressure_dPdT",0) + 0.8),1)
+    self:SetSoundState("releasede",-0.3*(self:GetPackedRatio("_1stRightDoorCloseCylPressure_dPdT",0) + 1.2),1)
 
     --[[local dT = self.DeltaTime
     --self.TunnelCoeff = 0.8

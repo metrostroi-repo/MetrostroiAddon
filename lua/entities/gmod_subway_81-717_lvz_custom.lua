@@ -69,6 +69,7 @@ ENT.Spawner = {
                 ent.OhrSig:TriggerInput("Set",val<4 and 1 or 0)
                 ent.A53:TriggerInput("Set",val<=3 and 1 or 0)
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
+                ent.A75:TriggerInput("Set",0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_UPO:TriggerInput("Set",val<=2 and 1 or 0)
                 if ent.Plombs.RC1 and val<=2 then
