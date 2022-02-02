@@ -475,6 +475,7 @@ function ENT:OnButtonPress(button,ply)
         if self.CouchCap and self.Pneumatic.DriverValvePosition>2 then return end
         self.CouchCap = not self.CouchCap
     end
+    --Оно нафиг не нужно, так как при надетой сидушке панели скрыты
     --if not self.CouchCap and (not button:find("VB") and not button:find("GV") and not button:find("Isolation") and not button:find("Parking") and not button:find("Air")) then return true end
 
     if button == "DriverValveDisconnect" then
@@ -488,12 +489,12 @@ function ENT:OnButtonPress(button,ply)
         return
     end
     if button == "DVRDisconnect" then
-		if self.DVRDisconnect.Value == 0 then
-			self.DVRDisconnect:TriggerInput("Set",1)
-		else
-			self.DVRDisconnect:TriggerInput("Set",0)
-		end
+	if self.DVRDisconnect.Value == 0 then
+	    self.DVRDisconnect:TriggerInput("Set",1)
+	else
+	    self.DVRDisconnect:TriggerInput("Set",0)
 	end
+    end
     if string.find(button,"PneumaticBrakeSet") then
         self.Pneumatic:TriggerInput("BrakeSet",tonumber(button:sub(-1,-1)))
         return
