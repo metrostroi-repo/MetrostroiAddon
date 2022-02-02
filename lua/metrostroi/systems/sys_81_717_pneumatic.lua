@@ -404,7 +404,7 @@ function TRAIN_SYSTEM:Think(dT)
     -- Reduce pressure for brake line
     self.TrainToBrakeReducedPressure = math.min(self.KM013offset,self.TrainLinePressure) -- * 0.725)
     -- Feed pressure to door line
-    self.DoorLinePressure = self.TrainToBrakeReducedPressure * 0.90
+    self.DoorLinePressure = Train.DVRDisconnect.Value == 0 and math.min(3.6,self.TrainLinePressure) or self.DoorLinePressure
     local trainLineConsumption_dPdT = 0.0
     local wagc = Train:GetWagonCount()
     local HaveEPK = not Train.SubwayTrain or not Train.SubwayTrain.ARS or not Train.SubwayTrain.ARS.NoEPK
@@ -701,7 +701,7 @@ function TRAIN_SYSTEM:Think(dT)
             self.RZDTimer = nil
         end
     end
-	-- Тут было бы лучше сделать не 2 цилиндра на вагон, а 8, но тогда будет не 5 вызовов функции, а 40...
+	-- Тут было бы лучше сделать не 2 цилиндра на вагон, а 8, но тогда будет не 5 вызовов функции, а 17...
     self:equalizePressure(dT,"RightDoorOpenCylPressure", self.DoorRight and self.DoorLinePressure or 0.0, 6)
     self:equalizePressure(dT,"RightDoorCloseCylPressure", not self.DoorRight and RightRelease and self.DoorLinePressure or 0.0, 6)
     self:equalizePressure(dT,"_1stRightDoorCloseCylPressure", not self.DoorRight and _1stRightRelease and RightRelease and self.DoorLinePressure or 0.0, 6)
@@ -712,11 +712,14 @@ function TRAIN_SYSTEM:Think(dT)
     self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorCloseCylPressure_dPdT*0.015)
     self.DoorLinePressure = self.DoorLinePressure-math.max(0,self._1stRightDoorCloseCylPressure_dPdT*0.004)	--simulating weak discharge
     self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorCloseCylPressure_dPdT*0.015)
+    Train:SetPackedRatio("RightDoorCloseCylPressure_dPdT",not RightRelease and self.RightDoorCloseCylPressure_dPdT or 0)
+    Train:SetPackedRatio("LeftDoorCloseCylPressure_dPdT",not LeftRelease and self.LeftDoorCloseCylPressure_dPdT or 0)
+    Train:SetPackedRatio("_1stRightDoorCloseCylPressure_dPdT",not _1stRightRelease and self._1stRightDoorCloseCylPressure_dPdT or 0)
 	if self.DoorReleaseRightPrevious ~= Train.DoorReleaseRight.Value then
 		self.DoorReleaseRightPrevious = Train.DoorReleaseRight.Value
-		if self.DoorReleaseRightPrevious == 1 then
-            Train:PlayOnce("pneumo_disconnect1","bass",math.max(0,math.log(self.RightDoorCloseCylPressure + 0.2,1.12)))
-		end
+		--if self.DoorReleaseRightPrevious == 1 then
+            --Train:PlayOnce("pneumo_disconnect1","bass",math.max(0,math.log(self.RightDoorCloseCylPressure + 0.2,1.12)))
+		--end
 		---[[
 		if not self.DoorRight and self.DoorReleaseRightPrevious == 1 then
 			self:equalizePressure(dT,"RightDoorCloseCylPressure", 0, 3)		--was DoorLinePressure
@@ -724,9 +727,9 @@ function TRAIN_SYSTEM:Think(dT)
 	end
 	if self.DoorReleaseExtraPrevious ~= Train.DoorReleaseExtra.Value then
 		self.DoorReleaseExtraPrevious = Train.DoorReleaseExtra.Value
-		if self.DoorReleaseExtraPrevious == 1 then
-            Train:PlayOnce("pneumo_disconnect1","bass",math.max(0,math.log(self._1stRightDoorCloseCylPressure + 0.2,1.12)))
-		end
+		--if self.DoorReleaseExtraPrevious == 1 then
+            --Train:PlayOnce("pneumo_disconnect1","bass",math.max(0,math.log(self._1stRightDoorCloseCylPressure + 0.2,1.12)))
+		--end
 		---[[
 		if not self.DoorRight and self.DoorReleaseExtraPrevious == 1 then
 			self:equalizePressure(dT,"_1stRightDoorCloseCylPressure", 0, 6)
@@ -734,9 +737,9 @@ function TRAIN_SYSTEM:Think(dT)
 	end
 	if self.DoorReleaseLeftPrevious ~= Train.DoorReleaseLeft.Value then
 		self.DoorReleaseLeftPrevious = Train.DoorReleaseLeft.Value
-		if self.DoorReleaseLeftPrevious == 1 then
-            Train:PlayOnce("pneumo_disconnect1","bass",math.max(0,math.log(self.LeftDoorCloseCylPressure + 0.2,1.12)))
-		end
+		--if self.DoorReleaseLeftPrevious == 1 then
+            --Train:PlayOnce("pneumo_disconnect1","bass",math.max(0,math.log(self.LeftDoorCloseCylPressure + 0.2,1.12)))
+		--end
 		---[[
 		if not self.DoorLeft and self.DoorReleaseLeftPrevious == 1 then
 			self:equalizePressure(dT,"LeftDoorCloseCylPressure", 0, 6)		--was DoorLinePressure
