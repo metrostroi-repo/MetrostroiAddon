@@ -17,7 +17,7 @@ ENT.SyncTable = {
     "A58","A59","A61","A15","A66",
     "RC1","VB","VRD","PB", "UAVA","UAVAC",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","DriverValveDisconnect","ParkingBrake","EPK",
-    "VUD2","VDL","VOPD","Wiper", "GV", "RC2","VAU",
+    "VUD2","VDL","VOPD","Wiper", "GV", "RC2","VAU","HDLK1","HDLK2","HDLK3","HDLK4","HDLK5","HDLK6","HDLK7","HDLK8","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight","DoorReleaseExtra",
     "KH","VAV","KSZD","VZP","VSOSD",
     "PAM7","PAM8","PAM9","PAMLeft","PAMRight","PAM4","PAM5","PAM6","PAMUp","PAM1","PAM2","PAM3","PAMDown","PAM0","PAMEnter","PAMEsc","PAMF","PAMM","PAMP",
 }
@@ -502,6 +502,7 @@ function ENT:Think()
     self.RetVal = self.BaseClass.Think(self)
     local Panel = self.Panel
 
+    self:SetPackedBool("ShowDVR",self.A75.Value)				--Потому что в головных вагонах не смоделили снимаемые сидушки -_-
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
     self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
