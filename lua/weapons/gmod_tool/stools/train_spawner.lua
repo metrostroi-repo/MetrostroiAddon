@@ -210,18 +210,22 @@ function TOOL:SpawnWagon(trace)
 
     local LastRot,LastEnt = false
     local trains = {}
+
+    --local TrainSpawnerSettings = self.Train.Spawner
+    --Metrostroi.Modules.DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
+
     for i=1,self.Settings.WagNum do
-        local spawnfunc = self.Train.Spawner.spawnfunc
+        local spawnfunc = self.TrainSpawnerSettings.spawnfunc
         local ent
         if i == 1 then
             if spawnfunc then
                 ent = self.Train:SpawnFunction(ply,trace,spawnfunc(i,self.Settings,self.Train),self:GetOwner():GetNW2Bool("metrostroi_train_spawner_rev"),UpdateWagPos)
             else
-                ent = self.Train:SpawnFunction(ply,trace,self.Train.Spawner.head or self.Train.ClassName,self:GetOwner():GetNW2Bool("metrostroi_train_spawner_rev"),UpdateWagPos)
+                ent = self.Train:SpawnFunction(ply,trace,self.TrainSpawnerSettings.head or self.Train.ClassName,self:GetOwner():GetNW2Bool("metrostroi_train_spawner_rev"),UpdateWagPos)
             end
             --nil,self:GetOwner():GetNW2Bool("metrostroi_train_spawner_rev") and Angle(0,180,0) or Angle(0,0,0)) --Create a first entity in queue
             if ent then
-                undo.Create(self.Train.Spawner.head or self.Train.ClassName)
+                undo.Create(self.TrainSpawnerSettings.head or self.Train.ClassName)
             else
                 self:GetOwner():LimitHit("spawner_wrong_pos")
                 return false
@@ -236,7 +240,7 @@ function TOOL:SpawnWagon(trace)
             if spawnfunc then
                 ent = ents.Create(spawnfunc(i,self.Settings,self.Train))
             else
-                ent = ents.Create(i~=self.Settings.WagNum and self.Train.Spawner.interim or self.Train.Spawner.head or self.Train.ClassName)
+                ent = ents.Create(i~=self.Settings.WagNum and self.TrainSpawnerSettings.interim or self.TrainSpawnerSettings.head or self.Train.ClassName)
             end
             ent.Owner = ply
             ent:Spawn()
@@ -320,7 +324,7 @@ function TOOL:SpawnWagon(trace)
             ent.RearCouple:SetMoveType(MOVETYPE_NONE)
         end]]
 
-        for _, set in ipairs(self.Train.Spawner) do
+        for _, set in ipairs(self.TrainSpawnerSettings) do
             local val = self.Settings[set[1]]
             if set[3] == "List" then
                 if set[6] and type(set[6]) == "function" then   set[6](ent,val,LastRot,i,self.Settings.WagNum) else SetValue(ent,set[1],val) end
@@ -330,8 +334,8 @@ function TOOL:SpawnWagon(trace)
                 if set[8] and type(set[8]) == "function" then   set[8](ent,val,LastRot,i,self.Settings.WagNum) else ent:SetNW2Int(set[1],val) end
             end
         end
-        if self.Train.Spawner.func then self.Train.Spawner.func(ent,i,self.Settings.WagNum,LastRot) end
-        if self.Train.Spawner.wagfunc then ent:GenerateWagonNumber(function(_,number) return self.Train.Spawner.wagfunc(ent,i,number) end) end
+        if self.TrainSpawnerSettings.func then self.TrainSpawnerSettings.func(ent,i,self.Settings.WagNum,LastRot) end
+        if self.TrainSpawnerSettings.wagfunc then ent:GenerateWagonNumber(function(_,number) return self.TrainSpawnerSettings.wagfunc(ent,i,number) end) end
         if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
         for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
         hook.Run("MetrostroiSpawnerUpdate",ent,self.Settings)
@@ -343,7 +347,7 @@ function TOOL:SpawnWagon(trace)
     undo.SetPlayer(ply)
     undo.SetCustomUndoText("Undone a train")
     undo.Finish()
-    if self.Train.Spawner.postfunc then self.Train.Spawner.postfunc(trains,self.Settings.WagNum) end
+    if self.TrainSpawnerSettings.postfunc then self.TrainSpawnerSettings.postfunc(trains,self.Settings.WagNum) end
     --if self.Settings.AutoCouple and #trains > 1 then
         local CoupledTrains,WagNum = 0,self.Settings.WagNum
         local function StopCoupling()
@@ -421,7 +425,7 @@ function TOOL:LeftClick(trace)
     local class = IsValid(trace.Entity) and trace.Entity:GetClass()
     if class and (trace.Entity.Spawner or class ~= "func_door" and class ~= "prop_door_rotating")  then
         if SERVER then
-            if trace.Entity.ClassName == (self.Train.Spawner.head or self.Train.ClassName) or trace.Entity.ClassName == self.Train.Spawner.interim then
+            if trace.Entity.ClassName == (self.TrainSpawnerSettings.head or self.Train.ClassName) or trace.Entity.ClassName == self.TrainSpawnerSettings.interim then
                 local LastEnt
                 local trains = {}
                 for k,ent in ipairs(trace.Entity.WagonList) do
@@ -432,7 +436,7 @@ function TOOL:LeftClick(trace)
                     end]]
                     local rot = ent.RearTrain == LastEnt
                     LastEnt = ent
-                    for i, set in ipairs(self.Train.Spawner) do
+                    for i, set in ipairs(self.TrainSpawnerSettings) do
                         local val = self.Settings[set[1]]
                         if set[3] == "List" then
                             if set[6] and type(set[6]) == "function" then   set[6](ent,val,rot,k,self.Settings.WagNum) else SetValue(ent,set[1],val) end
@@ -442,8 +446,8 @@ function TOOL:LeftClick(trace)
                             if set[8] and type(set[8]) == "function" then   set[8](ent,val,rot,k,self.Settings.WagNum) else ent:SetNW2Int(set[1],val) end
                         end
                     end
-                    if self.Train.Spawner.func then self.Train.Spawner.func(ent,k,self.Settings.WagNum,rot) end
-                    ent:GenerateWagonNumber(self.Train.Spawner.wagfunc)
+                    if self.TrainSpawnerSettings.func then self.TrainSpawnerSettings.func(ent,k,self.Settings.WagNum,rot) end
+                    ent:GenerateWagonNumber(self.TrainSpawnerSettings.wagfunc)
                     if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
                     for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
                     hook.Run("MetrostroiSpawnerUpdate",ent,self.Settings)
@@ -452,7 +456,7 @@ function TOOL:LeftClick(trace)
                     table.insert(trains,ent)
                     
                 end
-                if self.Train.Spawner.postfunc then self.Train.Spawner.postfunc(trains,self.Settings.WagNum) end
+                if self.TrainSpawnerSettings.postfunc then self.TrainSpawnerSettings.postfunc(trains,self.Settings.WagNum) end
             end
         end
         return
@@ -481,14 +485,14 @@ function TOOL:RightClick(trace)
     if not self.Train then return end
     if IsValid(trace.Entity) then
         if SERVER then
-            if trace.Entity.ClassName == (self.Train.Spawner.head or self.Train.ClassName) or trace.Entity.ClassName == self.Train.Spawner.interim then
+            if trace.Entity.ClassName == (self.TrainSpawnerSettings.head or self.Train.ClassName) or trace.Entity.ClassName == self.TrainSpawnerSettings.interim then
                 local LastEnt
                 local trains = {}
                 for k,ent in pairs(trace.Entity.WagonList) do
                     local rot = ent.RearTrain == LastEnt
                     LastEnt = ent
                     if ent ~= trace.Entity then continue end
-                    for i, set in ipairs(self.Train.Spawner) do
+                    for i, set in ipairs(self.TrainSpawnerSettings) do
                         local val = self.Settings[set[1]]
                         if set[3] == "List" then
                             if set[6] and type(set[6]) == "function" then set[6](ent,val,rot,k,self.Settings.WagNum,true) else SetValue(ent,set[1],val) end
@@ -498,14 +502,14 @@ function TOOL:RightClick(trace)
                             if set[8] and type(set[8]) == "function" then set[8](ent,val,rot,k,self.Settings.WagNum,true) else ent:SetNW2Int(set[1],val) end
                         end
                     end
-                    if self.Train.Spawner.func then self.Train.Spawner.func(ent,k,self.Settings.WagNum,rot) end
-                    ent:GenerateWagonNumber(self.Train.Spawner.wagfunc)
+                    if self.TrainSpawnerSettings.func then self.TrainSpawnerSettings.func(ent,k,self.Settings.WagNum,rot) end
+                    ent:GenerateWagonNumber(self.TrainSpawnerSettings.wagfunc)
                     if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
                     for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
                     hook.Run("MetrostroiSpawnerUpdate",ent,self.Settings)
                     ent:UpdateTextures()
                     table.insert(trains,ent)
-                    if self.Train.Spawner.postfunc then self.Train.Spawner.postfunc(trains,self.Settings.WagNum) end
+                    if self.TrainSpawnerSettings.postfunc then self.TrainSpawnerSettings.postfunc(trains,self.Settings.WagNum) end
                 end
             end
         end
@@ -532,7 +536,11 @@ if SERVER then
         tool.AllowSpawn = true
         tool.Settings = net.ReadTable()
         local ENT = scripted_ents.Get(tool.Settings.Train)
-        if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
+        if not ENT then tool.AllowSpawn = false else 
+            tool.Train = ENT
+            tool.TrainSpawnerSettings = ENT.Spawner
+            Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", tool.Settings, tool.TrainSpawnerSettings, true)
+        end
     end)
     return
 end
