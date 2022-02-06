@@ -222,7 +222,7 @@ local function UpdateTrainList(fromPresets)
 		local ENT = scripted_ents.Get(name)
 		if not ENT.Spawner or ENT.ClassName ~= Settings.Train  then continue end
 		local TrainSpawnerSettings = ENT.Spawner
-		Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, false)
+		Metrostroi.Modules.DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, false)
 		for i, menu in ipairs(TrainSpawnerSettings) do
 			if menu[3] == "List" then
 				if Settings[Settings.Train][menu[1]] == nil then
@@ -587,7 +587,7 @@ local function createFrame()
 		--[[
 		if ENT and ENT.Spawner then 
 			local TrainSpawnerSettings = ENT.Spawner
-			Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
+			Metrostroi.Modules.DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
 			tool.Train = ENT
 			tool.TrainSpawnerSettings = TrainSpawnerSettings
 		end]]

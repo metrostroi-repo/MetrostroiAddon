@@ -28,7 +28,7 @@ function MOD:TrainPostThink(ENT)
     if not allowed[ENT:GetClass()] then return end
 
     local custombpsn = ENT:GetNW2Bool("BPSNCustom", false)
-    
+    print(custombpsn)
     if custombpsn then
         ENT:SetSoundState("bpsn"..ENT.BPSNType, 0, 1)
         ENT:SetSoundState("bpsn_zl", 1, 1)

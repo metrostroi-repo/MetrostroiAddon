@@ -356,7 +356,7 @@ local lastAimButtonChange
 local lastAimButton
 
 function ENT:ShouldRenderClientEnts()
-    local override, hide = Metrostroi_Modules_DispatchEvent("TrainShouldDrawClientEnts", self)
+    local override, hide = Metrostroi.Modules.DispatchEvent("TrainShouldDrawClientEnts", self)
     if override then return hide end
 
     return not self:IsDormant() and math.abs(LocalPlayer():GetPos().z - self:GetPos().z) < 500 and (system.HasFocus() or C_MinimizedShow:GetBool()) and (not Metrostroi or not Metrostroi.ReloadClientside)
@@ -365,7 +365,7 @@ function ENT:ShouldDrawPanel(v)
     return not self.HiddenPanelsDistance[v] and not self.HiddenPanels[v]
 end
 function ENT:ShouldDrawClientEnt(k,v)
-    local override, hide = Metrostroi_Modules_DispatchEvent("TrainShouldDrawClientEnt", self, k ,v)
+    local override, hide = Metrostroi.Modules.DispatchEvent("TrainShouldDrawClientEnt", self, k ,v)
     if override then return hide end
 
     if self.Hidden[k] or self.Hidden.anim[k] then return false end
@@ -812,7 +812,7 @@ function ENT:Initialize()
     self.TunnelCoeff = 0
     self.StreetCoeff = 0
     self.Street = 0
-    Metrostroi_Modules_DispatchEvent("TrainInitalize", self)
+    Metrostroi.Modules.DispatchEvent("TrainInitalize", self)
 end
 
 function ENT:UpdateTextures()

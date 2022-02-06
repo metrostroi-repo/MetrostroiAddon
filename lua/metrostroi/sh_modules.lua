@@ -1,7 +1,6 @@
 Metrostroi.Modules = Metrostroi.Modules or {}
 
-Metrostroi.Modules.Loaded = {}
-Metrostroi_Modules_Loaded = Metrostroi.Modules.Loaded
+Metrostroi.Modules.Loaded = Metrostroi.Modules.Loaded or {}
 
 function Metrostroi.DefineModule(name)
     MOD = {}
@@ -14,19 +13,19 @@ function Metrostroi.ReloadModule()
     local name = MOD_NAME
 
     if DONT_RELOAD then return end
+    if not Metrostroi.Modules.Loaded[name] then return end
 
-    if string.StartWith(Metrostroi_Modules_Loaded[name]["__filename"], "!Dynamic") then
+    if string.StartWith(Metrostroi.Modules.Loaded[name]["__filename"], "!Dynamic") then
         Metrostroi.Modules.RegisterModuleTable(MOD, name)
     else
-        Metrostroi.Modules.RegisterModule(Metrostroi_Modules_Loaded[name]["__filename"])
+        Metrostroi.Modules.RegisterModule(Metrostroi.Modules.Loaded[name]["__filename"])
     end
 end
 
 local pairs = pairs
 
 function Metrostroi.Modules.DispatchEvent(event, ENT, a, b, c, d)
-    local tbl = Metrostroi_Modules_Loaded
-    for k, v in pairs(tbl) do
+    for k, v in pairs(Metrostroi.Modules.Loaded) do
         if not v["__enabled"] then return false end
         local func = v[event]
         if not func then return end
@@ -38,8 +37,6 @@ function Metrostroi.Modules.DispatchEvent(event, ENT, a, b, c, d)
     end
     return false
 end
-
-Metrostroi_Modules_DispatchEvent = Metrostroi.Modules.DispatchEvent
 
 function Metrostroi.Modules.RegisterModule(filename)
     DONT_RELOAD = true
@@ -73,19 +70,20 @@ function Metrostroi.Modules.RegisterModuleTable(tbl, name)
 end
 
 function Metrostroi.Modules.EnableModule(name)
-    local mod = Metrostroi_Modules_Loaded[name]
+    local mod = Metrostroi.Modules.Loaded[name]
     if not mod then return end
     mod["__enabled"] = true
 end
 
 function Metrostroi.Modules.DisableModule(name)
-    local mod = Metrostroi_Modules_Loaded[name]
+    local mod = Metrostroi.Modules.Loaded[name]
     if not mod then return end
     mod["__enabled"] = false
 end
 
 Metrostroi.Modules.CacheFunctions = Metrostroi.Modules.CacheFunctions or {}
 function Metrostroi.Modules.Inject()
+    
     for k, v in pairs(Metrostroi.TrainClasses) do
         local ENT = scripted_ents.GetStored(v).t
 
@@ -99,25 +97,25 @@ function Metrostroi.Modules.Inject()
         
         ENT.Initialize = function(ent)
             oldInitialize(ent)
-            Metrostroi_Modules_DispatchEvent("TrainPostInitialize", ent)
+            Metrostroi.Modules.DispatchEvent("TrainPostInitialize", ent)
         end
         ENT.Think = function(ent)
             local res = oldThink(ent)
-            Metrostroi_Modules_DispatchEvent("TrainPostThink", ent)
+            Metrostroi.Modules.DispatchEvent("TrainPostThink", ent)
             return res
         end
         ENT.TrainSpawnerUpdate = function(ent, a, b, c, d)
             local x, y, z, w = oldTrainSpawner(ent, a, b, c, d)
-            Metrostroi_Modules_DispatchEvent("TrainSpawnerUpdate", ent)
+            Metrostroi.Modules.DispatchEvent("TrainSpawnerUpdate", ent)
             return x, y, z, w
         end
         ENT.InitializeSounds = function(ent)
             oldInitializeSounds(ent)
-            Metrostroi_Modules_DispatchEvent("TrainInitializeSounds", ent)
+            Metrostroi.Modules.DispatchEvent("TrainInitializeSounds", ent)
         end
         ENT.DrawPost = function(ent, a)
             oldDrawPost(ent, a)
-            Metrostroi_Modules_DispatchEvent("TrainDrawPost", ent)
+            Metrostroi.Modules.DispatchEvent("TrainDrawPost", ent)
         end
 
         Metrostroi.Modules.CacheFunctions[v]["Initialize"] = oldInitialize
@@ -128,9 +126,9 @@ function Metrostroi.Modules.Inject()
     end
 end
 
-Metrostroi.Modules.Inject()
-
-hook.Add("InitPostEntity", "Metrostroi_Modules_Inject", Metrostroi.Modules.Inject)
+timer.Simple(3, function()
+    Metrostroi.Modules.Inject()
+end)
 
 if SERVER then -- Loading Modules
     files = file.Find("metrostroi/modules/*.lua","LUA")
@@ -151,41 +149,69 @@ end
 if SERVER then
 
     util.AddNetworkString("metrostroi-modules-set")
+    util.AddNetworkString("metrostroi-modules-msg")
+    
 
     concommand.Add("metrostroi_modules_list", function(ply)
-        local function print_msg(str)
+        local function print_msg(...)
             if IsValid(ply) then
-                ply:PrintMessage(HUD_PRINTCONSOLE, str)
+                local args = {...}
+                net.Start("metrostroi-modules-msg")
+                    net.WriteUInt(#args, 32)
+                    for k, v in ipairs(args) do
+                        net.WriteType(v)
+                    end
+                net.Send(ply)
             else
-                print(str)
+                MsgC(...)
             end
         end
 
-        print_msg("Current loaded modules:")
-        local text = {}
-        for k, v in pairs(Metrostroi_Modules_Loaded) do
-            local t = Format("%s [%s] - %s", v.name, v["__filename"], v["__enabled"] and "Enabled" or "Disabled")
-            table.insert(text, t)
+
+        local enabled = {}
+        local disabled = {}
+        local text = "Current loaded modules:"
+        local width = string.len(text)
+        for k, v in pairs(Metrostroi.Modules.Loaded) do
+            local t = Format("%s [%s]", v.name, v["__filename"])
+            if #t > width then width = #t end
+            table.insert(v["__enabled"] and enabled or disabled, t)
+            --print_msg(color_white, "│ ", color, t, "\n")
         end
-        print_msg(table.concat(text, "\n"))
+
+        print_msg(color_white, "┌", string.rep("─", width+2), "┐", "\n")
+        print_msg(color_white, "│ Current loaded modules:", string.rep( " ", width-#text ), " │", "\n")
+        for k, v in pairs(enabled) do
+            print_msg(color_white, "│ ", Color(0, 255, 0), v, color_white, string.rep( " ", width-#v ), " │", "\n")
+        end
+        for k, v in pairs(disabled) do
+            print_msg(color_white, "│ ", Color(255, 0, 0), v, color_white, string.rep( " ", width-#v ), " │", "\n")
+        end
+        print_msg(color_white, "└", string.rep("─", width+2), "┘", "\n")
     end)
 
     concommand.Add("metrostroi_modules_enable", function(ply, _, args)
-        local function print_msg(str)
+        local function print_msg(...)
             if IsValid(ply) then
-                ply:PrintMessage(HUD_PRINTCONSOLE, str)
+                local args = {...}
+                net.Start("metrostroi-modules-msg")
+                    net.WriteUInt(#args, 32)
+                    for k, v in ipairs(args) do
+                        net.WriteType(v)
+                    end
+                net.Send(ply)
             else
-                print(str)
+                MsgC(...)
             end
         end
 
         if IsValid(ply) then
-            if not ply:IsAdmin() then return print_msg("Missing permissions") end
+            if not ply:IsAdmin() then return print_msg(Color(255, 0, 0), "Metrostroi: Missing permissions", "\n") end
         end
 
         local name = args[1]
 
-        if not Metrostroi_Modules_Loaded[name] then return print_msg("Module not found") end
+        if not Metrostroi.Modules.Loaded[name] then return print_msg("Metrostroi: Module not found", "\n") end
 
         Metrostroi.Modules.EnableModule(name)
         net.Start("metrostroi-modules-set")
@@ -193,25 +219,31 @@ if SERVER then
         net.WriteString(name)
         net.Broadcast()
 
-        print_msg("Module " .. name .. " enabled")
+        print_msg(Color(0, 255, 0), "Metrostroi: Module '" .. name .. "' enabled", "\n")
     end)
 
     concommand.Add("metrostroi_modules_disable", function(ply, _, args)
-        local function print_msg(str)
+        local function print_msg(...)
             if IsValid(ply) then
-                ply:PrintMessage(HUD_PRINTCONSOLE, str)
+                local args = {...}
+                net.Start("metrostroi-modules-msg")
+                    net.WriteUInt(#args, 32)
+                    for k, v in ipairs(args) do
+                        net.WriteType(v)
+                    end
+                net.Send(ply)
             else
-                print(str)
+                MsgC(...)
             end
         end
 
         if IsValid(ply) then
-            if not ply:IsAdmin() then return print_msg("Missing permissions") end
+            if not ply:IsAdmin() then return print_msg(Color(255, 0, 0), "Metrostroi: Missing permissions", "\n") end
         end
 
         local name = args[1]
 
-        if not Metrostroi_Modules_Loaded[name] then return print_msg("Module not found") end
+        if not Metrostroi.Modules.Loaded[name] then return print_msg("Metrostroi: Module not found", "\n") end
 
         Metrostroi.Modules.DisableModule(name)
         net.Start("metrostroi-modules-set")
@@ -219,7 +251,7 @@ if SERVER then
         net.WriteString(name)
         net.Broadcast()
 
-        print_msg("Module " .. name .. " disabled")
+        print_msg(Color(255, 102, 0), "Metrostroi: Module '" .. name .. "' disabled", "\n")
     end)
 else
     net.Receive("metrostroi-modules-set", function()
@@ -230,5 +262,15 @@ else
         elseif typ == 2 then -- Disable module
             Metrostroi.Modules.DisableModule(name)
         end
+    end)
+
+    net.Receive("metrostroi-modules-msg", function()
+        local len = net.ReadUInt(32)
+        local tbl = {}
+        for i = 1, len do
+            local val = net.ReadType()
+            table.insert(tbl, val)
+        end
+        MsgC(unpack(tbl))
     end)
 end

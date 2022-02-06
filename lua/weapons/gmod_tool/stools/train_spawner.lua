@@ -539,7 +539,7 @@ if SERVER then
         if not ENT then tool.AllowSpawn = false else 
             tool.Train = ENT
             tool.TrainSpawnerSettings = ENT.Spawner
-            Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", tool.Settings, tool.TrainSpawnerSettings, true)
+            Metrostroi.Modules.DispatchEvent("TrainSpawnerSettings", tool.Settings, tool.TrainSpawnerSettings, true)
         end
     end)
     return

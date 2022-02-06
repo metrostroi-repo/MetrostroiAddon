@@ -297,7 +297,7 @@ function ENT:Initialize()
     -- Initialize train systems
     self:PostInitializeSystems()
     for k,v in pairs(self.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(self) end end
-    Metrostroi_Modules_DispatchEvent("TrainInitalize", self)
+    Metrostroi.Modules.DispatchEvent("TrainInitalize", self)
 end
 function ENT:GetWagonNumber()
     return self.WagonNumber or self:EntIndex()
