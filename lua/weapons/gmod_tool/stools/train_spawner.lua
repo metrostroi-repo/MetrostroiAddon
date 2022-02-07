@@ -212,7 +212,7 @@ function TOOL:SpawnWagon(trace)
     local trains = {}
 
     --local TrainSpawnerSettings = self.Train.Spawner
-    --Metrostroi.Modules.DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
+    --Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
 
     for i=1,self.Settings.WagNum do
         local spawnfunc = self.TrainSpawnerSettings.spawnfunc
@@ -539,7 +539,7 @@ if SERVER then
         if not ENT then tool.AllowSpawn = false else 
             tool.Train = ENT
             tool.TrainSpawnerSettings = ENT.Spawner
-            Metrostroi.Modules.DispatchEvent("TrainSpawnerSettings", tool.Settings, tool.TrainSpawnerSettings, true)
+            Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", tool.Settings, tool.TrainSpawnerSettings, true)
         end
     end)
     return

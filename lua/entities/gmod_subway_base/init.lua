@@ -297,7 +297,7 @@ function ENT:Initialize()
     -- Initialize train systems
     self:PostInitializeSystems()
     for k,v in pairs(self.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(self) end end
-    Metrostroi.Modules.DispatchEvent("TrainInitalize", self)
+    Metrostroi_Modules_DispatchEvent("TrainInitialize", self)
 end
 function ENT:GetWagonNumber()
     return self.WagonNumber or self:EntIndex()
@@ -1990,7 +1990,6 @@ function ENT:Think()
     self:SetNW2Float("Accel",math.Round((self.OldSpeed or 0) - (self.Speed or 0)*(self.SpeedSign or 0),2))
     self:SetNW2Float("TrainSpeed",self.Speed)
     self.OldSpeed = (self.Speed or 0)*(self.SpeedSign or 0)
-
     for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
     self:NextThink(CurTime()+0.05)
     return true

@@ -463,14 +463,16 @@ function ENT:Think()
                     if self.Signals[ID2].Stop and CurTime-self.Signals[ID2].Stop > 0 then
                         self.Signals[ID2].Stop = nil
                     end
-                    local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and (RealTime() % 1.2 > 0.4))) and not self.Signals[ID2].Stop) and 1 or 0,  0,1, 128)
+                    local anim_id = table.concat({ID,"/",i})
+                    local State = self:Animate(anim_id,  ((n == 1 or (n == 2 and (RealTime() % 1.2 > 0.4))) and not self.Signals[ID2].Stop) and 1 or 0,  0.01,1, 128, false)
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
                     local offsetAndLongOffset = offset + self.LongOffset
                     if not self.DoubleL then
                         self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     else
+                        local ID2x = table.concat({ID2,"x"})
                         self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
-                        self:SetLight(ID,ID2.."x",self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2x,self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     end
                     self.Signals[ID2].State = State
                 end
@@ -481,15 +483,15 @@ function ENT:Think()
             ID = ID + 1
         end
 
-        local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb.mdl"
-        local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
+        local LampIndicatorModels_numb_mdl = table.concat({TLM.LampIndicator.model,"_numb.mdl"})
+        local LampIndicatorModels_lamp_mdl = table.concat({TLM.LampIndicator.model,"_lamp.mdl"})
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
-            local rou1k = "rou1"..k
+            local rou1k = table.concat({"rou1",k})
             local State1 = self:Animate(rou1k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
             local State2
             --if v[3] then
-            local rou2k = "rou2"..k
+            local rou2k = table.concat({"rou2",k})
             if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
             if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
                 self.Models[3][rou1k] = ClientsideModel(v[3] and LampIndicatorModels_numb_mdl or LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)

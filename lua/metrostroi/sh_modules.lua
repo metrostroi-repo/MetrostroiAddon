@@ -1,9 +1,40 @@
 Metrostroi.Modules = Metrostroi.Modules or {}
 
-Metrostroi.Modules.Loaded = Metrostroi.Modules.Loaded or {}
+Metrostroi_Modules_Loaded = Metrostroi_Modules_Loaded or {}
+
+local useInject = false
 
 function Metrostroi.DefineModule(name)
     MOD = {}
+    if not useInject then
+        MOD = {
+            WrapFunction = function(self, tbl, name, func, prefunc)
+                local oldfunc = tbl[name]
+
+                tbl[name] = function(a, b, c, d)
+                    local ret, a2, b2, c2, d2 = false
+                    if prefunc ~= nil then
+                        ret, a2, b2, c2, d2 = prefunc(tbl, a, b, c, d)
+                        if ret then
+                            a, b, c, d = a2, b2, c2, d2
+                        end
+                    end
+                    local x, y, z, w = oldfunc(tbl, a, b, c, d)
+                    if func ~= nil then
+                        local ret2, x2, y2, z2, w2 = func(tbl, a, b, c, d)
+                        if ret2 then
+                            return x2, y2, z2, w2
+                        else
+                            return x, y, z, w
+                        end
+                    end
+                    return x, y, z, w
+                end
+
+                return oldfunc
+            end
+        }
+    end
 
     MOD.name = name
     MOD_NAME = name
@@ -13,19 +44,19 @@ function Metrostroi.ReloadModule()
     local name = MOD_NAME
 
     if DONT_RELOAD then return end
-    if not Metrostroi.Modules.Loaded[name] then return end
+    if not Metrostroi_Modules_Loaded[name] then return end
 
-    if string.StartWith(Metrostroi.Modules.Loaded[name]["__filename"], "!Dynamic") then
+    if string.StartWith(Metrostroi_Modules_Loaded[name]["__filename"], "!Dynamic") then
         Metrostroi.Modules.RegisterModuleTable(MOD, name)
     else
-        Metrostroi.Modules.RegisterModule(Metrostroi.Modules.Loaded[name]["__filename"])
+        Metrostroi.Modules.RegisterModule(Metrostroi_Modules_Loaded[name]["__filename"])
     end
 end
 
 local pairs = pairs
 
 function Metrostroi.Modules.DispatchEvent(event, ENT, a, b, c, d)
-    for k, v in pairs(Metrostroi.Modules.Loaded) do
+    for k, v in pairs(Metrostroi_Modules_Loaded) do
         if not v["__enabled"] then return false end
         local func = v[event]
         if not func then return end
@@ -37,6 +68,8 @@ function Metrostroi.Modules.DispatchEvent(event, ENT, a, b, c, d)
     end
     return false
 end
+
+Metrostroi_Modules_DispatchEvent = Metrostroi.Modules.DispatchEvent
 
 function Metrostroi.Modules.RegisterModule(filename)
     DONT_RELOAD = true
@@ -53,7 +86,7 @@ function Metrostroi.Modules.RegisterModule(filename)
     tbl["__filename"] = filename
     tbl["__enabled"] = true
 
-    Metrostroi.Modules.Loaded[name] = tbl
+    Metrostroi_Modules_Loaded[name] = tbl
 
     tbl:Initialize()
 end
@@ -64,71 +97,72 @@ function Metrostroi.Modules.RegisterModuleTable(tbl, name)
     tbl["__filename"] = Format("!Dynamic:%s", name)
     tbl["__enabled"] = true
 
-    Metrostroi.Modules.Loaded[name] = tbl
+    Metrostroi_Modules_Loaded[name] = tbl
 
     tbl:Initialize()
 end
 
 function Metrostroi.Modules.EnableModule(name)
-    local mod = Metrostroi.Modules.Loaded[name]
+    local mod = Metrostroi_Modules_Loaded[name]
     if not mod then return end
     mod["__enabled"] = true
 end
 
 function Metrostroi.Modules.DisableModule(name)
-    local mod = Metrostroi.Modules.Loaded[name]
+    local mod = Metrostroi_Modules_Loaded[name]
     if not mod then return end
     mod["__enabled"] = false
 end
 
-Metrostroi.Modules.CacheFunctions = Metrostroi.Modules.CacheFunctions or {}
-function Metrostroi.Modules.Inject()
-    
-    for k, v in pairs(Metrostroi.TrainClasses) do
-        local ENT = scripted_ents.GetStored(v).t
+if useInject then
+    Metrostroi.Modules.CacheFunctions = Metrostroi.Modules.CacheFunctions or {}
+    function Metrostroi.Modules.Inject()
+        for k, v in pairs(Metrostroi.TrainClasses) do
+            local ENT = scripted_ents.GetStored(v).t
 
-        if not Metrostroi.Modules.CacheFunctions[v] then Metrostroi.Modules.CacheFunctions[v] = {} end
+            if not Metrostroi.Modules.CacheFunctions[v] then Metrostroi.Modules.CacheFunctions[v] = {} end
 
-        local oldInitialize = Metrostroi.Modules.CacheFunctions[v]["Initialize"] or ENT.Initialize
-        local oldThink = Metrostroi.Modules.CacheFunctions[v]["Think"] or ENT.Think
-        local oldTrainSpawner = Metrostroi.Modules.CacheFunctions[v]["TrainSpawnerUpdate"] or ENT.TrainSpawnerUpdate or function() return end
-        local oldInitializeSounds = Metrostroi.Modules.CacheFunctions[v]["InitializeSounds"] or ENT.InitializeSounds or function() return end
-        local oldDrawPost = Metrostroi.Modules.CacheFunctions[v]["DrawPost"] or ENT.DrawPost or function() return end
-        
-        ENT.Initialize = function(ent)
-            oldInitialize(ent)
-            Metrostroi.Modules.DispatchEvent("TrainPostInitialize", ent)
-        end
-        ENT.Think = function(ent)
-            local res = oldThink(ent)
-            Metrostroi.Modules.DispatchEvent("TrainPostThink", ent)
-            return res
-        end
-        ENT.TrainSpawnerUpdate = function(ent, a, b, c, d)
-            local x, y, z, w = oldTrainSpawner(ent, a, b, c, d)
-            Metrostroi.Modules.DispatchEvent("TrainSpawnerUpdate", ent)
-            return x, y, z, w
-        end
-        ENT.InitializeSounds = function(ent)
-            oldInitializeSounds(ent)
-            Metrostroi.Modules.DispatchEvent("TrainInitializeSounds", ent)
-        end
-        ENT.DrawPost = function(ent, a)
-            oldDrawPost(ent, a)
-            Metrostroi.Modules.DispatchEvent("TrainDrawPost", ent)
-        end
+            local oldInitialize = Metrostroi.Modules.CacheFunctions[v]["Initialize"] or ENT.Initialize or function() return end
+            local oldThink = Metrostroi.Modules.CacheFunctions[v]["Think"] or ENT.Think or function() return end
+            local oldTrainSpawner = Metrostroi.Modules.CacheFunctions[v]["TrainSpawnerUpdate"] or ENT.TrainSpawnerUpdate or function() return end
+            local oldInitializeSounds = Metrostroi.Modules.CacheFunctions[v]["InitializeSounds"] or ENT.InitializeSounds or function() return end
+            local oldDrawPost = Metrostroi.Modules.CacheFunctions[v]["DrawPost"] or ENT.DrawPost or function() return end
+            
+            ENT.Initialize = function(ent)
+                oldInitialize(ent)
+                Metrostroi_Modules_DispatchEvent("TrainPostInitialize", ent)
+            end
+            ENT.Think = function(ent)
+                local res = oldThink(ent)
+                Metrostroi_Modules_DispatchEvent("TrainPostThink", ent)
+                return res
+            end
+            ENT.TrainSpawnerUpdate = function(ent, a, b, c, d)
+                local x, y, z, w = oldTrainSpawner(ent, a, b, c, d)
+                Metrostroi_Modules_DispatchEvent("TrainSpawnerUpdate", ent)
+                return x, y, z, w
+            end
+            ENT.InitializeSounds = function(ent)
+                oldInitializeSounds(ent)
+                Metrostroi_Modules_DispatchEvent("TrainInitializeSounds", ent)
+            end
+            ENT.DrawPost = function(ent, a)
+                oldDrawPost(ent, a)
+                Metrostroi_Modules_DispatchEvent("TrainDrawPost", ent)
+            end
 
-        Metrostroi.Modules.CacheFunctions[v]["Initialize"] = oldInitialize
-        Metrostroi.Modules.CacheFunctions[v]["Think"] = oldThink
-        Metrostroi.Modules.CacheFunctions[v]["TrainSpawnerUpdate"] = oldTrainSpawner
-        Metrostroi.Modules.CacheFunctions[v]["InitializeSounds"] = oldInitializeSounds
-        Metrostroi.Modules.CacheFunctions[v]["DrawPost"] = oldDrawPost
+            Metrostroi.Modules.CacheFunctions[v]["Initialize"] = oldInitialize
+            Metrostroi.Modules.CacheFunctions[v]["Think"] = oldThink
+            Metrostroi.Modules.CacheFunctions[v]["TrainSpawnerUpdate"] = oldTrainSpawner
+            Metrostroi.Modules.CacheFunctions[v]["InitializeSounds"] = oldInitializeSounds
+            Metrostroi.Modules.CacheFunctions[v]["DrawPost"] = oldDrawPost
+        end
     end
-end
 
-timer.Simple(3, function()
-    Metrostroi.Modules.Inject()
-end)
+    timer.Simple(3, function()
+        Metrostroi.Modules.Inject()
+    end)
+end
 
 if SERVER then -- Loading Modules
     files = file.Find("metrostroi/modules/*.lua","LUA")
@@ -150,7 +184,6 @@ if SERVER then
 
     util.AddNetworkString("metrostroi-modules-set")
     util.AddNetworkString("metrostroi-modules-msg")
-    
 
     concommand.Add("metrostroi_modules_list", function(ply)
         local function print_msg(...)
@@ -172,7 +205,7 @@ if SERVER then
         local disabled = {}
         local text = "Current loaded modules:"
         local width = string.len(text)
-        for k, v in pairs(Metrostroi.Modules.Loaded) do
+        for k, v in pairs(Metrostroi_Modules_Loaded) do
             local t = Format("%s [%s]", v.name, v["__filename"])
             if #t > width then width = #t end
             table.insert(v["__enabled"] and enabled or disabled, t)
@@ -211,7 +244,7 @@ if SERVER then
 
         local name = args[1]
 
-        if not Metrostroi.Modules.Loaded[name] then return print_msg("Metrostroi: Module not found", "\n") end
+        if not Metrostroi_Modules_Loaded[name] then return print_msg("Metrostroi: Module not found", "\n") end
 
         Metrostroi.Modules.EnableModule(name)
         net.Start("metrostroi-modules-set")
@@ -243,7 +276,7 @@ if SERVER then
 
         local name = args[1]
 
-        if not Metrostroi.Modules.Loaded[name] then return print_msg("Metrostroi: Module not found", "\n") end
+        if not Metrostroi_Modules_Loaded[name] then return print_msg("Metrostroi: Module not found", "\n") end
 
         Metrostroi.Modules.DisableModule(name)
         net.Start("metrostroi-modules-set")
@@ -272,5 +305,12 @@ else
             table.insert(tbl, val)
         end
         MsgC(unpack(tbl))
+    end)
+
+    concommand.Add("fprofiler_start", function()
+        FProfiler.start()
+    end)
+    concommand.Add("fprofiler_stop", function()
+        FProfiler.stop()
     end)
 end

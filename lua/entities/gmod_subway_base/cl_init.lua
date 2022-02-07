@@ -356,7 +356,7 @@ local lastAimButtonChange
 local lastAimButton
 
 function ENT:ShouldRenderClientEnts()
-    local override, hide = Metrostroi.Modules.DispatchEvent("TrainShouldDrawClientEnts", self)
+    local override, hide = Metrostroi_Modules_DispatchEvent("TrainShouldDrawClientEnts", self)
     if override then return hide end
 
     return not self:IsDormant() and math.abs(LocalPlayer():GetPos().z - self:GetPos().z) < 500 and (system.HasFocus() or C_MinimizedShow:GetBool()) and (not Metrostroi or not Metrostroi.ReloadClientside)
@@ -365,7 +365,7 @@ function ENT:ShouldDrawPanel(v)
     return not self.HiddenPanelsDistance[v] and not self.HiddenPanels[v]
 end
 function ENT:ShouldDrawClientEnt(k,v)
-    local override, hide = Metrostroi.Modules.DispatchEvent("TrainShouldDrawClientEnt", self, k ,v)
+    local override, hide = Metrostroi_Modules_DispatchEvent("TrainShouldDrawClientEnt", self, k ,v)
     if override then return hide end
 
     if self.Hidden[k] or self.Hidden.anim[k] then return false end
@@ -634,7 +634,8 @@ hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,is
             return
         end
         cam.IgnoreZ(true)
-        for i,vHandle in pairs(ent.Sprites) do
+        local sprites = ent.Sprites or {} -- motovozka fix
+        for i,vHandle in pairs(sprites) do
             local br = ent.LightBrightness[i]
             local lightData = ent.LightsOverride[i] or ent.Lights[i]
             if lightData[1] ~= "glow" and lightData[1] ~= "light" or br <= 0 then continue end
@@ -812,7 +813,7 @@ function ENT:Initialize()
     self.TunnelCoeff = 0
     self.StreetCoeff = 0
     self.Street = 0
-    Metrostroi.Modules.DispatchEvent("TrainInitalize", self)
+    Metrostroi_Modules_DispatchEvent("TrainInitialize", self)
 end
 
 function ENT:UpdateTextures()
@@ -855,7 +856,7 @@ function ENT:OnRemove(nfinal)
     self:RemoveCSEnts()
     self.RenderClientEnts = false
 
-
+    self.Sounds = self.Sounds or {loop = {}}
     for _,v in pairs(self.Sounds) do
         if type(v) ~= "function" and type(v) ~= "table" then
             self:DestroySound(v)
@@ -931,9 +932,9 @@ local function SoundTrace(startv,endv)
         endpos = endv,
         mask = MASK_NPCWORLDSTATIC,
     } )
-    --debugoverlay.Line(startv,endv,FrameTime(),Color( 255, 0, tr.Hit and 255 or 0 ))
+    debugoverlay.Line(startv,endv,FrameTime(),Color( 255, 0, tr.Hit and 255 or 0 ))
     if tr.Hit then
-        --debugoverlay.Sphere(tr.HitPos,4,FrameTime(),Color( 255, 200, 100))
+        debugoverlay.Sphere(tr.HitPos,4,FrameTime(),Color( 255, 200, 100))
         return startv:Distance(tr.HitPos)
     end
     return 1000
@@ -1794,45 +1795,49 @@ end
 --------------------------------------------------------------------------------
 -- Animation function
 --------------------------------------------------------------------------------
+local RealTime = RealTime
+local IsValid = IsValid
+local math_abs = math.abs
 function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
     local id = clientProp
     local anims = self.Anims
-    if not anims[id] then
-        anims[id] = {}
-        anims[id].val = value
-        anims[id].value = min + (max-min)*value
-        anims[id].V = 0.0
-        anims[id].block = false
-        anims[id].stuck = false
-        anims[id].P = value
+    local anims_tbl = anims[id]
+    if not anims_tbl then
+        anims_tbl = {}
+        anims_tbl.val = value
+        anims_tbl.value = min + (max-min)*value
+        anims_tbl.V = 0.0
+        anims_tbl.block = false
+        anims_tbl.stuck = false
+        anims_tbl.P = value
     end
     if self.Hidden[id] or self.Hidden.anim[id] then return 0 end
-    if anims[id].Ignore then
-        if RealTime()-anims[id].Ignore < 0 then
-            return anims[id].value
+    if anims_tbl.Ignore then
+        if RealTime()-anims_tbl.Ignore < 0 then
+            return anims_tbl.value
         else
-            anims[id].Ignore = nil
+            anims_tbl.Ignore = nil
         end
     end
-    local val = anims[id].val
+    local val = anims_tbl.val
     if value ~= val then
-        anims[id].block = false
+        anims_tbl.block = false
     end
-    if anims[id].block then
-        if anims[id].reload and IsValid(self.ClientEnts[clientProp]) then
-            self.ClientEnts[clientProp]:SetPoseParameter("position",anims[id].value)
-            anims[id].reload = false
+    if anims_tbl.block then
+        if anims_tbl.reload and IsValid(self.ClientEnts[clientProp]) then
+            self.ClientEnts[clientProp]:SetPoseParameter("position",anims_tbl.value)
+            anims_tbl.reload = false
         end
-        return anims[id].value--min + (max-min)*anims[id].val
+        return anims_tbl.value--min + (max-min)*anims_tbl.val
     end
     --if self["_anim_old_"..id] == value then return self["_anim_old_"..id] end
     -- Generate sticky value
     if stickyness and damping then
-        if (math.abs(anims[id].P - value) < stickyness) and (anims[id].stuck) then
-            value = anims[id].P
-            anims[id].stuck = false
+        if (math_abs(anims_tbl.P - value) < stickyness) and (anims_tbl.stuck) then
+            value = anims_tbl.P
+            anims_tbl.stuck = false
         else
-            anims[id].P = value
+            anims_tbl.P = value
         end
     end
     local dT = FrameTime()--self.DeltaTime
@@ -1846,9 +1851,9 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
         end
         if math.abs(value - val) < dX then
             val = value
-            anims[id].V = 0
+            anims_tbl.V = 0
         else
-            anims[id].V = dX
+            anims_tbl.V = dX
         end
     else
         -- Prepare speed limiting
@@ -1857,33 +1862,34 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
         local max_accel = 0.5 / dT
 
         -- Simulate
-        local dX2dT = (speed or 128)*(value - val) - anims[id].V * (damping or 8.0)
+        local dX2dT = (speed or 128)*(value - val) - anims_tbl.V * (damping or 8.0)
         if dX2dT >  max_accel then dX2dT =  max_accel end
         if dX2dT < -max_accel then dX2dT = -max_accel end
 
-        anims[id].V = anims[id].V + dX2dT * dT
-        if anims[id].V >  max_speed then anims[id].V =  max_speed end
-        if anims[id].V < -max_speed then anims[id].V = -max_speed end
+        anims_tbl.V = anims_tbl.V + dX2dT * dT
+        if anims_tbl.V >  max_speed then anims_tbl.V =  max_speed end
+        if anims_tbl.V < -max_speed then anims_tbl.V = -max_speed end
 
-        val = math.max(0,math.min(1,val + anims[id].V * dT))
+        val = math.max(0,math.min(1,val + anims_tbl.V * dT))
 
         -- Check if value got stuck
         if (math.abs(dX2dT) < 0.001) and stickyness and (dT > 0) then
-            anims[id].stuck = true
+            anims_tbl.stuck = true
         end
     end
     local retval = min + (max-min)*val
     if IsValid(self.ClientEnts[clientProp]) then
         self.ClientEnts[clientProp]:SetPoseParameter("position",retval)
     end
-    if math.abs(anims[id].V) == 0 and math.abs(val-value) == 0 and not anims[id].stuck then
-        anims[id].block = true
+    if math.abs(anims_tbl.V) == 0 and math.abs(val-value) == 0 and not anims_tbl.stuck then
+        anims_tbl.block = true
     end
 
-    anims[id].val = val
-    anims[id].oldival = value
-    anims[id].oldspeed = speed
-    anims[id].value = retval
+    anims_tbl.val = val
+    anims_tbl.oldival = value
+    anims_tbl.oldspeed = speed
+    anims_tbl.value = retval
+    self.Anims[id] = anims_tbl
     return retval
 end
 function ENT:AnimateFrom(clientProp,from,min,max)

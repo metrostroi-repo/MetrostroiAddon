@@ -1,3 +1,31 @@
+local include = include
+local CreateSound = CreateSound
+local Sound = Sound
+local pairs = pairs
+local SafeRemoveEntity = SafeRemoveEntity
+local Vector = Vector
+local util_TraceLine = util.TraceLine
+local Angle = Angle
+local math_randomseed = math.randomseed
+local math_min = math.min
+local math_abs = math.abs
+local math_random = math.random
+local table_Random = table.Random
+local table_insert = table.insert
+local CurTime = CurTime
+local ClientsideModel = ClientsideModel
+local math_floor = math.floor
+local IsValid = IsValid
+local math_max = math.max
+local LocalPlayer = LocalPlayer
+local GetConVar = GetConVar
+local cam_Start3D2D = cam.Start3D2D
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_DrawRect = surface.DrawRect
+local draw_DrawText = draw.DrawText
+local Format = Format
+local Color = Color
+local cam_End3D2D = cam.End3D2D
 include("shared.lua")
 
 --------------------------------------------------------------------------------
@@ -73,31 +101,31 @@ local function isPositionFree(pos)
     trace.start = pos+Vector(0,0,ped_legs)
     trace.endpos = pos+Vector(0,0,ped_height)
     trace.mask = -1
-    local result = util.TraceLine(trace)
+    local result = util_TraceLine(trace)
     if result.Hit then return false end
 
     trace.start = pos+Vector(-ped_size,0,ped_legs)
     trace.endpos = pos+Vector(-ped_size,0,ped_height)
     trace.mask = -1
-    local result = util.TraceLine(trace)
+    local result = util_TraceLine(trace)
     if result.Hit then return false end
 
     trace.start = pos+Vector(ped_size,0,ped_legs)
     trace.endpos = pos+Vector(ped_size,0,ped_height)
     trace.mask = -1
-    local result = util.TraceLine(trace)
+    local result = util_TraceLine(trace)
     if result.Hit then return false end
 
     trace.start = pos+Vector(0,-ped_size,ped_legs)
     trace.endpos = pos+Vector(0,-ped_size,ped_height)
     trace.mask = -1
-    local result = util.TraceLine(trace)
+    local result = util_TraceLine(trace)
     if result.Hit then return false end
 
     trace.start = pos+Vector(0,ped_size,ped_legs)
     trace.endpos = pos+Vector(0,ped_size,ped_height)
     trace.mask = -1
-    local result = util.TraceLine(trace)
+    local result = util_TraceLine(trace)
     if result.Hit then return false end
 
     return true
@@ -118,8 +146,8 @@ function ENT:PopulatePlatform(platformStart,platformEnd,stationCenter)
     self.Pool = self.Pool or {}
 
     -- Fill pool
-    math.randomseed(self:Seed() + #self.Pool)
-    local N = math.min(self:PoolSize() - #self.Pool,32)
+    math_randomseed(self:Seed() + #self.Pool)
+    local N = math_min(self:PoolSize() - #self.Pool,32)
     for i=1,N do
         local pedestrian = {}
         local iterations = 1
@@ -127,7 +155,7 @@ function ENT:PopulatePlatform(platformStart,platformEnd,stationCenter)
             -- Generate random constants
             local a = -1
             while (a < 0) or (a > 1) do a = gauss_random(self:GetNW2Float("X0"),self:GetNW2Float("Sigma")) end
-            local b = math.abs(gauss_random(0.00,0.20))
+            local b = math_abs(gauss_random(0.00,0.20))
 
             -- Create random position
             pedestrian.distance = b*platformWidth
@@ -139,13 +167,13 @@ function ENT:PopulatePlatform(platformStart,platformEnd,stationCenter)
         end
 
         -- Random other parameters
-        pedestrian.ang = platformN:Angle() + Angle(0,math.random(-50,50),0)
-        pedestrian.skin = math.random()
+        pedestrian.ang = platformN:Angle() + Angle(0,math_random(-50,50),0)
+        pedestrian.skin = math_random()
         pedestrian.scale = 0.98 + gauss_random(0,0.03)
-        pedestrian.model = table.Random(passengerModels)
+        pedestrian.model = table_Random(passengerModels)
 
         -- Add to pool
-        table.insert(self.Pool,pedestrian)
+        table_insert(self.Pool,pedestrian)
     end
 end
 
@@ -240,7 +268,7 @@ function ENT:Think()
                     self.ClientModels[i] = ClientsideModel(self.Pool[i].model,RENDERGROUP_OPAQUE)
                     self.ClientModels[i]:SetPos(self.Pool[i].pos)
                     self.ClientModels[i]:SetAngles(self.Pool[i].ang)
-                    self.ClientModels[i]:SetSkin(math.floor(self.ClientModels[i]:SkinCount()*self.Pool[i].skin))
+                    self.ClientModels[i]:SetSkin(math_floor(self.ClientModels[i]:SkinCount()*self.Pool[i].skin))
                     self.ClientModels[i]:SetModelScale(self.Pool[i].scale,0)
                     self.ClientModels[i]:DestroyShadow()
                     self.ClientModels[i]:DrawShadow(false)
@@ -255,7 +283,7 @@ function ENT:Think()
                     local distance = 1e9
                     local target = Vector(0,0,0)
                     for j=1,count do
-                        local vec = self:GetNW2Vector("TrainDoor"..j,Vector(0,0,0))
+                        local vec = self:GetNW2Vector(table.concat({"TrainDoor",j}),Vector(0,0,0))
                         local d = vec:Distance(self.ClientModels[i]:GetPos())
                         if d < distance then
                             target = vec
@@ -263,7 +291,7 @@ function ENT:Think()
                         end
                     end
                     -- Add to list of cleanups
-                    table.insert(self.CleanupModels,{
+                    table_insert(self.CleanupModels,{
                         ent = self.ClientModels[i],
                         target = target,
                     })
@@ -278,12 +306,12 @@ function ENT:Think()
     while poolReady and (self.PassengersLeft < self:GetNW2Int("PassengersLeft")) do
         -- Get random door
         local count = self:GetNW2Int("TrainDoorCount",0)
-        local i = math.max(1,math.min(count,1+math.floor((count-1)*math.random() + 0.5)))
-        local pos = self:GetNW2Vector("TrainDoor"..i,Vector(0,0,0))
+        local i = math_max(1,math_min(count,1+math_floor((count-1)*math_random() + 0.5)))
+        local pos = self:GetNW2Vector(table.concat({"TrainDoor",i}),Vector(0,0,0))
         pos.z = self:GetPos().z
 
         -- Create clientside model
-        local i = math.max(1,math.min(self:PoolSize(),1+math.floor(math.random()*self:PoolSize() + 0.5)))
+        local i = math_max(1,math_min(self:PoolSize(),1+math_floor(math_random()*self:PoolSize() + 0.5)))
         --local ent = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
         --ent:SetModel(self.Pool[i].model)
         --hook.Add("MetrostroiBigLag",ent,function(ent)
@@ -293,7 +321,7 @@ function ENT:Think()
         --end)
         local ent= ClientsideModel(self.Pool[i].model,RENDERGROUP_OPAQUE)
         ent:SetPos(pos)
-        ent:SetSkin(math.floor(ent:SkinCount()*self.Pool[i].skin))
+        ent:SetSkin(math_floor(ent:SkinCount()*self.Pool[i].skin))
         ent:SetModelScale(self.Pool[i].scale,0)
         -- Generate target pos
         local platformDir   = platformEnd-platformStart
@@ -301,12 +329,12 @@ function ENT:Think()
         local platformD     = platformDir:GetNormalized()
         local platformWidth = ((platformStart-stationCenter) - ((platformStart-stationCenter):Dot(platformD))*platformD):Length()
         local target = pos + platformN*platformWidth
-        pos = pos - platformN * 4.0 * math.random()
-        pos = pos + platformD * 16.0 * math.random()
-        target = target + platformD * 128.0 * math.random()
+        pos = pos - platformN * 4.0 * math_random()
+        pos = pos + platformD * 16.0 * math_random()
+        target = target + platformD * 128.0 * math_random()
 
         -- Add to list of cleanups
-        table.insert(self.CleanupModels,{
+        table_insert(self.CleanupModels,{
             ent = ent,
             target = target,
         })
@@ -331,7 +359,7 @@ function ENT:Think()
         local distance = pos:DistToSqr(target)
         local count = self:GetNW2Int("TrainDoorCount",0)
         -- Delete if reached the target point
-        if distance < 2*256--[[threshold]] or math.abs(LocalPlayer():GetPos().z - v.ent:GetPos().z) > 256 or count == 0 then
+        if distance < 2*256--[[threshold]] or math_abs(LocalPlayer():GetPos().z - v.ent:GetPos().z) > 256 or count == 0 then
             v.ent:Remove()
             self.CleanupModels[k] = nil
             continue
@@ -346,7 +374,7 @@ function ENT:Think()
         if distance > 36864--[[192]] then
             local platformDir = (platformEnd-platformStart):GetNormalized()
             local projection = targetDir:Dot(platformDir)
-            if math.abs(projection) > 0.1 then
+            if math_abs(projection) > 0.1 then
                 targetDir = (platformDir * projection):GetNormalized()
             end
         end
@@ -354,7 +382,7 @@ function ENT:Think()
         -- Move pedestrian
         local speed = 1024
         if distance > 1048576--[[1024]] then speed = 2048 end
-        v.ent:SetPos(v.ent:GetPos() + targetDir*math.min(threshold,speed*self.DeltaTime))
+        v.ent:SetPos(v.ent:GetPos() + targetDir*math_min(threshold,speed*self.DeltaTime))
         -- Rotate pedestrian
         v.ent:SetAngles(targetDir:Angle() + Angle(0,180,0))
 
@@ -393,17 +421,17 @@ function ENT:Draw()
     end--]]
     --print(2)
     local ang = self:LocalToWorldAngles(Angle(0,180,90))
-    cam.Start3D2D(pos, ang, 0.25)
-        surface.SetDrawColor(125, 125, 0, 255)
-        surface.DrawRect(0, 0, 160, 24)
+    cam_Start3D2D(pos, ang, 0.25)
+        surface_SetDrawColor(125, 125, 0, 255)
+        surface_DrawRect(0, 0, 160, 24)
 
-        draw.DrawText(Format("[%d]/%d",self:GetNWInt("StationIndex"),self:GetNWInt("PlatformIndex")),"Trebuchet24",5,0,Color(0,0,0,255))
-    cam.End3D2D()
+        draw_DrawText(Format("[%d]/%d",self:GetNWInt("StationIndex"),self:GetNWInt("PlatformIndex")),"Trebuchet24",5,0,Color(0,0,0,255))
+    cam_End3D2D()
     local ang = self:LocalToWorldAngles(Angle(0,0,90))
-    cam.Start3D2D(pos, ang, 0.25)
-        surface.SetDrawColor(125, 125, 0, 255)
-        surface.DrawRect(0, 0, 160, 24)
+    cam_Start3D2D(pos, ang, 0.25)
+        surface_SetDrawColor(125, 125, 0, 255)
+        surface_DrawRect(0, 0, 160, 24)
 
-        draw.DrawText(Format("[%d]/%d",self:GetNWInt("StationIndex"),self:GetNWInt("PlatformIndex")),"Trebuchet24",5,0,Color(0,0,0,255))
-    cam.End3D2D()
+        draw_DrawText(Format("[%d]/%d",self:GetNWInt("StationIndex"),self:GetNWInt("PlatformIndex")),"Trebuchet24",5,0,Color(0,0,0,255))
+    cam_End3D2D()
 end
