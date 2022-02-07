@@ -47,6 +47,7 @@ Panel.ShadowsOther      = Enable shadows from other\nlight sources
 Panel.PanelSprites      = Enable sprites from control\npanel lamps
 Panel.MinimizedShow     = Don't unload an elements\nwhen minimized
 Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
+Panel.FastSwitch        = Enable fast change signal lenses
 Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = FOV
 Panel.Z                 = Camera height #NEW

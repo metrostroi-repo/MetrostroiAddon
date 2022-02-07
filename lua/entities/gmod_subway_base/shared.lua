@@ -454,7 +454,7 @@ else
 				if type(soundname) == "table" then soundname = table.Random(soundname) end
 				if IsValid(self.ClientEnts[esnd[1]]) and not self.ClientEnts[esnd[1]].snd then
 					local ent = self.ClientEnts[esnd[1]]
-					sound.PlayFile( table.concat({"sound/",soundname}), "3d noplay mono", function( snd,err,errName )
+					sound.PlayFile( "sound/"..soundname, "3d noplay mono", function( snd,err,errName )
 						if not IsValid(self) then destroySound(snd) return end
 						if err then
 							self:DestroySound(snd)

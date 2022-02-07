@@ -283,7 +283,7 @@ function ENT:Think()
                     local distance = 1e9
                     local target = Vector(0,0,0)
                     for j=1,count do
-                        local vec = self:GetNW2Vector(table.concat({"TrainDoor",j}),Vector(0,0,0))
+                        local vec = self:GetNW2Vector("TrainDoor"..j),Vector(0,0,0))
                         local d = vec:Distance(self.ClientModels[i]:GetPos())
                         if d < distance then
                             target = vec
@@ -307,7 +307,7 @@ function ENT:Think()
         -- Get random door
         local count = self:GetNW2Int("TrainDoorCount",0)
         local i = math_max(1,math_min(count,1+math_floor((count-1)*math_random() + 0.5)))
-        local pos = self:GetNW2Vector(table.concat({"TrainDoor",i}),Vector(0,0,0))
+        local pos = self:GetNW2Vector("TrainDoor"..i),Vector(0,0,0))
         pos.z = self:GetPos().z
 
         -- Create clientside model

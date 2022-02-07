@@ -17,6 +17,7 @@ CreateConVar("metrostroi_ars_sfreq",1,FCVAR_ARCHIVE,"Enable second freq.")
 CreateConVar("metrostroi_signal_debug",0,FCVAR_ARCHIVE,"Enable signal debug")
 
 
+
 Metrostroi.SignalDebugCV = GetConVar("metrostroi_signal_debug")
 if SERVER then
     util.AddNetworkString("metrostroi_expel_passengers")
@@ -111,6 +112,8 @@ CreateClientConVar("metrostroi_shadows3",0,true)
 CreateClientConVar("metrostroi_shadows4",0,true)
 CreateClientConVar("metrostroi_sprites",1,true)
 CreateClientConVar("metrostroi_minimizedshow",0,true)
+CreateClientConVar("metrostroi_signal_fastswitch",1,true)
+
 local function reload()
     --Metrostroi.ReloadClientside = true
 end

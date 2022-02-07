@@ -117,24 +117,26 @@ end
 function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
     local IsStateAboveZero = State > 0
     local IDID2 = ID..ID2
-    local IsModelValid = IsValid(self.Models[3][IDID2])
+    local model = self.Models[3][IDID2]
+    local IsModelValid = IsValid(model)
     if IsModelValid then
         if IsStateAboveZero then 
             if Change then 
-                self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
+                model:SetColor(Color(255,255,255,State*255))
             end
         else
-            self.Models[3][IDID2]:Remove()
+            model:Remove()
         end
     elseif IsStateAboveZero then
-        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model,RENDERGROUP_OPAQUE)
-        self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
-        self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
-        self.Models[3][IDID2]:SetSkin(skin)
-        self.Models[3][IDID2]:SetParent(self)
-        self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
+        model = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model,RENDERGROUP_OPAQUE)
+        model:SetPos(self:LocalToWorld(pos))
+        model:SetAngles(self:LocalToWorldAngles(ang))
+        model:SetSkin(skin)
+        model:SetParent(self)
+        model:SetRenderMode(RENDERMODE_TRANSCOLOR)
         -- self.Models[3][IDID2]:SetColor(Color(255, 255, 255, 0))
-        self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
+        model:SetColor(Color(255,255,255,State*255))
+        self.Models[3][IDID2] = model
     end
 end
 
@@ -197,6 +199,8 @@ net.Receive("metrostroi-signal", function()
     end
     if ent.RemoveModels then ent:RemoveModels() end
 end)
+
+local C_FastSwitch = GetConVar("metrostroi_signal_fastswitch")
 
 function ENT:Think()
     local CurTime = CurTime()
@@ -413,6 +417,10 @@ function ENT:Think()
         self.Models.have = true
         self.ModelsCreated = true
     else
+        local damping = C_FastSwitch:GetBool()
+
+        if damping then damping = false else damping = 8 end
+        
         --TODO
         if self.AutostopPresent then
             if IsValid(self.Models[1]["autostop"]) then
@@ -463,16 +471,14 @@ function ENT:Think()
                     if self.Signals[ID2].Stop and CurTime-self.Signals[ID2].Stop > 0 then
                         self.Signals[ID2].Stop = nil
                     end
-                    local anim_id = table.concat({ID,"/",i})
-                    local State = self:Animate(anim_id,  ((n == 1 or (n == 2 and (RealTime() % 1.2 > 0.4))) and not self.Signals[ID2].Stop) and 1 or 0,  0.01,1, 128, false)
+                    local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and (RealTime() % 1.2 > 0.4))) and not self.Signals[ID2].Stop) and 1 or 0,  0.01,1, 128, damping)
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
                     local offsetAndLongOffset = offset + self.LongOffset
                     if not self.DoubleL then
                         self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     else
-                        local ID2x = table.concat({ID2,"x"})
                         self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
-                        self:SetLight(ID,ID2x,self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2..x,self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     end
                     self.Signals[ID2].State = State
                 end
@@ -483,16 +489,16 @@ function ENT:Think()
             ID = ID + 1
         end
 
-        local LampIndicatorModels_numb_mdl = table.concat({TLM.LampIndicator.model,"_numb.mdl"})
-        local LampIndicatorModels_lamp_mdl = table.concat({TLM.LampIndicator.model,"_lamp.mdl"})
+        local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb.mdl"
+        local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
-            local rou1k = table.concat({"rou1",k})
-            local State1 = self:Animate(rou1k,self.Num:find(v[1]) and 1 or 0,   0,1, 256)
+            local rou1k = "rou1"..k
+            local State1 = self:Animate(rou1k,self.Num:find(v[1]) and 1 or 0,   0,1, 256, damping)
             local State2
             --if v[3] then
-            local rou2k = table.concat({"rou2",k})
-            if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
+            local rou2k = "rou2"..k
+            if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256, damping) end
             if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
                 self.Models[3][rou1k] = ClientsideModel(v[3] and LampIndicatorModels_numb_mdl or LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
                 self.Models[3][rou1k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4]))
@@ -527,7 +533,7 @@ function ENT:Think()
             end
         end
         if self.Arrow then
-            local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
+            local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256, damping)
             if not IsValid(self.Models[3]["roua"]) and State > 0 then
                 self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
                 self.SpecRouteNumbers.pos = (self.BasePosition+offset-TLM.SpecRouteNumberOffset)-(self.RouteNumberOffset or Vector(0, 0, 0))+TLM.RouteNumberOffset3

@@ -47,6 +47,7 @@ Panel.ShadowsOther      = Вкл. тени от остальных\nисточн
 Panel.PanelSprites      = Вкл. отображение спрайтов\nна пульте
 Panel.MinimizedShow     = Не выгружать элементы\nпри сворачивании
 Panel.PanelLights       = Вкл. динамический свет от\nламп на пульте
+Panel.FastSwitch        = Вкл. резкое изменение линз светофора
 Panel.RouteNumber       = Номер маршрута
 Panel.FOV               = Поле зрения
 Panel.Z                 = Высота камеры
