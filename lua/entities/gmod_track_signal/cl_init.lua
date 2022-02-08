@@ -478,7 +478,7 @@ function ENT:Think()
                         self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     else
                         self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + data[3][i-1],Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
-                        self:SetLight(ID,ID2..x,self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                        self:SetLight(ID,ID2.."x",self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + data[3][i-1]*Vector(-1,1,1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
                     end
                     self.Signals[ID2].State = State
                 end

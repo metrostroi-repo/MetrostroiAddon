@@ -584,13 +584,6 @@ local function createFrame()
 		tool.Settings = tbl
 		local ENT = scripted_ents.Get(tool.Settings.Train)
 		if ENT and ENT.Spawner then tool.Train = ENT end
-		--[[
-		if ENT and ENT.Spawner then 
-			local TrainSpawnerSettings = ENT.Spawner
-			Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
-			tool.Train = ENT
-			tool.TrainSpawnerSettings = TrainSpawnerSettings
-		end]]
 		frame:Close()
 	end
 

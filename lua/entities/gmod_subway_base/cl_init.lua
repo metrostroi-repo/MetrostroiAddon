@@ -634,8 +634,7 @@ hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,is
             return
         end
         cam.IgnoreZ(true)
-        local sprites = ent.Sprites or {} -- motovozka fix
-        for i,vHandle in pairs(sprites) do
+        for i,vHandle in pairs(ent.Sprites) do
             local br = ent.LightBrightness[i]
             local lightData = ent.LightsOverride[i] or ent.Lights[i]
             if lightData[1] ~= "glow" and lightData[1] ~= "light" or br <= 0 then continue end
@@ -856,7 +855,6 @@ function ENT:OnRemove(nfinal)
     self:RemoveCSEnts()
     self.RenderClientEnts = false
 
-    self.Sounds = self.Sounds or {loop = {}}
     for _,v in pairs(self.Sounds) do
         if type(v) ~= "function" and type(v) ~= "table" then
             self:DestroySound(v)
