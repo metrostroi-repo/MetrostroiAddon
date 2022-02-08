@@ -932,9 +932,9 @@ local function SoundTrace(startv,endv)
         endpos = endv,
         mask = MASK_NPCWORLDSTATIC,
     } )
-    debugoverlay.Line(startv,endv,FrameTime(),Color( 255, 0, tr.Hit and 255 or 0 ))
+    --debugoverlay.Line(startv,endv,FrameTime(),Color( 255, 0, tr.Hit and 255 or 0 ))
     if tr.Hit then
-        debugoverlay.Sphere(tr.HitPos,4,FrameTime(),Color( 255, 200, 100))
+        --debugoverlay.Sphere(tr.HitPos,4,FrameTime(),Color( 255, 200, 100))
         return startv:Distance(tr.HitPos)
     end
     return 1000
