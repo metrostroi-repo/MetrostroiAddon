@@ -306,11 +306,12 @@ else
         end
         MsgC(unpack(tbl))
     end)
-
+    --[[
     concommand.Add("fprofiler_start", function()
         FProfiler.start()
     end)
     concommand.Add("fprofiler_stop", function()
         FProfiler.stop()
     end)
+    ]]
 end
