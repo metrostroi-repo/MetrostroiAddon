@@ -120,3 +120,5 @@ end
 cvars.AddChangeCallback("metrostroi_shadows1",reload,"reload_shadows")
 cvars.AddChangeCallback("metrostroi_shadows2",reload,"reload_shadows")
 CreateClientConVar("metrostroi_tooltip_delay",0,true)
+
+if CLIENT then RunConsoleCommand("gmod_mcore_test", 1) end

@@ -211,9 +211,6 @@ function TOOL:SpawnWagon(trace)
     local LastRot,LastEnt = false
     local trains = {}
 
-    --local TrainSpawnerSettings = self.Train.Spawner
-    --Metrostroi_Modules_DispatchEvent("TrainSpawnerSettings", Settings, TrainSpawnerSettings, true)
-
     for i=1,self.Settings.WagNum do
         local spawnfunc = self.TrainSpawnerSettings.spawnfunc
         local ent
