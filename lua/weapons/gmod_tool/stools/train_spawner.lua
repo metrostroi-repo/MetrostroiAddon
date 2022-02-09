@@ -198,6 +198,11 @@ local function SetValue(ent,id,val)
     end
 end
 
+local function SetSelectiveValue(ent,id,val)
+    local str = table.concat(val or {1}, ";")
+    ent:SetNW2String(id, str)
+end
+
 function TOOL:SpawnWagon(trace)
     if CLIENT then return end
     local ply = self:GetOwner()
@@ -328,6 +333,8 @@ function TOOL:SpawnWagon(trace)
                 if set[5] and type(set[5]) == "function" then   set[5](ent,val,LastRot,i,self.Settings.WagNum) else ent:SetNW2Bool(set[1],val) end
             elseif set[3] == "Slider" then
                 if set[8] and type(set[8]) == "function" then   set[8](ent,val,LastRot,i,self.Settings.WagNum) else ent:SetNW2Int(set[1],val) end
+            elseif set[3] == "Selective" then
+                if set[6] and type(set[6]) == "function" then   set[6](ent,val,LastRot,i,self.Settings.WagNum) else SetSelectiveValue(ent,set[1],val) end
             end
         end
         if self.Train.Spawner.func then self.Train.Spawner.func(ent,i,self.Settings.WagNum,LastRot) end
@@ -440,6 +447,8 @@ function TOOL:LeftClick(trace)
                             if set[5] and type(set[5]) == "function" then   set[5](ent,val,rot,k,self.Settings.WagNum) else ent:SetNW2Bool(set[1],val) end
                         elseif set[3] == "Slider" then
                             if set[8] and type(set[8]) == "function" then   set[8](ent,val,rot,k,self.Settings.WagNum) else ent:SetNW2Int(set[1],val) end
+                        elseif set[3] == "Selective" then
+                            if set[6] and type(set[6]) == "function" then   set[6](ent,val,rot,k,self.Settings.WagNum) else SetSelectiveValue(ent,set[1],val) end
                         end
                     end
                     if self.Train.Spawner.func then self.Train.Spawner.func(ent,k,self.Settings.WagNum,rot) end
@@ -496,6 +505,8 @@ function TOOL:RightClick(trace)
                             if set[5] and type(set[5]) == "function" then set[5](ent,val,rot,k,self.Settings.WagNum,true) else ent:SetNW2Bool(set[1],val) end
                         elseif set[3] == "Slider" then
                             if set[8] and type(set[8]) == "function" then set[8](ent,val,rot,k,self.Settings.WagNum,true) else ent:SetNW2Int(set[1],val) end
+                        elseif set[3] == "Selective" then
+                            if set[6] and type(set[6]) == "function" then set[6](ent,val,rot,k,self.Settings.WagNum,true) else SetSelectiveValue(ent,set[1],val) end
                         end
                     end
                     if self.Train.Spawner.func then self.Train.Spawner.func(ent,k,self.Settings.WagNum,rot) end

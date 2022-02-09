@@ -195,6 +195,7 @@ Spawner.Close                           = Закрыть
 Spawner.Trains1                         = Разрешено ваг.
 Spawner.Trains2                         = На человека
 Spawner.WagNum                          = Количество вагонов
+Spawner.Select                          = Выбрать
 Spawner.PresetTitle                     = Пресеты
 Spawner.Preset.New                      = Создать новый
 Spawner.Preset.Unsaved                  = Сохранить текущий

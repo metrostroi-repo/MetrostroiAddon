@@ -195,6 +195,7 @@ Spawner.Close                           = Close
 Spawner.Trains1                         = Wags. allowed
 Spawner.Trains2                         = Per player
 Spawner.WagNum                          = Wagons amount
+Spawner.Select                          = Select
 Spawner.PresetTitle                     = Presets
 Spawner.Preset.New                      = New preset
 Spawner.Preset.Unsaved                  = Save current preset
