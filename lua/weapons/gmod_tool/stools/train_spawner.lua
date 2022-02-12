@@ -132,16 +132,17 @@ function TOOL:Holster()
     if not IsFirstTimePredicted() or SERVER then return end
 end
 
---local owner
 function TOOL:Think()
-    if not self.Train then return end
-    --owner = self:GetOwner()
-    --self.tbl = self:GetConvar()
-    --self.int = self.tbl.Prom > 0 or !Trains[self.tbl.Train][1]:find("Ezh3")
-    if CLIENT and self.Train.Spawner.model then
-        if not self.GhostEntities  then self.GhostEntities = {} end
-        if not IsValid(self.GhostEntities[1]) or self.Model ~= self.Train.Spawner.model then
-            self.Model = self.Train.Spawner.model
+    if SERVER then return end
+
+    if self.IsConsist then
+        if not self.Consist then return end
+        local entSpawner = scripted_ents.GetStored(self.Consist.Train).t.Spawner
+        if not entSpawner.model then return end
+
+        if not self.GhostEntities then self.GhostEntities = {} end
+        if not IsValid(self.GhostEntities[1]) or self.Model ~= entSpawner.model then
+            self.Model = entSpawner.model
             for _,e in pairs(self.GhostEntities) do SafeRemoveEntity(e) end
             self.GhostEntities = {}
             if type(self.Model) == "string" then
@@ -177,8 +178,49 @@ function TOOL:Think()
         else
             self:UpdateGhost()
         end
+    else
+        if not self.Train then return end
+        if self.Train.Spawner.model then
+            if not self.GhostEntities  then self.GhostEntities = {} end
+            if not IsValid(self.GhostEntities[1]) or self.Model ~= self.Train.Spawner.model then
+                self.Model = self.Train.Spawner.model
+                for _,e in pairs(self.GhostEntities) do SafeRemoveEntity(e) end
+                self.GhostEntities = {}
+                if type(self.Model) == "string" then
+                    self.GhostEntities[1] = ClientsideModel(self.Model,RENDERGROUP_OPAQUE)
+                    self.GhostEntities[1]:SetModel(self.Model)
+                else
+                    for i,t in pairs(self.Model) do
+                        if type(t) == "string" then
+                            self.GhostEntities[i] = ClientsideModel(t,RENDERGROUP_OPAQUE)
+                            self.GhostEntities[i]:SetModel(t)
+                        else
+                            self.GhostEntities[i] = ClientsideModel(t[1],RENDERGROUP_OPAQUE)
+                            self.GhostEntities[i]:SetModel(t[1])
+                        end
+                    end
+                end
+                for i,e in pairs(self.GhostEntities) do
+                    e:SetRenderMode(RENDERMODE_TRANSALPHA)
+                    e.GetBodyColor = function() return Vector(1,1,1) end
+                    e.GetDirtLevel = function() return 0.25 end
+                end
+                hook.Add("Think",self.GhostEntities[1],function()
+                    if not IsValid(self.Owner:GetActiveWeapon()) or self.Owner:GetActiveWeapon():GetClass()~="gmod_tool" or GetConVar("gmod_toolmode"):GetString() ~= "train_spawner" then
+                        self:OnRemove()
+                    end
+                end)
+
+                local oldOR = self.GhostEntities[1].OnRemove
+                self.GhostEntities[1].OnRemove = function(ent)
+                    hook.Remove("Think",ent)
+                    oldOR(ent)
+                end
+            else
+                self:UpdateGhost()
+            end
+        end
     end
-    ---if SERVER then self.Rev = self.Rev end
 end
 
 function TOOL:SetSettings(ent, ply, i,inth)
@@ -199,8 +241,62 @@ local function SetValue(ent,id,val)
 end
 
 local function SetSelectiveValue(ent,id,val)
-    local str = table.concat(val or {1}, ";")
-    ent:SetNW2String(id, str)
+    local num = ent.WagonNumber
+    if num ~= nil then
+        math.randomseed(num+817171)
+    end
+    table.Shuffle(val)
+    ent:SetNW2Int(id, table.Random(val))
+    math.randomseed(os.time())
+end
+
+
+function TOOL:OnRemove()
+    self:Finish()
+end
+
+function TOOL:Finish()
+    for _,e in pairs(self.GhostEntities or {}) do SafeRemoveEntity(e) end
+    self.GhostEntities = {}
+end
+
+function TOOL:Reload(trace)
+    if CLIENT then return end
+    local ply = self:GetOwner()
+    local consist = false
+
+    if IsValid(trace.Entity) and trace.Entity._Settings then
+        ply:ConCommand("gmod_tool train_spawner")
+        ply:SelectWeapon("gmod_tool")
+
+        local tool = ply:GetTool("train_spawner")
+
+        tool.AllowSpawn = true
+        tool.IsConsist = trace.Entity._IsConsist
+
+        local settings = trace.Entity._Settings
+
+        if tool.IsConsist then
+            tool.Consist = settings
+            consist = true
+        else
+            tool.Settings = settings
+            consist = false
+
+            local ENT = scripted_ents.Get(tool.Settings.Train)
+            if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
+        end
+
+        net.Start("train_spawner_open")
+            net.WriteBool(tool.IsConsist)
+            net.WriteTable(tool.IsConsist and tool.Consist or tool.Settings)
+        net.Send(ply)
+    end
+
+    if not consist then
+        local spawner = ents.Create("gmod_train_spawner")
+        spawner:SpawnFunction(ply)
+    end
 end
 
 function TOOL:SpawnWagon(trace)
@@ -314,16 +410,9 @@ function TOOL:SpawnWagon(trace)
             LastRot = rot
         end
         ent._Settings = self.Settings
+        ent._IsConsist = false
         table.insert(trains,ent)
         undo.AddEntity(ent)
-        --[[
-        ent:SetMoveType(MOVETYPE_NONE)
-        ent.FrontBogey:SetMoveType(MOVETYPE_NONE)
-        ent.RearBogey:SetMoveType(MOVETYPE_NONE)
-        if IsValid(ent.FrontCouple) then
-            ent.FrontCouple:SetMoveType(MOVETYPE_NONE)
-            ent.RearCouple:SetMoveType(MOVETYPE_NONE)
-        end]]
 
         for _, set in ipairs(self.Train.Spawner) do
             local val = self.Settings[set[1]]
@@ -351,80 +440,50 @@ function TOOL:SpawnWagon(trace)
     undo.SetCustomUndoText("Undone a train")
     undo.Finish()
     if self.Train.Spawner.postfunc then self.Train.Spawner.postfunc(trains,self.Settings.WagNum) end
-    --if self.Settings.AutoCouple and #trains > 1 then
-        local CoupledTrains,WagNum = 0,self.Settings.WagNum
-        local function StopCoupling()
-            if not IsValid(trains[1]) or not trains[1].IgnoreEngine then return end
-            for _,train in ipairs(trains) do
-                train.FrontBogey.BrakeCylinderPressure = 3
-                train.RearBogey.BrakeCylinderPressure = 3
-                train.FrontBogey.MotorPower = 0
-                train.RearBogey.MotorPower = 0
-                train.OnCoupled = nil
-            end
-            timer.Simple(1,function() for i,train in ipairs(trains) do train.IgnoreEngine = false end end)
+    local CoupledTrains,WagNum = 0,self.Settings.WagNum
+    local function StopCoupling()
+        if not IsValid(trains[1]) or not trains[1].IgnoreEngine then return end
+        for _,train in ipairs(trains) do
+            train.FrontBogey.BrakeCylinderPressure = 3
+            train.RearBogey.BrakeCylinderPressure = 3
+            train.FrontBogey.MotorPower = 0
+            train.RearBogey.MotorPower = 0
+            train.OnCoupled = nil
         end
-        for i,train in ipairs(trains) do
-            train.IgnoreEngine = true
-            train.RearBogey.MotorForce = 40000
-            train.FrontBogey.MotorForce = 40000
-            train.RearBogey.PneumaticBrakeForce = 50000
-            train.FrontBogey.PneumaticBrakeForce = 50000
-            if i==#trains then
-                train.RearBogey.MotorPower = 1
-                train.FrontBogey.MotorPower = 0
-            else
-                train.RearBogey.MotorPower = 0
-                train.FrontBogey.MotorPower = 0
-            end
-            if i==1 then
-                train.FrontBogey.BrakeCylinderPressure = 3
-                train.RearBogey.BrakeCylinderPressure = 3
-            else
-                train.FrontBogey.BrakeCylinderPressure = 0
-                train.RearBogey.BrakeCylinderPressure = 0
-            end
-            train.OnCoupled = function(ent)
-                CoupledTrains = CoupledTrains + 0.5
-                if CoupledTrains==WagNum-1 then StopCoupling() end
-            end
+        timer.Simple(1,function() for i,train in ipairs(trains) do train.IgnoreEngine = false end end)
+    end
+    for i,train in ipairs(trains) do
+        train.IgnoreEngine = true
+        train.RearBogey.MotorForce = 40000
+        train.FrontBogey.MotorForce = 40000
+        train.RearBogey.PneumaticBrakeForce = 50000
+        train.FrontBogey.PneumaticBrakeForce = 50000
+        if i==#trains then
+            train.RearBogey.MotorPower = 1
+            train.FrontBogey.MotorPower = 0
+        else
+            train.RearBogey.MotorPower = 0
+            train.FrontBogey.MotorPower = 0
         end
-        timer.Simple(3+1*#trains,StopCoupling)
-    --end
-    --self.rot = false
+        if i==1 then
+            train.FrontBogey.BrakeCylinderPressure = 3
+            train.RearBogey.BrakeCylinderPressure = 3
+        else
+            train.FrontBogey.BrakeCylinderPressure = 0
+            train.RearBogey.BrakeCylinderPressure = 0
+        end
+        train.OnCoupled = function(ent)
+            CoupledTrains = CoupledTrains + 0.5
+            if CoupledTrains==WagNum-1 then StopCoupling() end
+        end
+    end
+    timer.Simple(3+1*#trains,StopCoupling)
     for k,v in pairs(FIXFIXFIX) do SafeRemoveEntity(v) end
 end
 
-function TOOL:OnRemove()
-    self:Finish()
-end
-function TOOL:Finish()
-    for _,e in pairs(self.GhostEntities) do SafeRemoveEntity(e) end
-    self.GhostEntities = {}
-end
-
-function TOOL:Reload(trace)
-    if CLIENT then return end
-    local ply = self:GetOwner()
-    if IsValid(trace.Entity) and trace.Entity._Settings then
-        ply:ConCommand("gmod_tool train_spawner")
-        ply:SelectWeapon("gmod_tool")
-        local tool = ply:GetTool("train_spawner")
-        tool.AllowSpawn = true
-        tool.Settings = trace.Entity._Settings
-        local ENT = scripted_ents.Get(tool.Settings.Train)
-        if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
-
-        net.Start("train_spawner_open")
-            net.WriteTable(tool.Settings)
-        net.Send(ply)
-    end
-
-    local spawner = ents.Create("gmod_train_spawner")
-    spawner:SpawnFunction(ply)
-end
-function TOOL:LeftClick(trace)
+function TOOL:DefaultLeftClick(trace)
     if not self.Train then return end
+    --PrintTable(self.Train)
     local class = IsValid(trace.Entity) and trace.Entity:GetClass()
     if class and (trace.Entity.Spawner or class ~= "func_door" and class ~= "prop_door_rotating")  then
         if SERVER then
@@ -432,11 +491,6 @@ function TOOL:LeftClick(trace)
                 local LastEnt
                 local trains = {}
                 for k,ent in ipairs(trace.Entity.WagonList) do
-                    --[[
-                    local rot = ent.RearTrain and ent.RearTrain.FrontTrain == ent or ent.FrontTrain and ent.FrontTrain.RearTrain == ent
-                    if not LastRot then
-                        rot = ent.RearTrain and ent.RearTrain.RearTrain == ent or ent.FrontTrain and ent.FrontTrain.FrontTrain == ent
-                    end]]
                     local rot = ent.RearTrain == LastEnt
                     LastEnt = ent
                     for i, set in ipairs(self.Train.Spawner) do
@@ -477,7 +531,7 @@ function TOOL:LeftClick(trace)
                 self:GetOwner():LimitHit("train_limit")
             return true
         end
-        if hook.Run("MetrostroiSpawnerRestrict",self:GetOwner(),self.Settings) then
+        if hook.Run("MetrostroiSpawnerRestrict",self:GetOwner(),self.Settings,false) then
             self:GetOwner():LimitHit("spawner_restrict")
             return true
         end
@@ -486,7 +540,263 @@ function TOOL:LeftClick(trace)
     return
 end
 
-function TOOL:RightClick(trace)
+function TOOL:ConsistSpawnWagon(trace)
+    local ply = self:GetOwner()
+
+    local FIXFIXFIX = {}
+    for i=1,math.random(12) do
+        FIXFIXFIX[i] = ents.Create("env_sprite")
+        FIXFIXFIX[i]:Spawn()
+    end
+
+    local Train = scripted_ents.Get(self.Consist.Train)
+
+    local LastRot,LastEnt = false
+    local trains = {}
+    for i=1,self.Consist.WagNum do
+        local spawnfunc = Train.Spawner.spawnfunc
+        local ent
+        if i == 1 then
+            if spawnfunc then
+                ent = Train:SpawnFunction(ply,trace,spawnfunc(i,self.Consist,self.Train),self:GetOwner():GetNW2Bool("metrostroi_train_spawner_rev"),UpdateWagPos)
+            else
+                ent = Train:SpawnFunction(ply,trace,Train.Spawner.head or Train.ClassName,self:GetOwner():GetNW2Bool("metrostroi_train_spawner_rev"),UpdateWagPos)
+            end
+            if ent then
+                undo.Create(Train.Spawner.head or Train.ClassName)
+            else
+                self:GetOwner():LimitHit("spawner_wrong_pos")
+                return false
+            end
+        end
+        if i > 1 then
+            local rot = (i==self.Consist.WagNum or math.random() > 0.5) -- Rotate last wagon or rotate it randomly
+            if spawnfunc then
+                ent = ents.Create(spawnfunc(i,self.Consist,Train))
+            else
+                ent = ents.Create(i~=self.Consist.WagNum and Train.Spawner.interim or Train.Spawner.head or Train.ClassName)
+            end
+            ent.Owner = ply
+            ent:Spawn()
+            -- Invert bogeys by rotation
+            local bogeyL1,bogeyE1,bogeyE2
+            local couplL1,couplE1,couplE2
+            if LastRot then
+                bogeyL1 = LastEnt.FrontBogey
+                couplL1 = LastEnt.FrontCouple
+            else
+                bogeyL1 = LastEnt.RearBogey
+                couplL1 = LastEnt.RearCouple
+            end
+            if rot then
+                bogeyE1,bogeyE2 = ent.RearBogey,ent.FrontBogey
+                couplE1,couplE2 = ent.FrontCouple,ent.RearCouple
+            else
+                bogeyE1,bogeyE2 = ent.FrontBogey,ent.RearBogey
+                couplE1,couplE2 = ent.RearCouple,ent.FrontCouple
+            end
+            local haveCoupler = couplL1 ~= nil
+            if haveCoupler then
+                bogeyE1:SetAngles(ent:LocalToWorldAngles(bogeyE1.SpawnAng))
+                bogeyE2:SetAngles(ent:LocalToWorldAngles(bogeyE1.SpawnAng))
+                -- Set bogey position by our bogey couple offset and lastent bogey couple offset
+                couplE1:SetPos(
+                    couplL1:LocalToWorld(
+                        Vector(
+                            couplL1.CouplingPointOffset.x*1.1+couplE1.CouplingPointOffset.x*1.1,
+                            couplL1.CouplingPointOffset.y-couplE1.CouplingPointOffset.y,
+                            couplL1.CouplingPointOffset.z-couplE1.CouplingPointOffset.z
+                        )
+                    )
+                )
+                -- Set bogey angles
+                couplE1:SetAngles(couplL1:LocalToWorldAngles(Angle(0,180,0)))
+                -- Set entity position by bogey pos and bogey offset
+                couplE2:SetAngles(couplE1:LocalToWorldAngles(Angle(0,180,0)))
+                ent:SetPos(couplE1:LocalToWorld(couplE1.SpawnPos*Vector(rot and -1 or 1,-1,-1)))
+                -- Set entity angles by last ent and rotation
+                ent:SetAngles(LastEnt:LocalToWorldAngles(Angle(0,rot ~= LastRot and 180 or 0,0)))
+
+                -- Set bogey pos
+                bogeyE1:SetPos(ent:LocalToWorld(bogeyE1.SpawnPos))
+                bogeyE2:SetPos(ent:LocalToWorld(bogeyE2.SpawnPos))
+                -- Set bogey angles
+                bogeyE1:SetAngles(ent:LocalToWorldAngles(bogeyE1.SpawnAng))
+                bogeyE2:SetAngles(ent:LocalToWorldAngles(bogeyE1.SpawnAng))
+            else
+                -- Set bogey position by our bogey couple offset and lastent bogey couple offset
+                bogeyE1:SetPos(
+                            bogeyL1:LocalToWorld(
+                                Vector(bogeyL1.CouplingPointOffset.x*1.1+bogeyE1.CouplingPointOffset.x*1.05,bogeyL1.CouplingPointOffset.y-bogeyE1.CouplingPointOffset.y,bogeyL1.CouplingPointOffset.z-bogeyE1.CouplingPointOffset.z)
+                            )
+                )
+                -- Set bogey angles
+                bogeyE1:SetAngles(bogeyL1:LocalToWorldAngles(Angle(0,180,0)))
+                -- Set entity position by bogey pos and bogey offset
+                bogeyE2:SetAngles(bogeyE1:LocalToWorldAngles(Angle(0,180,0)))
+                ent:SetPos(bogeyE1:LocalToWorld(bogeyE1.SpawnPos*Vector(rot and -1 or 1,-1,-1)))
+                -- Set entity angles by last ent and rotation
+                ent:SetAngles(LastEnt:LocalToWorldAngles(Angle(0,rot ~= LastRot and 180 or 0,0)))
+                -- Set second bogey pos
+                bogeyE2:SetPos(ent:LocalToWorld(bogeyE2.SpawnPos))
+            end
+
+            Metrostroi.RerailTrain(ent) --Rerail train
+            --LastEnt:LocalToWorld(bogeyL1:WorldToLocal(Vector))))
+
+            LastRot = rot
+        end
+        ent._Settings = self.Consist
+        ent._IsConsist = true
+        table.insert(trains,ent)
+        undo.AddEntity(ent)
+
+        for _, set in ipairs(Train.Spawner) do
+            local val = self.Consist.Wagons[i][set[1]]
+            if set[3] == "List" then
+                if set[6] and type(set[6]) == "function" then   set[6](ent,val,LastRot,i,self.Consist.WagNum) else SetValue(ent,set[1],val) end
+            elseif set[3] == "Boolean" then
+                if set[5] and type(set[5]) == "function" then   set[5](ent,val,LastRot,i,self.Consist.WagNum) else ent:SetNW2Bool(set[1],val) end
+            elseif set[3] == "Slider" then
+                if set[8] and type(set[8]) == "function" then   set[8](ent,val,LastRot,i,self.Consist.WagNum) else ent:SetNW2Int(set[1],val) end
+            elseif set[3] == "Selective" then
+                if set[6] and type(set[6]) == "function" then   set[6](ent,val,LastRot,i,self.Consist.WagNum) else SetSelectiveValue(ent,set[1],val) end
+            end
+        end
+        if Train.Spawner.func then Train.Spawner.func(ent,i,self.Consist.WagNum,LastRot) end
+        if Train.Spawner.wagfunc then ent:GenerateWagonNumber(function(_,number) return Train.Spawner.wagfunc(ent,i,number) end) end
+        if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
+        for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
+        hook.Run("MetrostroiSpawnerUpdate",ent,self.Consist,true)
+        ent:UpdateTextures()
+        ent.FrontAutoCouple = i > 1 and i < self.Consist.WagNum
+        ent.RearAutoCouple = self.Consist.WagNum > 1
+        LastEnt = ent
+    end
+    undo.SetPlayer(ply)
+    undo.SetCustomUndoText("Undone a train")
+    undo.Finish()
+    if Train.Spawner.postfunc then Train.Spawner.postfunc(trains,self.Consist.WagNum) end
+    local CoupledTrains,WagNum = 0,self.Consist.WagNum
+    local function StopCoupling()
+        if not IsValid(trains[1]) or not trains[1].IgnoreEngine then return end
+        for _,train in ipairs(trains) do
+            train.FrontBogey.BrakeCylinderPressure = 3
+            train.RearBogey.BrakeCylinderPressure = 3
+            train.FrontBogey.MotorPower = 0
+            train.RearBogey.MotorPower = 0
+            train.OnCoupled = nil
+        end
+        timer.Simple(1,function() for i,train in ipairs(trains) do train.IgnoreEngine = false end end)
+    end
+    for i,train in ipairs(trains) do
+        train.IgnoreEngine = true
+        train.RearBogey.MotorForce = 40000
+        train.FrontBogey.MotorForce = 40000
+        train.RearBogey.PneumaticBrakeForce = 50000
+        train.FrontBogey.PneumaticBrakeForce = 50000
+        if i==#trains then
+            train.RearBogey.MotorPower = 1
+            train.FrontBogey.MotorPower = 0
+        else
+            train.RearBogey.MotorPower = 0
+            train.FrontBogey.MotorPower = 0
+        end
+        if i==1 then
+            train.FrontBogey.BrakeCylinderPressure = 3
+            train.RearBogey.BrakeCylinderPressure = 3
+        else
+            train.FrontBogey.BrakeCylinderPressure = 0
+            train.RearBogey.BrakeCylinderPressure = 0
+        end
+        train.OnCoupled = function(ent)
+            CoupledTrains = CoupledTrains + 0.5
+            if CoupledTrains==WagNum-1 then StopCoupling() end
+        end
+    end
+    timer.Simple(3+1*#trains,StopCoupling)
+    for k,v in pairs(FIXFIXFIX) do SafeRemoveEntity(v) end
+end
+
+function TOOL:ConsistLeftClick(trace)
+    if not self.Consist then return end
+    if CLIENT then return end
+
+    local ent = trace.Entity
+    local class = IsValid(ent) and ent:GetClass()
+
+    if class and (ent.Spawner or class ~= "func_door" and class ~= "prop_door_rotating") then
+        local entSpawner = scripted_ents.Get(self.Consist.Train).Spawner
+        local headClass = entSpawner.head or self.Consist.Train
+        local interimClass = entSpawner.interim or self.Consist.Train
+
+        if ent.ClassName ~= headClass then return end
+        if #ent.WagonList ~= self.Consist.WagNum then return end
+
+        
+        local lastent
+        local trains = {}
+
+        for k, ent in pairs(ent.WagonList) do
+            local rot = ent.RearTrain == lastent
+            lastent = ent
+            for i, set in ipairs(entSpawner) do
+                local val = self.Consist.Wagons[k][set[1]]
+                if set[3] == "List" then
+                    if set[6] and type(set[6]) == "function" then set[6](ent,val,rot,k,self.Consist.WagNum,true) else SetValue(ent,set[1],val) end
+                elseif set[3] == "Boolean" then
+                    if set[5] and type(set[5]) == "function" then set[5](ent,val,rot,k,self.Consist.WagNum,true) else ent:SetNW2Bool(set[1],val) end
+                elseif set[3] == "Slider" then
+                    if set[8] and type(set[8]) == "function" then set[8](ent,val,rot,k,self.Consist.WagNum,true) else ent:SetNW2Int(set[1],val) end
+                elseif set[3] == "Selective" then
+                    if set[6] and type(set[6]) == "function" then set[6](ent,val,rot,k,self.Consist.WagNum,true) else SetSelectiveValue(ent,set[1],val) end
+                end
+            end
+            if entSpawner.func then entSpawner.func(ent,k,self.Consist.WagNum,rot) end
+
+            ent:GenerateWagonNumber(entSpawner.wagfunc)
+
+            if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
+
+            for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
+
+            hook.Run("MetrostroiSpawnerUpdate",ent,self.Consist.Wagons[k])
+            ent:UpdateTextures()
+
+            table.insert(trains,ent)
+        end
+
+        if entSpawner.postfunc then entSpawner.postfunc(trains,self.Consist.WagNum) end
+
+        return
+    end
+
+    if self.Consist.WagNum > C_MaxWagons:GetInt() then
+        self.Consist.WagNum = C_MaxWagons:GetInt()
+    end
+
+    if Metrostroi.TrainCountOnPlayer(self:GetOwner()) + self.Consist.WagNum > GetConVar("metrostroi_maxtrains_onplayer"):GetInt()*C_MaxWagons:GetInt()
+        or Metrostroi.TrainCount() + self.Consist.WagNum > GetConVar("metrostroi_maxtrains"):GetInt()*C_MaxWagons:GetInt() then
+            self:GetOwner():LimitHit("train_limit")
+        return true
+    end
+    if hook.Run("MetrostroiSpawnerRestrict",self:GetOwner(),self.Consist,true) then
+        self:GetOwner():LimitHit("spawner_restrict")
+        return true
+    end
+    
+    self:ConsistSpawnWagon(trace)
+end
+
+function TOOL:LeftClick(trace)
+    if self.IsConsist then
+        return self:ConsistLeftClick(trace)
+    else
+        return self:DefaultLeftClick(trace)
+    end
+end
+
+function TOOL:DefaultRightClick(trace)
     if not self.Train then return end
     if IsValid(trace.Entity) then
         if SERVER then
@@ -526,7 +836,70 @@ function TOOL:RightClick(trace)
     if CLIENT then return end
     self.Rev = not self.Rev
     self:GetOwner():SetNW2Bool("metrostroi_train_spawner_rev",self.Rev)
+end
 
+function TOOL:ConsistRightClick(trace)
+    if not self.Consist then return end
+    if CLIENT then return end
+    
+    local ent = trace.Entity
+
+    if not IsValid(ent) then
+        if not self.AllowSpawn or not self.Consist then return end
+        self.Rev = not self.Rev
+        self:GetOwner():SetNW2Bool("metrostroi_train_spawner_rev",self.Rev)
+        return
+    end
+
+    local entSpawner = scripted_ents.Get(self.Consist.Train).Spawner
+    local headClass = entSpawner.head or self.Consist.Train
+    local interimClass = entSpawner.interim or self.Consist.Train
+
+    if ent.ClassName ~= headClass then return end
+    if #ent.WagonList ~= self.Consist.WagNum then return end
+
+    local lastent
+    local trains = {}
+
+    for k, ent in pairs(ent.WagonList) do
+        local rot = ent.RearTrain == lastent
+        lastent = ent
+        if ent ~= trace.Entity then continue end
+        for i, set in ipairs(entSpawner) do
+            local val = self.Consist.Wagons[k][set[1]]
+            if set[3] == "List" then
+                if set[6] and type(set[6]) == "function" then set[6](ent,val,rot,k,self.Consist.WagNum,true) else SetValue(ent,set[1],val) end
+            elseif set[3] == "Boolean" then
+                if set[5] and type(set[5]) == "function" then set[5](ent,val,rot,k,self.Consist.WagNum,true) else ent:SetNW2Bool(set[1],val) end
+            elseif set[3] == "Slider" then
+                if set[8] and type(set[8]) == "function" then set[8](ent,val,rot,k,self.Consist.WagNum,true) else ent:SetNW2Int(set[1],val) end
+            elseif set[3] == "Selective" then
+                if set[6] and type(set[6]) == "function" then set[6](ent,val,rot,k,self.Consist.WagNum,true) else SetSelectiveValue(ent,set[1],val) end
+            end
+        end
+        if entSpawner.func then entSpawner.func(ent,k,self.Consist.WagNum,rot) end
+
+        ent:GenerateWagonNumber(entSpawner.wagfunc)
+
+        if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
+
+        for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
+
+        hook.Run("MetrostroiSpawnerUpdate",ent,self.Consist.Wagons[k])
+        ent:UpdateTextures()
+
+        table.insert(trains,ent)
+    end
+
+    if entSpawner.postfunc then entSpawner.postfunc(trains,self.Consist.WagNum) end
+end
+
+function TOOL:RightClick(trace)
+    if self.IsConsist then
+        return self:ConsistRightClick(trace)
+    else
+        return self:DefaultRightClick(trace)
+    end
 end
 
 function TOOL.BuildCPanel(panel)
@@ -541,9 +914,20 @@ if SERVER then
         ply:SelectWeapon("gmod_tool")
         local tool = ply:GetTool("train_spawner")
         tool.AllowSpawn = true
-        tool.Settings = net.ReadTable()
-        local ENT = scripted_ents.Get(tool.Settings.Train)
-        if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
+        local consist = net.ReadBool()
+        if not consist then
+            tool.IsConsist = false
+            tool.Settings = net.ReadTable()
+            tool:Finish()
+            local ENT = scripted_ents.Get(tool.Settings.Train)
+            if not ENT then tool.AllowSpawn = false else tool.Train = ENT end
+        else
+            tool.IsConsist = true
+            tool.Consist = net.ReadTable()
+            tool:Finish()
+            local ENT = scripted_ents.Get(tool.Consist.Train)
+            if not ENT then tool.AllowSpawn = false end
+        end
     end)
     return
 end

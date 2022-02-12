@@ -168,7 +168,7 @@ Entities.gmod_track_clock_small.Name        = Small interval clock
 Entities.gmod_track_clock_interval.Name     = Big interval clock (interval)
 Entities.gmod_track_switch.Name             = Track switch
 Entities.gmod_track_powermeter.Name         = Power meter
-Entities.gmod_track_arm.Name                = ARM DSCP
+Entities.gmod_track_arm.Name                = ARM DSCP #?????????????????????????????????????????????????
 Entities.gmod_track_udochka.Name            = Power connector
 Entities.gmod_train_spawner.Name            = Train spawner
 Entities.gmod_train_special_box.Name        = Special delivery
@@ -196,6 +196,37 @@ Spawner.Trains1                         = Wags. allowed
 Spawner.Trains2                         = Per player
 Spawner.WagNum                          = Wagons amount
 Spawner.Select                          = Select
+
+Spawner.Consist.ConsistEditor           = Consist Editor
+Spawner.Consist.Information             = Information:
+Spawner.Consist.InformationSelect       = Information: Select consist
+Spawner.Consist.Invalid                 = Information: Invalid consist
+Spawner.Consist.Type                    = Type: %s
+Spawner.Consist.WagNum                  = @[Spawner.WagNum]: %d
+Spawner.Consist.Name                    = Name: %s
+Spawner.Consist.Author                  = Author: %s
+
+Spawner.Consist.Spawn                   = Spawn
+Spawner.Consist.Edit                    = Edit
+Spawner.Consist.New                     = New consist
+Spawner.Consist.Delete                  = Delete consist
+
+Spawner.Consist.Create                  = Create new consist
+Spawner.Consist.CreateName              = Consist name
+Spawner.Consist.ErrorName               = Enter consist name
+Spawner.Consist.Error                   = Error
+Spawner.Consist.ErrorNameExists         = Consist with this name already exists
+Spawner.Consist.Overwrite               = Overwrite consist
+Spawner.Consist.Cancel                  = Cancel
+
+Spawner.ConsistEditor.Menu              = Menu
+Spawner.ConsistEditor.Save              = Save
+Spawner.ConsistEditor.SaveAs            = Save as
+Spawner.ConsistEditor.ShowLongName      = Show long name
+Spawner.ConsistEditor.ApplyForAll       = Apply settings to all wagons
+Spawner.ConsistEditor.Wagon             = Wagon %d
+Spawner.ConsistEditor.Info              = Info
+
 Spawner.PresetTitle                     = Presets
 Spawner.Preset.New                      = New preset
 Spawner.Preset.Unsaved                  = Save current preset
