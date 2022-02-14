@@ -304,16 +304,20 @@ function ENT:PostInitalize()
 		if not v.Lights then continue end
 		v.LightsExploded = string.Explode("-",v.Lights)
 	end
-	self.GoodInvationSignal = 0
-	local index = 1
-	local after_red = false
-	for k,v in ipairs(self.Lenses) do
-		if v == "M" then continue end
-		for i = 1,#v do
-			if v[i] == "R" then after_red = true end
-			if v[i] == "W" and after_red then self.GoodInvationSignal = index end
-			index = index + 1
+	if not self.RouteNumberSetup or not self.RouteNumberSetup:find("W") then
+		self.GoodInvationSignal = 0
+		local index = 1
+		local after_red = false
+		for k,v in ipairs(self.Lenses) do
+			if v == "M" then continue end
+			for i = 1,#v do
+				if v[i] == "R" then after_red = true end
+				if v[i] == "W" and after_red then self.GoodInvationSignal = index end
+				index = index + 1
+			end
 		end
+	else
+		self.GoodInvationSignal = -1
 	end
 	if self.Left then
 		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBoxMittor.model)
