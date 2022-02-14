@@ -650,11 +650,9 @@ function FRAME:OnKeyCodePressed( code )
     end
     if code == KEY_F and input.IsShiftDown() then
         self.ApplyForAll = not self.ApplyForAll
-        print(self.ApplyForAll)
     end
     if code == KEY_G and input.IsShiftDown() then
         self:UpdateNames(true)
-        print(self.ShowLongName)
     end
 end
 
