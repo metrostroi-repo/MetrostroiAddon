@@ -165,13 +165,13 @@ function MSignalSayHook(ply, comm, fromULX)
 			comm = comm:sub(8,-1):upper()
 			comm = string.Explode(":",comm)
 			if comm[1] == sig.Name then
-				sig.InvationSignal = true
+				if sig.GoodInvationSignal and sig.GoodInvationSignal > 0 then sig.InvationSignal = true end
 			end
 		elseif comm:sub(1,7) == "!sclps " then
 			comm = comm:sub(8,-1):upper()
 			comm = string.Explode(":",comm)
 			if comm[1] == sig.Name then
-				sig.InvationSignal = false
+				if sig.GoodInvationSignal and sig.GoodInvationSignal > 0 then sig.InvationSignal = false end
 			end
 		elseif comm:sub(1,7) == "!senao " then
 			comm = comm:sub(8,-1):upper()
@@ -304,19 +304,16 @@ function ENT:PostInitalize()
 		if not v.Lights then continue end
 		v.LightsExploded = string.Explode("-",v.Lights)
 	end
-	if not self.RouteNumberSetup or not self.RouteNumberSetup:find("W") then
-		self.GoodInvationSignal = 0
-		local index = 1
-		for k,v in ipairs(self.Lenses) do
-			if v ~= "M" then
-				for i = 1,#v do
-					if v[i] == "W" then self.GoodInvationSignal = index end
-					index = index + 1
-				end
-			end
+	self.GoodInvationSignal = 0
+	local index = 1
+	local after_red = false
+	for k,v in ipairs(self.Lenses) do
+		if v == "M" then continue end
+		for i = 1,#v do
+			if v[i] == "R" then after_red = true end
+			if v[i] == "W" and after_red then self.GoodInvationSignal = index end
+			index = index + 1
 		end
-	else
-		self.GoodInvationSignal = -1
 	end
 	if self.Left then
 		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBoxMittor.model)
