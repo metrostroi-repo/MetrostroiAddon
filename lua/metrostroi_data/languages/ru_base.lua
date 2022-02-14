@@ -143,6 +143,7 @@ Entities.gmod_subway_81-717_mvm.Name  = 81-717 (Номерной МСК голо
 Entities.gmod_subway_81-717_mvm_custom.Name     = 81-717 (Номерной МСК кастом)
 Entities.gmod_subway_81-714_mvm.Name  = 81-714 (Номерной МСК промежуточный)
 Entities.gmod_subway_81-717_lvz.Name  = 81-717 (Номерной СПБ головной)
+Entities.gmod_subway_81-717_lvz_custom.Name     = 81-717 (Номерной СПБ кастом)
 Entities.gmod_subway_81-714_lvz.Name  = 81-714 (Номерной СПБ промежуточный)
 Entities.gmod_subway_81-718.Name      = 81-718 (ТИСУ головной)
 Entities.gmod_subway_81-719.Name      = 81-719 (ТИСУ промежуточный)
@@ -227,6 +228,10 @@ Spawner.ConsistEditor.ShowLongName      = Показывать длинное н
 Spawner.ConsistEditor.ApplyForAll       = Применять параметры для всех вагонов
 Spawner.ConsistEditor.Wagon             = Вагон %d
 Spawner.ConsistEditor.Info              = Инфо
+
+Spawner.ConsistEditor.HotKeys           = Горячие клавишы:
+Spawner.ConsistEditor.HotKeys1          = Стрелки/Цифры используется для переключении вкладок
+Spawner.ConsistEditor.HotKeys2          = Shift + F используется для смены настройки "@[Spawner.ConsistEditor.ApplyForAll]"
 
 Spawner.PresetTitle                     = Пресеты
 Spawner.Preset.New                      = Создать новый

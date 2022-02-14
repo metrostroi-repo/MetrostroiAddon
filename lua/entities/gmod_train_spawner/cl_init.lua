@@ -107,6 +107,12 @@ function FRAME:Setup(train, settings, entSettings, frame)
     self.Train = ent
     self.EntSettings = entSettings
 
+    local isinterim = entSettings.Spawner.interim == ent.ClassName
+
+    if entSettings.Spawner.forinterim and isinterim then
+        self:PrepareSpawner()
+    end
+
     self.Pos = 0
     self.MaxHorizontal = 20
 
@@ -122,6 +128,25 @@ function FRAME:Paint(w, h)
     draw.RoundedBox(4, 1, 1, w-2, h-2, Color(108, 111, 114, self:GetAlpha()))
 end
 
+function FRAME:PrepareSpawner()
+    local tbl = {}
+    local i = 1
+
+    for _, menu in ipairs(self.EntSettings.Spawner) do
+        if self.EntSettings.Spawner.forinterim[menu[1]] then
+            tbl[i] = menu
+            i = i + 1
+        elseif type(menu[1]) == "number" then
+            tbl[i] = menu
+            i = i + 1
+        elseif #menu==0 then
+            tbl[i] = {}
+            i = i + 1
+        end
+    end
+    self.InterimSpawner = tbl
+end
+
 function FRAME:Load()
     local function incPos(a) self.Pos=self.Pos+(a or 1) end
 
@@ -131,7 +156,9 @@ function FRAME:Load()
     self.Objects = {}
     self.ObjectsTypes = {}
 
-    for i, menu in ipairs(self.EntSettings.Spawner) do
+    local spawnertbl = self.InterimSpawner or self.EntSettings.Spawner
+
+    for i, menu in ipairs(spawnertbl) do
         if menu[3] == "List" then
             if self.Settings[menu[1]] == nil then
                 self.Settings[menu[1]] = def_train[menu[1]] or menu[5]
@@ -305,7 +332,7 @@ function FRAME:CreateList(name, text, tbl, func, out_tbl)
     List.OnSelect = function(this,_, _, index)
         if frame.Block then return end
         out_tbl[name] = index
-        if func then func(List) end
+        if func then func(List, self) end
         frame:TriggerChange(out_tbl[name], name, self)
     end
 
@@ -447,6 +474,11 @@ function FRAME:TriggerChange(newval, name, tab)
         if distTab == tab then continue end
         local typ = distTab.ObjectsTypes[name]
         local obj = distTab.Objects[name]
+        
+        self.Wagons[k][name] = newval
+        
+        if not obj or not typ then continue end
+
         if typ == "Slider" then
             obj:SetValue(newval)
         elseif typ == "List" then
@@ -460,7 +492,6 @@ function FRAME:TriggerChange(newval, name, tab)
         elseif typ == "Boolean" then
             obj:SetChecked(newval)
         end
-        self.Wagons[k][name] = newval
     end
     self.Block = false
 end
@@ -557,10 +588,40 @@ function FRAME:Setup(con, filename)
 
     self.InfoButton.DoClick = function()
         local frame = vgui.Create("DFrame")
-        frame:SetSize(300, 100)
+        frame:SetSize(500, 90)
         frame:Center()
         frame:MakePopup()
         frame:SetTitle(Metrostroi.GetPhrase("Spawner.ConsistEditor.Info"))
+        
+        local fields = {
+            Metrostroi.GetPhrase("Spawner.ConsistEditor.HotKeys"),
+            Metrostroi.GetPhrase("Spawner.ConsistEditor.HotKeys1"),
+            Metrostroi.GetPhrase("Spawner.ConsistEditor.HotKeys2"),
+        }
+
+        local info = vgui.Create("DLabel", frame)
+        info:SetText(table.concat(fields, "\n"))
+        info:SizeToContents()
+        info:Dock(TOP)
+    end
+
+    self.SpawnButton = vgui.Create("DButton", self)
+    self.SpawnButton:SetSize(80, self.SpawnButton:GetTall()-4)
+    self.SpawnButton:SetPos(self:GetWide()-self.SpawnButton:GetWide()*3-100, 3)
+    self.SpawnButton:SetText(Metrostroi.GetPhrase("Spawner.Consist.Spawn"))
+
+    self.SpawnButton.DoClick = function()
+        self:SaveConsist()
+
+		net.Start("train_spawner_open")
+            net.WriteBool(true)
+            net.WriteTable(self.Consist)
+        net.SendToServer()
+        local tool = LocalPlayer():GetTool("train_spawner")
+        tool.IsConsist = true
+        tool.Consist = self.Consist
+
+        self:Close()
     end
 end
 
@@ -586,6 +647,14 @@ function FRAME:OnKeyCodePressed( code )
             local tab = self.Sheet:GetItems()[curr].Tab
             self.Sheet:SetActiveTab(tab)
         end
+    end
+    if code == KEY_F and input.IsShiftDown() then
+        self.ApplyForAll = not self.ApplyForAll
+        print(self.ApplyForAll)
+    end
+    if code == KEY_G and input.IsShiftDown() then
+        self:UpdateNames(true)
+        print(self.ShowLongName)
     end
 end
 

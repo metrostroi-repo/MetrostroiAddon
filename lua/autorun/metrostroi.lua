@@ -169,19 +169,22 @@ function Metrostroi.AddSkin(category,name,tbl)
                 ent:SetNW2String(id,texture.func(ent))
             end--]]
         end,function(List,Frame)
+            local objs
+
             if Frame then
-                for k, v in pairs(Frame.ObjectsNames) do
+                objs = Frame.ObjectsNames or Frame.Objects
+                for k, v in pairs(objs) do
                     if v.SetDisabled then
                         v:SetDisabled(false)
                     end
                 end
             end
-
+            if not objs then return end
             if not Metrostroi.Skins or not Metrostroi.Skins[typ] then return end
             local texture = Metrostroi.Skins[typ][List:GetOptionData(List:GetSelectedID())]
             if not texture or not texture.defaults then return end
             for k,v in pairs(texture.defaults) do
-                local obj = Frame.ObjectsNamed[k]
+                local obj = objs[k]
                 if obj then
                     obj:SetDisabled(true)
                 end

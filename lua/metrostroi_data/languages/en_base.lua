@@ -143,6 +143,7 @@ Entities.gmod_subway_81-717_mvm.Name  = 81-717 (Moscow head)
 Entities.gmod_subway_81-717_mvm_custom.Name     = 81-717 (Moscow custom)
 Entities.gmod_subway_81-714_mvm.Name  = 81-714 (Moscow intermediate)
 Entities.gmod_subway_81-717_lvz.Name  = 81-717 (St. Petersburg head)
+Entities.gmod_subway_81-717_lvz_custom.Name     = 81-717 (St. Petersburg custom)
 Entities.gmod_subway_81-714_lvz.Name  = 81-714 (St. Petersburg intermediate)
 Entities.gmod_subway_81-718.Name      = 81-718 (TISU head)
 Entities.gmod_subway_81-719.Name      = 81-719 (TISU intermediate)
@@ -226,6 +227,10 @@ Spawner.ConsistEditor.ShowLongName      = Show long name
 Spawner.ConsistEditor.ApplyForAll       = Apply settings to all wagons
 Spawner.ConsistEditor.Wagon             = Wagon %d
 Spawner.ConsistEditor.Info              = Info
+
+Spawner.ConsistEditor.HotKeys           = Hotkeys:
+Spawner.ConsistEditor.HotKeys1          = Arrows/Numbers used for change tab
+Spawner.ConsistEditor.HotKeys2          = Shift + F used for change "@[Spawner.ConsistEditor.ApplyForAll]"
 
 Spawner.PresetTitle                     = Presets
 Spawner.Preset.New                      = New preset
