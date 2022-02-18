@@ -307,15 +307,17 @@ function ENT:PostInitalize()
 	if not self.RouteNumberSetup or not self.RouteNumberSetup:find("W") then
 		self.GoodInvationSignal = 0
 		local index = 1
+		local white_lenses = {}
 		local after_red = false
 		for k,v in ipairs(self.Lenses) do
-			if v == "M" then continue end
-			for i = 1,#v do
-				if v[i] == "R" then after_red = true end
-				if v[i] == "W" and after_red then self.GoodInvationSignal = index end
-				index = index + 1
+			if v != "M" then
+				for i = 1,#v do
+					if i == #v and v[i] == "W" then table.insert(white_lenses, index) end
+					index = index + 1
+				end
 			end
 		end
+		self.GoodInvationSignal = white_lenses[#white_lenses] or 0
 	else
 		self.GoodInvationSignal = -1
 	end
