@@ -598,6 +598,11 @@ function ENT:Think()
 		if self.KGU then number = number.."K" end
 		if number then self:SetNW2String("Number",number) end
 
+		if self.Occupied ~= self.OccupiedOld then
+			hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
+			self.OccupiedOld = self.Occupied
+		end	
+
 		if self.ARSOnly then
 			if self.Sprites then
 				for k,v in pairs(self.Sprites) do
@@ -651,12 +656,17 @@ function ENT:Think()
 		local number = self.RouteNumberReplace or ""
 		if self.ControllerLogicCheckOccupied then
 			self.PrevTime = self.PrevTime or 0
-			if (CurTime() - self.PrevTime) > 1.0 then
+			if (CurTime() - self.PrevTime) > 0.5 then
 				self.PrevTime = CurTime() + math.random(0.5,1.5)
 				if self.Node and self.TrackPosition then
 					self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", self)
 				end
 			end
+			if self.Occupied ~= self.OccupiedOld then
+				hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
+				self.OccupiedOld = self.Occupied
+			end
+		
 		end
 		--[[
 		if self.MU or self.ARSOnly or self.RouteNumberSetup and self.RouteNumberSetup ~= "" or self.RouteNumber and self.RouteNumber ~= "" then
@@ -697,10 +707,7 @@ function ENT:Think()
 			end
 		end
 	end
-	if self.Occupied ~= self.OccupiedOld then
-		hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
-		self.OccupiedOld = self.Occupied
-	end
+
 	if self.Controllers then
 		for k,v in pairs(self.Controllers) do
 			if self.Sig ~= v.Sig then
