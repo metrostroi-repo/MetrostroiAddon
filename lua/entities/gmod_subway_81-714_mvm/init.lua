@@ -369,7 +369,7 @@ function ENT:Think()
         else
             vdrop = vdrop - ((v.A56.Value == 0 and 0.4 or (v.VB.Value == 0 and 0.4 or 0)) + (v.LK4.Value == 0 and 0.725 or 0))
         end
-	end
+    end
     local PCV_o = hvcounter > 0 and math.Clamp(76+(hvcar.Electric.Aux750V - 600)*8/375, 76, 84) - vdrop or self.WagonList[1].Battery.Voltage
     --imitating converter overload protection only when control circuits are energized and at least one PC on the train is off; pretty useless btw (but fun)
     local pcloadratio = #self.WagonList/(hvcounter > 0 and hvcounter or 0.5)
