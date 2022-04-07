@@ -85,7 +85,7 @@ function FRAME:CreateError(msg)
     self.Error:SetExpensiveShadow(1,Color(0,0,0,200))
 end
 
-function FRAME:Setup(train, settings, entSettings, frame)
+function FRAME:Setup(train, settings, consist, entSettings, wagnum, frame)
     self.Settings = settings
     self.TrainClass = train
 
@@ -106,6 +106,10 @@ function FRAME:Setup(train, settings, entSettings, frame)
 
     self.Train = ent
     self.EntSettings = entSettings
+
+    self.ID = self.ID or 0
+    self.WagNum = wagnum or 3
+    self.Consist = consist or {}
 
     local isinterim = entSettings.Spawner.interim == ent.ClassName
 
@@ -157,6 +161,12 @@ function FRAME:Load()
     self.ObjectsTypes = {}
 
     local spawnertbl = self.InterimSpawner or self.EntSettings.Spawner
+
+    if not (self.ID == 1 or self.ID == self.WagNum) then
+        self:CreateList("Rotation", "Поворот вагона", {"По стандарту", "Повернуть", "Не поворачивать"})
+    
+        incPos()
+    end
 
     for i, menu in ipairs(spawnertbl) do
         if menu[3] == "List" then
@@ -549,7 +559,8 @@ function FRAME:Setup(con, filename)
     for k, v in pairs(self.Wagons) do
         local tab = vgui.Create("MSConsistTab", self.Sheet)
         local name = GetTrainName(v["__class"], true) or v["__class"]
-        tab:Setup(v["__class"], self.Wagons[k], self.Train, self)
+        tab.ID = k
+        tab:Setup(v["__class"], self.Wagons[k], self.Consist, self.Train, self.Consist.WagNum, self)
 
         self.Sheet:AddSheet(Format(Metrostroi.GetPhrase("Spawner.ConsistEditor.Wagon"), tonumber(k)), tab).Tab.ID = k
     end
