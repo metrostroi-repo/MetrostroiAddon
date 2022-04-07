@@ -589,10 +589,9 @@ function ENT:Think()
         end
     end
 	
-	--отработка "выбивания" А54 при включении реверса вперед в обеих кабинах
-	if self:ReadTrainWire(4)*self:ReadTrainWire(5) > 0 then
-	    self.A54:TriggerInput("Set",0)
-	end
+    if self:ReadTrainWire(4)*self:ReadTrainWire(5) > 0 then
+        self.A54:TriggerInput("Set",0)
+    end
 
     -- Door button lights
     self:SetPackedBool("DoorsLeftL",Panel.DoorsLeft > 0.5)
