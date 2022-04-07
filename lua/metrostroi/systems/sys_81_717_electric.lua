@@ -717,11 +717,12 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Panel.KUP = S["B9a"]*Train.KUP.Value
 
     S["D4"] = BO*Train.A13.Value
-    S["D1"] = T[10]*Train.A21.Value*KV["D-D1"]+S["14b"]*KRU["11/3-D1/1"]
     if isLVZ then
         if isKSD then
+            S["D1"] = T[10]*Train.A21.Value*KV["D-D1"]+S["14b"]*KRU["11/3-D1/1"]+T[16]*Train.VUD1.Value
             S[16] = S["D1"]*Train.VUD1.Value
         else
+            S["D1"] = T[10]*Train.A21.Value*KV["D-D1"]+S["14b"]*KRU["11/3-D1/1"]+T[16]*Train.VUD1.Value*Train.VUD2.Value
             S[16] = S["D1"]*Train.VUD1.Value*Train.VUD2.Value
         end
         Train:WriteTrainWire(16,S[16]+AVO["16"]*RC2)
@@ -735,23 +736,19 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         S[31] = S[31]*(1-Train.VUD1.Value)
         S[32] = S[32]*(1-Train.VUD1.Value)
     else
-        S["D16"] = Train.VUD1.Value*Train.VUD2.Value
-        S[31] = (S["D1"]+T[16]*S["D16"])*(1-Train.DoorSelect.Value)
-        S[32] = (S["D1"]+T[16]*S["D16"])*Train.DoorSelect.Value
-        Train:WriteTrainWire(16,S["D1"]*S["D16"])
+        S["D1"] = T[10]*Train.A21.Value*KV["D-D1"]+S["14b"]*KRU["11/3-D1/1"]+T[16]*Train.VUD1.Value*Train.VUD2.Value
+        S[31] = (S["D1"])*(1-Train.DoorSelect.Value)
+        S[32] = (S["D1"])*Train.DoorSelect.Value
+        Train:WriteTrainWire(16,S["D1"]*Train.VUD1.Value*Train.VUD2.Value)
     end
     Train:WriteTrainWire(12,S["D1"]*Train.KRZD.Value)
     Panel.DoorsLeft = S[31]
     Panel.DoorsRight = S[32]
-
+    
     S["12A"] = T[12]*Train.A12.Value
     if isLVZ then
         if isPA then AVI.ZD = S[16] end
-        if isKSD then
-            Train:WriteTrainWire(31,S[31]*(Train.KDL.Value*(1-RC2))+(S["D1"]+T[16]*Train.VUD1.Value)*Train.VDL.Value+AVO["31"]*RC2 + S["12A"]*Train.A31.Value)
-        else
-            Train:WriteTrainWire(31,S[31]*(Train.KDL.Value*(1-RC2))+(S["D1"]+T[16]*Train.VUD1.Value*Train.VUD2.Value)*Train.VDL.Value+AVO["31"]*RC2 + S["12A"]*Train.A31.Value)
-        end        
+        Train:WriteTrainWire(31,S[31]*((Train.KDL.Value+Train.KDLR.Value)*(1-RC2))+(S["D1"])*Train.VDL.Value+AVO["31"]*RC2 + S["12A"]*Train.A31.Value)
         Train:WriteTrainWire(32,S[32]*(Train.KDP.Value)*(1-RC2)+AVO["32"]*RC2 + S["12A"]*Train.A32.Value)
     elseif not isDot2 then
         Train:WriteTrainWire(31,S[31]*(Train.KDL.Value+Train.KDLR.Value+Train.VDL.Value)*(Train.ASNP.K1+(1-Train.VBD.Value)) + S["12A"]*Train.A31.Value)
@@ -760,7 +757,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         Train:WriteTrainWire(31,S[31]*(Train.KDL.Value+Train.KDLR.Value+Train.VDL.Value) + S["12A"]*Train.A31.Value)
         Train:WriteTrainWire(32,S[32]*Train.KDP.Value + S["12A"]*Train.A32.Value)
     end
-
+    
 
     if isMVM then
         S["15B"] = T[15]*(KV["15A-15B"]+Train.KD.Value)
