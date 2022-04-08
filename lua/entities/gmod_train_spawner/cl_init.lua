@@ -743,7 +743,7 @@ local function ExtendedFrame()
         txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Name"), con.Name or "GenericName")
         txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Type"), name or "GenericTrain")
         txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.WagNum"), con.WagNum or 0)
-        txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Author"), con.Author or "Smile")
+        txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Author"), con.Author or "N/A")
         
         info:SetText(Metrostroi.GetPhrase("Spawner.Consist.Information") .. txt)
         info:SizeToContents()
