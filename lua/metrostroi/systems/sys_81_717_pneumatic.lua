@@ -45,8 +45,8 @@ function TRAIN_SYSTEM:Initialize(parameters)
 
     -- Air distrubutor part
     self.WorkingChamberPressure = 0.0
-    self.AirDistributorReady = false
-    self.OverchargeReleaseValve = false
+    --self.AirDistributorReady = false		--заменено на локальные
+    --self.OverchargeReleaseValve = false	--переменные
     self.WCChargeValve = true
     self.PN1 = 0
     self.PN2 = 0
@@ -180,8 +180,8 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
             self.EmergencyValve = true
             if value ~= 2 then
 		self.Train.UAVAC:TriggerInput("Set",0)
-		if not self.Train.autosaid then
-		    self.Train.autosaid = true
+		if not self.Train.avtostopmsg then
+		    self.Train.avtostopmsg = true
 		    RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName())
 		end
 	    end
@@ -468,7 +468,7 @@ function TRAIN_SYSTEM:Think(dT)
     if self.EmergencyValveDisable then--and (self.BrakeLinePressure-self.OldBrakeLinePressure)>0.01 then
         self.EmergencyValveDisable=false
         self.EmergencyValve=false
-	Train.autosaid=false
+	Train.avtostopmsg=false
     end
     self.OldBrakeLinePressure = self.BrakeLinePressure
     local leak = 0
@@ -505,10 +505,12 @@ function TRAIN_SYSTEM:Think(dT)
     if self.WCChargeValve == true then
 	self:equalizePressure(dT,"WorkingChamberPressure",self.BrakeLinePressure,0.107,nil,nil,1.0)	--simulate 0.8mm hole btw BL and working chambers
     end
-    self.AirDistributorReady = self.WorkingChamberPressure >= 2.2
+    --self.AirDistributorReady = self.WorkingChamberPressure >= 2.2
+    local aird_ready = self.WorkingChamberPressure >= 2.2
     self.WCChargeValve = not ((self.WorkingChamberPressure - self.BrakeLinePressure) > 0.2 and (self.WorkingChamberPressure - self.BrakeLinePressure) < 2.5)
-    self.OverchargeReleaseValve = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
-    if self.OverchargeReleaseValve then	
+    --self.OverchargeReleaseValve = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
+    local KLSZ = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
+    if KLSZ then	
 	self:equalizePressure(dT,"WorkingChamberPressure",0.0,0.22)	-- КЛСЗ
     end
 
@@ -518,7 +520,7 @@ function TRAIN_SYSTEM:Think(dT)
     local _offset1 = self.Train.AR63 and 0.9 or 0.8
     self.GN1Offset = self.GN1Offset or math.random(20,100)*0.002 + _offset1
     self.BcBl = (self.GN2Offset + self.WeightLoadRatio*1.3)/1.93
-    if Train.AirDistributorDisconnect.Value == 0 and self.AirDistributorReady then
+    if Train.AirDistributorDisconnect.Value == 0 and aird_ready then
         -- Valve #1
         if (Train.PneumaticNo1.Value == 1.0) and (Train.PneumaticNo2.Value == 0.0) then
             if self.PN1 < self.GN1Offset then
