@@ -426,7 +426,6 @@ function TOOL:SpawnWagon(trace)
                 if set[6] and type(set[6]) == "function" then   set[6](ent,val,LastRot,i,self.Settings.WagNum) else SetSelectiveValue(ent,set[1],val) end
             end
         end
-
         if self.Train.Spawner.func then self.Train.Spawner.func(ent,i,self.Settings.WagNum,LastRot) end
         if self.Train.Spawner.wagfunc then ent:GenerateWagonNumber(function(_,number) return self.Train.Spawner.wagfunc(ent,i,number) end) end
         if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
@@ -555,7 +554,6 @@ function TOOL:ConsistSpawnWagon(trace)
     local LastRot,LastEnt = false
     local trains = {}
     for i=1,self.Consist.WagNum do
-        local wag = self.Consist.Wagons[i]
         local spawnfunc = Train.Spawner.spawnfunc
         local ent
         if i == 1 then
@@ -667,7 +665,6 @@ function TOOL:ConsistSpawnWagon(trace)
         end
         if Train.Spawner.func then Train.Spawner.func(ent,i,self.Consist.WagNum,LastRot) end
         if Train.Spawner.wagfunc then ent:GenerateWagonNumber(function(_,number) return Train.Spawner.wagfunc(ent,i,number) end) end
-        print(Train)
         if ent.TrainSpawnerUpdate then ent:TrainSpawnerUpdate() end
         for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
         hook.Run("MetrostroiSpawnerUpdate",ent,self.Consist,true)

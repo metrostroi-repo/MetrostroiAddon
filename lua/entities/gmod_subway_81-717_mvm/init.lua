@@ -29,13 +29,10 @@ ENT.SyncFunctions = {
 function ENT:Initialize()
     self.Plombs = {
         VAH = true,
-        VAD = true,
         VP = true,
         OtklAVU = true,
         OVT = true,
         --KAH = {true,"KAHK"},
-        ALS = true,
-        ARSR = true,
         KAH = {true},
         OtklBV = {true},
         RC1 = true,

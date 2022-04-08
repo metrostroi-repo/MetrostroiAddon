@@ -319,8 +319,8 @@ ENT.ARSes = {
     "models/metrostroi_train/81-717/pult/ars_square.mdl",
     "models/metrostroi_train/81-717/pult/ars_round.mdl",
     "models/metrostroi_train/81-717/pult/ars_round_yellow.mdl",
-    "models/metrostroi_train/81-717_spl/ars_old.mdl",
-    "models/metrostroi_train/81-717_spl/ars_old.mdl",
+    "models/metrostroi_train/81-717/pult/ars_old.mdl",
+    "models/metrostroi_train/81-717/pult/ars_old_yellow.mdl",
 }
 ENT.ClientProps["ars_mvm"] = {
     model = "models/metrostroi_train/81-717/pult/ars_round.mdl",
@@ -618,7 +618,6 @@ ENT.ButtonMap["Block5_6"] = {
         {ID = "ARSRToggle",x=293,y=134,radius=20,tooltip="",model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_t2.mdl",ang = 180,z=-6,
             var="ARSR",speed=16,
-            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=270,x=-1,y=26,z=2,var="ARSRPl",ID="ARSRPl",},
             sndvol = 1,snd = function(val) return val and "switchbl_on" or "switchbl_off" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
         }},
@@ -690,7 +689,7 @@ ENT.ButtonMap["Block7"] = {
         {ID = "VADToggle",x=107,y=180.5,radius=20,tooltip="",model = {
             model = "models/metrostroi_train/81-710/ezh3_tumbler_pp250.mdl",ang = 180,z=-4,
             var="VAD",speed=16,
-            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=270,x=-1,y=28,z=4,var="VADPl",ID="VADPl",},
+            --plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=270,x=-1,y=28,z=4,var="VADPl",ID="VADPl",},
             sndvol = 1,snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
         }},
@@ -1078,12 +1077,11 @@ ENT.ButtonMap["Block2_3"] = {
         }},
     }
 }
---findjopa
 ENT.ClientProps["speed"] = {
     model = "models/metrostroi_train/81-710/ezh3_voltages.mdl",
-    pos = Vector(448.34,0.05,2.645087),
+    pos = Vector(448.287628,-0.010203,1.644087),
     ang = Angle(0.000000,-90.000000,58.000000),
-    bscale = Vector(1.2,1.2,1.2),
+    bscale = Vector(1.2,1.2,1.65),
     hideseat=0.2,
 }
 
@@ -2806,7 +2804,7 @@ function ENT:Think()
     self:Animate("brake334",self:GetPackedRatio("CranePosition")/5,0.35,0.65,256,24)
     self:Animate("brake013",        Cpos[self:GetPackedRatio("CranePosition")] or 0, 0.03, 0.458,  256,24)
 
-    self:Animate("speed",self:GetPackedRatio("Speed"),0.93,0.562,nil,nil,256,2,0.01)
+    self:Animate("speed",self:GetPackedRatio("Speed"),0.881+0.004,0.609-0.008,nil,nil,256,2,0.01)
 
     local ARSType = self:GetNW2Int("ARSType",1)
     if self.ARSType ~= ARSType then

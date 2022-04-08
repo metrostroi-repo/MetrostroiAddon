@@ -2113,7 +2113,6 @@ end
 -- Process Cabin button and keyboard input
 --------------------------------------------------------------------------------
 function ENT:OnButtonPress(button,ply)
-    
 end
 
 function ENT:OnButtonRelease(button)
