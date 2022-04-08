@@ -43,14 +43,14 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.OldBrakeLinePressure = 0.0
     self.BCPressure = 0
 
-	-- Air distrubutor part
-	self.WorkingChamberPressure = 0.0
-	self.AirDistributorReady = false
-	self.OverchargeReleaseValve = false
-	self.WCChargeValve = true
-	self.PN1 = 0
-	self.PN2 = 0
-	self.cranPres = 0
+    -- Air distrubutor part
+    self.WorkingChamberPressure = 0.0
+    self.AirDistributorReady = false
+    self.OverchargeReleaseValve = false
+    self.WCChargeValve = true
+    self.PN1 = 0
+    self.PN2 = 0
+    self.cranPres = 0
 
     --DKPT
     self.Train:LoadSystem("DKPT","Relay","R-52B") --
@@ -82,8 +82,8 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("EmergencyBrakeValve","Relay","Switch")
     -- Воздухораспределитель
     self.Train:LoadSystem("AirDistributorDisconnect","Relay","Switch")
-	--Срывной клапан
-	self.Train:LoadSystem("AutostopValve","Relay","Switch")
+    --Срывной клапан
+    self.Train:LoadSystem("AutostopValve","Relay","Switch")
     --УАВА
     self.Train:LoadSystem("UAVA","Relay","Switch",{ bass = true})
     --self.Train:LoadSystem("UAVAContact","Relay","Switch")
