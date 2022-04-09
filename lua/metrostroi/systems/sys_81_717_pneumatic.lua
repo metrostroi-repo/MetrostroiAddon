@@ -180,8 +180,8 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
             self.EmergencyValve = true
             if value ~= 2 then
 		self.Train.UAVAC:TriggerInput("Set",0)
-		if not self.Train.avtostopmsg then
-		    self.Train.avtostopmsg = true
+		if not self.Train.AutoStopNotify then
+		    self.Train.AutoStopNotify = true
 		    RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName())
 		end
 	    end
@@ -468,7 +468,7 @@ function TRAIN_SYSTEM:Think(dT)
     if self.EmergencyValveDisable then--and (self.BrakeLinePressure-self.OldBrakeLinePressure)>0.01 then
         self.EmergencyValveDisable=false
         self.EmergencyValve=false
-	Train.avtostopmsg=false
+	Train.AutoStopNotify=false
     end
     self.OldBrakeLinePressure = self.BrakeLinePressure
     local leak = 0
