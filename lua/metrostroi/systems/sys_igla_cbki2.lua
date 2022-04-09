@@ -115,7 +115,7 @@ if CLIENT then
         local Train = self.Train
         local State = self.Train:GetNW2Int("IGLA:State",0)
         if State > -2 then
-            surface.SetDrawColor(81,223,0,self.Warm and 100 or 255)
+            surface.SetDrawColor(140,190,0,self.Warm and 130 or 255)
             surface.DrawRect(0,0,512,80)
             self.Warm = true
         else
@@ -136,8 +136,8 @@ if CLIENT then
             end
             if State2 == 0 then
                 --self:PrintText(0,"")
-                self:PrintText(0,Format("[%03d]",Train:GetNW2Int("IGLA:Messages")))
-                self:PrintText(7,"ПЦБК-"..Train:GetNW2Int("IGLA:Count",0))
+                self:PrintText(2,Format("[%03d]",Train:GetNW2Int("IGLA:Messages")))
+                self:PrintText(8,"ПЦБК-"..Train:GetNW2Int("IGLA:Count",0))
             elseif State2 == 1 then
                 local w = Train:GetNW2Int("IGLA:WagNumber")
                 local m = Train:GetNW2String("IGLA:LogID")
@@ -246,7 +246,7 @@ else
     function TRAIN_SYSTEM:Trigger(name,value)
         if self.State == 2 then
             if self.State2 == 0 then
-                if name == "IGLA2D"  and value and #self.Log > 0 then
+                if name == "IGLA1"  and value and #self.Log > 0 then
                     self.State2 = 1
                     self.StandbyTimer = CurTime()
                     self.Selected = #self.Log
@@ -256,9 +256,12 @@ else
                     self.StandbyTimer = CurTime()
                     self.Selected = #self.Messages
                 end
+                if name =="IGLA2" and value then
+                    self.State = -2
+                end
             elseif self.State2 == 1 then
                 self.StandbyTimer = CurTime()
-                if name == "IGLA2D"  and value and self.Selected > 1 then
+                if name == "IGLA1"  and value and self.Selected > 1 then
                     self.Selected = self.Selected - 1
                 end
                 if name == "IGLA2"  and value then

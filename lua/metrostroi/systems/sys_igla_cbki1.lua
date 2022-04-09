@@ -420,7 +420,7 @@ else
             self.Error = CurTime()%0.5 > 0.25
         elseif self.State == 2 then
             if #self.Log > 100 then table.remove(self.Log,1) end
-            local Standby = CurTime()-self.StandbyTimer > 10
+            local Standby = CurTime()-self.StandbyTimer > 60
             if self.State2 > 0 and Standby then self.State2 = 0 end
             if self.ShowTimeTimer and self.ShowTimeTimer ~= true and CurTime()-self.ShowTimeTimer > 1.5 then
                 self.ShowTime = not self.ShowTime

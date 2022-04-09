@@ -544,41 +544,48 @@ ENT.ButtonMap["LampsALS2"] = {
 }--]]
 
 ENT.ClientProps["asotp"] = {
-    model = "models/metrostroi_train/81-707/asotp.mdl",
+    model = "models/metrostroi_train/81-707/asotp_new.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     hideseat = 1,
 }
+local corr = -1.79
 ENT.ButtonMap["ASNP"] = {
-    pos = Vector(461.42,-35.2,35.4),
-    ang = Angle(-0.4,-97,90),
-    width = 115,
-    height = 60,
+    pos = Vector(459.616-corr,-34.662-corr-1.30,35.545),
+    ang = Angle(-.4,264,90),
+    width = 150,
+    height = 130,
     scale = 0.0625,
     hideseat = 0.2,
 
     buttons = {
-        {ID = "R_ASNPMenuSet",x=58, y=48.5, radius=8, tooltip = "Информатор: Меню",model = {
-            model = "models/metrostroi_train/81-720/button_round.mdl",
-            var="R_ASNPMenu",speed=12, vmin=0, vmax=0.9,z=-3,
-            sndvol = 0.5,snd = function(val) return val and "pnm_button1_on" or "pnm_button1_off" end,
+        {ID = "R_ASNPMenuSet",x=72.8, y=65.3, radius=8, tooltip = "АСНП: Меню",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_menu_button.mdl",
+            var="R_ASNPMenu",speed=12, vmin=0, vmax=0.7, ang=Angle(0,90,-90), z=-0.1,
+            sndvol = 0.5,snd = function(val) return val and "pnm_button2_on" or "pnm_button2_on" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "R_ASNPUpSet",x=105, y=14.5, radius=8, tooltip = "Информатор: Вверх",model = {
-            model = "models/metrostroi_train/81-720/button_round.mdl",
-            var="R_ASNPUp",speed=12, vmin=0, vmax=0.9,z=-3,
+        {ID = "R_ASNPUpSet",x=131.8, y=23, radius=8, tooltip = "АСНП: Вверх",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_triangle_button.mdl",
+            var="R_ASNPUp",speed=12, vmin=0, vmax=1, ang=Angle(0,90,-90), z=-3,
             sndvol = 0.5,snd = function(val) return val and "pnm_button1_on" or "pnm_button2_off" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "R_ASNPDownSet",x=105, y=31, radius=8, tooltip = "Информатор: Вниз",model = {
-            model = "models/metrostroi_train/81-720/button_round.mdl",
-            var="R_ASNPDown",speed=12, vmin=0, vmax=0.9,z=-3,
+        {ID = "R_ASNPDownSet",x=131.8, y=41, radius=8, tooltip = "АСНП: Вниз",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_triangle_button.mdl",
+            var="R_ASNPDown",speed=12, vmin=0, vmax=1, ang=Angle(0,90,90), z=-3,
             sndvol = 0.5,snd = function(val) return val and "pnm_button2_on" or "pnm_button1_off" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "R_ASNPOnToggle",x=12, y=18, radius=8, tooltip = "Информатор: Включение",model = {
-            model = "models/metrostroi_train/81-720/tumbler2.mdl", ang=0, z = -3,
-            var="R_ASNPOn",speed=12, vmin=1, vmax=0,
+        {ID = "R_ASNPPathToggle",x=9, y=29, radius=8, tooltip = "АСНП: Установка пути",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_track_tumbler.mdl", ang = Angle(0,90,-90), z=-3,
+            var="R_ASNPPath",speed=12, vmin=1, vmax=0,
+            sndvol = 0.5,snd = function(val) return val and "pnm_on" or "pnm_off" end,
+            sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
+        }},
+        {ID = "R_ASNPOnToggle",x=33.5, y=91, radius=25, tooltip = "АСНП: Включение",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_power_tumbler.mdl", ang=Angle(0,90,-90), z = -24.5,
+            var="R_ASNPOn",speed=12, vmin=0, vmax=1,
             sndvol = 0.5,snd = function(val) return val and "pnm_on" or "pnm_off" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
@@ -586,62 +593,72 @@ ENT.ButtonMap["ASNP"] = {
 }
 
 ENT.ButtonMap["ASNPScreen"] = {
-    pos = ENT.ButtonMap["ASNP"].pos+Vector(-0.1,-1.6,-0.85),
-    ang = Angle(-.4,-97,90),
+    pos = ENT.ButtonMap["ASNP"].pos+Vector(0.25,-2.03,-1.2),
+    ang = Angle(-.4,263,90),
     width = 512,
     height = 128,
-    scale = 0.008,
+    scale = 0.025/2.51,
     hideseat = 0.2,
     hide=true,
 }
 
 
 ENT.ButtonMap["IGLAButtons"] = {
-    pos = Vector(459.1,-53.7,15.81),
-    ang = Angle(-0,237.1,90),
-    width = 87,
-    height = 70,
+    pos = Vector(415.93,-58.0,28.666),
+    ang = Angle(-0,180,90),
+    width = 120,
+    height = 80,
     scale = 0.0625,
     hideseat = 0.2,
     buttons = {
-        {ID = "IGLA1USet",x=11, y=39, w=12, h=7, tooltip=""},
-        {ID = "IGLA1Set",x=11, y=46, w=12, h=7, tooltip=""},
-        {ID = "IGLA1DSet",x=11, y=53, w=12, h=7, tooltip=""},
-        {ID = "IGLA2USet",x=65, y=39, w=12, h=7, tooltip=""},
-        {ID = "IGLA2Set",x=65, y=46, w=12, h=7, tooltip=""},
-        {ID = "IGLA2DSet",x=65, y=53, w=12, h=7, tooltip=""},
-        {ID = "!IGLASR",x=17.9, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLASR",color=Color(175,250,20),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-1,}
+        -- {ID = "IGLA1USet",x=19, y=55.5, w=18, h=7, tooltip=""},
+        {ID = "IGLA1Set",x=15.3, y=60.2, w=18, h=7, tooltip="", model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_rect_button.mdl", z=-3, ang=Angle(90,90,180),
+            var="IGLA1",speed=12,vmin=0,vmax=1,
+            sndvol = 1, snd = function(val) return val and "vu223_on" or "vu223_off" end,
+            sndmin = 100, sndmax = 1e3, sndang = Angle(0,0,0),
         }},
-        {ID = "!IGLARX",x=27.5, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLARX",color=Color(255,56,30),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-1,}
+        -- {ID = "IGLA1DSet",x=19, y=65.5, w=18, h=7, tooltip=""},
+        -- {ID = "IGLA2USet",x=85, y=55.5, w=18, h=7, tooltip=""},
+        {ID = "IGLA2Set",x=82.5, y=60.2, w=18, h=7, tooltip="", model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_rect_button.mdl", z=-3, ang=Angle(90,90,180),
+            var="IGLA2",speed=12,vmin=0,vmax=1,
+            sndvol = 1, snd = function(val) return val and "vu223_on" or "vu223_off" end,
+            sndmin = 100, sndmax = 1e3, sndang = Angle(0,0,0),
         }},
-        {ID = "!IGLAErr",x=40.5, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAErr",color=Color(255,168,000),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,168,000),z=-1,}
+        -- {ID = "IGLA2DSet",x=85, y=65.5, w=18, h=7, tooltip=""},
+        {ID = "!IGLASR",x=24.5, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLASR",color=Color(175,250,20),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-5,}
         }},
-        {ID = "!IGLAOSP",x=50, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOSP",color=Color(175,250,20),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-1,}
+        {ID = "!IGLARX",x=37, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLARX",color=Color(255,56,30),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-5,}
         }},
-        {ID = "!IGLAPI",x=59.5, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAPI",color=Color(255,56,30),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-1,}
+        {ID = "!IGLAErr",x=54, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAErr",color=Color(255,168,000),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,168,000),z=-5,}
         }},
-        {ID = "!IGLAOff",x=69, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOff",color=Color(255,56,30),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-1,}
+        {ID = "!IGLAOSP",x=66, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOSP",color=Color(175,250,20),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-5,}
+        }},
+        {ID = "!IGLAPI",x=79, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAPI",color=Color(255,56,30),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-5,}
+        }},
+        {ID = "!IGLAOff",x=91, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOff",color=Color(255,56,30),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-5,}
         }},
     }
 }
 ENT.ButtonMap["IGLA"] = {
-    pos = ENT.ButtonMap["IGLAButtons"].pos+Vector(-0.30,-0.6,-1.25),
+    pos = ENT.ButtonMap["IGLAButtons"].pos+Vector(-0.9,-0.32,-1.75),
     ang = ENT.ButtonMap["IGLAButtons"].ang,
     width = 512,
     height = 128,
-    scale = 0.025/2.7,
+    scale = 0.025/2.36,
     hideseat = 0.2,
     hide=true,
 
@@ -1518,12 +1535,6 @@ ENT.ClientProps["controller_2"] = {
     hide = 2.0,
 }
 
-ENT.ClientProps["asotp"] = {
-    model = "models/metrostroi_train/81-707/asotp.mdl",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hide = 2.0,
-    }
 ENT.ClientProps["underwagon"] = {
     model = "models/metrostroi_train/81-508/81-508_underwagon.mdl",
     pos = Vector(0.2,0,-18),
