@@ -2043,6 +2043,21 @@ ENT.ButtonMap["AirDistributor"] = {
     }
 }
 
+ENT.ButtonMap["AutostopValve"] = {
+    pos = Vector(365.8,-67.6,-56),
+    ang = Angle(0,0,90),
+    width = 130,
+    height = 40,
+    scale = 0.1,
+    hideseat=0.1,
+    hide=true,
+    screenHide = true,
+
+    buttons = {
+        {ID = "AutostopValveSet",x=0,y=0,w= 130,h = 40,tooltip="Сорвать срывной клапан"},
+    }
+}
+
 for i=0,4 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/common/bort_numbers.mdl",
@@ -3130,8 +3145,8 @@ function ENT:Think()
     --self:SetSoundState("rolling_medium1",0 or rol40*rollings,rol40p) --57
     self:SetSoundState("rolling_high2"  ,rol70*rollings,rol70p) --70
 
-    self.ReleasedPdT = math.Clamp(self.ReleasedPdT + 2*(-self:GetPackedRatio("BrakeCylinderPressure_dPdT",0)-self.ReleasedPdT)*dT,0,1)
-    local release1 = math.Clamp((self.ReleasedPdT-0.1)/0.8,0,1)^2
+    self.ReleasedPdT = math.Clamp(self.ReleasedPdT + 2*(-self:GetPackedRatio("BrakeCylinderPressure_dPdT",0)-0.8*self.ReleasedPdT)*dT,0,1)
+    local release1 = math.Clamp((1.1*self.ReleasedPdT-0.1)/0.48,0,8)^2
     self:SetSoundState("release1",release1,1)
     self:SetSoundState("release2",(math.Clamp(0.3-release1,0,0.3)/0.3)*(release1/0.3),1.0)
     local parking_brake = self:GetPackedRatio("ParkingBrakePressure_dPdT",0)
@@ -3194,9 +3209,9 @@ function ENT:Think()
         self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
     end
     local emergencyValveEPK = self:GetPackedRatio("EmergencyValveEPK_dPdT",0)
-    self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*dT,0,1)
+    self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*12*dT,0,1)
     if self.EmergencyValveEPKRamp < 0.01 then self.EmergencyValveEPKRamp = 0 end
-    self:SetSoundState("epk_brake",self.EmergencyValveEPKRamp,1.0)
+    self:SetSoundState("epk_brake",self.EmergencyValveEPKRamp,2.8)
 
 --[[
     local emergencyBrakeValve = self:GetPackedRatio("EmergencyBrakeValve_dPdT", 0)
@@ -3351,6 +3366,9 @@ function ENT:DrawPost()
 
     self:DrawOnPanel("AirDistributor",function()
         draw.DrawText(self:GetNW2Bool("AD") and "Air Distributor ON" or "Air Distributor OFF","Trebuchet24",0,0,Color(0,0,0,255))
+    end)
+    self:DrawOnPanel("AutostopValve",function()
+        draw.DrawText("Autostop Valve", "Trebuchet24",0,6,Color(0,0,0,255))
     end)
 end
 

@@ -200,6 +200,10 @@ function ENT:Initialize()
             ID = "AirDistributorDisconnectToggle",
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
+        {
+            ID = "AutostopValveToggle",
+            Pos = Vector(377, -66, -50), Radius = 20,
+        },
     }
 
     local vX = Angle(0,-90-0.2,56.3):Forward() -- For ARS panel
@@ -557,7 +561,7 @@ function ENT:Think()
     local power = Panel.V1 > -1.5
     local brightness = math.min(1,Panel.Headlights1)*0.60 +
                         math.min(1,Panel.Headlights2)*0.40
-
+    --local T = {}
 
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
@@ -584,7 +588,10 @@ function ENT:Think()
             self:SetPackedBool("lightsActive"..i,false)
         end
     end
-
+	
+    if self:ReadTrainWire(4)*self:ReadTrainWire(5) > 0 then
+        self.A54:TriggerInput("Set",0)
+    end
 
     -- Door button lights
     self:SetPackedBool("DoorsLeftL",Panel.DoorsLeft > 0.5)

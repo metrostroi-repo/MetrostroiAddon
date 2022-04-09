@@ -15,7 +15,7 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("RV3","Relay","REV-813T",{ open_time = 2.3 })
     -- Реле тока (РТ2)
     self.Train:LoadSystem("RT2","Relay","REV-830",{ trigger_level = 130 }) -- A
-    self.Train:LoadSystem("RT2r","Relay","REV-830",{  close_time = 0, open_time = 0.2 }) --UNREALISTIC Repeater for RT2 for MSK trains
+    self.Train:LoadSystem("RT2r","Relay","REV-830",{  close_time = 0, open_time = 0.6 }) --UNREALISTIC Repeater for RT2 for MSK trains
     -- Реле контроля тормозного тока (РКТТ)
     self.Train:LoadSystem("RKTT","Relay","R-52B")
     self.Train.RKTTsh = 1
