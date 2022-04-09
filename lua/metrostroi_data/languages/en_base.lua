@@ -220,6 +220,8 @@ Spawner.Consist.ErrorNameExists         = Consist with this name already exists
 Spawner.Consist.Overwrite               = Overwrite consist
 Spawner.Consist.Cancel                  = Cancel
 
+Spawner.ConsistPreview.Preview          = Preview
+
 Spawner.ConsistEditor.Menu              = Menu
 Spawner.ConsistEditor.Save              = Save
 Spawner.ConsistEditor.SaveAs            = Save as

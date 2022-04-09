@@ -221,6 +221,8 @@ Spawner.Consist.ErrorNameExists         = Состав с таким имене�
 Spawner.Consist.Overwrite               = Перезаписать состав
 Spawner.Consist.Cancel                  = Отмена
 
+Spawner.ConsistPreview.Preview          = Предпросмотр
+
 Spawner.ConsistEditor.Menu              = Меню
 Spawner.ConsistEditor.Save              = Сохранить
 Spawner.ConsistEditor.SaveAs            = Сохранить как

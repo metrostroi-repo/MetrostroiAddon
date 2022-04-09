@@ -416,6 +416,125 @@ FRAME = {}
 
 function FRAME:Init()
     self:SetDeleteOnClose(true)
+    self:SetSize(ScrW() / 1.1, ScrH() / 1.1)
+    self:SetTitle(Metrostroi.GetPhrase("Spawner.ConsistPreview.Preview"))
+end
+
+function FRAME:SpawnWagon(wag, i, max)
+    local texture = Metrostroi.Skins["train"][wag.Texture]
+    local passtexture = Metrostroi.Skins["pass"][wag.PassTexture]
+    local cabintexture = Metrostroi.Skins["cab"][wag.CabTexture]
+
+    local model = scripted_ents.Get(wag["__class"]).Model or self.MainFrame.Train.Model
+
+    local models = {model}
+
+    if i == 1 or i == max then models = self.MainFrame.Train.Spawner.model end
+    
+    local distance = 960
+    local ang = Angle(0, 0, 0)
+
+    if i == max then ang = Angle(0, 180, 0) end
+
+    for k, v in pairs(models) do
+        local ent = ClientsideModel( v, RENDERGROUP_OTHER )
+        if ( !IsValid( ent ) ) then return end
+
+        --[[
+        if k == 1 then
+            local mins = ent:OBBMins()
+            local maxs = ent:OBBMaxs()
+            print(mins, maxs)
+            x = math.abs(mins.x) + math.abs(maxs.x)
+            y = math.abs(mins.y) + math.abs(maxs.y)
+            z = math.abs(mins.z) + math.abs(maxs.z)
+        end
+        ]]
+    
+        ent:SetNoDraw( true )
+        ent:SetIK( false )
+
+        ent:SetPos(Vector(-(distance*(i - 1)), 0, 0))
+        ent:SetAngles(ang)
+
+        ent.GetBodyColor = function()
+            return Vector(1, 1, 1)
+        end
+
+        ent.GetDirtLevel = function()
+            return 0
+        end
+        
+        for k2 in pairs(ent:GetMaterials()) do ent:SetSubMaterial(k2-1,"") end
+        for k2,v2 in pairs(ent:GetMaterials()) do
+            local tex = string.Explode("/",v2)
+            tex = tex[#tex]
+            if cabintexture and cabintexture.textures and cabintexture.textures[tex] then
+                ent:SetSubMaterial(k2-1,cabintexture.textures[tex])
+            end
+            if passtexture and passtexture.textures and passtexture.textures[tex] then
+                ent:SetSubMaterial(k2-1,passtexture.textures[tex])
+            end
+            if texture and texture.textures and texture.textures[tex] then
+                ent:SetSubMaterial(k2-1,texture.textures[tex])
+            end
+        end
+
+        table.insert(self.Models, ent)
+    end
+end
+
+function FRAME:Setup(mainframe)
+    self.ModelPanel = vgui.Create( "DAdjustableModelPanel", self )
+    self.ModelPanel:Dock(FILL)
+    self.ModelPanel:SetModel( LocalPlayer():GetModel() )
+
+    self.ModelPanel.LayoutEntity = function() end
+    
+    self.ModelPanel:SetFOV(90)
+
+    self.ModelPanel.PreDrawModel = function()
+        for k, v in pairs(self.Models) do
+            v:DrawModel()
+        end
+
+        return false
+    end
+
+    self.Models = {}
+
+    if not mainframe.Train then return end
+    if not mainframe.Train.Spawner then return end
+
+    self.MainFrame = mainframe
+
+    for k, v in pairs(mainframe.Wagons) do
+        self:SpawnWagon(v, k, #mainframe.Wagons)
+    end
+
+    mainframe:Hide()
+end
+
+function FRAME:Paint(w, h)
+    draw.RoundedBox(2, 0, 0, w, h, Color(127, 127, 127, 127))
+end
+
+function FRAME:OnRemove()
+    for k, v in pairs(self.Models) do
+        if IsValid(v) then
+            v:Remove()
+        end
+    end
+
+    self.MainFrame:Show()
+end
+
+vgui.Register("MSConsistPreview", FRAME, "DFrame")
+
+FRAME = {}
+
+function FRAME:Init()
+    self:SetDeleteOnClose(true)
     self:SetSize(824, 560)
 end
 
@@ -622,6 +741,18 @@ function FRAME:Setup(con, filename)
         tool.Consist = self.Consist
 
         self:Close()
+    end
+
+    self.PreviewButton = vgui.Create("DButton", self)
+    self.PreviewButton:SetSize(80, self.PreviewButton:GetTall()-4)
+    self.PreviewButton:SetPos(self:GetWide()-self.PreviewButton:GetWide()*4-100, 3)
+    self.PreviewButton:SetText(Metrostroi.GetPhrase("Spawner.ConsistPreview.Preview"))
+
+    self.PreviewButton.DoClick = function()
+        local frame = vgui.Create("MSConsistPreview")
+        frame:Center()
+        frame:MakePopup()
+        frame:Setup(self)
     end
 end
 
