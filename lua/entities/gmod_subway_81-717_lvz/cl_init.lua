@@ -4042,7 +4042,7 @@ function ENT:Think()
     end
     self.OldBPSNType = self.BPSNType
     if self.BPSNType<5 then
-        self:SetSoundState("bpsn"..self.BPSNType,self:GetPackedBool("BPSN") and 1 or 0,1) --FIXME Ð³ÑÐ¾Ð¼ÐºÐ¾ÑÑÑ Ð¿Ð¾ Ð´ÑÑÐ³Ð¾Ð¼Ñ
+        self:SetSoundState("bpsn"..self.BPSNType,self:GetPackedBool("BPSN") and 1 or 0,1)
     end
 
     local cabspeaker = self:GetPackedBool("AnnCab")
