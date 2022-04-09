@@ -271,14 +271,14 @@ if CLIENT then
             --  self:PrintText(0,1,"<<<      КОНЕЧАЯ      >>>")
             else
                 --self:PrintText(0,1,string.rep("I",Path and 2 or 1))
-                local ezh = Train.SubwayTrain.Name:find("zh")
-                if not ezh and Path then
+                local findE = Train.SubwayTrain.Type=="E"
+                if not findE and Path then
                     self:PrintText(-0.2,1,"I")
                     self:PrintText( 0.2,1,"I")
-                elseif not ezh then
+                elseif not findE then
                     self:PrintText(0,1,"I")
                 end
-                self:PrintText(ezh and 0 or 2,1,string.format("%2d",Train:GetNW2Int("ASNP:RouteNumber",0)))
+                self:PrintText(findE and 0 or 2,1,string.format("%2d",Train:GetNW2Int("ASNP:RouteNumber",0)))
                 if ltbl.Loop and Train:GetNW2Int("ASNP:LastStation",1) == 0 then
                     self:PrintText(6,1,"Кольцевой")
                 else
