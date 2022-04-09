@@ -10,7 +10,8 @@ ENT.SyncTable = {
     "AB1","AB2",
     "RRIEnable","RRIAmplifier",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","EPK","EmergencyBrakeValve","UAVA","UAVAC",
-    "GV"
+    "GV",
+    "R_ASNPOn","R_ASNPDown","R_ASNPUp","R_ASNPPath","R_ASNPMenu","IGLA1","IGLA2",
 }
 ENT.SyncFunctions = {
     ""
