@@ -245,6 +245,12 @@ if CLIENT then
             self:PrintText(0,1,Arrived and "Отпр." or "Приб.")
         end
         if State == 7 then
+            if Train:GetNW2Bool("ASNP:StopMessage",false) then
+                self:PrintText(3,0,"ПЕРЕД ОТПРАВЛЕНИЕМ")                
+                self:PrintText(0,1,"НАЖМИ КНОПКУ   ОБЪЯВИТЬ")
+                return
+            end
+
             local Line = Train:GetNW2Int("ASNP:Line",1)
             local ltbl = stbl[Line]
 
@@ -692,6 +698,7 @@ function TRAIN_SYSTEM:Trigger(name,value)
                 self:Zero()
             end
             self:Play(self.Arrived)
+            self.StopMessage = false
             self.PlayNextArmed = true
         end
     end
@@ -767,6 +774,17 @@ function TRAIN_SYSTEM:Think()
     Train:SetNW2Int("ASNP:FirstStation",self.FirstStation)
     Train:SetNW2Int("ASNP:LastStation",self.LastStation)
     Train:SetNW2Bool("ASNP:Path",self.Path)
+    Train:SetNW2Bool("ASNP:StopMessage",self.StopMessage)
+    
+    if self.State>1 and self.State~=7 then
+        self.StateTime = self.StateTime or CurTime()+10
+        if self.StateTime and CurTime()>self.StateTime then
+            for i=self.State,6 do
+                self:Trigger("R_ASNPMenu",true)
+            end
+            self.StateTime = false
+        end
+    end
 
     Train:SetNW2Bool("ASNP:Station",self.Station)
     Train:SetNW2Bool("ASNP:Arrived",self.Arrived)
