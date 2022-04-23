@@ -1097,7 +1097,9 @@ function ENT:Think()
 
                 if i==1 then
                     local no1 = ntbl.loop and ntbl.loop==0
-                    local endt = (ntbl.loop and snd:GetTime() > ntbl.loop or snd:GetTime()/snd:GetLength() >= 0.8) or no1
+                    --Any use of endt local was commented out to avoid unexpected interruption of the horn sound being played during air pressure reduction
+                    --(seems like it doesn't affect other sounds but still need to be repeatedly tested)
+                    --local endt = (ntbl.loop and snd:GetTime() > ntbl.loop or snd:GetTime()/snd:GetLength() >= 0.8) or no1
                     if stbl.state and stbl.volume < v.volume and not no1 then
                         if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
                             snd:Play()
@@ -1118,7 +1120,7 @@ function ENT:Think()
                         end
                         stbl.time = nil
                     end
-                    if stbl.state and endt then
+                    if stbl.state then --and endt then
                         stbl.state = false
                         if no1 then
                             stbl.time = true
