@@ -124,6 +124,16 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     local dataCache = {{}, {}}
 
     local cacheEnabled = CreateConVar("turbostroi_caching_enabled", "1", FCVAR_ARCHIVE, "Turbostroi file caching")
+    local train_mask = CreateConVar("turbostroi_train_cores", "254", bit.bor(FCVAR_ARCHIVE,FCVAR_NEVER_AS_STRING) , "Train thread affinity mask")
+
+    cvars.AddChangeCallback("turbostroi_train_cores", function(name, old, new)
+        for k, v in pairs(TS_turbostroiTrains) do
+            local affinity = CreateMessage(32)
+            affinity:WriteUInt8(102)
+            affinity:WriteUInt32(tonumber(new) or 254)
+            SendMessage(affinity, v:EntIndex())
+        end
+    end)
 
     local function printTurbostroi(str)
         print("Metrostroi: Turbostroi V3 - " .. str)
@@ -238,6 +248,11 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         local msg = CreateMessage(8 * 1024 * 1024) --- 8 MB
         loadSystems(msg)
         SendMessage(msg, id)
+        
+        local affinity = CreateMessage(32)
+        affinity:WriteUInt8(102)
+        affinity:WriteUInt32(train_mask:GetInt() or 254)
+        SendMessage(affinity, id)
 
         TS_turbostroiTrains[id] = true
         dataCache[id] = {}
@@ -716,6 +731,9 @@ xpcall(function()
                     local val = msg:ReadFloat()
                     GlobalTrain.TrainWires[wire] = val
                 end
+            elseif id == 102 then
+                local mask = msg:ReadUInt32()
+                SetAffinityMask(mask)
             elseif id == 103 then
 
                 local all_system_count = msg:ReadUInt16()
