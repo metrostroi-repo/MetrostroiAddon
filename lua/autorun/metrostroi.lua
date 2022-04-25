@@ -388,7 +388,7 @@ if SERVER then
     end
 
     if Turbostroi
-    then print("Metrostroi: Simulation acceleration ENABLED!")
+    then print("Metrostroi: Simulation acceleration ENABLED!") print("Metrostroi: Turbostroi Version: " .. Either(Turbostroi.Version, Turbostroi.Version, "2.0 or 1.0"))
     else print("Metrostroi: Simulation acceleration DISABLED")
     end
 
