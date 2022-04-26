@@ -64,11 +64,12 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
-            if ent.AR63  then
+            if ent.AR63 then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.OhrSig:TriggerInput("Set",val<4 and 1 or 0)
                 ent.A53:TriggerInput("Set",val<=3 and 1 or 0)
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
+				--ent.A75:TriggerInput("Set",0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_UPO:TriggerInput("Set",val<=2 and 1 or 0)
                 if ent.Plombs.RC1 and val<=2 then
@@ -90,6 +91,16 @@ ENT.Spawner = {
                 ent.L_3:TriggerInput("Set",val==1 and 1 or 0)
                 ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.EPK:TriggerInput("Set",(ent.Plombs.RC1 and val==1) and 1 or 0)
+                timer.Simple(1,function()
+                    if ent:GetNW2Int("Crane") == 1 then--ent.Pneumatic.ValveType == 2 then
+                        ent.DriverValveDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                        ent.Pneumatic:TriggerInput("BrakeSet",(val~=2) and (not first and 7 or 2) or 7)
+                    else
+                        ent.DriverValveBLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                        ent.DriverValveTLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                        ent.Pneumatic:TriggerInput("BrakeSet",(val==4 and first) and 2 or 1)
+                    end
+                end)
                 _LastSpawner=CurTime()
                 ent.CabinDoor = val==4 and first
                 ent.PassengerDoor = val==4
@@ -107,7 +118,10 @@ ENT.Spawner = {
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
+        --ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+        --if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end
         ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
-        if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end
+        ent.Pneumatic.BrakeLinePressure = val == 4 and 5.2 or val == 1 and 2.3 or math.min(ent.Pneumatic.TrainLinePressure+0.25,math.random()*4)
+        ent.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
     end},
 }

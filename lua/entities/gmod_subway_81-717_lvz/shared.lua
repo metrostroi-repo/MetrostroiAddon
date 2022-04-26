@@ -992,7 +992,7 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
-            if ent.AR63  then
+            if ent.AR63 then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.OhrSig:TriggerInput("Set",val<4 and 1 or 0)
                 ent.A53:TriggerInput("Set",val<=3 and 1 or 0)
@@ -1018,6 +1018,16 @@ ENT.Spawner = {
                 ent.L_3:TriggerInput("Set",val==1 and 1 or 0)
                 ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.EPK:TriggerInput("Set",(ent.Plombs.RC1 and val==1) and 1 or 0)
+                timer.Simple(1,function()
+                    if ent:GetNW2Int("Crane") == 1 then--ent.Pneumatic.ValveType == 2 then
+                        ent.DriverValveDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                        ent.Pneumatic:TriggerInput("BrakeSet",(val~=2) and (not first and 7 or 2) or 7)
+                    else
+                        ent.DriverValveBLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                        ent.DriverValveTLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                        ent.Pneumatic:TriggerInput("BrakeSet",(val==4 and first) and 2 or 1)
+                    end
+                end)
                 _LastSpawner=CurTime()
                 ent.CabinDoor = val==4 and first
                 ent.PassengerDoor = val==4

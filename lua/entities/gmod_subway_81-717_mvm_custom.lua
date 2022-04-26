@@ -77,11 +77,12 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
-            if ent.AR63  then
+            if ent.AR63 then
                 local first = i==1 or _LastSpawner~=CurTime()
-                ent.A53:TriggerInput("Set",val<=2 and 1 or 0)
+                ent.A53:TriggerInput("Set",val<=3 and 1 or 0)
                 ent.A49:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
+				ent.A75:TriggerInput("Set",0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_Radio:TriggerInput("Set",val==1 and 1 or 0)
                 ent.BPSNon:TriggerInput("Set",(val==1 and first) and 1 or 0)
@@ -92,7 +93,15 @@ ENT.Spawner = {
                 ent.L_3:TriggerInput("Set",val==1 and 1 or 0)
                 ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
                 ent.EPK:TriggerInput("Set",(ent.Plombs.RC1 and val==1) and 1 or 0)
-                ent.DriverValveDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+				local kran = ent:GetNW2String("Cran")
+                if kran == "2" then--ent.Pneumatic.ValveType == 2 then
+                    ent.DriverValveDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                    ent.Pneumatic:TriggerInput("BrakeSet",(val~=2) and (not first and 6 or 2) or 6)
+                else
+                    ent.DriverValveBLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                    ent.DriverValveTLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                    ent.Pneumatic:TriggerInput("BrakeSet",(val==4 and first) and 2 or 1)
+                end
                 _LastSpawner=CurTime()
                 ent.CabinDoor = val==4 and first
                 ent.PassengerDoor = val==4
@@ -107,6 +116,17 @@ ENT.Spawner = {
                     ent.BV:TriggerInput("Enable",1)
                 end)
             end
+			if val == 4 then
+				ent.Pneumatic.RightDoorState = {1,1,1,1}
+				ent.Pneumatic.LeftDoorState = {1,1,1,1}
+				ent.Pneumatic.DoorRight = true
+				ent.Pneumatic.DoorLeft = true
+			else
+				ent.Pneumatic.RightDoorState = {0,0,0,0}
+				ent.Pneumatic.LeftDoorState = {0,0,0,0}
+				ent.Pneumatic.DoorRight = false
+				ent.Pneumatic.DoorLeft = false
+			end
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
