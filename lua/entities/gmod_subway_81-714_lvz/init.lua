@@ -461,12 +461,12 @@ function ENT:OnButtonPress(button,ply)
         return
     end
     if button == "DVRDisconnect" then
-	if self.DVRDisconnect.Value == 0 then
-	    self.DVRDisconnect:TriggerInput("Set",1)
-	else
-	    self.DVRDisconnect:TriggerInput("Set",0)
+		if self.DVRDisconnect.Value == 0 then
+			self.DVRDisconnect:TriggerInput("Set",1)
+		else
+			self.DVRDisconnect:TriggerInput("Set",0)
+		end
 	end
-    end
     if string.find(button,"PneumaticBrakeSet") then
         self.Pneumatic:TriggerInput("BrakeSet",tonumber(button:sub(-1,-1)))
         return
