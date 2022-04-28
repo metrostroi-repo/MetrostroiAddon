@@ -3477,7 +3477,6 @@ function ENT:Think()
 
     --self:InitializeSounds()
     -- reworked doors animation and sounds
-    local dT = self.DeltaTime
     if not self.DoorStates then self.DoorStates = {} end
     if not self.DoorLoopStates then self.DoorLoopStates = {} end
 	if not self.DSprev then self.DSprev = {{},{},{},{}} end
@@ -3524,10 +3523,8 @@ function ENT:Think()
             end		
         end
     end
-    self:SetSoundState("releasedr",-0.5*(self:GetPackedRatio("RightDoorCloseCylPressure_dPdT",0) + 0.8),1)
-    self:SetSoundState("releasedl",-0.5*(self:GetPackedRatio("LeftDoorCloseCylPressure_dPdT",0) + 0.8),1)
-    self:SetSoundState("releasede",-0.3*(self:GetPackedRatio("_1stRightDoorCloseCylPressure_dPdT",0) + 1.2),1)
 
+    local dT = self.DeltaTime
     local rollingi = math.min(1,self.TunnelCoeff+math.Clamp((self.StreetCoeff-0.82)/0.3,0,1))
     local rollings = math.max(self.TunnelCoeff*0.6,self.StreetCoeff)
     local speed = self:GetPackedRatio("Speed")*100.0

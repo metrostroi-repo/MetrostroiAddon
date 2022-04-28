@@ -82,7 +82,6 @@ ENT.Spawner = {
                 ent.A53:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.A49:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.AR63:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.A75:TriggerInput("Set",0)
                 ent.R_UNch:TriggerInput("Set",val==1 and 1 or 0)
                 ent.R_Radio:TriggerInput("Set",val==1 and 1 or 0)
                 ent.BPSNon:TriggerInput("Set",(val==1 and first) and 1 or 0)
