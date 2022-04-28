@@ -269,6 +269,18 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
 
         local code = getFile("metrostroi/sv_turbostroi_v3.lua") or "-- EMPTY"
 
+        dataCache[id] = {wires = {}, systems = {}}
+
+        for sys_name, sys in pairs(self.Systems) do
+            if sys.DontAccelerateSimulation and sys.OutputsList then
+                dataCache[id].systems[sys_name] = sys
+                dataCache[id][sys_name] = {}
+                for _, var_name in next, sys.OutputsList do
+                    dataCache[id][sys_name][var_name] = 0
+                end
+            end
+        end
+
         Turbostroi.InternalInitializeTrain(id, code)
 
         local failsim = CreateMessage(1024 * 1024) --- 1 MB
@@ -285,7 +297,6 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         SendMessage(affinity, id)
 
         TS_turbostroiTrains[id] = true
-        dataCache[id] = {wires = {}}
     end
 
     function Turbostroi.DeinitializeTrain(self)
@@ -302,32 +313,9 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     local SysTime = SysTime
     local mathRound = math.Round
     local tableHasValue = table.HasValue
+    local type = type
 
     local function turbostroiHandle1(train, msg)
-        -- local changes = msg:ReadUInt16()
-        -- local changes = msg_readu16(msg)
-
-        -- for i = 1, changes do
-        --     local sys_name_len = msg_readu16(msg)
-        --     local sys_name = msg_readdata(msg, sys_name_len)
-
-        --     local sys_changes = msg_readu16(msg)
-        --     for j = 1, sys_changes do
-        --         local var_name_len = msg_readu16(msg)
-        --         local var_name = msg_readdata(msg, var_name_len)
-
-        --         local val = msg_readfloat(msg)
-
-        --         train.Systems[sys_name][var_name] = val
-
-        --         if var_name == "Value" then
-        --             if tableHasValue(train.SyncTable,sys_name) then
-        --                 train:SetPackedBool(sys_name,val > 0)
-        --             end
-        --         end
-        --     end
-        -- end
-        
         msg_readu16(msg)
         while true do
             local sys_len = msg_readu16(msg)
@@ -442,40 +430,31 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         SendMessage(msg_wire, k)
     end
 
+
     local function turbostroiSendSys(train, k, dataCacheTrain)
         local systems_exists = {}
 
         local edited = false
 
-        for sys_name, sys in next, train.Systems do
-            if sys.DontAccelerateSimulation then
-                if not dataCacheTrain[sys_name] then dataCacheTrain[sys_name] = {} end
-                if sys.OutputsList then
-                    for _, var_name in next, sys.OutputsList do
-                        local val = tonumber(sys[var_name] or 0) or 0
-
-                        if dataCacheTrain[sys_name][var_name] ~= val then
-                            if not systems_exists[sys_name] then
-                                systems_exists[sys_name] = true
-                                edited = true
-                                msg_writeu16(msg_sys, 0)
-                                msg_writeu16(msg_sys, #sys_name)
-                                msg_writedata(msg_sys, sys_name)
-                                -- msg_sys:WriteUInt16(0)
-                                -- msg_sys:WriteUInt16(#sys_name)
-                                -- msg_sys:WriteData(sys_name)
-                            end
-
-                            msg_writeu16(msg_sys, #var_name)
-                            msg_writedata(msg_sys, var_name)
-                            msg_writefloat(msg_sys, val)
-                            -- msg_sys:WriteUInt16(#var_name)
-                            -- msg_sys:WriteData(var_name)
-
-                            -- msg_sys:WriteFloat(val)
-
-                            dataCacheTrain[sys_name][var_name] = val
+        for sys_name, sys in next, dataCacheTrain.systems do
+            for _, var_name in next, sys.OutputsList do
+                local val = sys[var_name] or 0
+                if type(val) == "boolean" then val = val and 1 or 0 end
+                if type(val) == "number" then
+                    if dataCacheTrain[sys_name][var_name] ~= val then
+                        if not systems_exists[sys_name] then
+                            systems_exists[sys_name] = true
+                            edited = true
+                            msg_writeu16(msg_sys, 0)
+                            msg_writeu16(msg_sys, #sys_name)
+                            msg_writedata(msg_sys, sys_name)
                         end
+
+                        msg_writeu16(msg_sys, #var_name)
+                        msg_writedata(msg_sys, var_name)
+                        msg_writefloat(msg_sys, val)
+
+                        dataCacheTrain[sys_name][var_name] = val
                     end
                 end
             end
