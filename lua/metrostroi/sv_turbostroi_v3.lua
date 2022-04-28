@@ -450,32 +450,33 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         for sys_name, sys in next, train.Systems do
             if sys.DontAccelerateSimulation then
                 if not dataCacheTrain[sys_name] then dataCacheTrain[sys_name] = {} end
+                if sys.OutputsList then
+                    for _, var_name in next, sys.OutputsList do
+                        local val = sys[var_name]
+                        if type(val) == "boolean" then val = val and 1 or 0 end
 
-                for _, var_name in next, sys.OutputsList do
-                    local val = sys[var_name]
-                    if type(val) == "boolean" then val = val and 1 or 0 end
+                        if dataCacheTrain[sys_name][var_name] ~= val then
+                            if not systems_exists[sys_name] then
+                                systems_exists[sys_name] = true
+                                edited = true
+                                msg_writeu16(msg_sys, 0)
+                                msg_writeu16(msg_sys, #sys_name)
+                                msg_writedata(msg_sys, sys_name)
+                                -- msg_sys:WriteUInt16(0)
+                                -- msg_sys:WriteUInt16(#sys_name)
+                                -- msg_sys:WriteData(sys_name)
+                            end
 
-                    if dataCacheTrain[sys_name][var_name] ~= val then
-                        if not systems_exists[sys_name] then
-                            systems_exists[sys_name] = true
-                            edited = true
-                            msg_writeu16(msg_sys, 0)
-                            msg_writeu16(msg_sys, #sys_name)
-                            msg_writedata(msg_sys, sys_name)
-                            -- msg_sys:WriteUInt16(0)
-                            -- msg_sys:WriteUInt16(#sys_name)
-                            -- msg_sys:WriteData(sys_name)
+                            msg_writeu16(msg_sys, #var_name)
+                            msg_writedata(msg_sys, var_name)
+                            msg_writefloat(msg_sys, val)
+                            -- msg_sys:WriteUInt16(#var_name)
+                            -- msg_sys:WriteData(var_name)
+
+                            -- msg_sys:WriteFloat(val)
+
+                            dataCacheTrain[sys_name][var_name] = val
                         end
-
-                        msg_writeu16(msg_sys, #var_name)
-                        msg_writedata(msg_sys, var_name)
-                        msg_writefloat(msg_sys, val)
-                        -- msg_sys:WriteUInt16(#var_name)
-                        -- msg_sys:WriteData(var_name)
-
-                        -- msg_sys:WriteFloat(val)
-
-                        dataCacheTrain[sys_name][var_name] = val
                     end
                 end
             end
