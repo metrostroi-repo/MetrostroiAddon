@@ -121,6 +121,37 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     local SendMessage = Turbostroi.SendMessage
     local RecvMessage = Turbostroi.RecvMessage
 
+    local localize_msg = Turbostroi.CreateMessage(1)
+    local mt = debug.getmetatable(localize_msg)
+    
+    local msg_readu8  = mt.__index(localize_msg, "ReadUInt8")
+    local msg_readu16 = mt.__index(localize_msg, "ReadUInt16")
+    local msg_readu32 = mt.__index(localize_msg, "ReadUInt32")
+    
+    local msg_readi8  = mt.__index(localize_msg, "ReadInt8")
+    local msg_readi16 = mt.__index(localize_msg, "ReadInt16")
+    local msg_readi32 = mt.__index(localize_msg, "ReadInt32")
+
+    local msg_readfloat = mt.__index(localize_msg, "ReadFloat")
+    local msg_readdata = mt.__index(localize_msg, "ReadData")
+
+    local msg_writeu8  = mt.__index(localize_msg, "WriteUInt8")
+    local msg_writeu16 = mt.__index(localize_msg, "WriteUInt16")
+    local msg_writeu32 = mt.__index(localize_msg, "WriteUInt32")
+    
+    local msg_writei8  = mt.__index(localize_msg, "WriteInt8")
+    local msg_writei16 = mt.__index(localize_msg, "WriteInt16")
+    local msg_writei32 = mt.__index(localize_msg, "WriteInt32")
+    
+    local msg_writefloat = mt.__index(localize_msg, "WriteFloat")
+    local msg_writedata = mt.__index(localize_msg, "WriteData")
+
+    local msg_seek = mt.__index(localize_msg, "Seek")
+    local msg_tell = mt.__index(localize_msg, "Tell")
+
+    localize_msg = nil
+    collectgarbage()
+
     local dataCache = {{}, {}}
 
     local cacheEnabled = CreateConVar("turbostroi_caching_enabled", "1", FCVAR_ARCHIVE, "Turbostroi file caching")
@@ -176,15 +207,14 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         local msg = CreateMessage(512)
 
         local sys_len, name_len = #system, #name
-        msg:WriteUInt8(2)
+        msg_writeu8(msg, 2)
+        msg_writefloat(msg, value)
 
-        msg:WriteFloat(value)
+        msg_writeu16(msg, sys_len)
+        msg_writedata(msg, system)
         
-        msg:WriteUInt16(sys_len)
-        msg:WriteData(system)
-
-        msg:WriteUInt16(name_len)
-        msg:WriteData(name)
+        msg_writeu16(msg, name_len)
+        msg_writedata(msg, name)
 
         SendMessage(msg, train:EntIndex())
     end
@@ -274,23 +304,45 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     local tableHasValue = table.HasValue
 
     local function turbostroiHandle1(train, msg)
-        local changes = msg:ReadUInt16()
+        -- local changes = msg:ReadUInt16()
+        -- local changes = msg_readu16(msg)
 
-        for i = 1, changes do
-            local sys_name_len = msg:ReadUInt16()
-            local sys_name = msg:ReadData(sys_name_len)
+        -- for i = 1, changes do
+        --     local sys_name_len = msg_readu16(msg)
+        --     local sys_name = msg_readdata(msg, sys_name_len)
 
-            local sys_changes = msg:ReadUInt16()
-            for j = 1, sys_changes do
-                local var_name_len = msg:ReadUInt16()
-                local var_name = msg:ReadData(var_name_len)
+        --     local sys_changes = msg_readu16(msg)
+        --     for j = 1, sys_changes do
+        --         local var_name_len = msg_readu16(msg)
+        --         local var_name = msg_readdata(msg, var_name_len)
 
-                local val = msg:ReadFloat()
+        --         local val = msg_readfloat(msg)
 
-                train.Systems[sys_name][var_name] = val
+        --         train.Systems[sys_name][var_name] = val
 
-                if name == "Value" then
-                    if train.SyncTable and tableHasValue(train.SyncTable,sys) then
+        --         if var_name == "Value" then
+        --             if tableHasValue(train.SyncTable,sys_name) then
+        --                 train:SetPackedBool(sys_name,val > 0)
+        --             end
+        --         end
+        --     end
+        -- end
+        
+        msg_readu16(msg)
+        while true do
+            local sys_len = msg_readu16(msg)
+            if sys_len == 0 then break end
+            local sys = msg_readdata(msg, sys_len)
+            while true do
+                local var_len = msg_readu16(msg)
+                if var_len == 0 then break end
+                local var = msg_readdata(msg, var_len)
+                local val = msg_readfloat(msg)
+
+                train.Systems[sys][var] = val
+
+                if var == "Value" then
+                    if tableHasValue(train.SyncTable,sys) then
                         train:SetPackedBool(sys,val > 0)
                     end
                 end
@@ -299,34 +351,34 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     end
 
     local function turbostroiHandle2(train, msg)
-        local val = msg:ReadFloat()
+        local val = msg_readfloat(msg)
 
-        local sys_len = msg:ReadUInt16()
-        local sys = msg:ReadData(sys_len)
+        local sys_len = msg_readu16(msg)
+        local sys = msg_readdata(msg, sys_len)
 
-        local name_len = msg:ReadUInt16()
-        local name = msg:ReadData(name_len)
+        local name_len = msg_readu16(msg)
+        local name = msg_readdata(msg, name_len)
 
         train:TriggerInput(name, val)
     end
 
     local function turbostroiHandle3(train, msg)
-        local range = msg:ReadFloat()
-        local pitch = msg:ReadFloat()
-        local id_len = msg:ReadUInt16()
-        local soundid = msg:ReadData(id_len)
-        local loc_len = msg:ReadUInt16()
-        local location = msg:ReadData(loc_len)
+        local range = msg_readfloat(msg)
+        local pitch = msg_readfloat(msg)
+        local id_len = msg_readu16(msg)
+        local soundid = msg_readdata(msg, id_len)
+        local loc_len = msg_readu16(msg)
+        local location = msg_readdata(msg, loc_len)
         
         train:PlayOnce(soundid,location,range,pitch)
     end
 
     local function turbostroiHandle4(train, msg)
-        local changes = msg:ReadUInt16()
+        local changes = msg_readu16(msg)
 
         for i=1, changes do
-            local wire = msg:ReadInt16()
-            local val = msg:ReadFloat()
+            local wire = msg_readu32(msg)
+            local val = msg_readfloat(msg)
 
             if not train.TrainWireWritersID[wire] then train.TrainWireWritersID[wire] = true end
             train.TrainWireTurbostroi[wire] = val
@@ -338,7 +390,7 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
             local msg = RecvMessage(k)
             if not msg then break end
 
-            local typ = msg:ReadUInt8()
+            local typ = msg_readu8(msg)
 
             if typ == 1 then
                 turbostroiHandle1(train, msg)
@@ -369,16 +421,16 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
 
     local function turbostroiSendWire(train, k, dataCacheTrain)
         local wire_changes_num = 0
-        local wires = dataCacheTrain["wires"]
+        local wires_cache = dataCacheTrain["wires"]
+        local wires = train.TrainWires
 
-        for i in next, train.TrainWires do
-            local wire_val = train.TrainWires[i] or 0
-
-            if wires[i] ~= wire_val then
-                msg_wire:WriteInt16(i)
-                msg_wire:WriteFloat(wire_val)
+        for i in next, wires do
+            local wire_val = wires[i] or 0
+            if wires_cache[i] ~= wire_val then
+                msg_writei32(msg_wire, i)
+                msg_writefloat(msg_wire, wire_val)
                 wire_changes_num = wire_changes_num + 1
-                wires[i] = wire_val
+                wires_cache[i] = wire_val
             end
         end
 
@@ -386,8 +438,7 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
 
         was_sent_wire = true
 
-        msg_wire:Seek(1)
-        msg_wire:WriteUInt16(wire_changes_num)
+        msg_writeu8(msg_wire, 0) -- end
         SendMessage(msg_wire, k)
     end
 
@@ -408,21 +459,28 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
                         if not systems_exists[sys_name] then
                             systems_exists[sys_name] = true
                             edited = true
-                            msg_sys:WriteUInt16(0)
-                            msg_sys:WriteUInt16(#sys_name)
-                            msg_sys:WriteData(sys_name)
+                            msg_writeu16(msg_sys, 0)
+                            msg_writeu16(msg_sys, #sys_name)
+                            msg_writedata(msg_sys, sys_name)
+                            -- msg_sys:WriteUInt16(0)
+                            -- msg_sys:WriteUInt16(#sys_name)
+                            -- msg_sys:WriteData(sys_name)
                         end
 
-                        msg_sys:WriteUInt16(#var_name)
-                        msg_sys:WriteData(var_name)
+                        msg_writeu16(msg_sys, #var_name)
+                        msg_writedata(msg_sys, var_name)
+                        msg_writefloat(msg_sys, val)
+                        -- msg_sys:WriteUInt16(#var_name)
+                        -- msg_sys:WriteData(var_name)
 
-                        msg_sys:WriteFloat(val)
+                        -- msg_sys:WriteFloat(val)
 
                         dataCacheTrain[sys_name][var_name] = val
                     end
                 end
             end
         end
+
 
         if not edited then return end
 
@@ -431,8 +489,10 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         SendMessage(msg_sys, k)
     end
 
+    local UpdateThink = Turbostroi.UpdateThink
+
     local function turbostroiThink()
-        Turbostroi.UpdateThink(SysTime())
+        UpdateThink(SysTime())
 
         for k,v in next, TS_turbostroiTrains do
             local train = Entity(k)
@@ -444,7 +504,6 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
             if was_sent_wire then
                 msg_wire = CreateMessage(4096)
                 msg_wire:WriteUInt8(4)
-                msg_wire:Seek(3)
                 was_sent_wire = false
             end
             
@@ -703,6 +762,43 @@ xpcall(function()
         return n
     end
 
+    
+    local msg_sys, was_sent_sys = nil, true
+
+    
+    local function turbostroiSendSys()
+        local systems_exists = {}
+
+        local edited = false
+        for sys_name,system in pairs(GlobalTrain.Systems) do
+            if system.OutputsList and (not system.DontAccelerateSimulation) then
+                for _,name in pairs(system.OutputsList) do
+                    local value = (system[name] or 0)
+                    
+                    if dataCache[sys_name][name] ~= value then
+                        if not systems_exists[sys_name] then
+                            systems_exists[sys_name] = {}
+                            edited = true
+                            msg_sys:WriteUInt16(0)
+                            msg_sys:WriteUInt16(#sys_name)
+                            msg_sys:WriteData(sys_name)
+                        end
+                        msg_sys:WriteUInt16(#name)
+                        msg_sys:WriteData(name)
+                        msg_sys:WriteFloat(value)
+                        dataCache[sys_name][name] = value
+                    end
+                end
+            end
+        end
+
+        if not edited then return end
+
+        was_sent_sys = true
+
+        SendMessage(msg_sys, k)
+    end
+
     function DataThink()
         while true do
             local msg = RecvMessage()
@@ -736,12 +832,18 @@ xpcall(function()
 
                 GlobalTrain.Systems[sys]:TriggerInput(name,val)
             elseif id == 4 then
-                local num_changes = msg:ReadUInt16()
-                for i = 1, num_changes do
-                    local wire = msg:ReadInt16()
+                while true do
+                    local wire = msg:ReadInt32()
+                    if wire == 0 then break end
                     local val = msg:ReadFloat()
                     GlobalTrain.TrainWires[wire] = val
                 end
+                -- local num_changes = msg:ReadUInt16()
+                -- for i = 1, num_changes do
+                --     local wire = msg:ReadInt32()
+                --     local val = msg:ReadFloat()
+                --     GlobalTrain.TrainWires[wire] = val
+                -- end
             elseif id == 102 then
                 local mask = msg:ReadUInt32()
                 print("[! " .. TRAIN_ID .. "] Affinity Mask: " .. mask)
@@ -797,48 +899,56 @@ xpcall(function()
         end
 
         do --- SYSTEM CHANGE SEND
-            local changes = {}
-            local changes_num = 0
+            
+            if was_sent_sys then
+                msg_sys = CreateMessage(4096*2)
+                msg_sys:WriteUInt8(1)
+                was_sent_sys = false
+            end
 
-            for sys_name,system in pairs(GlobalTrain.Systems) do
-                if system.OutputsList and (not system.DontAccelerateSimulation) then
-                    for _,name in pairs(system.OutputsList) do
-                        local value = (system[name] or 0)
+            turbostroiSendSys()
+            -- local changes = {}
+            -- local changes_num = 0
+
+            -- for sys_name,system in pairs(GlobalTrain.Systems) do
+            --     if system.OutputsList and (not system.DontAccelerateSimulation) then
+            --         for _,name in pairs(system.OutputsList) do
+            --             local value = (system[name] or 0)
                         
-                        if dataCache[sys_name][name] ~= value then
-                            if not changes[sys_name] then changes[sys_name] = {} changes_num = changes_num + 1 end
-                            changes[sys_name][name] = value
-                            dataCache[sys_name][name] = value
-                        end
-                    end
-                end
-            end
+            --             if dataCache[sys_name][name] ~= value then
+            --                 if not changes[sys_name] then changes[sys_name] = {} changes_num = changes_num + 1 end
+            --                 changes[sys_name][name] = value
+            --                 dataCache[sys_name][name] = value
+            --             end
+            --         end
+            --     end
+            -- end
 
-            if tableCount(changes) ~= 0 then
-                local msg = CreateMessage(4096*2)
+            -- if tableCount(changes) ~= 0 then
+            --     local msg = CreateMessage(4096*2)
 
-                msg:WriteUInt8(1)
-                msg:WriteUInt16(changes_num)
-                for sys_name, vars in pairs(changes) do
-                    local sys_name_len = #sys_name
+            --     msg:WriteUInt8(1)
+            --     msg:WriteUInt16(changes_num)
+            --     for sys_name, vars in pairs(changes) do
+            --         local sys_name_len = #sys_name
 
-                    msg:WriteUInt16(sys_name_len)
-                    msg:WriteData(sys_name)
+            --         msg:WriteUInt16(sys_name_len)
+            --         msg:WriteData(sys_name)
 
-                    msg:WriteUInt16(tableCount(vars))
+            --         msg:WriteUInt16(tableCount(vars))
 
-                    for var_name, val in pairs(vars) do
-                        local var_name_len = #var_name
+            --         for var_name, val in pairs(vars) do
+            --             local var_name_len = #var_name
 
-                        msg:WriteUInt16(var_name_len)
-                        msg:WriteData(var_name)
+            --             msg:WriteUInt16(var_name_len)
+            --             msg:WriteData(var_name)
 
-                        msg:WriteFloat(val)
-                    end
-                end
+            --             msg:WriteFloat(val)
+            --         end
+            --     end
 
-                SendMessage(msg)
-            end
+            --     SendMessage(msg)
+            -- end
         end
 
         do --- WIRE CHANGE SEND
@@ -860,7 +970,7 @@ xpcall(function()
                 msg:WriteUInt16(changes_num)
 
                 for wire, val in pairs(changes) do
-                    msg:WriteInt16(wire)
+                    msg:WriteInt32(wire)
                     msg:WriteFloat(val)
                 end
 
