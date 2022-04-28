@@ -1435,25 +1435,25 @@ function ENT:Think()
 
     if not self.DoorStates then self.DoorStates = {} end
     if not self.DoorLoopStates then self.DoorLoopStates = {} end
-    if not self.DSprev then self.DSprev = {{},{},{},{}} end
-    if not self.DoorDelta then self.DoorDelta = {{0.0,0.0},{0.0,0.0},{0.0,0.0},{0.0,0.0}} end
+	if not self.DSprev then self.DSprev = {{},{},{},{}} end
+	if not self.DoorDelta then self.DoorDelta = {{0.0,0.0},{0.0,0.0},{0.0,0.0},{0.0,0.0}} end
     for i=0,3 do
         for k=0,1 do
             local st = k==1 and "DoorL" or "DoorR"
             local id,sid = st..(i+1),"door"..i.."x"..k
             local state = self:GetPackedRatio(id)
-	    local prevstate = self.DSprev[i+1][k+1]
-	    if (prevstate ~= state) then
+			local prevstate = self.DSprev[i+1][k+1]
+			if (prevstate ~= state) then
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) + 2*self.DeltaTime,0,1)
-		self.DoorDelta[i+1][k+1] = 0.0
-	    else
-		if self.DoorDelta[i+1][k+1] < 0.2 then
-		    self.DoorDelta[i+1][k+1] = self.DoorDelta[i+1][k+1] + self.DeltaTime
-		else
-		    self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 1.2*self.DeltaTime,0,1)
-	        end
-	    end
-	    self.DSprev[i+1][k+1] = state
+				self.DoorDelta[i+1][k+1] = 0.0
+			else
+				if self.DoorDelta[i+1][k+1] < 0.2 then
+					self.DoorDelta[i+1][k+1] = self.DoorDelta[i+1][k+1] + self.DeltaTime
+				else                                                                --was 6
+					self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 1.2*self.DeltaTime,0,1)
+				end
+			end
+			self.DSprev[i+1][k+1] = state
             self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.8+self.DoorLoopStates[id]*0.2)
             local n_l = "door"..i.."x"..k--.."a"
             --local n_r = "door"..i.."x"..k.."b"
@@ -1465,11 +1465,11 @@ function ENT:Think()
             end
             local retval = self:Animate(n_l,state,0,0.95, math.max(0.15, dlo*14),false)--0.8 + (-0.2+0.4*math.random()),0)
             if (retval ~= 0.95 and retval ~= 0) ~= self.DoorStates[id] then
-                if retval == 0.95 then
-                    self:PlayOnce(sid.."o","",1,math.Rand(0.8,1.2))
-                elseif retval == 0 then
-                    self:PlayOnce(sid.."c","",1,math.Rand(0.8,1.2))
-                end
+                    if retval == 0.95 then
+                        self:PlayOnce(sid.."o","",1,math.Rand(0.8,1.2))
+                    elseif retval == 0 then
+                        self:PlayOnce(sid.."c","",1,math.Rand(0.8,1.2))
+                    end
                 self.DoorStates[id] = (state ~= 1 and state ~= 0)
             end
         end
