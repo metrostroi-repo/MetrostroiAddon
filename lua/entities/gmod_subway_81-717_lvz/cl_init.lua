@@ -2363,7 +2363,7 @@ ENT.ClientProps["RearBrake"] = {--
 ENT.ClientSounds["RearBrakeLineIsolation"] = {{"RearBrake",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
 ENT.ClientSounds["RearTrainLineIsolation"] = {{"RearTrain",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
 
--- Р”Р’Р 
+-- ДВР
 ENT.ButtonMap["DVR_87"] = {
     pos = Vector(-398,35,-28),
     ang = Angle(0,180,5),
@@ -2443,7 +2443,7 @@ ENT.ButtonMap["AirDistributor"] = {
     }
 }
 
---Р СѓС‡РЅРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ РґРІРµСЂСЊРјРё
+--Выключение дверей
 ENT.ButtonMap["Doors7_8_right"] = {
     pos = Vector(-386,-62,-50),
     ang = Angle(0,0,-90),
@@ -3787,28 +3787,28 @@ function ENT:Think()
     --self:InitializeSounds()
     if not self.DoorStates then self.DoorStates = {} end
     if not self.DoorLoopStates then self.DoorLoopStates = {} end
-    if not self.DSprev then self.DSprev = {{},{},{},{}} end
-    if not self.DoorDelta then self.DoorDelta = {{0,0},{0,0},{0,0},{0,0}} end
-    for i=0,3 do
+	if not self.DSprev then self.DSprev = {{},{},{},{}} end
+	if not self.DoorDelta then self.DoorDelta = {{0,0},{0,0},{0,0},{0,0}} end
+	for i=0,3 do
         for k=0,1 do
             local st = k==1 and "DoorL" or "DoorR"
             local id,sid = st..(i+1),"door"..i.."x"..k
             local state = self:GetPackedRatio(id)
-	    local prevstate = self.DSprev[i+1][k+1]
+			local prevstate = self.DSprev[i+1][k+1]
 						
-	    if (prevstate ~= state) then
+			if (prevstate ~= state) then
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) + 2*self.DeltaTime,0,1)
-		self.DoorDelta[i+1][k+1] = 0.0
-	    else
-		if self.DoorDelta[i+1][k+1] < 0.2 then
-		    self.DoorDelta[i+1][k+1] = self.DoorDelta[i+1][k+1] + self.DeltaTime
-		else
-		    self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 1*self.DeltaTime,0,1)
-		end
-	    end
-	    self.DSprev[i+1][k+1] = state
-	    self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.8+self.DoorLoopStates[id]*0.2)
-	    local n_l = "door"..i.."x"..k--.."a"
+				self.DoorDelta[i+1][k+1] = 0.0
+			else
+				if self.DoorDelta[i+1][k+1] < 0.2 then
+					self.DoorDelta[i+1][k+1] = self.DoorDelta[i+1][k+1] + self.DeltaTime
+				else                                                                --was 6
+					self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 1*self.DeltaTime,0,1)
+				end
+			end
+			self.DSprev[i+1][k+1] = state
+			self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.8+self.DoorLoopStates[id]*0.2)
+			local n_l = "door"..i.."x"..k--.."a"
             --local n_r = "door"..i.."x"..k.."b"
             local dlo = 1
             if self.Anims[n_l] then
@@ -3817,12 +3817,16 @@ function ENT:Think()
             end
 
             local retval = self:Animate(n_l,state,0,0.95,math.max(0.15, dlo*14),false)--0.8 + (-0.2+0.4*math.random()),0)
+            --Заменил в условии "серверное" положение створок на возвращаемое из функции Animate, чтобы хлопок не раздавался раньше фактического смыкания створок
             if (retval ~= 0.95 and retval ~= 0) ~= self.DoorStates[id] then
-                if retval == 0.95 then
-                    self:PlayOnce(sid.."o","",1,math.Rand(0.8,1.2))
-                elseif retval == 0 then
-                    self:PlayOnce(sid.."c","",1,math.Rand(0.8,1.2))
-                end
+                --if doorstate and state < 1 or not doorstate and state > 0 then			Закомментил, чтобы хлопанье раздавалось даже при
+                --else																		открытии-закрытии дверей руками
+                    if retval == 0.95 then	-- was state > 0
+                        self:PlayOnce(sid.."o","",1,math.Rand(0.8,1.2))
+                    elseif retval == 0 then	-- was else
+                        self:PlayOnce(sid.."c","",1,math.Rand(0.8,1.2))
+                    end
+                --end
                 self.DoorStates[id] = (state ~= 1 and state ~= 0)
             end		
         end
@@ -4042,7 +4046,7 @@ function ENT:Think()
     end
     self.OldBPSNType = self.BPSNType
     if self.BPSNType<5 then
-        self:SetSoundState("bpsn"..self.BPSNType,self:GetPackedBool("BPSN") and 1 or 0,1) --FIXME ГђВіГ‘ВЂГђВѕГђВјГђВєГђВѕГ‘ВЃГ‘В‚Г‘ВЊ ГђВїГђВѕ ГђВґГ‘ВЂГ‘ВѓГђВіГђВѕГђВјГ‘Вѓ
+        self:SetSoundState("bpsn"..self.BPSNType,self:GetPackedBool("BPSN") and 1 or 0,1) --FIXME РіСЂРѕРјРєРѕСЃС‚СЊ РїРѕ РґСЂСѓРіРѕРјСѓ
     end
 
     local cabspeaker = self:GetPackedBool("AnnCab")
