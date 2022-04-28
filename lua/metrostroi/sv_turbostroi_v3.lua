@@ -208,7 +208,7 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
 
         local sys_len, name_len = #system, #name
         msg_writeu8(msg, 2)
-        msg_writefloat(msg, value)
+        msg_writefloat(msg, value or 0)
 
         msg_writeu16(msg, sys_len)
         msg_writedata(msg, system)
@@ -452,8 +452,7 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
                 if not dataCacheTrain[sys_name] then dataCacheTrain[sys_name] = {} end
                 if sys.OutputsList then
                     for _, var_name in next, sys.OutputsList do
-                        local val = sys[var_name]
-                        if type(val) == "boolean" then val = val and 1 or 0 end
+                        local val = tonumber(sys[var_name] or 0) or 0
 
                         if dataCacheTrain[sys_name][var_name] ~= val then
                             if not systems_exists[sys_name] then
