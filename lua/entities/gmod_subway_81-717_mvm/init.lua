@@ -563,7 +563,7 @@ function ENT:Think()
                         math.min(1,Panel.Headlights2)*0.40
     --local T = {}
 
-    self:SetPackedBool("ShowDVR",self.A75.Value)
+    self:SetPackedBool("ShowDVR",self.A75.Value)				--Потому что в головных вагонах не смоделили снимаемые сидушки -_-
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
     self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
