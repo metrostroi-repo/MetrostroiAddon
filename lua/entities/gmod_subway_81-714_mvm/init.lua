@@ -9,8 +9,8 @@ ENT.SyncTable = {
     "A22","A30","A1","A2","A3","A4","A5","A6","A72","A38","A20",
     "A25","A37","A55","A45","A66","A51","A65","A28","A70","AV2",
     "AV3","AV4","AV5","A81","AV6","A80","A18",
-    "VB","GV","IDLK1","IDLK2","IDLK3","IDLK4","IDLK5","IDLK6","IDLK7","IDLK8",
-    "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight",
+    "VB","GV",
+    "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake",
     "A84","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP","EmergencyBrakeValve"
 }
 
@@ -475,7 +475,7 @@ function ENT:OnButtonPress(button,ply)
         if self.CouchCap and self.Pneumatic.DriverValvePosition>2 then return end
         self.CouchCap = not self.CouchCap
     end
-    --if not self.CouchCap and (not button:find("VB") and not button:find("GV") and not button:find("Isolation") and not button:find("Parking") and not button:find("Air")) then return true end
+    if not self.CouchCap and (not button:find("VB") and not button:find("GV") and not button:find("Isolation") and not button:find("Parking") and not button:find("Air")) then return true end
 
     if button == "DriverValveDisconnect" then
         if self.DriverValveBLDisconnect.Value == 0 or self.DriverValveTLDisconnect.Value == 0 then
@@ -487,13 +487,6 @@ function ENT:OnButtonPress(button,ply)
         end
         return
     end
-    if button == "DVRDisconnect" then
-		if self.DVRDisconnect.Value == 0 then
-			self.DVRDisconnect:TriggerInput("Set",1)
-		else
-			self.DVRDisconnect:TriggerInput("Set",0)
-		end
-	end
     if string.find(button,"PneumaticBrakeSet") then
         self.Pneumatic:TriggerInput("BrakeSet",tonumber(button:sub(-1,-1)))
         return

@@ -411,32 +411,6 @@ for i,button in pairs(ENT.ButtonMap.AV_T.buttons) do
     button.ID = "1:"..button.ID
 end
 
--- ДВР()
-ENT.ButtonMap["DVR_87"] = {
-    pos = Vector(448,-53,-28),
-    ang = Angle(0,180,-5),
-    width = 1000,
-    height = 300,
-    scale = 0.0625,
-    hide=0.8,
-
-    buttons = {
-        {ID = "DVRDisconnectToggle", x=0, y=0, w=1000, h=300, tooltip="ДВР (разобщ.)", model = {
-            var="DVRDisconnect",sndid="disconnect_valve",--"brake_disconnect",
-            sndvol = 1, snd = function(val) return "disconnect_valve" end,
-            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
-        },   
-    }
-}
-ENT.ClientSounds["DVRDisconnect"] = {{"DVR_disconnect",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
-
-ENT.ClientProps["DVR_disconnect"] = {
-    model = "models/metrostroi_train/81-707/cran1.mdl",
-    pos = Vector(431.15,-43.5,-24.7),
-    ang = Angle(-90,0,-90),
-    hideseat=0.2,
-}
-
 ENT.ButtonMap["DriverValveBLTLDisconnect"] = {
     pos = Vector(-466,44,-18),
     ang = Angle(0,80,90),
@@ -605,339 +579,6 @@ ENT.ClientProps["door2"] = {
     ang = Angle(0,-90,0),
     hide=2,
 }
-
---Выключение дверей ()
-ENT.ButtonMap["Doors1_2_left"] = {
-    pos = Vector(-387,-62,-50),
-    ang = Angle(0,0,-90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod4Set",x=304,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd4Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr1_2_lft"] = {
-    pos = Vector(-317.5,-64.48,-50),
-    ang = Angle(0,90,-90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    --hide = 1
-	hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK4Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 1 лев.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK4",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors3_4_left"] = {
-    pos = Vector(-156.5,-62,-50),
-    ang = Angle(0,0,-90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod3Set",x=300,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd3Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr3_4_lft"] = {
-    pos = Vector(-87.4,-64.48,-50),
-    ang = Angle(0,90,-90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    --hide = 0.8
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK3Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 2 лев.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK3",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors5_6_left"] = {
-    pos = Vector(73,-62,-50),
-    ang = Angle(0,0,-90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod2Set",x=304,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd2Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr5_6_lft"] = {
-    pos = Vector(142.7,-64.48,-50),
-    ang = Angle(0,90,-90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    --hide = 0.8
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK2Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 3 лев.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK2",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors7_8_left"] = {
-    pos = Vector(302,-62,-50),
-    ang = Angle(0,0,-90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod1Set",x=312,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd1Set",x=0,y=0,w= 60,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr7_8_lft"] = {
-    pos = Vector(372.8,-64.48,-50),
-    ang = Angle(0,90,-90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    --hide = 0.8
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK1Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 4 лев.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK1",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors1_2_right"] = {
-    pos = Vector(-389,62,50),
-    ang = Angle(0,0,90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod5Set",x=324,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd5Set",x=0,y=0,w= 100,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr1_2_rgh"] = {
-    pos = Vector(-317.5,64.45,0),
-    ang = Angle(0,-90,90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK5Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 1 пр.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK5",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors3_4_right"] = {
-    pos = Vector(-156.6,62,50),
-    ang = Angle(0,0,90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod6Set",x=298,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd6Set",x=0,y=0,w= 100,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr3_4_rgh"] = {
-    pos = Vector(-87.5,64.45,0),
-    ang = Angle(0,-90,90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK6Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 2 пр.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK6",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors5_6_right"] = {
-    pos = Vector(72,62,50),
-    ang = Angle(0,0,90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod7Set",x=312,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd7Set",x=0,y=0,w= 100,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr5_6_rgh"] = {
-    pos = Vector(142.56,64.5,0),
-    ang = Angle(0,-90,90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK7Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 3 пр.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK7",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["Doors7_8_right"] = {
-    pos = Vector(302,62,50),
-    ang = Angle(0,0,90),
-    width = 520,
-    height = 1000,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "iod8Set",x=314,y=0,w= 100,h = 1000,tooltip="Раздвинуть"},
-        {ID = "icd8Set",x=0,y=0,w= 100,h = 1000,tooltip="Закрыть"},
-    }
-}
-ENT.ButtonMap["bldr7_8_rgh"] = {
-    pos = Vector(372.7,64.5,0),
-    ang = Angle(0,-90,90),
-    width = 20,
-    height = 450,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "IDLK8Toggle", x=0, y=180, w=20, h=100, tooltip="Заблочить 4 пр.", model = {
-            model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="IDLK8",speed=0.5,vmin=1,vmax=0.8,
-            sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
-        }},
-    }
-}
-
-
-ENT.ButtonMap["DoorReleaseRight"] = {
-    pos = Vector(284,-62,15),
-    ang = Angle(0,180,90),
-    width = 100,
-    height = 160,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "DoorReleaseRightToggle",x=0,y=0,w= 100,h = 40,tooltip="выкл. дверей левых",model = {
-            var="DoorReleaseRight",sndid="doorsmanual_r",
-            sndvol = 1,snd = function(val) return "disconnect_valve" end,
-            sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),}},
-    }
-}
-ENT.ClientProps["doorsmanual_r"] = {
-    model = "models/metrostroi_train/81-717/stop_mvm.mdl",
-    pos = Vector(281,-62,12.8),
-    ang = Angle(180,180,0),
-    hideseat=0.2,
-}
-ENT.ClientSounds["DoorReleaseRight"] = {{"doorsmanual_r",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
-
-
-ENT.ButtonMap["DoorReleaseLeft"] = {
-    pos = Vector(274,62,15),
-    ang = Angle(0,0,90),
-    width = 100,
-    height = 160,
-    scale = 0.1,
-    hideseat=0.1,
-    hide=true,
-    screenHide = true,
-
-    buttons = {
-        {ID = "DoorReleaseLeftToggle",x=0,y=0,w= 100,h = 40,tooltip="выкл. дверей правых"},
-    }
-}
-ENT.ClientProps["doorsmanual_l"] = {
-    model = "models/metrostroi_train/81-717/stop_mvm.mdl",
-    pos = Vector(282,62,12.5),
-    ang = Angle(0,0,0),
-    hideseat=0.2,
-}
-ENT.ClientSounds["DoorReleaseLeft"] = {{"doorsmanual_l",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
 
 --------------------------------------------------------------------------------
 ENT.ClientPropsInitialized = false
@@ -1336,13 +977,11 @@ function ENT:Think()
     self:HidePanel("AV_S",not capOpened)
     self:HidePanel("AV_T",not capOpened)
     -- self:HidePanel("Stopkran",not capOpened)
-    self:HidePanel("DVR_87",not capOpened)  --()
     self:ShowHide("otsek_cap_r",not capOpened)
     self:ShowHide("brake334",capOpened and not c013)
     self:ShowHide("brake013",capOpened and c013)
     self:ShowHide("brake_disconnect",capOpened)
     self:ShowHide("train_disconnect",capOpened)
-    self:ShowHide("DVR_disconnect",capOpened)  --()
     self:HidePanel("DriverValveBLTLDisconnect",not capOpened)
     self:HidePanel("Shunt",not capOpened)
     self:HidePanel("VU",not capOpened)
@@ -1351,7 +990,6 @@ function ENT:Think()
     self:Animate("train_disconnect",self:GetPackedBool("DriverValveTLDisconnect") and 1 or 0,0.25,0,  4,false)
     self:Animate("brake334",self:GetPackedRatio("CranePosition")/5,0.35,0.65,256,24)
     self:Animate("brake013",Cpos[self:GetPackedRatio("CranePosition")] or 0, 0.03, 0.458,  256,24)
-    self:Animate("DVR_disconnect",self:GetPackedBool("DVRDisconnect") and 1 or 0,0.25,0,  4,false)  --()
 
     self:Animate("brake_line",      self:GetPackedRatio("BLPressure"),0.14, 0.875,  256,2)--,,0.01)
     self:Animate("train_line",      self:GetPackedRatio("TLPressure"),0.14, 0.875,  256,2)--,,0.01)
@@ -1422,8 +1060,6 @@ function ENT:Think()
     self:Animate("RearBrake",   self:GetNW2Bool("RbI") and 0 or 1,0,1, 3, false)
     self:Animate("RearTrain",   self:GetNW2Bool("RtI") and 1 or 0,0,1, 3, false)
     self:Animate("ParkingBrake",    self:GetPackedBool("ParkingBrake") and 1 or 0,1,0, 3, false)
-    self:Animate("doorsmanual_r",   self:GetNW2Bool("DoorReleaseRight") and 0 or 1,     0.25,0, 128,  3,false)
-    self:Animate("doorsmanual_l",   self:GetNW2Bool("DoorReleaseLeft") and 0 or 1,     0.25,0, 128,  3,false)
 
     -- Main switch
     if self.LastGVValue ~= self:GetPackedBool("GV") then
@@ -1435,25 +1071,29 @@ function ENT:Think()
 
     if not self.DoorStates then self.DoorStates = {} end
     if not self.DoorLoopStates then self.DoorLoopStates = {} end
-	if not self.DSprev then self.DSprev = {{},{},{},{}} end
-	if not self.DoorDelta then self.DoorDelta = {{0.0,0.0},{0.0,0.0},{0.0,0.0},{0.0,0.0}} end
     for i=0,3 do
         for k=0,1 do
             local st = k==1 and "DoorL" or "DoorR"
+            local doorstate = self:GetPackedBool(st)
             local id,sid = st..(i+1),"door"..i.."x"..k
             local state = self:GetPackedRatio(id)
-			local prevstate = self.DSprev[i+1][k+1]
-			if (prevstate ~= state) then
+            --print(state,self.DoorStates[state])
+            if (state ~= 1 and state ~= 0) ~= self.DoorStates[id] then
+                if doorstate and state < 1 or not doorstate and state > 0 then
+                else
+                    if state > 0 then
+                        self:PlayOnce(sid.."o","",1,math.Rand(0.8,1.2))
+                    else
+                        self:PlayOnce(sid.."c","",1,math.Rand(0.8,1.2))
+                    end
+                end
+                self.DoorStates[id] = (state ~= 1 and state ~= 0)
+            end
+            if (state ~= 1 and state ~= 0) then
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) + 2*self.DeltaTime,0,1)
-				self.DoorDelta[i+1][k+1] = 0.0
-			else
-				if self.DoorDelta[i+1][k+1] < 0.2 then
-					self.DoorDelta[i+1][k+1] = self.DoorDelta[i+1][k+1] + self.DeltaTime
-				else                                                                --was 6
-					self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 1.2*self.DeltaTime,0,1)
-				end
-			end
-			self.DSprev[i+1][k+1] = state
+            else
+                self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) - 6*self.DeltaTime,0,1)
+            end
             self:SetSoundState(sid.."r",self.DoorLoopStates[id],0.8+self.DoorLoopStates[id]*0.2)
             local n_l = "door"..i.."x"..k--.."a"
             --local n_r = "door"..i.."x"..k.."b"
@@ -1463,15 +1103,8 @@ function ENT:Think()
                 dlo = math.abs(state-(self.Anims[n_l] and self.Anims[n_l].oldival or 0))
                 if dlo <= 0 and self.Anims[n_l].oldspeed then dlo = self.Anims[n_l].oldspeed/14 end
             end
-            local retval = self:Animate(n_l,state,0,0.95, math.max(0.15, dlo*14),false)--0.8 + (-0.2+0.4*math.random()),0)
-            if (retval ~= 0.95 and retval ~= 0) ~= self.DoorStates[id] then
-                    if retval == 0.95 then
-                        self:PlayOnce(sid.."o","",1,math.Rand(0.8,1.2))
-                    elseif retval == 0 then
-                        self:PlayOnce(sid.."c","",1,math.Rand(0.8,1.2))
-                    end
-                self.DoorStates[id] = (state ~= 1 and state ~= 0)
-            end
+            self:Animate(n_l,state,0,0.95, dlo*14,false)--0.8 + (-0.2+0.4*math.random()),0)
+            --self:Animate(n_r,state,0,1, dlo*14,false)--0.8 + (-0.2+0.4*math.random()),0)
         end
     end
 
