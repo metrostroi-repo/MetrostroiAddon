@@ -425,6 +425,7 @@ Common.ASNP.ASNPMenu        = АСНП: Меню
 Common.ASNP.ASNPUp          = АСНП: Вверх
 Common.ASNP.ASNPDown        = АСНП: Вниз
 Common.ASNP.ASNPOn          = Выключатель АСНП
+Common.ASNP.ASNPPath        = Выбор пути
 
 #PVK
 Common.CabVent.PVK-         = Уменьшение силы обдува вентиляции кабины

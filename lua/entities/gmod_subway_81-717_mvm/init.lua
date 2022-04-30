@@ -200,6 +200,10 @@ function ENT:Initialize()
             ID = "AirDistributorDisconnectToggle",
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
+        {
+            ID = "AutostopValveToggle",
+            Pos = Vector(377, -66, -50), Radius = 20,
+        },
     }
 
     local vX = Angle(0,-90-0.2,56.3):Forward() -- For ARS panel
@@ -557,7 +561,7 @@ function ENT:Think()
     local power = Panel.V1 > -1.5
     local brightness = math.min(1,Panel.Headlights1)*0.60 +
                         math.min(1,Panel.Headlights2)*0.40
-
+    --local T = {}
 
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
@@ -584,7 +588,10 @@ function ENT:Think()
             self:SetPackedBool("lightsActive"..i,false)
         end
     end
-
+	
+    if self:ReadTrainWire(4)*self:ReadTrainWire(5) > 0 then
+        self.A54:TriggerInput("Set",0)
+    end
 
     -- Door button lights
     self:SetPackedBool("DoorsLeftL",Panel.DoorsLeft > 0.5)
@@ -668,8 +675,48 @@ function ENT:Think()
     self:SetPackedRatio("EnginesVoltage", self.Electric.Aux750V/1000.0)
     self:SetPackedRatio("EnginesCurrent2",  0.5 + 0.5*(self.Electric.I13/500.0))
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
-    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)
 
+----------------------------------*****************************--------------------------------
+    --10th wire voltage readout imitation depending on the BPSNs and EKK state, not on the wagon battery switch state
+    -- PC  power converter; CC  control circuits
+    local hvcounter = 0
+    local hvcar = nil
+    local vdrop = 1.125*(#self.WagonList)
+    for k,v in ipairs(self.WagonList) do
+	if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
+            hvcounter = hvcounter + 1
+            hvcar = hvcar or v
+            vdrop = vdrop - 1.125
+        else
+            vdrop = vdrop - ((v.A56.Value == 0 and 0.4 or (v.VB.Value == 0 and 0.4 or 0)) + (v.LK4.Value == 0 and 0.725 or 0))
+        end
+    end
+    local PCV_o = hvcounter > 0 and math.Clamp(76+(hvcar.Electric.Aux750V - 600)*8/375, 76, 84) - vdrop or self.WagonList[1].Battery.Voltage
+    --imitating converter overload protection only when control circuits are energized and at least one PC on the train is off; pretty useless btw (but fun)
+    local pcloadratio = #self.WagonList/(hvcounter > 0 and hvcounter or 0.5)
+    local _A = 25*(6 - 6/(5.01))                                            --assuming one PC on 6 cars can work for 25 secs while the cars' CCs are energized
+    if pcloadratio > 1 and pcloadratio <= #self.WagonList and self.LK4.Value > 0 and self.PowerSupply.X2_2 > 0 and not self.pcrlxtimer then
+        self.pcprotimer = self.pcprotimer or CurTime()
+        --hyperbolic function of PC operating time depending on load coeff
+        if CurTime() - self.pcprotimer > _A/(pcloadratio - 6/5.01) then
+            self.pcrlxtimer = CurTime()
+        end
+    else
+        if self.pcrlxtimer then
+            if CurTime() - self.pcrlxtimer < 30 then 			      --30 seconds relaxation time before PC overload protecion can be reset
+                self.RZP:TriggerInput("Close",1)
+            else
+                self.pcrlxtimer = nil
+            end
+        else
+            self.pcprotimer = nil
+        end
+    end
+    self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0)     --BPSN overheat protection in case of RZP button is being pressed constantly
+----------------------------------*****************************--------------------------------
+
+    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*PCV_o/150.0)
+    
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)
     self:SetPackedBool("Buzzer",Panel.Ring >= 1)
     self:SetPackedBool("BuzzerBZOS",Panel.Ring>0 and Panel.Ring<1)
