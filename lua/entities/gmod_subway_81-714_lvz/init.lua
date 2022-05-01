@@ -28,10 +28,8 @@ function ENT:Initialize()
     --self.InstructorsSeat = self:CreateSeat("instructor",Vector(430,47,-27+2.5),Angle(0,-90,0))
 
     -- Hide seats
-    self.DriverSeat:SetColor(Color(0,0,0,0))
-    self.DriverSeat:SetRenderMode(RENDERMODE_TRANSALPHA)
-    --self.InstructorsSeat:SetColor(Color(0,0,0,0))
-    --self.InstructorsSeat:SetRenderMode(RENDERMODE_TRANSALPHA)
+    self.DriverSeat:SetRenderMode(RENDERMODE_NONE)
+    --self.InstructorsSeat:SetRenderMode(RENDERMODE_NONE)
 
     -- Create bogeys
     if Metrostroi.BogeyOldMap then

@@ -40,15 +40,11 @@ function ENT:Initialize()
     self.ExtraSeat1 = self:CreateSeat("instructor",Vector(443,0,-48+6+2.5),Angle(0,90,0),"models/vehicles/prisoner_pod_inner.mdl")
     self.ExtraSeat2 = self:CreateSeat("instructor",Vector(420,-20,-48+6),Angle(0,90,0),"models/vehicles/prisoner_pod_inner.mdl")
     -- Hide seats
-    self.DriverSeat:SetColor(Color(0,0,0,0))
-    self.DriverSeat:SetRenderMode(RENDERMODE_TRANSALPHA)
-    self.InstructorsSeat:SetColor(Color(0,0,0,0))
-    self.InstructorsSeat:SetRenderMode(RENDERMODE_TRANSALPHA)
+    self.DriverSeat:SetRenderMode(RENDERMODE_NONE)
+    self.InstructorsSeat:SetRenderMode(RENDERMODE_NONE)
 
-    self.ExtraSeat1:SetColor(Color(0,0,0,0))
-    self.ExtraSeat1:SetRenderMode(RENDERMODE_TRANSALPHA)
-    self.ExtraSeat2:SetColor(Color(0,0,0,0))
-    self.ExtraSeat2:SetRenderMode(RENDERMODE_TRANSALPHA)
+    self.ExtraSeat1:SetRenderMode(RENDERMODE_NONE)
+    self.ExtraSeat2:SetRenderMode(RENDERMODE_NONE)
 
     -- Create bogeys
     if Metrostroi.BogeyOldMap then

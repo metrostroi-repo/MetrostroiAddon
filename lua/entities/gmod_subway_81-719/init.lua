@@ -22,8 +22,7 @@ function ENT:Initialize()
     self.DriverSeat = self:CreateSeat("driver",Vector(-415-16,0,-48+2.5+6),Angle(0,-90,0),"models/vehicles/prisoner_pod_inner.mdl")
 
     -- Hide seats
-    self.DriverSeat:SetColor(Color(0,0,0,0))
-    self.DriverSeat:SetRenderMode(RENDERMODE_TRANSALPHA)
+    self.DriverSeat:SetRenderMode(RENDERMODE_NONE)
 
     -- Create bogeys
     if Metrostroi.BogeyOldMap then
