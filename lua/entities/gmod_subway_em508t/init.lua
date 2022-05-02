@@ -15,6 +15,11 @@ ENT.SyncTable = {
     "FrontBrakeLineIsolation","FrontTrainLineIsolation",
     "EmergencyBrakeValve",
     "GV",
+    "Ring",
+    "PR1","PR2","PR5","PR11","PR4","PR9","PR6","PR8","PR12",--9
+    "PRL13","PRL31","PRL17","PRL25","PRL18","PRL24","PRL19","PRL6A","PRL4A","PRL16","PRL28","PRL2A","PRL34",--13+13==26 --PRL2 ?
+    "PRL23","PRL15","PRL22","PRL20","PRL21","PRL32","PRL30","PRL1A","PRL14","PRL26","PRL12","PRL29","PRL33",
+     "FBoxCover"
 }
 
 function ENT:Initialize()
@@ -193,6 +198,9 @@ function ENT:Initialize()
     self.FrontDoor = false
     self.CabinDoor = false
     self.PassengerDoor = false
+    
+    self.FuseboxCover = false
+    
     self:TrainSpawnerUpdate()
 end
 
@@ -209,17 +217,19 @@ function ENT:Think()
 
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
-
-    local lightsActive2 = math.min(1,Panel.MainLights2)
-    local lightsActive1 = math.min(1,Panel.MainLights1)^2
+    self:SetPackedBool("RedLights1",Panel.RedLight1 > 0)
+    self:SetPackedBool("RedLights2",Panel.RedLight2 > 0)
+    local lightsActive2 = math.min(1,self.Panel.MainLights2)^2
+    local lightsActive1 = math.min(1,self.Panel.MainLights1)^2
+    local LightPower = math.min(1,self.Panel.LightPower)^2
     local emerActive1 = Panel.EmergencyLights1
     local emerActive2 = Panel.EmergencyLights2
-    self:SetPackedBool("Lamps_emer1",emerActive1 > 0 and lightsActive1 == 0)
+
     self:SetPackedBool("Lamps_cab",emerActive1 > 0)
     self:SetPackedBool("Lamps_emer2",emerActive2 > 0)
     self:SetPackedBool("Lamps_half1",lightsActive1 > 0)
     self:SetPackedBool("Lamps_half2",lightsActive2 > 0)
-    self:SetPackedRatio("LampsStrength",lightsActive1)
+    self:SetPackedRatio("LampsStrength",LightPower)
 
     -- Switch and button states
     --self:SetPackedBool(0,self:IsWrenchPresent())
@@ -251,7 +261,8 @@ function ENT:Think()
     if self.TrueBrakeAngle > 0.999 and self.ManualBrake > self.TrueBrakeAngle then self.TrueBrakeAngle = self.ManualBrake end
     self.TrueBrakeAngle = self.TrueBrakeAngle + (self.ManualBrake - self.TrueBrakeAngle)*2.0*(self.DeltaTime or 0)
     self:SetPackedRatio("ManualBrake",self.TrueBrakeAngle)
-
+    
+    self:SetPackedBool("RingEnabled",Panel.Ring > 0.5)
     self:SetPackedRatio("LampsCount",math.Clamp(1-self.Electric.Cosume,0.3,1))
     self:SetNW2Int("WrenchMode",self.KVWrenchMode)
     self:SetPackedBool("Compressor",Pneumatic.Compressor == 1.0)
@@ -261,7 +272,6 @@ function ENT:Think()
     self:SetPackedBool("PassengerDoor",self.PassengerDoor)
     self:SetPackedBool("CabinDoor",self.CabinDoor)
     self:SetPackedBool("AnnPlay",Panel.AnnouncerPlaying > 0)
-
 
     self:SetPackedRatio("CranePosition", Pneumatic.DriverValvePosition/7)
     self:SetPackedRatio("ControllerPosition", (self.KV.ControllerPosition+3)/7)
@@ -308,6 +318,56 @@ function ENT:Think()
     end
 
     self:GenerateJerks()
+    
+    --Fuses
+    self:SetPackedBool("PR1FState",self.PR1.Value)
+    self:SetPackedBool("PR2FState",self.PR2.Value)
+    self:SetPackedBool("PR5FState",self.PR5.Value)
+    self:SetPackedBool("PR11FState",self.PR11.Value)
+    self:SetPackedBool("PR4FState",self.PR4.Value)
+    self:SetPackedBool("PR9FState",self.PR9.Value)
+    self:SetPackedBool("PR6FState",self.PR6.Value)
+    self:SetPackedBool("PR8FState",self.PR8.Value)
+    self:SetPackedBool("PR12FState",self.PR12.Value)
+     
+     self:SetPackedBool("PR1Cover", self.PR1Cap.Value)
+    self:SetPackedBool("PR2Cover", self.PR2Cap.Value)
+    self:SetPackedBool("PR5Cover", self.PR5Cap.Value)
+    self:SetPackedBool("PR11Cover", self.PR11Cap.Value)
+    self:SetPackedBool("PR4Cover", self.PR4Cap.Value)
+    self:SetPackedBool("PR9Cover", self.PR9Cap.Value)
+    self:SetPackedBool("PR6Cover", self.PR6Cap.Value)
+    self:SetPackedBool("PR8Cover", self.PR8Cap.Value)
+    self:SetPackedBool("PR12Cover", self.PR12Cap.Value)
+    self:SetPackedBool("FuseboxCover", self.FBoxCover.Value)
+    
+    self:SetPackedBool("PRL13State",self.PRL13.Value)
+    self:SetPackedBool("PRL31State",self.PRL31.Value)
+    self:SetPackedBool("PRL17State",self.PRL17.Value)
+    self:SetPackedBool("PRL25State",self.PRL25.Value)
+    self:SetPackedBool("PRL18State",self.PRL18.Value)
+    self:SetPackedBool("PRL24State",self.PRL24.Value)
+    self:SetPackedBool("PRL19State",self.PRL19.Value)
+    --self:SetPackedBool("PRL6AState",self.PRL6A.Value)
+    self:SetPackedBool("PRL4AState",self.PRL4A.Value)
+    self:SetPackedBool("PRL16State",self.PRL16.Value)
+    self:SetPackedBool("PRL28State",self.PRL28.Value)
+    self:SetPackedBool("PRL2AState",self.PRL2A.Value)
+    self:SetPackedBool("PRL34State",self.PRL34.Value)
+    
+    self:SetPackedBool("PRL23State",self.PRL23.Value)
+    self:SetPackedBool("PRL15State",self.PRL15.Value)
+    self:SetPackedBool("PRL22State",self.PRL22.Value)
+    self:SetPackedBool("PRL20State",self.PRL20.Value)
+    self:SetPackedBool("PRL21State",self.PRL21.Value)
+    --self:SetPackedBool("PRL32State",self.PRL32.Value)
+    --self:SetPackedBool("PRL30State",self.PRL30.Value) 
+    --self:SetPackedBool("PRL1AState",self.PRL1A.Value)
+    self:SetPackedBool("PRL14State",self.PRL14.Value)
+    self:SetPackedBool("PRL26State",self.PRL26.Value)
+    self:SetPackedBool("PRL12State",self.PRL12.Value)
+    self:SetPackedBool("PRL29State",self.PRL29.Value)
+    self:SetPackedBool("PRL33State",self.PRL33.Value)
 
     return RetVal
 end
@@ -317,7 +377,7 @@ function ENT:OnButtonPress(button,ply)
     if string.find(button,"PneumaticBrakeSet") then
         self.Pneumatic:TriggerInput("BrakeSet",tonumber(button:sub(-1,-1)))
         return
-    end
+     end
     -- Parking brake
     if button == "ParkingBrakeLeft" then self.ManualBrake = math.max(0.0,(self.ManualBrake or 0) - 0.05) end
     if button == "ParkingBrakeRight" then self.ManualBrake = math.min(1.0,(self.ManualBrake or 0) + 0.05) end

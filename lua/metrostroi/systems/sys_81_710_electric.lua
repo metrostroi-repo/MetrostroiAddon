@@ -42,7 +42,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local RheostatController = Train.RheostatController
     local P     = Train.PositionSwitch.SelectedPosition
     local RK    = Train.RheostatController.SelectedPosition
-    local B     = (Train.Battery.Voltage > 55) and 1 or 0
+    local B     = Train.PR1.Value*((Train.Battery.Voltage > 55) and 1 or 0)
     local T     = Train.SolverTemporaryVariables
 
     local BO = min(1,B * Train.VB.Value+T[10])--B * Train.VB.Value
@@ -51,27 +51,27 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local Panel = Train.Panel
     local ARS = Train.ALS_ARS
     local RUM = Train.RUM.Value
+    local BC = (Panel.MainLights1+Panel.MainLights2)
 
-
-    Panel.V1 = BO
+    
     Train:WriteTrainWire(10,B*Train.VB.Value)
-
-    S["10AK"] = BO*Train.VU.Value
+    Panel.V1 = BO
+    S["10AK"] = BO*Train.PRL24.Value*Train.VU.Value 
     --10AK->AV --FIXME SAMM
     S["U2"] = S["10AK"]*KV["U2-10AK"]
-    S["F7"] = BO*(KV["F-F7"]+KRU["11/3-FR1"])
-    Train:WriteTrainWire(1,S["10AK"]*KV["10AK-1"]*Train.R1_5.Value+KRU["1/3-ZM31"]*-10) --FIXME KRU
-    Train:WriteTrainWire(2,S["U2"]*KV["U2-2"]+KRU["2/3-ZM31"]*-10+ARS["2"]*RUM) --FIXME ARS SAMM KRU
-    Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+KRU["3/3-ZM31"]*-10) --FIXME SAMM KRU
+    S["F7"] = BO*Train.PRL15.Value*(KV["F-F7"]+KRU["11/3-FR1"])
+    Train:WriteTrainWire(1,S["10AK"]*KV["10AK-1"]*Train.R1_5.Value+(KRU["1/3-ZM31"]*Train.PRL6A.Value)*-10) --FIXME KRU
+    Train:WriteTrainWire(2,S["U2"]*KV["U2-2"]+(KRU["2/3-ZM31"]*Train.PRL6A.Value)*-10+ARS["2"]*RUM) --FIXME ARS SAMM KRU
+    Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+(KRU["3/3-ZM31"]*Train.PRL6A.Value)*-10) --FIXME SAMM KRU
     Train:WriteTrainWire(4,S["10AK"]*KV["U2-4"])
-    Train:WriteTrainWire(5,S["10AK"]*KV["U2-5"]+KRU["5/3-ZM31"]*-10*(1-Train.KRR.Value)+BO*KRU["14/1-B3"]*Train.KRR.Value)
+    Train:WriteTrainWire(5,S["10AK"]*KV["U2-5"]+(KRU["5/3-ZM31"]*Train.PRL6A.Value)*-10*(1-Train.KRR.Value)+BO*(KRU["14/1-B3"]*Train.PRL6A.Value)*Train.KRR.Value)
     Train:WriteTrainWire(6,S["10AK"]*Train.RVT.Value)--FIXME ARS SAMM
-    Train:WriteTrainWire(8,BO*KV["10-8"]+S["F7"]*(1-Train.RPB.Value)*(1-Train.VAH.Value)+ARS["8"]*RUM)--FIXME ARS
+    Train:WriteTrainWire(8,BO*KV["10-8"]+S["F7"]*(1-Train.RPB.Value)*(1-Train.VAH.Value)+(ARS["8"]*Train.PRL33.Value*RUM))--FIXME ARS
     Train:WriteTrainWire(9,ARS["48"]*RUM)
     Train:WriteTrainWire(14,BO*KV["10-14A"]*KV["14A-14B"]*(ARS["33D"]*RUM+(1-RUM)))--FIXME ARS SAMM
     Train:WriteTrainWire(17,S["10AK"]*KV["10AK-17"]*Train.KU9.Value)--FIXME SAMM
     Train:WriteTrainWire(20,S["U2"]*KV["U2-20"]+KRU["20/3-ZM31"]*-10+ARS["20"]*RUM) --FIXME ARS SAMM KRU
-    Train:WriteTrainWire(29,(BO*KRU["14/1-B3"]+T[5]*Train.KRR.Value)*Train.KU10.Value)
+    Train:WriteTrainWire(29,(BO*(KRU["14/1-B3"]*Train.PRL6A.Value)+T[5]*Train.KRR.Value)*Train.KU10.Value)
     Train:WriteTrainWire(24,S["U2"]*Train.KU8.Value)
     Train:WriteTrainWire(25,S["U2"]*KV["U2-6"]*KV["6-25"]*Train.K25.Value) --FIXME ARS SAMM KRU
     Train:WriteTrainWire(30,BO*Train.BSM_RUT.Value) --FIXME ARS SAMM KRU
@@ -82,29 +82,29 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train.R1_5:TriggerInput("Set",S["10AK"]*Train.RV2.Value*Train.UAVAC.Value*(Train.RPB.Value+Train.VAH.Value)*((ARS["33D"]*Train.SOT.Value)*RUM+(1-RUM))) --FIXME SAMM
     if self.RRI> 0 then
         local RRI_VV = Train.RRI_VV
-        RRI_VV.Power = BO*Train.RRIEnable.Value
-        RRI_VV.AmplifierPower = BO*Train.RRIAmplifier.Value
+        RRI_VV.Power = BO*Train.R_Radio.Value*Train.RRIEnable.Value*Train.PRL4A.Value
+        RRI_VV.AmplifierPower = BO*Train.RRIAmplifier.Value*Train.PRL4A.Value
         RRI_VV.CabinSpeakerPower = RRI_VV.Power*Train.RRI.LineOut*Train.R_G.Value
         Train:WriteTrainWire(13,RRI_VV.AmplifierPower*Train.RRI.LineOut)
         --RRI_VV.CabinSpeakerPower = T[13]
     else
         local ASNP_VV = Train.ASNP_VV
-        ASNP_VV.Power = BO*Train.R_ASNPOn.Value
+        ASNP_VV.Power = BO*Train.R_ASNPOn.Value*Train.R_Radio.Value*Train.PRL4A.Value
         ASNP_VV.AmplifierPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_UNch.Value
         ASNP_VV.CabinSpeakerPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_G.Value
         Train:WriteTrainWire(13,ASNP_VV.AmplifierPower)
         --Train:WriteTrainWire(-13,ASNP_VV.AmplifierPower*Train.PowerSupply.X2_2)
         --ASNP_VV.CabinSpeakerPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_G.Value
-        Panel.CBKIPower = T[10]
+        Panel.CBKIPower = T[10]*Train.PRL4A.Value
     end
     Panel.AnnouncerPlaying = T[13]
 
-    ARS.ALS  = S["F7"]*Train.ALS.Value*RUM
-    ARS.GE = S["F7"]*Train.ARS.Value*RUM
+    ARS.ALS  = S["F7"]*Train.ALS.Value*Train.PRL32.Value*RUM
+    ARS.GE = S["F7"]*Train.PRL32.Value*Train.ARS.Value*RUM
     ARS.DAR = S["10AK"]*Train.BUM_RET.Value*RUM
     ARS.DA = S["10AK"]*Train.BUM_RET.Value*RUM
-    Train.BLPM.Power = ARS.ALS
-    Train.BIS200.Power = ARS.ALS
+    Train.BLPM.Power = ARS.ALS*Train.PRL30.Value
+    Train.BIS200.Power = ARS.ALS*Train.PRL30.Value
     Train:WriteTrainWire(-34,S["10AK"]*(1-Train.BSM_GE.Value))
     Train:WriteTrainWire(34,Train.RKTT.Value+Train.DKPT.Value)
     ARS.KT = T[34]*T[-34]*Train.BSM_GE.Value
@@ -135,15 +135,14 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Reverser:TriggerInput("VP",S["5A"]*Reverser.NZ)
     Train.LK4:TriggerInput("Set",(S["4A"]*Reverser.NZ+S["5A"]*Reverser.VP)*(1-Train.RPvozvrat.Value)*Train.LK3.Value*S["ZR"])
 
-    Train.PneumaticNo1:TriggerInput("Set",T[8]*C(17 <= RK and RK <= 18)+T[9])
-    --Train.PneumaticNo2:TriggerInput("Set",T[8]*(1-Train.RV3.Value)*(1-Train.RT2.Value)*((1-Train.LK4.Value)+C(RK==1)))
-    Train.PneumaticNo2:TriggerInput("Set",T[8]*(1-Train.RT2.Value)*((1-Train.LK4.Value)+C(RK==1)))
+    Train.PneumaticNo1:TriggerInput("Set",T[8]*Train.PRL23.Value*C(17 <= RK and RK <= 18)+T[9])
+    Train.PneumaticNo2:TriggerInput("Set",T[8]*Train.PRL23.Value*(1-Train.RT2.Value)*((1-Train.LK4.Value)+C(RK==1)))
     Train.RV3:TriggerInput("Set",T[14])
 
     S["10A"] = BO*RCU
     self.ThyristorControllerPower = S["10A"]
 
-    S["10B"] = S["10A"]*(Train.RV1.Value+Train.TR1.Value)
+    S["10B"] = Train.PRL16.Value*S["10A"]*(Train.RV1.Value+Train.TR1.Value)
 
     --Train["RUTreg"] = T[9]
     S["10I"] = S["10A"]*RheostatController.RKM2
@@ -163,14 +162,14 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     --СДПП
     S["10AV"] = S["10A"]*(1-Train.LK3.Value)*C(2<=RK and RK<=18)*(1-Train.LK4.Value)
-    S["10E"] = S["10A"]*((1-Train.LK3.Value)+Train.Rper.Value+Train.PositionSwitch.PMPos)
+    S["10E"] = S["10A"]*Train.PRL28.Value*((1-Train.LK3.Value)+Train.Rper.Value+Train.PositionSwitch.PMPos)
     Train.SR2:TriggerInput("Set",S["10E"]*((C(P==3 or P==4)+Train.LK2.Value))*(1-Train.LK4.Value))
 
     S["10AD"] = (1-Train.LK1.Value)*Train.SR2.Value
     S["10AYu"] = S["10AD"]*(1-Train.RPP.Value)
     S["10AZh"] = S["10AD"]* Train.TR1.Value*C(P==1 or P==2 or P==4)
     S["10AR"] = S["10AYu"]*(1-Train.TR1.Value)*C(2<=P and P<=4)
-    S["10Ya"] = Train.LK3.Value*C(RK==18 and (P==1))
+    S["10Ya"] = Train.PRL28.Value*Train.LK3.Value*C(RK==18 and (P==1))
     S["10AG"] = S["10E"]*(S["10AR"]+S["10AZh"]+S["10Ya"])
     Train.PositionSwitch:TriggerInput("MotorState",-1.0 + 2.0*math.max(0,S["10AG"]))
 
@@ -205,7 +204,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train.KSH2:TriggerInput("Set",S["1R"]*S["ZR"]) --Идет обратная цепь от ЛК к 1 проводу, но мне лень
     Train.KSH1:TriggerInput("Set",S["1R"]*S["ZR"]) --Идет обратная цепь от ЛК к 1 проводу, но мне лень
 
-    S["1P"] = S["1A"]*C(P == 1 or P == 2)*Train.NR.Value+S["6A"]*C(P==3 or P==4)
+    S["1P"] = S["1A"]*C(P == 1 or P == 2)*(Train.NR.Value+Train.RPU.Value)+S["6A"]*C(P==3 or P==4)
     Train["RUTavt"] = S["1P"]*(Train.KSB1.Value+Train.KSH2.Value)*S["ZR"] --Идет обратная цепь от ЛК к 1 проводу, но мне лень
     S["1G"] = S["1P"]*Train.AVT.Value*(1-Train.RPvozvrat.Value)
     S["1Zh"] = S["1G"]*(Train.LK3.Value+C(RK==1)*(Train.KSH2.Value+Train.KSB1.Value*Train.KSB2.Value)*C(P==1 or P==3)*Train.LK5.Value)
@@ -221,51 +220,47 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     --Вспом цепи низкого напряжения
     Train:WriteTrainWire(7,BO*Train.Ring.Value)
-    Train:WriteTrainWire(11,BO*Train.VU2.Value)
-    Train:WriteTrainWire(22,BO*Train.V1.Value*Train.AK.Value)
+    Train:WriteTrainWire(11,BO*Train.VU2.Value*Train.PRL25.Value)
+    Train:WriteTrainWire(22,BO*Train.PRL20.Value*Train.V1.Value*Train.AK.Value)
     Train:WriteTrainWire(23,BO*Train.KU15.Value)
-    Train:WriteTrainWire(27,BO*Train.V4.Value)
-    Train:WriteTrainWire(28,BO*Train.V5.Value)
-    Panel.GRP = BO*Train.RPvozvrat.Value
+    Train:WriteTrainWire(27,BO*Train.PRL21.Value*Train.V4.Value)
+    Train:WriteTrainWire(28,BO*Train.PRL21.Value*Train.V5.Value)
+    Panel.GRP = BO*Train.PRL21.Value*Train.RPvozvrat.Value
     Panel.Headlights1 = S["F7"]
     Panel.Headlights2 = S["F7"]*Train.VU14.Value
-    Panel.RedLights = BO*KV["B2-F1"]
-    S["D1"] = BO*(KV["D-D1"]+KRU["11/3-D1/1"])
-    Train:WriteTrainWire(31,S["D1"]*(Train.V6.Value+Train.KU12.Value)+T[12])
-    Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value+T[12])
+    Panel.RedLight1 = BO*Train.PRL26.Value*KV["B2-F1"]
+    Panel.RedLight2 = BO*Train.PRL12.Value*KV["B2-F1"]
+    S["D1"] = BO*Train.PRL22.Value*(KV["D-D1"]+KRU["11/3-D1/1"])
+    Train:WriteTrainWire(31,S["D1"]*(Train.V6.Value+Train.KU12.Value))
+    Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value)
     Train:WriteTrainWire(12,S["D1"]*Train.V10.Value)
     Train:WriteTrainWire(16,S["D1"]*Train.V2.Value*Train.V3.Value)
+    Train.RPU:TriggerInput("Set",T[27])
 
     Panel.PanelLights = BO*Train.PLights.Value
     Panel.GaugeLights = BO*Train.GLights.Value
     S["11A"] = T[11]*(1-Train.NR.Value)
-    Panel.Ring = ARS.Ring+S["11A"]+T[7]
-    Panel.EmergencyLights1 = BO*Train.VU3.Value+S["11A"]*(1-Train.VU3.Value)
-    Panel.EmergencyLights2 = S["11A"]
-    Panel.MainLights1 = math.max(0,math.min(1,
-        (
-            self.Aux750V-100
-            -self.Itotal*0.25*C(Train.PositionSwitch.SelectedPosition >= 3)
-            -25*Train.KK.Value
-        )/750*(0.5+0.5*B*Train.VB.Value*Train.KZ1.Value)
-    ))
-    Panel.MainLights2 = Panel.MainLights1*Train.KO.Value
-    Train.Battery:TriggerInput("Charge", Train.VB.Value*Panel.MainLights1)
+    Panel.Ring = (ARS.Ring+S["11A"]+T[7])*Train.PRL34.Value
+    Panel.EmergencyLights1 = (BO*Train.PRL21.Value*Train.VU3.Value)+(S["11A"]*(1-Train.VU3.Value))
+    Panel.EmergencyLights2 = Train.PRL13.Value*S["11A"]
+    Panel.MainLights1 = math.max(0,math.min(1,(self.Aux750V*Train.PR4.Value*Train.PR9.Value-100-self.Itotal*0.25*C(Train.PositionSwitch.SelectedPosition >= 3)-25*Train.KK.Value)/750*(0.5+0.5*B*Train.VB.Value*Train.PR6.Value)))
+    Panel.MainLights2 = math.max(0,math.min(1,(self.Aux750V*Train.PR4.Value*Train.KO.Value*Train.PR8.Value-100-self.Itotal*0.25*C(Train.PositionSwitch.SelectedPosition >= 3)-25*Train.KK.Value)/750*(0.5+0.5*B*Train.VB.Value*Train.PR6.Value)))
+    Panel.LightPower = math.max(0,math.min(1,(self.Aux750V-100-self.Itotal*0.25*C(Train.PositionSwitch.SelectedPosition >= 3)-25*Train.KK.Value)/750*(0.5+0.5*B*Train.VB.Value*Train.PR6.Value)))
+    Train.Battery:TriggerInput("Charge", Train.PR1.Value*BC*Train.PR6.Value)
+    Panel.VPR = BO*Train.RST.Value*Train.PRL4A.Value
 
-    Panel.VPR = BO*Train.RST.Value
-
-    Train.KK:TriggerInput("Set",T[22]+T[23])
+    Train.KK:TriggerInput("Set",(T[22]*Train.PRL14.Value)+(T[23]*Train.PRL31.Value))
     Train.KO:TriggerInput("Close",T[27])
     Train.KO:TriggerInput("Open",T[28])
 
     local BD = 1-Train.BD.Value
     Train:WriteTrainWire(15,BD*(1-Train.KU11.Value))--Заземление 15 провода
-    Train.Panel.SD = (S["D1"]+BO*Train.KU11.Value)*(T[15]*(1-Train.KU11.Value)+BD)
+    Train.Panel.SD = (S["D1"]+BO*Train.PRL22.Value*Train.KU11.Value)*(T[15]*(1-Train.KU11.Value)+BD)
 
-    Train.VDZ:TriggerInput("Set",T[16]*BD)
-    Train.VDOL:TriggerInput("Set",T[31]+T[12])
-    Train.VDOP:TriggerInput("Set",T[32]+T[12])
-    Panel.PCBKPower = T[10]
+    Train.VDZ:TriggerInput("Set",T[16]*Train.PRL17.Value*BD)
+    Train.VDOL:TriggerInput("Set",(T[31]*Train.PRL18.Value)+(T[12]*Train.PRL2A.Value))
+    Train.VDOP:TriggerInput("Set",(T[32]*Train.PRL19.Value)+(T[12]*Train.PRL2A.Value))
+    Panel.PCBKPower = T[10]*Train.PRL4A.Value
 end
 function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     local RheostatController = Train.RheostatController
@@ -281,7 +276,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     local RCU = Train.KV.RCU
     S["ZR"] = (1-Train.RRU.Value)+(B*Train.RRU.Value)*-1
 
-    S["10A"] = BO*RCU
+    S["10A"] = BO*RCU 
     S["10I"] = S["10A"]*RheostatController.RKM2
     Train["RUTpod"] = S["10I"]*Train.LK4.Value
     Train["RRTpod"] = S["10I"]*(1-Train.LK1.Value)
@@ -294,7 +289,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
 
     S["10N"] = S["10A"]*(RheostatController.RKM1+Train.SR1.Value*(1-Train.RUT.Value))
     S["10T"] = ((1-Train.SR1.Value)+Train.RUT.Value)*(RheostatController.RKP)
-    RheostatController:TriggerInput("MotorState",(S["10N"]+S["10T"]*(-10)))
+    RheostatController:TriggerInput("MotorState",S["10N"]+S["10T"]*(-10))
 
     S["2A"] = T[2]*RCU
     S["2G"] = S["2A"]*((1-Train.TR1.Value)+(1-Train.KSB1.Value)+Train.ThyristorBU5_6.Value)*(
@@ -324,7 +319,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     return S
 end
 
-local wires = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,22,23,24,25,27,28,29,30,31,32,34,-34}
+local wires = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25,27,28,29,30,31,32,34,-34}
 
 function TRAIN_SYSTEM:SolveInternalCircuits(Train,dT,firstIter)
     local T     = Train.SolverTemporaryVariables
@@ -573,6 +568,7 @@ function TRAIN_SYSTEM:Think(dT,iter)
     self.Main750V = Train.TR.Main750V
     self.Aux750V  = Train.TR.Main750V*Train.AV.Value
     self.Power750V = self.Main750V * Train.GV.Value
+    self.NR750V    = self.Aux750V*Train.PR5.Value
 
 
     ----------------------------------------------------------------------------
