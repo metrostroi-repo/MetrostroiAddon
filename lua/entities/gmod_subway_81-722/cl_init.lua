@@ -1162,7 +1162,7 @@ ENT.ButtonMap["Sarmat"] = {
     height = 640,
     scale = 0.02*0.567,
     sensor = true,
-    system = "SarmatUPO",
+    system = "BMCIK",
     hideseat=0.2,
     hide=true,
 }

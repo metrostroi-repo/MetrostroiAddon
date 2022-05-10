@@ -281,10 +281,10 @@ function ENT:InitializeSystems()
     self:LoadSystem("Panel","81_722_Panel")
 
     self:LoadSystem("Announcer","81_71_Announcer", "AnnouncementsSarmatUPO")
-    self:LoadSystem("SarmatUPO","81_722_sarmat")
+    self:LoadSystem("BMCIK","81_722_BMCIK")
     self:LoadSystem("UPO","81_71_UPO")
-    self:LoadSystem("Tickers","81_722_Tickers")
-    self:LoadSystem("PassSchemes","81_722_PassScheme")
+    self:LoadSystem("BIT","81_722_BIT")
+    self:LoadSystem("BNT","81_722_BNT")
 
 end
 
