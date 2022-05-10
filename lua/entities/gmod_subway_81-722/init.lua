@@ -4,7 +4,7 @@ include("shared.lua")
 
 ENT.BogeyDistance = 650 -- Needed for gm trainspawner
 ENT.SyncTable = {
-    "SF1","SF2","SF3","SF4","SF5","SF6","SF7","SF8","SF9","R_UPO","SF01","SF10","SF11","SF12","SF13","SF02",
+    "SF1","SF2","SF3","SF4","SF5","SF6","SF7","SF8","SF9","SF00","SF01","SF10","SF11","SF12","SF13","SF02",
     "SF14","SF15","SF16","SF17","SF18","SF19","SF20","SF21","SF22","SF23","SF24","SF25","SF26","SF27","SF03","SF04",
 
     "SF31","SF32","SF33","SF34","SF35","SF36","SF37","SF38","SF41","SF42","SF43","SF44","SF45","SF46","SF47","SF48","SF49","SF51","SF52","SF53","SF54","SF55","SF56","SF57","SF58","SF59",

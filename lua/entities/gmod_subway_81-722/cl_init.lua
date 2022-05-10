@@ -273,7 +273,7 @@ ENT.ButtonMap["PPZ"] = {
         {ID = "SF7Toggle", x=0+15.15*6,  y=40+167*0, w=15,h=45, tooltip="SF7:Двери(управление)"},
         {ID = "SF8Toggle", x=0+15.15*7,  y=40+167*0, w=15,h=45, tooltip="SF8:БАРС 1"},
         {ID = "SF9Toggle", x=0+15.15*8,  y=40+167*0, w=15,h=45, tooltip="SF9:БАРС 2"},
-        {ID = "R_UPOToggle", x=0+15.15*9,  y=40+167*0, w=15,h=45, tooltip="SF: УПО1"},
+        {ID = "SF00Toggle", x=0+15.15*9,  y=40+167*0, w=15,h=45, tooltip="SF00:"},
         {ID = "SF01Toggle", x=0+15.15*10,  y=40+167*0, w=15,h=45, tooltip="SF01:"},
         {ID = "SF10Toggle", x=0+15.15*11,  y=40+167*0, w=15,h=45, tooltip="SF10:БРПИ-М1"},
         {ID = "SF11Toggle", x=0+15.15*12,  y=40+167*0, w=15,h=45, tooltip="SF11:БРПИ-М2"},
