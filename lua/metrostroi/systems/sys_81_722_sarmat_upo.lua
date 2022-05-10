@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
--- 81-722 "Sarmat-UPO" announcer system
+-- 81-722 BMCIK-01 system
 --------------------------------------------------------------------------------
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_722_sarmat")
+Metrostroi.DefineSystem("81_722_BMCIK")
 TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize()
@@ -325,23 +325,23 @@ if SERVER then
         if not self.Active then return end
         local tbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)][self.Line]
         if not tbl then
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Current",0)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Arrival",32)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Path",self.Path)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BNT",nil,"Current",0)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BNT",nil,"Arrival",32)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BNT",nil,"Path",self.Path)
 
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Prev",self.Specials[self.Line])
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"PrevEn",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Next",self.Specials[self.Line])
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextEn",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextRight",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Curr",self.Specials[self.Line])
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrEn",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrRight",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Arrived",true)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Last",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Closing",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Prev",self.Specials[self.Line])
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"PrevEn",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Next",self.Specials[self.Line])
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"NextEn",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"NextRight",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Curr",self.Specials[self.Line])
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"CurrEn",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"CurrRight",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Arrived",true)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Last",false)
+            self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Closing",false)
             if self.Specials[self.Line] then
-                self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Special","%g"..self.Specials[self.Line].."\n%r"..self.Specials[self.Line])
+                self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"Tickers",nil,"Special","%g"..self.Specials[self.Line].."\n%r"..self.Specials[self.Line])
             end
             return
         end
@@ -360,24 +360,24 @@ if SERVER then
         else
             nxt = stbl[self.Station]
         end
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Current",curr)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Arrival",nxt)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Path",self.Path)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BNT",nil,"Current",curr)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BNT",nil,"Arrival",nxt)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BNT",nil,"Path",self.Path)
 
         local curr,prev,nxt = tbl[self.Station],tbl[self.Station-(self.Path and -1 or 1)],tbl[self.Station-(self.Path and 1 or -1)]
         if not self.Arrived then prev = curr nxt = curr end
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Prev",prev and prev[2])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"PrevEn",prev and prev[3])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Next",nxt and nxt[2])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextEn",nxt and nxt[3])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextRight",nxt and nxt.right_doors)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Curr",curr and curr[2])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrEn",curr and curr[3])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrRight",curr and curr.right_doors)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Arrived",self.Arrived and not self.Depeating)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Last",self.Last)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Closing",self.Depeating)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Special",not self.Last and (self.Arrived and (self.Depeating and curr.messagedep or not self.Depeating and curr.messagearr) or not self.Arrived and prev.messagedep))
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Prev",prev and prev[2])
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"PrevEn",prev and prev[3])
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Next",nxt and nxt[2])
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"NextEn",nxt and nxt[3])
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"NextRight",nxt and nxt.right_doors)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Curr",curr and curr[2])
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"CurrEn",curr and curr[3])
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"CurrRight",curr and curr.right_doors)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Arrived",self.Arrived and not self.Depeating)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Last",self.Last)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Closing",self.Depeating)
+        self.Train:CANWrite("BMCIK",self.Train:GetWagonNumber(),"BIT",nil,"Special",not self.Last and (self.Arrived and (self.Depeating and curr.messagedep or not self.Depeating and curr.messagearr) or not self.Arrived and prev.messagedep))
     end
 
     function TRAIN_SYSTEM:Trigger(name,value)

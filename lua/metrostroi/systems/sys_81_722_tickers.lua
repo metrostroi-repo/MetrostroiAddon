@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
--- 81-722 tickers
+-- 81-722 BIT-20 system
 --------------------------------------------------------------------------------
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_722_Tickers")
+Metrostroi.DefineSystem("81_722_BIT")
 TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize()

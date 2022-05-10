@@ -340,9 +340,9 @@ function ENT:Think()
     self:SetPackedBool("DoorAlarmL",self.BUKV.CloseRing)
     self:SetPackedBool("DoorAlarmR",self.BUKV.CloseRing)
 
-    self:SetNW2Int("PassSchemesLED",self.PassSchemes.PassSchemeCurr)
-    self:SetNW2Int("PassSchemesLEDN",self.PassSchemes.PassSchemeNext)
-    self:SetPackedBool("PassSchemesLEDO",self.PassSchemes.PassSchemePath)
+    self:SetNW2Int("PassSchemesLED",self.BNT.PassSchemeCurr)
+    self:SetNW2Int("PassSchemesLEDN",self.BNT.PassSchemeNext)
+    self:SetPackedBool("PassSchemesLEDO",self.BNT.PassSchemePath)
     self:SetPackedBool("SarmatLeft",self.Panel.PassSchemePowerL)
     self:SetPackedBool("SarmatRight",self.Panel.PassSchemePowerR)
 
