@@ -267,7 +267,7 @@ function ENT:InitializeSystems()
     self:LoadSystem("BUKP","81_722_BUKP")
     self:LoadSystem("MFDU","81_722_MFDU")
     self:LoadSystem("BUKV","81_722_BUKV")
-    self:LoadSystem("RouteNumberSys","81_722_RouteNumber")
+    self:LoadSystem("TNM","81_722_TNM")
 
     self:LoadSystem("BARS","81_722_BARS")
     self:LoadSystem("ALSCoil")
