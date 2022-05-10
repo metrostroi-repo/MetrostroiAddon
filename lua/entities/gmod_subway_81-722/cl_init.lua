@@ -1180,20 +1180,21 @@ ENT.ButtonMap["RouteNumberSet"] = {
     pos = Vector(477,42.6,-2.75),
     ang = Angle(0,-90,0),
     width = 30,
-    height = 10,
+    height = 20,
     scale = 0.085,
     buttons = {
         {ID = "RouteNumber1Set",x=0,y=0,w=10,h=10, tooltip="Первая цифра"},
         {ID = "RouteNumber2Set",x=10,y=0,w=10,h=10, tooltip="Вторая цифра"},
         {ID = "RouteNumber3Set",x=20,y=0,w=10,h=10, tooltip="Третья цифра"},
+        {ID = "RouteNumber13",x=5,y=10,w=20,h=10, tooltip="Правая и левая кнопки\n(удерживать для настройки яркости)"},
     }
 }
-ENT.ButtonMap["RouteNumber"] = {
-    pos = Vector(485.4,32.6,-4.55),
-    ang = Angle(0,90+5,88),
-    width = (7*8)*3+1*8*2,
-    height = 14*8,
-    scale = 0.23/4/(14/16),
+ENT.ButtonMap["TNM"] = {
+    pos = Vector(485.4,32.62,-4.9),
+    ang = Angle(0,95,88),
+    width = 203,
+    height = 115,
+    scale = 0.06,
 
     hide=2,
 }
@@ -1284,7 +1285,7 @@ function ENT:Initialize()
     self.PAM = self:CreateRT("717PAM",1024,512)
     self.Tickers = self:CreateRT("721Tickers",1024,128)
     self.Sarmat = self:CreateRT("721Sarmat",1024,1024)
-    self.RouteNumber = self:CreateRT("721RouteNumber",256,128)
+    self.TNMScr = self:CreateRT("722TNM",256,128)
     self.LastStation = self:CreateRT("721LastStation",512,64)
     self.ReleasedPdT = 0
     self.CraneRamp = 0
@@ -1469,16 +1470,20 @@ function ENT:Think()
         end
     end
 
-    local rnwork = self:GetNW2Bool("RouteNumberWork")
-    local rn =  self:GetNW2Int("RouteNumberSet")
-    for i=1,3 do
-        self:ShowHide("route_number"..i,rnwork)
-        if rnwork and IsValid(self.ClientEnts["route_number"..i]) then
-            local number = math.floor(rn/10^(3-i)) % 10
-            --local d1 = math.floor(num) % 10
-            --local d2 = math.floor(num / 10) % 10
-            --local d3 = math.floor(num / 100) % 10
-            self.ClientEnts["route_number"..i]:SetSkin(number)
+    local tnmState = self:GetNW2Int("TNM:State",0)
+    if tnmState > 0 then
+        local rn = self:GetNW2Int("TNM:Number",0)
+        local hide = tnmState==2 and CurTime()%1.2>0.3 or tnmState==1
+        for i=1,3 do
+            self:ShowHide("route_number"..i,hide)
+            if IsValid(self.ClientEnts["route_number"..i]) then
+                local number = math.floor(rn/10^(3-i)) % 10
+                self.ClientEnts["route_number"..i]:SetSkin(number)
+            end
+        end
+    else
+        for i=1,3 do
+            self:ShowHide("route_number"..i,false)
         end
     end
     --self:Animate("brake_cylinder", 0/6, 0.016, 0.78,  2,false)
@@ -1738,8 +1743,8 @@ function ENT:DrawPost()
         surface.SetDrawColor(255,255,255)
         surface.DrawTexturedRectRotated(256,32,512,64,0)
     end)
-    self.RTMaterial:SetTexture("$basetexture", self.RouteNumber)
-    self:DrawOnPanel("RouteNumber",function(...)
+    self.RTMaterial:SetTexture("$basetexture", self.TNMScr)
+    self:DrawOnPanel("TNM",function(...)
         surface.SetMaterial(self.RTMaterial)
         surface.SetDrawColor(255,255,255)
         surface.DrawTexturedRectRotated(128,64,256,128,0)

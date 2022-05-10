@@ -436,6 +436,10 @@ function ENT:OnButtonPress(button,ply)
             self.DoorClose:TriggerInput("Set",1)
         end
     end
+    if button == "RouteNumber13" then
+        self.RouteNumber1:TriggerInput("Set",1)
+        self.RouteNumber3:TriggerInput("Set",1)
+    end
 end
 function ENT:OnButtonRelease(button,ply)
     if string.find(button,"PneumaticBrakeSet") then
@@ -449,5 +453,9 @@ function ENT:OnButtonRelease(button,ply)
     end
     if button == "DoorRight" then
         self.DoorRight:TriggerInput("Set",0)
+    end
+    if button == "RouteNumber13" then
+        self.RouteNumber1:TriggerInput("Set",0)
+        self.RouteNumber3:TriggerInput("Set",0)
     end
 end
