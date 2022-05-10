@@ -377,9 +377,14 @@ function TRAIN_SYSTEM:Think(dT)
         MFDU:Error(49,1,(Train.DoorBack.Value>0 and Train.DoorSelect.Value==1 or MFDU:ErrorGet("49_1") and self.BackDoors~=nil) and not self.States.CloseDoors)
         Train:CANWrite("BUKP",Train:GetWagonNumber(),"BUKV",self.Trains[#self.Trains].ID,"OpenRightBack",self.BackDoors and self.BackDoors~=true)
 
-        if self.CloseRing and (Train.DoorLeft1.Value > 0 or Train.DoorLeft2.Value > 0 or Train.DoorRight.Value > 0 or self.LSD) then self.CloseRing = false end
-        if (not self.CloseRing or self.CloseRing and CurTime()-self.CloseRing<0) and Train.DoorClose.Value==2 and not self.LSD then self.CloseRing = CurTime() end
-        self:CState("CloseDoors",RR and Train.SF7.Value>0 and (Train.DoorClose.Value == 0 or (not self.CloseRing and Train.DoorClose.Value==2 or self.CloseRing and CurTime()-self.CloseRing>4)))
+        if self.CloseDoorsDelay and Train.DoorClose.Value~=2 and (Train.DoorLeft1.Value > 0 or Train.DoorLeft2.Value > 0 or Train.DoorRight.Value > 0 or self.LSD) then
+            self.CloseDoorsDelay = nil
+            Train.BMCIK:TriggerInput("CloseDoorsAVT",false)
+        elseif not self.CloseDoorsDelay and Train.DoorClose.Value==2 and not self.LSD then
+            self.CloseDoorsDelay = CurTime()+4
+            Train.BMCIK:TriggerInput("CloseDoorsAVT",true)
+        end
+        self:CState("CloseDoors",RR and Train.SF7.Value>0 and (Train.DoorClose.Value == 0 or self.CloseDoorsDelay and CurTime()>self.CloseDoorsDelay))
         self:CState("PassLight",Train.PassLight.Value>0)
         self:CState("PassVent",Train.PassVent.Value-1)
         if BARSPower and Train.BARS.V2 > 0 or not BARSPower and math.abs(self.Speed) < 0.5 and self.PowerCommand < 0 then
@@ -401,7 +406,6 @@ function TRAIN_SYSTEM:Think(dT)
             self:CState("PN1",false)
             self:CState("PN2",false)
         end
-        self:CState("CloseRing",self.CloseRing and (CurTime()-self.CloseRing)%1<=0.5)
         --[[
         self:CState("RVPB",(1-Train.RV["KRO5-6"])*Train.SF2.Value > 0)
         self.ControllerState = stength
