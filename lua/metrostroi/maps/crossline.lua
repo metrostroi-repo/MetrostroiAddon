@@ -1,5 +1,5 @@
 local Map = game.GetMap():lower() or ""
-if Map:find("gm_metro_crossline_c") then
+if Map:find("gm_metro_crossline_c") or Map:find("gm_metro_crossline_n") then
     Metrostroi.PlatformMap = "gm_metro_crossline"
     Metrostroi.CurrentMap = "gm_metro_crossline"
 else
@@ -729,6 +729,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO Artur",{
 },{
     { --МАРШРУТ
         LED = {3,4,5,5,5,5,3,2},
+        Name = "Кировская",
         {
             110,"Международная","Mezhdunarodnaya",
             arr = {nil,"last_mejdunarodnaya"},

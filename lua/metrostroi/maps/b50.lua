@@ -1145,7 +1145,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO",{
 }, {
     {
         LED = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2},
-        Name = "Индустриал.-Синеозёрн.",
+        Name = "Автозавдоская - Междустройская",
         Loop = false,
         {
             108,
@@ -1264,7 +1264,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO",{
     },
     {
         LED = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 1, 1},
-        Name = "Индустриально-Авт.Юж.",
+        Name = "Автозавдоская - Автостанция Южная",
         Loop = false,
         {
             108,
