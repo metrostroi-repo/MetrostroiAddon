@@ -192,8 +192,8 @@ function TRAIN_SYSTEM:Think(dT)
         Panel.ARSPower = Panel.BARSPower*(1-Train.BUKP.Back)*Train.ARS.Value
         Panel.ALSPower = BO*(1-Train.BUKP.Back)*Train.ALS.Value
 
-        Panel.UPOPower = BO*S["RV"]*Train.R_UPO.Value
-        Train:WriteTrainWire(15,BO*(Train.UPO.LineOut*Train.SarmatUPO.UPOActive+Train.SarmatUPO.LineOut))
+        Panel.UPOPower = BO*S["RV"]*Train.SarmatUPO.UPOActive
+        Train:WriteTrainWire(15,BO*(Train.SarmatUPO.LineOut + Train.SarmatUPO.LineOut))
         --print(W[15],Train.UPO.LineOut*Train.SarmatUPO.UPOActive,Train.SarmatUPO.LineOut)
 
         self.Emer = S["RU"]
