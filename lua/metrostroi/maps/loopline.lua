@@ -72,7 +72,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO",{
 },{
     {
         LED = {5,6,5,6,5,5},
-        Name = "Line 1",
+        Name = "Кольцевой",
         Loop = true,
         {
             651,"Первоапрельская","First april",
