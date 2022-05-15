@@ -205,7 +205,7 @@ function ENT:NonSupportTrigger()
 end
 
 function ENT:OnUPOArrived()
-    return self.SarmatUPO:TriggerInput("CheckUPO")
+    return self.BMCIK:TriggerInput("CheckUPO")
 end
 
 --------------------------------------------------------------------------------
