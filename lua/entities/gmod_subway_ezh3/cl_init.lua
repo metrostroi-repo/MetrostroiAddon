@@ -510,36 +510,44 @@ ENT.ButtonMap["AV1"] = {
         }},
     }
 }
+
+local corr = -1.5
 ENT.ButtonMap["ASNP"] = {
-    pos = Vector(462.77,-51.43-1.3,5.85),
-    ang = Angle(-.4,230,90),
-    width = 220,
-    height = 100,
+    pos = Vector(459.491-corr,-54.762-corr-0.1,8.675),
+    ang = Angle(-.4,210,90),
+    width = 150,
+    height = 130,
     scale = 0.0625,
     hideseat = 0.2,
 
     buttons = {
-        {ID = "R_ASNPMenuSet",x=100, y=40, radius=8, tooltip = "Информатор: Меню",model = {
-            model = "models/metrostroi_train/81-720/button_round.mdl",
-            var="R_ASNPMenu",speed=12, vmin=0, vmax=0.9,
-            sndvol = 0.5,snd = function(val) return val and "pnm_button1_on" or "pnm_button1_off" end,
+        {ID = "R_ASNPMenuSet",x=72.8, y=65.3, radius=8, tooltip = "АСНП: Меню",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_menu_button.mdl",
+            var="R_ASNPMenu",speed=12, vmin=0, vmax=1, ang=Angle(0,90,-90), z=-1,
+            sndvol = 0.5,snd = function(val) return val and "pnm_button2_on" or "pnm_button2_on" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "R_ASNPUpSet",x=140, y=8, radius=8, tooltip = "Информатор: Вверх",model = {
-            model = "models/metrostroi_train/81-720/button_round.mdl",
-            var="R_ASNPUp",speed=12, vmin=0, vmax=0.9,
+        {ID = "R_ASNPUpSet",x=131.8, y=23, radius=8, tooltip = "АСНП: Вверх",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_triangle_button.mdl",
+            var="R_ASNPUp",speed=12, vmin=0, vmax=1, ang=Angle(0,90,-90), z=-3,
             sndvol = 0.5,snd = function(val) return val and "pnm_button1_on" or "pnm_button2_off" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "R_ASNPDownSet",x=140, y=8+15, radius=8, tooltip = "Информатор: Вниз",model = {
-            model = "models/metrostroi_train/81-720/button_round.mdl",
-            var="R_ASNPDown",speed=12, vmin=0, vmax=0.9,
+        {ID = "R_ASNPDownSet",x=131.8, y=41, radius=8, tooltip = "АСНП: Вниз",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_triangle_button.mdl",
+            var="R_ASNPDown",speed=12, vmin=0, vmax=1, ang=Angle(0,90,90), z=-3,
             sndvol = 0.5,snd = function(val) return val and "pnm_button2_on" or "pnm_button1_off" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
-        {ID = "R_ASNPOnToggle",x=52, y=8, radius=8, tooltip = "Информатор: Включение",model = {
-            model = "models/metrostroi_train/81-720/tumbler2.mdl", ang=0, z = 7,
-            var="R_ASNPOn",speed=12, vmin=1, vmax=0,
+        {ID = "R_ASNPPathToggle",x=9, y=29, radius=8, tooltip = "АСНП: Установка пути",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_track_tumbler.mdl", ang = Angle(0,90,-90), z=-3,
+            var="R_ASNPPath",speed=12, vmin=1, vmax=0,
+            sndvol = 0.5,snd = function(val) return val and "pnm_on" or "pnm_off" end,
+            sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
+        }},
+        {ID = "R_ASNPOnToggle",x=33.5, y=91, radius=25, tooltip = "АСНП: Включение",model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_power_tumbler.mdl", ang=Angle(0,90,-90), z = -24.5,
+            var="R_ASNPOn",speed=12, vmin=0, vmax=1,
             sndvol = 0.5,snd = function(val) return val and "pnm_on" or "pnm_off" end,
             sndmin = 50, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
@@ -547,61 +555,71 @@ ENT.ButtonMap["ASNP"] = {
 }
 
 ENT.ButtonMap["ASNPScreen"] = {
-    pos = Vector(459.77,-54.43-1.3,5.85),
-    ang = Angle(-.4,230,90),
+    pos = Vector(459.48,-54.73,7.5),
+    ang = Angle(0,210,90),
     width = 512,
     height = 128,
-    scale = 0.025/3,
+    scale = 0.025/2.52,
     hideseat = 0.2,
     hide=true,
 }
 
 ENT.ButtonMap["IGLAButtons"] = {
-    pos = Vector(460.9,-53.3,14),
-    ang = Angle(-0,229.5,90),
-    width = 87,
-    height = 70,
+    pos = Vector(459.744-corr-0.8,-54.596-corr-0.8,18),
+    ang = Angle(-0,210,90),
+    width = 120,
+    height = 80,
     scale = 0.0625,
     hideseat = 0.2,
     buttons = {
-        {ID = "IGLA1USet",x=11, y=39, w=12, h=7, tooltip=""},
-        {ID = "IGLA1Set",x=11, y=46, w=12, h=7, tooltip=""},
-        {ID = "IGLA1DSet",x=11, y=53, w=12, h=7, tooltip=""},
-        {ID = "IGLA2USet",x=65, y=39, w=12, h=7, tooltip=""},
-        {ID = "IGLA2Set",x=65, y=46, w=12, h=7, tooltip=""},
-        {ID = "IGLA2DSet",x=65, y=53, w=12, h=7, tooltip=""},
-        {ID = "!IGLASR",x=17.9, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLASR",color=Color(175,250,20),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-1,}
+        -- {ID = "IGLA1USet",x=19, y=55.5, w=18, h=7, tooltip=""},
+        {ID = "IGLA1Set",x=15.3, y=60.2, w=18, h=7, tooltip="", model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_rect_button.mdl", z=-3, ang=Angle(90,90,180),
+            var="IGLA1",speed=12,vmin=0,vmax=1,
+            sndvol = 1, snd = function(val) return val and "vu223_on" or "vu223_off" end,
+            sndmin = 100, sndmax = 1e3, sndang = Angle(0,0,0),
         }},
-        {ID = "!IGLARX",x=27.5, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLARX",color=Color(255,56,30),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-1,}
+        -- {ID = "IGLA1DSet",x=19, y=65.5, w=18, h=7, tooltip=""},
+        -- {ID = "IGLA2USet",x=85, y=55.5, w=18, h=7, tooltip=""},
+        {ID = "IGLA2Set",x=82.5, y=60.2, w=18, h=7, tooltip="", model = {
+            model = "models/metrostroi_train/81-710/asotp_pu_rect_button.mdl", z=-3, ang=Angle(90,90,180),
+            var="IGLA2",speed=12,vmin=0,vmax=1,
+            sndvol = 1, snd = function(val) return val and "vu223_on" or "vu223_off" end,
+            sndmin = 100, sndmax = 1e3, sndang = Angle(0,0,0),
         }},
-        {ID = "!IGLAErr",x=40.5, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAErr",color=Color(255,168,000),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,168,000),z=-1,}
+        -- {ID = "IGLA2DSet",x=85, y=65.5, w=18, h=7, tooltip=""},
+        {ID = "!IGLASR",x=24.5, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLASR",color=Color(175,250,20),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-5,}
         }},
-        {ID = "!IGLAOSP",x=50, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOSP",color=Color(175,250,20),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-1,}
+        {ID = "!IGLARX",x=37, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLARX",color=Color(255,56,30),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-5,}
         }},
-        {ID = "!IGLAPI",x=59.5, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAPI",color=Color(255,56,30),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-1,}
+        {ID = "!IGLAErr",x=54, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAErr",color=Color(255,168,000),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,168,000),z=-5,}
         }},
-        {ID = "!IGLAOff",x=69, y=10.5, radius=3, tooltip="", model = {
-            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOff",color=Color(255,56,30),z=-2},
-            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-1,}
+        {ID = "!IGLAOSP",x=66, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOSP",color=Color(175,250,20),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(175,250,20),z=-5,}
+        }},
+        {ID = "!IGLAPI",x=79, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAPI",color=Color(255,56,30),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-5,}
+        }},
+        {ID = "!IGLAOff",x=91, y=14.5, radius=3, tooltip="", model = {
+            lamp = {speed=16,model = "models/metrostroi_train/common/lamps/svetodiod2.mdl", var="IGLAOff",color=Color(255,56,30),z=-5},
+            sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,56,30),z=-5,}
         }},
     }
 }
 ENT.ButtonMap["IGLA"] = {
-    pos = Vector(460.5,-53.87,12.67),
-    ang = Angle(-0,229.5,90),
+    pos = Vector(459.8,-54.65,16.2),
+    ang = Angle(-0,210,90),
     width = 512,
     height = 128,
-    scale = 0.025/2.96,
+    scale = 0.025/2.36,
     hideseat = 0.2,
     hide=true,
 }
@@ -1079,7 +1097,7 @@ ENT.ClientProps["rcureverser"] = {
 }
 ENT.ClientProps["brake_disconnect"] = {
     model = "models/metrostroi_train/81-710/ezh3_red_brake.mdl",
-    pos = Vector(430.7,-58.90,-21.01),
+    pos = Vector(430.7,-58.8,-21.2),
     ang = Angle(0,270,0),
     hideseat = 0.2,
 }
@@ -1091,7 +1109,7 @@ ENT.ClientProps["train_disconnect"] = {
 }
 ENT.ClientProps["EPK_disconnect"] = {
     model = "models/metrostroi_train/81-710/ezh3_epk.mdl",
-    pos = Vector(430.7+6.87,-56.30,-28.51),
+    pos = Vector(430.7+7.17,-56.7,-29.11),
     ang = Angle(0,270,0),
     hideseat = 0.2,
 }
@@ -1185,7 +1203,7 @@ ENT.ClientProps["salon2"] = {
     hide = 2.0,
 }
 ENT.ClientProps["asotp"] = {
-    model = "models/metrostroi_train/81-710/710_asotp.mdl",
+    model = "models/metrostroi_train/81-710/710_asotp_new.mdl",
     pos = Vector(0,0,0),
     ang = Angle(0,0,0),
     hideseat = 1.0,

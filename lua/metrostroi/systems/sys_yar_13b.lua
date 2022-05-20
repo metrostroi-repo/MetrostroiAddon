@@ -93,13 +93,14 @@ function TRAIN_SYSTEM:Think()
     end
     --self.RUTTarget = 250 + 150*self.Train.Pneumatic.WeightLoadRatio
     -- RPvozvrat operation
-    Train.RPvozvrat:TriggerInput("Close",
-        (Train.DR1.Value == 1.0) or
+	--local A = Train.RPvozvrat.VozRpPressed ~= 0
+    Train.RPvozvrat:TriggerInput("Close", Train:ReadTrainWire(17) == 0 and    -- condition added to override the blocking action of the energized RP relays on RPVozvrat
+        ((Train.DR1.Value == 1.0) or
         (Train.DR2.Value == 1.0) or
         (Train.RPL.Value == 1.0) or
         (Train.RP1_3.Value == 1.0) or
         (Train.RP2_4.Value == 1.0) or
         (Train.RZ_1.Value == 1.0) or
         (Train.RZ_2.Value == 1.0) or
-        (Train.RZ_3.Value == 1.0))
+        (Train.RZ_3.Value == 1.0)))
 end

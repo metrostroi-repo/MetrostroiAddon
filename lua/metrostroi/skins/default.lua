@@ -978,8 +978,8 @@ Metrostroi.AddSkin("cab","Def_708Def1",{
     name = "White cab",
     typ = "81-718",
     textures = {
-        ["1003"] = "",
-        ["1006"] = "",
+        ["1003"] = "models/metrostroi_train/81_718/1003",
+        ["1006"] = "models/metrostroi_train/81_718/1006",
     },
     default = true
 })
