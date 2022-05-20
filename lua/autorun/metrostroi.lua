@@ -387,9 +387,17 @@ if SERVER then
         Turbostroi = nil
     end
 
-    if Turbostroi
-    then print("Metrostroi: Simulation acceleration ENABLED!") print("Metrostroi: Turbostroi Version: " .. Either(Turbostroi.Version, Turbostroi.Version, "2.0 or 1.0"))
-    else print("Metrostroi: Simulation acceleration DISABLED")
+    if Turbostroi then
+        print("Metrostroi: Simulation acceleration ENABLED!")
+        local ver = Turbostroi.Version
+        
+        if not ver then
+            ver = Turbostroi.SetMTAffinityMask and "2" or "1"
+        end
+        
+        print("Metrostroi: Turbostroi Version: " .. ver)
+    else
+        print("Metrostroi: Simulation acceleration DISABLED")
     end
 
     -- Load all lua translations

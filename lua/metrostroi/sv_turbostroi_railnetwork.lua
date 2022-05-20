@@ -1,6 +1,6 @@
 -- OLD API AND NOT USED
 
-if Turbostroi and Turbostroi.Version and string.StartWith(Turbostroi.Version, "3") then return true end -- DISABLE OLD API
+if Turbostroi and Turbostroi.Version and string.StartWith(Turbostroi.Version, "3") then return end
 
 if not TURBOSTROI and (not Turbostroi or not Turbostroi.SetMTAffinityMask) then return end
 if not TURBOSTROI then

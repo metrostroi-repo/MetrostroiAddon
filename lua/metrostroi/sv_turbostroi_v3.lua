@@ -104,13 +104,19 @@
 --- 200 - Send LUA Code
 ]]--
 
-if Turbostroi and Turbostroi.Version and not TURBOSTROI then
+if Turbostroi and not Turbostroi.Version then return end
+
+if not TURBOSTROI then
     local FPS = math.Round(1000*engine.TickInterval())
 
-    TS_filesCache = TS_filesCache or {}
-    TS_loadSystem = TS_loadSystem or {}
-    TS_registeredSystem = TS_registeredSystem or {}
-    TS_turbostroiTrains = TS_turbostroiTrains or {}
+    -- TS_filesCache = TS_filesCache or {}
+    -- TS_loadSystem = TS_loadSystem or {}
+    -- TS_registeredSystem = TS_registeredSystem or {}
+    -- TS_turbostroiTrains = TS_turbostroiTrains or {}
+    local TS_filesCache = {}
+    local TS_loadSystem = {}
+    local TS_registeredSystem = {}
+    local TS_turbostroiTrains = {}
 
     Turbostroi.SetFPSSimulation(FPS)
 
@@ -171,7 +177,7 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     end
 
     concommand.Add("turbostroi_clear_cache", function(ply)
-        if IsValid(ply) and not ply:IsAdmin() then return end
+        if IsValid(ply) then return end
         TS_filesCache = {}
         printTurbostroi("Cache of loaded files cleared!")
     end)
@@ -267,7 +273,7 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
     function Turbostroi.InitializeTrain(self)
         local id = self:EntIndex()
 
-        local code = getFile("metrostroi/sv_turbostroi_v3.lua") or "-- EMPTY"
+        local code = getFile("metrostroi/sv_turbostroi_v3.lua")
 
         dataCache[id] = {wires = {}, systems = {}}
 
@@ -329,11 +335,12 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
 
                 train.Systems[sys][var] = val
 
-                if var == "Value" then
-                    if tableHasValue(train.SyncTable,sys) then
-                        train:SetPackedBool(sys,val > 0)
-                    end
-                end
+                if train.TriggerTurbostroiInput then train:TriggerTurbostroiInput(system,name,value) end
+                -- if var == "Value" then
+                --     if tableHasValue(train.SyncTable,sys) then
+                --         train:SetPackedBool(sys,val > 0)
+                --     end
+                -- end
             end
         end
     end
@@ -373,6 +380,10 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         end
     end
     
+    local color_pink = Color(255, 0, 255)
+    local color_red = Color(255, 0, 0)
+    local color_blue = Color(0, 0, 255)
+
     local function turbostroiGetData(train, k)
         while true do
             local msg = RecvMessage(k)
@@ -392,14 +403,14 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
                 local len = msg:ReadUInt16()
                 local str = msg:ReadData(len)
                 
-                MsgC(Color(255, 0, 255), str, "\n")
+                MsgC(color_pink, str, "\n")
             elseif typ == 101 then
                 local len = msg:ReadUInt16()
                 local str = msg:ReadData(len)
                 
-                MsgC(Color(255, 0, 0), str, "\n")
+                MsgC(color_red, str, "\n")
             else
-                MsgC(Color(0, 0, 255), "UNKNOWN MESSAGE TYPE '" .. typ .. "'")
+                MsgC(color_blue, "UNKNOWN MESSAGE TYPE '" .. typ .. "'")
             end
         end
     end
@@ -439,8 +450,9 @@ if Turbostroi and Turbostroi.Version and not TURBOSTROI then
         for sys_name, sys in next, dataCacheTrain.systems do
             for _, var_name in next, sys.OutputsList do
                 local val = sys[var_name] or 0
-                if type(val) == "boolean" then val = val and 1 or 0 end
-                if type(val) == "number" then
+                local typ = type(val)
+                if typ == "boolean" then val = val and 1 or 0 end
+                if typ == "number" then
                     if dataCacheTrain[sys_name][var_name] ~= val then
                         if not systems_exists[sys_name] then
                             systems_exists[sys_name] = true
@@ -995,6 +1007,6 @@ xpcall(function()
     end
 
     function Think(gameCurtime, threadCurtime)
-        local res, ret = xpcall(TrainThink, errorHandler, gameCurtime, threadCurtime)
+        xpcall(TrainThink, errorHandler, gameCurtime, threadCurtime)
     end
 end, errorHandler)
