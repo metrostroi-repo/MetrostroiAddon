@@ -589,7 +589,7 @@ function ENT:Think()
         end
     end
 	
-    if self:ReadTrainWire(4)*self:ReadTrainWire(5) > 0 then
+    if self:ReadTrainWire(4)*self:ReadTrainWire(5)*self:ReadTrainWire(10) > 0 then
         self.A54:TriggerInput("Set",0)
     end
 
