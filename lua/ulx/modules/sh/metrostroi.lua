@@ -321,7 +321,7 @@ function ulx.changecab( calling_ply )
     if not IsValid(calling_ply) then return end
     local Wagon = calling_ply:GetTrain()
     if not IsValid(Wagon) then
-        ULib.tsayError( calling_ply, "You ,ust sit in train",true)
+        ULib.tsayError( calling_ply, "You must sit in train",true)
         return
     end
 
@@ -504,6 +504,81 @@ local tps = ulx.command( "Metrostroi", "ulx station", ulx.tps, {"!station","!sta
 tps:addParam{ type=ULib.cmds.StringArg, hint="Station or station number", ULib.cmds.optional }
 tps:defaultAccess( ULib.ACCESS_ALL )
 tps:help( "Teleport between stations." )
+
+
+function ulx.getroutes( calling_ply )
+    if not IsValid(calling_ply) then return end
+    local Train = calling_ply:GetTrain()
+    if not IsValid(Train) then
+        ULib.tsayError( calling_ply, "You must sit in train",true)
+        return
+    end
+   
+    local signal
+    -- Get train position
+    local pos = Metrostroi.TrainPositions[Train]
+    if pos then pos = pos[1] end
+    -- Get previous ARS section
+    if pos then
+        signal = Metrostroi.GetARSJoint(pos.node1,pos.x,Metrostroi.TrainDirections[Train], Train)
+    end 
+
+    if signal then
+        local found = false
+        for k,v in pairs(signal.Routes or {}) do
+            if v.RouteName != "" then
+                found = true
+                break
+            end
+        end        
+        if not found then
+            ULib.tsayError( calling_ply, "Signal routes not found", true)
+            return            
+        end
+        ulx.fancyLog("Routes of signal #s:", signal.Name)
+        for k,v in pairs(signal.Routes) do
+            if v.RouteName != "" then
+                ulx.fancyLog("#s", v.RouteName)
+            end
+        end    
+    else
+        ULib.tsayError( calling_ply, "Signal not found", true)
+    end
+end
+local getroutes = ulx.command( CATEGORY_NAME, "ulx getroutes", ulx.getroutes, "!getroutes" )
+getroutes:defaultAccess( ULib.ACCESS_ALL )
+getroutes:help( "Print routes of next signal" )
+
+function ulx.getsigroutes( calling_ply, sig )
+    if not IsValid(calling_ply) then return end
+    local signal = Metrostroi.GetSignalByName(sig)
+    if not signal then
+        ULib.tsayError( calling_ply, "Signal not found", true)
+        return
+    end
+
+    local found = false
+    for k,v in pairs(signal.Routes or {}) do
+        if v.RouteName != "" then
+            found = true
+            break
+        end
+    end        
+    if not found then
+        ULib.tsayError( calling_ply, "Signal routes not found", true)
+        return            
+    end
+    ulx.fancyLog("Routes of signal #s:", signal.Name)
+    for k,v in pairs(signal.Routes) do
+        if v.RouteName != "" then
+            ulx.fancyLog("#s", v.RouteName)
+        end
+    end    
+end
+local getsigroutes = ulx.command( CATEGORY_NAME, "ulx getsigroutes", ulx.getsigroutes, "!getsigroutes" )
+getsigroutes:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
+getsigroutes:defaultAccess( ULib.ACCESS_ALL )
+getsigroutes:help( "Print routes of signal" )
 
 --Костылииии
 function ulx.sopen( calling_ply, arg )
