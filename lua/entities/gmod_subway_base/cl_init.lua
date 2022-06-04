@@ -665,7 +665,7 @@ local function enableDebug()
                 if ent.ButtonMap ~= nil then
                     draw.NoTexture()
                     for kp,panel in pairs(ent.ButtonMap) do
-                        if kp ~= "BaseClass" and LocalPlayer():GetPos():Distance(ent:LocalToWorld(panel.pos)) < 512 then
+                        if kp ~= "BaseClass" and LocalPlayer():GetPos():DistToSqr(ent:LocalToWorld(panel.pos)) < 262144 then
                             ent:DrawOnPanel(kp,function()
                                 surface.SetDrawColor(0,0,255)
                                 if not ent:ShouldDrawPanel(kp) then surface.SetDrawColor(255,0,0) end
