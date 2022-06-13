@@ -413,6 +413,7 @@ function TRAIN_SYSTEM:Think(dT)
                 self:equalizePressure(dT, "BrakeLinePressure", 0, pr_speed*math.abs(self.BrakeLinePressure - self.ReservoirPressure), nil, nil, 6)
             end
         end
+        self.ReservoirPressure_dPdT = self.ReservoirPressure_dPdT + self.BrakeLinePressure_dPdT*0.2
         Train:SetPackedRatio("ReservoirPressure_dPdT",self.ReservoirPressure_dPdT/wagc*2)
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeLinePressure_dPdT)
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.ReservoirPressure_dPdT)*0.05
