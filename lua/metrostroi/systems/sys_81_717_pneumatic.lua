@@ -36,8 +36,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
     -- Pressure in trains brake line
     self.BrakeLinePressure = 0.0 -- atm
     self.EPKPressure = 0.0 -- atm
-    -- Pressure in train's auxiliary line
-	self.AuxiliaryLinePressure = 8.0 -- atm
     -- Pressure in brake cylinder
     self.BrakeCylinderPressure = 0.0 -- atm
     -- Pressure in the door line
@@ -163,7 +161,7 @@ end
 
 function TRAIN_SYSTEM:Outputs()
     return { "BrakeLinePressure", "BrakeCylinderPressure", "DriverValvePosition",
-             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "WorkingChamberPressure", "AuxiliaryLinePressure" }
+             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "WorkingChamberPressure" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
@@ -313,33 +311,12 @@ function TRAIN_SYSTEM:equalizePressure(dT,pressure,target,rate,fill_rate,no_limi
     --self[pressure] = math.Approach(self[pressure], target, dT * dPdT)
     self[pressure] = math.max(0.0,math.min(16.0,self[pressure]))
     self[pressure.."_dPdT"] = (self[pressure.."_dPdT"] or 0) + dPdT
-    if no_limit ~= true then                                                --помудрить с лимитом. Рефакторить функцию для возможности эквализации в ноль, но до лимита
-        if self[pressure] == 0.0  then self[pressure.."_dPdT"] = 0 end      --чтобы темп разрядки-зарядки не зависел от рампы
+    if no_limit ~= true then
+        if self[pressure] == 0.0  then self[pressure.."_dPdT"] = 0 end
         if self[pressure] == 16.0 then self[pressure.."_dPdT"] = 0 end
     end
     return dPdT
 end
-
---[[function TRAIN_SYSTEM:equalizePressure(dT,pressure,target,rate,fill_rate,lo_limit,smooth,hi_limit)
-    if fill_rate and (target > self[pressure]) then rate = fill_rate end
-
-    -- Calculate derivative
-    local dPdT = rate
-    if target < self[pressure] then dPdT = -dPdT end
-    --if (hi_limit and self[pressure] >= hi_limit - 0.2) or (lo_limit and self[pressure] <= lo_limit + 0.2) then target = self[pressure] end
-    if hi_limit and self[pressure] >= hi_limit - 0.2 and target > self[pressure] then taret = hi_limit end 
-    if lo_limit and self[pressure] <= lo_limit + 0.2 and target < self[pressure] then taret = lo_limit end 
-    local dPdTramp = math.min(1.0,math.abs(target - self[pressure])*(smooth or 0.5))
-    dPdT = dPdT*dPdTramp
-
-    -- Update pressure
-    self[pressure] = self[pressure] + dT * dPdT
-    self[pressure] = math.max(tonumber(lo_limit) and lo_limit or 0.0, math.min(tonumber(hi_limit) and hi_limit or 16.0,self[pressure]))
-    self[pressure.."_dPdT"] = (self[pressure.."_dPdT"] or 0) + dPdT
-    if self[pressure] == 0.0  then self[pressure.."_dPdT"] = 0 end
-    if self[pressure] == 16.0 then self[pressure.."_dPdT"] = 0 end
-    return dPdT
-end]]
 
 -------------------------------------------------------------------------------
 function TRAIN_SYSTEM:Think(dT)
@@ -355,7 +332,6 @@ function TRAIN_SYSTEM:Think(dT)
     self.BrakeCylinderPressure_dPdT = 0.0
     self.ParkingBrakePressure_dPdT = 0.0
     self.WorkingChamberPressure_dPdT = 0.0
-	self.AuxiliaryLinePressure_dPdT = 0.0
 
     local rnd = math.random(1,10)
     local offs = 0.1
@@ -378,14 +354,12 @@ function TRAIN_SYSTEM:Think(dT)
     if self.ValveType == 1 then
         self.BLDisconnect = Train.DriverValveBLDisconnect.Value > 0
         self.TLDisconnect = Train.DriverValveTLDisconnect.Value > 0 and self.RealDriverValvePosition ~= 3
-        pr_speed = 1*wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6) --2
+        pr_speed = 1*wagc
         if self.TLDisconnect then self.TLDisconnectPressure = self.TrainLinePressure end
-        --if self.BLDisconnect then self.BLDisconnectPressure = self.BrakeLinePressure end
         if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
         -- 334: 1 Fill reservoir from train line, fill brake line from train line
         if (self.RealDriverValvePosition == 1) then
             if self.TLDisconnect or self.ReservoirPressure ~= self.TLDisconnectPressure then
-                --self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 1.55,nil,nil,2)--1.55
                 if self.BLDisconnect then
                     self.ReservoirPressure = self.BrakeLinePressure
                     self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, pr_speed*(pr_speed < wagc and 1 or 1.35),nil,nil,2)--0.7
@@ -394,8 +368,6 @@ function TRAIN_SYSTEM:Think(dT)
                 end
             end
         end
-        --возможно, надо модифицировать функцию equalizePressure() для возможности ограниченной разрядки (то есть, в закрытую емкость), либо одновременно раз-
-        --ряжать одну емкость и заряжать другую с разными скоростями, имитируя разные объемы
 
         -- 334: 2 Brake line, reservoir replenished from brake line reductor
         if (self.RealDriverValvePosition == 2) then
@@ -446,10 +418,8 @@ function TRAIN_SYSTEM:Think(dT)
             end
             if _a > 0 then pr_speed = pr_speed*0.1 end
             if self.BLDisconnect and self.BrakeLinePressure - self.ReservoirPressure > (self.RealDriverValvePosition == 3 and 0 or self.RealDriverValvePosition == 4 and 0.2 or 100) then      --0.2 bar is a piston sensitivity
-                --Train:SetPackedRatio("ReservoirPressure_dPdT",self:equalizePressure(dT, "BrakeLinePressure", 0, pr_speed*math.abs(self.BrakeLinePressure - self.ReservoirPressure), nil, nil, 6)/wagc*2)
                 self:equalizePressure(dT, "BrakeLinePressure", 0, pr_speed*math.abs(self.BrakeLinePressure - self.ReservoirPressure), nil, nil, 6)
             else
-                --Train:SetPackedRatio("ReservoirPressure_dPdT",0)
             end
         end
 
@@ -572,7 +542,6 @@ function TRAIN_SYSTEM:Think(dT)
 
     local leak = 0
     if Train.EmergencyBrakeValve and Train.EmergencyBrakeValve.Value > 0.5 then
-        --local leakst = (1.6*(Train:GetWagonCount())*(self.BrakeLinePressure-math.min(2.5,self.TrainToBrakeReducedPressure))*0.9)
         leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,(1.1*wagc)*2,false,false,1)
         self.Leak = true
     end
@@ -582,16 +551,13 @@ function TRAIN_SYSTEM:Think(dT)
     if self.WCChargeValve == true then
 	self:equalizePressure(dT,"WorkingChamberPressure",self.BrakeLinePressure,0.107,nil,nil,1.0)	--simulate 0.8mm hole btw BL and working chambers
     end
-    --self.AirDistributorReady = self.WorkingChamberPressure >= 2.2
     local aird_ready = self.WorkingChamberPressure >= 2.2
     self.WCChargeValve = not ((self.WorkingChamberPressure - self.BrakeLinePressure) > 0.2 and (self.WorkingChamberPressure - self.BrakeLinePressure) < 2.5)
-    --self.OverchargeReleaseValve = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
     local KLSZ = self.WorkingChamberPressure > 5.2 and not self.WCChargeValve
     if KLSZ then	
 	self:equalizePressure(dT,"WorkingChamberPressure",0.0,0.22)	-- КЛСЗ
     end
 
-    --trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.WorkingChamberPressure_dPdT*0.2)
     local _offset2 = self.Train.AR63 and 2.5 or 2.4
     self.GN2Offset = self.GN2Offset or math.random(20,100)*0.002 + _offset2
     local _offset1 = self.Train.AR63 and 0.9 or 0.8
@@ -617,8 +583,6 @@ function TRAIN_SYSTEM:Think(dT)
             self.PN2 = self.BrakeCylinderPressure > 0.4 and 0.2 or self.PN2 - 0.5*dT
         end
         --уставки зависят от типа крана машиниста
-        --local br334_upper_threshold = self.BrakeLinePressure_dPdT > 0 and 3.6 or 3.08     --такой вариант работает только для вагона, из которого управляют тормозами
-        --local br013_upper_threshold = self.BrakeLinePressure_dPdT > 0 and 3.7 or 3.08
         local bl_diff = self.BrakeLinePressure - self.OldBrakeLinePressure
         self.OldBrakeLinePressure = self.BrakeLinePressure
 
@@ -644,7 +608,6 @@ function TRAIN_SYSTEM:Think(dT)
             end
             ---------------debug---------------------]]                
 
-        --self.cranPres = WcBl and math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3,self.BcBl*(self.WorkingChamberPressure - WcBl)*(self.BrakeLinePressure > self.KM013offset and 0.6 or 1))) or self.cranPres
         self.cranPres = WcBl and math.max(0,self.BcBl*(self.WorkingChamberPressure - WcBl)*(self.BrakeLinePressure > self.KM013offset and (0.56 + self.PN1*0.43) or 1)) or self.cranPres
         local targetPressure = math.max(0,math.min(self.GN2Offset + self.WeightLoadRatio*1.3, (self.cranPres < (self.PN1 + self.WeightLoadRatio*0.7) and (Train.PneumaticNo1.Value == 1.0) and (self.PN1 + self.WeightLoadRatio*0.7) or self.PN1) + self.PN2 + self.cranPres))
         if math.abs(self.BrakeCylinderPressure - targetPressure) > 0.150 then
@@ -654,7 +617,6 @@ function TRAIN_SYSTEM:Think(dT)
             self.BrakeCylinderValve = 0
         end
         if self.BrakeCylinderValve == 1 then
-            --self:equalizePressure(dT,"BrakeCylinderPressure", math.min(self.GN2Offset + self.WeightLoadRatio*1.3,targetPressure), 1, 3.5, nil, (self.BrakeLinePressure_dPdT > 0.02) and (0.9+math.Clamp((1 - self.BrakeCylinderPressure)*0.9,0,1.8)) or 1)
             self:equalizePressure(dT,"BrakeCylinderPressure", math.min(self.GN2Offset + self.WeightLoadRatio*1.3,targetPressure), 1, 3.5, nil, 1)
         end
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeCylinderPressure_dPdT*0.5)
@@ -697,10 +659,6 @@ function TRAIN_SYSTEM:Think(dT)
     -- Simulate cross-feed between different wagons
     self:UpdatePressures(Train,dT)
 
-	-- Simulate air pressure drop while the horn is engaged
-    local horny = self.Train:GetNW2Bool("HornState",false)
-	self:equalizePressure(dT,"AuxiliaryLinePressure", horny and math.max(0,self.TrainLinePressure - 0.3) or self.TrainLinePressure, 22)	--was 12		
-	self.TrainLinePressure = self.TrainLinePressure - (horny and 0.012 or 0)
     ----------------------------------------------------------------------------
     -- Simulate compressor operation and train line depletion
     self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
