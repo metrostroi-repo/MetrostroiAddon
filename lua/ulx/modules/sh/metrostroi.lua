@@ -506,10 +506,10 @@ tps:defaultAccess( ULib.ACCESS_ALL )
 tps:help( "Teleport between stations." )
 
 
-function ulx.sroutes( calling_ply, signal )
+function ulx.sroutes( calling_ply, sig )
     if not IsValid(calling_ply) then return end
     local Train = calling_ply:GetTrain()
-    if IsValid(Train) then       
+    if IsValid(Train) and (not sig or sig == "") then       
         local signal
         -- Get train position
         local pos = Metrostroi.TrainPositions[Train]
@@ -518,7 +518,6 @@ function ulx.sroutes( calling_ply, signal )
         if pos then
             signal = Metrostroi.GetARSJoint(pos.node1,pos.x,Metrostroi.TrainDirections[Train], Train)
         end 
-
         if signal then
             local found = false
             for k,v in pairs(signal.Routes or {}) do
@@ -542,6 +541,9 @@ function ulx.sroutes( calling_ply, signal )
         end
     else
         local signal = Metrostroi.GetSignalByName(sig)
+        if not signal and sig then
+            signal = Metrostroi.GetSignalByName(sig:upper())
+        end
         if not signal then
             ULib.tsayError( calling_ply, "Signal not found", true)
             return
@@ -567,7 +569,7 @@ function ulx.sroutes( calling_ply, signal )
     end
 end
 local sroutes = ulx.command( CATEGORY_NAME, "ulx sroutes", ulx.sroutes, "!sroutes" )
-sroutes:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
+sroutes:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.optional }
 sroutes:defaultAccess( ULib.ACCESS_ALL )
 sroutes:help( "Print routes of next signal" )
 
