@@ -25,7 +25,7 @@ local function enableDebug()
     if debug:GetBool() then
         hook.Add("PostDrawTranslucentRenderables","MetrostroiPAMarkerDebug",function(bDrawingDepth,bDrawingSkybox)
             for _,ent in pairs(ents.FindByClass("gmod_track_autodrive_plate")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 512 then
+                if bDrawingDepth and LocalPlayer():GetPos():DistToSqr(sig:GetPos()) < 262144 then
                     cam.Start3D()
                         render.SetMaterial(mat)
                         --render.DrawQuadEasy(self:GetPos(),self:GetAngles():Forward(),600,600,Color(255,255,255),0)

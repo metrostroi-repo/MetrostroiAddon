@@ -256,7 +256,7 @@ function ENT:Think()
                     local target = Vector(0,0,0)
                     for j=1,count do
                         local vec = self:GetNW2Vector("TrainDoor"..j,Vector(0,0,0))
-                        local d = vec:Distance(self.ClientModels[i]:GetPos())
+                        local d = vec:DistToSqr(self.ClientModels[i]:GetPos())
                         if d < distance then
                             target = vec
                             distance = d
