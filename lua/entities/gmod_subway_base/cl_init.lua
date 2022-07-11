@@ -615,17 +615,20 @@ local function colAlpha(col,a)
 end
 hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,isDD)
     if isDD then return end
+    local inSeat = LocalPlayer().InMetrostroiTrain
     for ent in pairs(Metrostroi.SpawnedTrains) do
         if ent:IsDormant() then continue end
         if MetrostroiStarted and MetrostroiStarted~=true or ent.RenderBlock then
-            local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
-            cam.Start3D2D(ent:LocalToWorld(Vector(0,-200,100)),ent:LocalToWorldAngles(Angle(0,90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
-            cam.End3D2D()
-            cam.Start3D2D(ent:LocalToWorld(Vector(0,200,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
-            cam.End3D2D()
-            return
+            if not inSeat then
+                local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
+                cam.Start3D2D(ent:LocalToWorld(Vector(0,-150,100)),ent:LocalToWorldAngles(Angle(0,90,90)),1.5)
+                    draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                cam.End3D2D()
+                cam.Start3D2D(ent:LocalToWorld(Vector(0,150,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),1.5)
+                    draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                cam.End3D2D()
+            end
+            continue
         end
         cam.IgnoreZ(true)
         for i,vHandle in pairs(ent.Sprites) do
