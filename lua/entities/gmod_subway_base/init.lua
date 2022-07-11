@@ -1126,7 +1126,7 @@ function ENT:CreateCouple(pos,ang,forward,typ)
     table.insert(self.JointPositions,index,x)
     -- Constraint bogey to the train
     if self.NoPhysics then
-        bogey:SetParent(coupler)
+        coupler:SetParent(self)
     else
         constraint.AdvBallsocket(
             self,
