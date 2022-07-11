@@ -400,12 +400,12 @@ function TRAIN_SYSTEM:Think(dT)
         local TLDisconnect = self.DisconnectType and Train.DriverValveTLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
         -- 013: 1 Overcharge
         if (self.RealDriverValvePosition == 1) and BLDisconnect and (TLDisconnect or self.BrakeLinePressure > self.TrainLinePressure) then
-	    self:equalizePressure(dT,"BrakeLinePressure", math.min(6.4,self.TrainLinePressure), pr_speed,Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2.2 or pr_speed*0.35, nil, 1.0)
+	    self:equalizePressure(dT,"BrakeLinePressure", math.min(6.4,self.TrainLinePressure), pr_speed,Train.EPKC and Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2.2 or pr_speed*0.35, nil, 1.0)
         end
 
         -- 013: 2 Normal pressure
         if (self.RealDriverValvePosition == 2) and BLDisconnect and (TLDisconnect or self.BrakeLinePressure > 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure)) then
-            self:equalizePressure(dT,"BrakeLinePressure", 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure), pr_speed,Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2 or pr_speed*0.35, nil, 1.0)-- nil, 1.0)
+            self:equalizePressure(dT,"BrakeLinePressure", 1.01*math.min(self.KM013offset,self.TrainToBrakeReducedPressure), pr_speed,Train.EPKC and Train.EPKC.Value==0 and Train.EPK.Value > 0 and pr_speed*2 or pr_speed*0.35, nil, 1.0)-- nil, 1.0)
         end
 
         -- 013: 3 4.3 Atm
