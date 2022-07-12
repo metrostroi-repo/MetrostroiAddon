@@ -587,7 +587,7 @@ function ENT:InitializeSystems()
     self:LoadSystem("IGLA_PCBK")
 
     self:LoadSystem("ALSCoil")
-    self:LoadSystem("UKS","81_509_UKS")
+    self:LoadSystem("UKS","UKS_20M")
 end
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("Type",self.Electric.Em)

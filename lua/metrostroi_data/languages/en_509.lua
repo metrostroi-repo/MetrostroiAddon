@@ -6,8 +6,8 @@ return [[
 #######Buttons###########
 #Common
 Common.509.50V                  = +50V: Additional consumers
-Common.509.UKS                  = Speed limiter active
-Common.509.UKSDisconnect        = Speed limiter disable valve
+Common.509.UKS                  = UKS work (Speed limiter active)
+Common.509.UKSDisconnect        = RC-UKS (Speed limiter disconnect)
 Common.509.Heaters              = Passenger compartment heater
 
 
@@ -99,7 +99,7 @@ Entities.gmod_subway_em509.Buttons.ParkingBrake.ParkingBrakeLeft                
 Entities.gmod_subway_em509.Buttons.ParkingBrake.ParkingBrakeRight                          = @[Common.703.ParkingBrakeRight]
 Entities.gmod_subway_em509.Buttons.UAVAPanel.UAVAToggle                                    = @[Common.ALL.UAVA]
 Entities.gmod_subway_em509.Buttons.UAVAPanel.UAVACToggle                                   = @[Common.ALL.UAVAContact]
-Entities.gmod_subway_em509.Buttons.UAVAPanel.UKSDisconnectToggle                           = @[Common.509.UKSDisconnect]
+Entities.gmod_subway_em509.Buttons.UKSPanel.UKSDisconnectToggle                            = @[Common.509.UKSDisconnect]
 Entities.gmod_subway_em509.Buttons.DriverValveBLDisconnect.DriverValveBLDisconnectToggle   = @[Common.ALL.DriverValveBLDisconnect]
 Entities.gmod_subway_em509.Buttons.DriverValveTLDisconnect.DriverValveTLDisconnectToggle   = @[Common.ALL.DriverValveTLDisconnect]
 Entities.gmod_subway_em509.Buttons.EPKDisconnect.EPKToggle                                 = @[Common.ALL.EPK]

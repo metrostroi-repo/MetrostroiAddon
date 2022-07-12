@@ -103,8 +103,8 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train:WriteTrainWire(4,S["10AK"]*KV["U2-4"])
         Train:WriteTrainWire(5,S["10AK"]*KV["U2-5"]+KRU["5/3-ZM31"]*-10*(1-Train.KRR.Value)+BO*KRU["14/1-B3"]*Train.KRR.Value)
         --Panel.Sequence = T[2]
-        Panel.UKS = BO*Train.UKS.UKSEngaged
-        Panel.UKSb = BO*Train.UKS.UKSTriggered
+        Panel.UKS = Train.UKS.UKSLamp
+        Panel.UKSb = Train.UKS.UKSTriggered
         if self.RRI> 0 then
             local RRI_VV = Train.RRI_VV
             RRI_VV.Power = BO*Train["50V"].Value*Train.RRIEnable.Value
@@ -132,18 +132,18 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
     Panel.AnnouncerPlaying = T[13]
     Train:WriteTrainWire(24,S["U2"]*Train.KU8.Value)
     if isE then
-        Train:WriteTrainWire(14,BO*KV["10-14B"]*KV["14-14B"])
+        Train:WriteTrainWire(14,BO*KV["10-14B"]*KV["14-14B"]*(1-Train.UKS.UKSEmerTriggered))
         Train:WriteTrainWire(1,S["10AK"]*Train.R1_5.Value)
         Train:WriteTrainWire(2,S["U2"]*KV["U2-2"])
         Train:WriteTrainWire(3,S["U2"]*KV["U2-3"])
         Train:WriteTrainWire(25,S["U2"]*KV["U2-25"])
         Train:WriteTrainWire(20,S["U2"]*KV["U2-20"])
         Train:WriteTrainWire(6,S["U2"]*KV["U2-6"])
-        Train.RV2:TriggerInput("Set",S["10AK"]*KV["10AK-7A"])
+        Train.RV2:TriggerInput("Set",S["10AK"]*KV["10AK-7A"]*(Train.AVU.Value+Train.OtklAVU.Value)*(1-Train.UKS.UKSTriggered))
         Train.R1_5:TriggerInput("Set",S["10AK"]*Train.RV2.Value)
         Train:WriteTrainWire(17,S["10AK"]*Train.KU9.Value)
 
-        Train:WriteTrainWire(8,BO*KV["10-8"])
+        Train:WriteTrainWire(8,BO*(KV["10-8"]+KV["10-14B"]*Train.UKS.UKSEmerTriggered))
     elseif isEzh then
         S["10a"] = BO*KV["10a-8"]
         ARS.ALS  = S["10a"]*Train.ALS.Value*RC
@@ -199,7 +199,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train)
         Train.RV2:TriggerInput("Set",S["10AK"]*KV["33-10AK"]*(Train.AVU.Value+Train.OtklAVU.Value)*Train.UAVAC.Value*(1-Train.UKS.UKSTriggered))
         Train.R1_5:TriggerInput("Set",S["10AK"]*Train.RV2.Value)
         Train:WriteTrainWire(17,S["10AK"]*Train.KU9.Value)
-        Train:WriteTrainWire(8,BO*KV["10-8"])
+        Train:WriteTrainWire(8,BO*(KV["10-8"]+KV["10a-8"]*Train.UKS.UKSEmerTriggered))
         Train:WriteTrainWire(44,S["10AK"]*Train.UV1.Value)
     end
 
