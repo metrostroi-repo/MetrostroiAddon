@@ -32,6 +32,7 @@ Panel.DisableHUD        = Wyłącz HUD na miejscu maszynisty
 Panel.DisableCamAccel   = Wyłącz ruch kamery (wrażenie przyspieszenia)
 Panel.DisableHoverText  = Wyłącz podpowiedzi przycisków
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW #FIXME
+Panel.DisableSeatShadows= Disable seat shadows #NEW #FIXME
 Panel.ScreenshotMode    = Tryb fotografii (NISKI FPS!)
 Panel.ShadowsHeadlight  = Włącz dynamiczne cienie (lampy)
 Panel.RedLights         = Enable dynamic light\nof red lights

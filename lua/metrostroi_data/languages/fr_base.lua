@@ -32,6 +32,7 @@ Panel.DisableHUD        = Désactive le HUD sur le siège du conducteur
 Panel.DisableCamAccel   = Désactive l'accéleration de caméra
 Panel.DisableHoverText  = Désactive le texte de légende
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = Mode screenshot (IPS bas)
 Panel.ShadowsHeadlight  = Active les ombres des phares
 Panel.RedLights         = Activer la lumière dynamique\ndes feux rouges

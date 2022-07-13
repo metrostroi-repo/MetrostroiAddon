@@ -310,6 +310,7 @@ local C_Shadows3            = GetConVar("metrostroi_shadows3")
 local C_Shadows4            = GetConVar("metrostroi_shadows4")
 local C_AA                  = GetConVar("mat_antialias")
 local C_Sprites             = GetConVar("metrostroi_sprites")
+local C_DisableSeatShadows  = GetConVar("metrostroi_disableseatshadows")
 local whitelist = {
     ["CHudChat"] = true,
     ["CHudDeathNotice"] = true,
@@ -1049,6 +1050,18 @@ function ENT:Think()
             end
         end
     end
+    
+    local disableSeatShadows = C_DisableSeatShadows:GetBool()
+    if self.DisableSeatShadows ~= disableSeatShadows then
+        for i=1,self:GetNW2Int("seats",0) do
+            local seat = self:GetNW2Entity("seat_"..i)
+            if IsValid(seat) then
+                seat:SetRenderMode(disableSeatShadows and RENDERMODE_NONE or RENDERMODE_TRANSALPHA)
+                if disableSeatShadows then seat:AddEffects(EF_NODRAW) else seat:RemoveEffects(EF_NODRAW) end
+            end
+        end
+        self.DisableSeatShadows = disableSeatShadows
+    end    
 
     if (GetConVar("metrostroi_disablecamaccel"):GetInt() == 0) then
         self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Float("Accel",0)+1)/2),0,1, 4, 1)*30-15)
