@@ -47,17 +47,6 @@ ENT.Spawner = {
             train.NumberRangesID = body>1 and (math.random()>0.5 and 6 or 7) or (math.random()>0.5 and 4 or 5)
         end
     end,
-    forinterim = {
-        Type = true,
-        BodyType = true,
-        Scheme = true,
-        Announcer = true,
-        LampType = true,
-        SeatType = true,
-        Texture = true,
-        PassTexture = true,
-        SpawnMode = true
-    },
     {"Type","Spawner.717.Type","List",{"81-717","81-717.5"}},
     {"BodyType","Spawner.717.BodyType","List",{"Spawner.717.Type.MVM","Spawner.717.Type.LVZ"}},
     {"Scheme","Spawner.717.Schemes","List",function()

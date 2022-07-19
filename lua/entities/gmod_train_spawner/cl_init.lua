@@ -107,11 +107,7 @@ function FRAME:Setup(train, settings, entSettings, frame)
     self.Train = ent
     self.EntSettings = entSettings
 
-    local isinterim = entSettings.Spawner.interim == ent.ClassName
-
-    if entSettings.Spawner.forinterim and isinterim then
-        self:PrepareSpawner()
-    end
+    self.IsInterim = entSettings.Spawner.interim == ent.ClassName
 
     self.Pos = 0
     self.MaxHorizontal = 20
@@ -128,25 +124,6 @@ function FRAME:Paint(w, h)
     draw.RoundedBox(4, 1, 1, w-2, h-2, Color(108, 111, 114, self:GetAlpha()))
 end
 
-function FRAME:PrepareSpawner()
-    local tbl = {}
-    local i = 1
-
-    for _, menu in ipairs(self.EntSettings.Spawner) do
-        if self.EntSettings.Spawner.forinterim[menu[1]] then
-            tbl[i] = menu
-            i = i + 1
-        elseif type(menu[1]) == "number" then
-            tbl[i] = menu
-            i = i + 1
-        elseif #menu==0 then
-            tbl[i] = {}
-            i = i + 1
-        end
-    end
-    self.InterimSpawner = tbl
-end
-
 function FRAME:Load()
     local function incPos(a) self.Pos=self.Pos+(a or 1) end
 
@@ -156,7 +133,7 @@ function FRAME:Load()
     self.Objects = {}
     self.ObjectsTypes = {}
 
-    local spawnertbl = self.InterimSpawner or self.EntSettings.Spawner
+    local spawnertbl = Metrostroi.TrainSpawner.GetProperties(self.EntSettings.ClassName)
 
     for i, menu in ipairs(spawnertbl) do
         if menu[3] == "List" then
@@ -420,68 +397,78 @@ function FRAME:Init()
     self:SetTitle(Metrostroi.GetPhrase("Spawner.ConsistPreview.Preview"))
 end
 
-function FRAME:SpawnWagon(wag, i, max)
+function FRAME:GetTrainPos(pos)
+    local distance = 960
+
+    return Vector(-(distance*(pos - 1)), 0, 0)
+end
+
+function FRAME:SpawnModel(model, pos, rot)
+    local ang = rot and Angle(0, 180, 0) or Angle(0, 0, 0)
+
+    local ent = ClientsideModel( model, RENDERGROUP_OTHER )
+    if ( !IsValid( ent ) ) then return end
+
+    ent:SetNoDraw( true )
+    ent:SetIK( false )
+
+    ent:SetPos(pos)
+    ent:SetAngles(ang)
+
+    return ent
+end
+
+function FRAME:SpawnTrainModel(model, pos, rot, wag)
     local texture = Metrostroi.Skins["train"][wag.Texture]
     local passtexture = Metrostroi.Skins["pass"][wag.PassTexture]
     local cabintexture = Metrostroi.Skins["cab"][wag.CabTexture]
+
+    local ent = self:SpawnModel(model, pos, rot)
+
+    ent.GetBodyColor = function()
+        return Vector(1, 1, 1)
+    end
+
+    ent.GetDirtLevel = function()
+        return 0
+    end
+    
+    for k2 in pairs(ent:GetMaterials()) do ent:SetSubMaterial(k2-1,"") end
+    for k2,v2 in pairs(ent:GetMaterials()) do
+        local tex = string.Explode("/",v2)
+        tex = tex[#tex]
+        if cabintexture and cabintexture.textures and cabintexture.textures[tex] then
+            ent:SetSubMaterial(k2-1,cabintexture.textures[tex])
+        end
+        if passtexture and passtexture.textures and passtexture.textures[tex] then
+            ent:SetSubMaterial(k2-1,passtexture.textures[tex])
+        end
+        if texture and texture.textures and texture.textures[tex] then
+            ent:SetSubMaterial(k2-1,texture.textures[tex])
+        end
+    end
+
+    return ent
+end
+
+function FRAME:SpawnWagon(wag, i, max)
+    hook.Run("MetrostroiTrainSpawnerPreview-WagonSpawn", self.MainFrame, self, wag["__class"], wag, i, max)
 
     local model = scripted_ents.Get(wag["__class"]).Model or self.MainFrame.Train.Model
 
     local models = {model}
 
-    if i == 1 or i == max then models = self.MainFrame.Train.Spawner.model end
-    
-    local distance = 960
-    local ang = Angle(0, 0, 0)
-
-    if i == max then ang = Angle(0, 180, 0) end
+    if not hook.Run("MetrostroiTrainSpawnerPreview-PreventSpawnerModels", self.MainFrame, self, wag["__class"], wag, i, max) then
+        if i == 1 or i == max then models = self.MainFrame.Train.Spawner.model end
+    end
 
     for k, v in pairs(models) do
-        local ent = ClientsideModel( v, RENDERGROUP_OTHER )
-        if ( !IsValid( ent ) ) then return end
-
-        --[[
-        if k == 1 then
-            local mins = ent:OBBMins()
-            local maxs = ent:OBBMaxs()
-            print(mins, maxs)
-            x = math.abs(mins.x) + math.abs(maxs.x)
-            y = math.abs(mins.y) + math.abs(maxs.y)
-            z = math.abs(mins.z) + math.abs(maxs.z)
-        end
-        ]]
-    
-        ent:SetNoDraw( true )
-        ent:SetIK( false )
-
-        ent:SetPos(Vector(-(distance*(i - 1)), 0, 0))
-        ent:SetAngles(ang)
-
-        ent.GetBodyColor = function()
-            return Vector(1, 1, 1)
-        end
-
-        ent.GetDirtLevel = function()
-            return 0
-        end
-        
-        for k2 in pairs(ent:GetMaterials()) do ent:SetSubMaterial(k2-1,"") end
-        for k2,v2 in pairs(ent:GetMaterials()) do
-            local tex = string.Explode("/",v2)
-            tex = tex[#tex]
-            if cabintexture and cabintexture.textures and cabintexture.textures[tex] then
-                ent:SetSubMaterial(k2-1,cabintexture.textures[tex])
-            end
-            if passtexture and passtexture.textures and passtexture.textures[tex] then
-                ent:SetSubMaterial(k2-1,passtexture.textures[tex])
-            end
-            if texture and texture.textures and texture.textures[tex] then
-                ent:SetSubMaterial(k2-1,texture.textures[tex])
-            end
-        end
+        local ent = self:SpawnTrainModel(v, self:GetTrainPos(i), i == max, wag)
 
         table.insert(self.Models, ent)
     end
+
+    hook.Run("MetrostroiTrainSpawnerPreview-PostWagonSpawn", self.MainFrame, self, wag["__class"], wag, i, max)
 end
 
 function FRAME:Setup(mainframe)
@@ -500,6 +487,10 @@ function FRAME:Setup(mainframe)
 
         return false
     end
+
+    self.ModelPanel.vCamPos = mainframe.PreviewCamPos or self.ModelPanel.vCamPos
+    self.ModelPanel.aLookAngle = mainframe.PreviewLookAngle or self.ModelPanel.aLookAngle
+    self.ModelPanel.vLookatPos = mainframe.PreviewLookatPos or self.ModelPanel.vLookatPos
 
     self.Models = {}
 
@@ -525,6 +516,10 @@ function FRAME:OnRemove()
             v:Remove()
         end
     end
+
+    self.MainFrame.PreviewCamPos = self.ModelPanel.vCamPos
+    self.MainFrame.PreviewLookAngle = self.ModelPanel.aLookAngle
+    self.MainFrame.PreviewLookatPos = self.ModelPanel.vLookatPos
 
     self.MainFrame:Show()
 end
@@ -1236,35 +1231,63 @@ function FRAME:UpdateFrame()
 
     if not self.Settings[self.Settings.Train] then self.Settings[self.Settings.Train] = {} end
 
-    for k,name in pairs(Metrostroi.TrainClasses) do
-        local ENT = scripted_ents.Get(name)
-        if not ENT.Spawner or ENT.ClassName ~= self.Settings.Train  then continue end
-        for i, menu in ipairs(ENT.Spawner) do
-            if menu[3] == "List" then
-                if self.Settings[self.Settings.Train][menu[1]] == nil then
-                    self.Settings[self.Settings.Train][menu[1]] = menu[5]
-                end
-                self:CreateList(menu[1],menu[2],menu[4],menu[7])
-            elseif menu[3] == "Boolean" then
-                if self.Settings[self.Settings.Train][menu[1]] == nil then
-                    self.Settings[self.Settings.Train][menu[1]] = menu[4]
-                end
-                self:CreateCheckBox(menu[1],menu[2],menu[6])
-            elseif menu[3] == "Slider" then
-                if self.Settings[self.Settings.Train][menu[1]] == nil then
-                    self.Settings[self.Settings.Train][menu[1]] = menu[7]
-                end
-                self:CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
-            elseif menu[3] == "Selective" then
-                if self.Settings[self.Settings.Train][menu[1]] == nil then
-                    self.Settings[self.Settings.Train][menu[1]] = menu[5]
-                end
-                self:CreateSelective(menu[1],menu[2],menu[4],menu[7])
-            elseif type(menu[1]) == "number" then
-                incPos(menu[1])
-            elseif #menu==0 then
-                incPos()
+    -- for k,name in pairs(Metrostroi.TrainClasses) do
+    --     local ENT = scripted_ents.Get(name)
+    --     if not ENT.Spawner or ENT.ClassName ~= self.Settings.Train  then continue end
+    --     for i, menu in ipairs(ENT.Spawner) do
+    --         if menu[3] == "List" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[5]
+    --             end
+    --             self:CreateList(menu[1],menu[2],menu[4],menu[7])
+    --         elseif menu[3] == "Boolean" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[4]
+    --             end
+    --             self:CreateCheckBox(menu[1],menu[2],menu[6])
+    --         elseif menu[3] == "Slider" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[7]
+    --             end
+    --             self:CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
+    --         elseif menu[3] == "Selective" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[5]
+    --             end
+    --             self:CreateSelective(menu[1],menu[2],menu[4],menu[7])
+    --         elseif type(menu[1]) == "number" then
+    --             incPos(menu[1])
+    --         elseif #menu==0 then
+    --             incPos()
+    --         end
+    --     end
+    -- end
+
+    for i, menu in pairs(Metrostroi.TrainSpawner.GetProperties(self.Settings.Train)) do
+        if menu[3] == "List" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[5]
             end
+            self:CreateList(menu[1],menu[2],menu[4],menu[7])
+        elseif menu[3] == "Boolean" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[4]
+            end
+            self:CreateCheckBox(menu[1],menu[2],menu[6])
+        elseif menu[3] == "Slider" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[7]
+            end
+            self:CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
+        elseif menu[3] == "Selective" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[5]
+            end
+            self:CreateSelective(menu[1],menu[2],menu[4],menu[7])
+        elseif type(menu[1]) == "number" then
+            incPos(menu[1])
+        elseif #menu==0 then
+            incPos()
         end
     end
 
@@ -1337,6 +1360,7 @@ function FRAME:CreateSelective(name, text, tbl, func, out_tbl)
         if #tbl == count then
             for i=1,#tbl do
                 local line = selective:AddLine(tbl[i])
+                print(out_tbl[name])
                 line:SetSelected(table.HasValue(out_tbl[name], i))
                 item_count = item_count + 1
             end
