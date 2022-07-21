@@ -438,10 +438,13 @@ function ENT:CheckVoltage(dT)
     end
 
     self.VoltageDropByTouch = 0
-    self.NextStates[1] = not self.DisableContacts and not self.DisableContactsManual
-                        and self:CheckContact(self.PantLPos,Vector(0,-1,0),1,self.PantLCPos)
-    self.NextStates[2] = not self.DisableContacts and not self.DisableContactsManual
-                        and self:CheckContact(self.PantRPos,Vector(0, 1,0),2,self.PantRCPos)
+    self.NextStates[1] = self:CheckContact(self.PantLPos,Vector(0,-1,0),1,self.PantLCPos)
+    self.NextStates[2] = self:CheckContact(self.PantRPos,Vector(0, 1,0),2,self.PantRCPos)
+
+    if self.DisableContacts or self.DisableContactsManual then
+        self.NextStates[1] = false
+        self.NextStates[2] = false
+    end
 
     -- Detect changes in contact states
     for i=1,2 do
@@ -489,7 +492,6 @@ function ENT:Think()
             constraint.NoCollide(self.Wheels,self:GetNW2Entity("TrainEntity"),0,0)
         end
     end
-
     -- Update timing
     self.PrevTime = self.PrevTime or CurTime()
     self.DeltaTime = (CurTime() - self.PrevTime)
