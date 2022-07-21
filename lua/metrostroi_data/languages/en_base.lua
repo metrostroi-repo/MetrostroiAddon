@@ -425,6 +425,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menu
 Common.ASNP.ASNPUp          = ASNP: Up
 Common.ASNP.ASNPDown        = ASNP: Down
 Common.ASNP.ASNPOn          = ASNP: Power
+Common.ASNP.ASNPPath        = ASNP: Set path
 
 #PVK
 Common.CabVent.PVK-         = Decrease driver's cab ventilation power

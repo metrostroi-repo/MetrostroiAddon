@@ -57,7 +57,6 @@ end
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
     local speed = Train.ALSCoil.Speed
-
     --vv При торможении смещение на 2км\ч vv
     ----[[
     if self.SpeedDec then

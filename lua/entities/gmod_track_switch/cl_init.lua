@@ -5,7 +5,7 @@ local function enableDebug()
     if debug:GetBool() then
         hook.Add("PreDrawEffects","MetrostroiSwitchDebug",function()
             for _,ent in pairs(ents.FindByClass("gmod_track_switch")) do
-                if IsValid(ent) and LocalPlayer():GetPos():Distance(ent:GetPos()) < 512 then
+                if IsValid(ent) and LocalPlayer():GetPos():DistToSqr(ent:GetPos()) < 262144 then
 					local pos = ent:LocalToWorld(Vector(30,0,75))
 					local ang = ent:LocalToWorldAngles(Angle(0,180,90))
 					cam.Start3D2D(pos, ang, 0.25)

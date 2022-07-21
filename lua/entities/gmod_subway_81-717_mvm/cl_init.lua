@@ -706,14 +706,14 @@ ENT.ButtonMap["Block7"] = {
             var="KRP",speed=16,vmin=1,vmax=0,
             sndvol = 0.07,snd = function(val) return val and "button1_on" or "button1_off" end,sndmin = 60,sndmax = 1e3/3,sndang = Angle(-90,0,0),
         }},
-        {ID = "VKSTToggle",x=28,y=58,radius=20,tooltip="",model = {
-            model = "models/metrostroi_train/81-710/ezh3_tumbler_pp250.mdl",ang = 180,z=-2,
+        {ID = "VKSTToggle",x=28,y=57,radius=20,tooltip="",model = {
+            model = "models/metrostroi_train/81-717/udkst.mdl",ang = 180,z=-2.4,
             var="VKST",speed=16,
             sndvol = 1,snd = function(val) return val and "switch_on" or "switch_off" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
         }}, 
-        {ID = "!IST", x=43, y=58, radius=8, tooltip="", model = {
-            lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",z = -2,color = Color(255,50,45), var="ISTLamp"},
+        {ID = "!IST", x=43, y=57, radius=8, tooltip="", model = {
+            lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",z = 0,color = Color(255,50,45), var="ISTLamp"},
             sprite = {bright=0.5,size=0.25,scale=0.01,color=Color(255,50,45),z=-1.4,}
         }},        
         {ID = "KAHSet",x=43,y=88,radius=20,tooltip="",model = {
@@ -723,9 +723,9 @@ ENT.ButtonMap["Block7"] = {
         }},
         --{ID = "KAHPl",x=37,y=68,radius=20,tooltip=""},
         {ID = "KAHKToggle",x=23,y=98,w=40,h=20,tooltip="",model = {
-            model = "models/metrostroi_train/81/krishka.mdl",ang = 0,z = -1,
+            model = "models/metrostroi_train/81/krishka.mdl",ang = 0,z = -1.6,
             var="KAHK",speed=8,min=0.43,max=0.685,disable="KAHSet",
-            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=80,x=15,y=-49,z=-0,var="KAHPl",ID="KAHPl",},
+            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=160,x=-30,y=-29.5,z=1,var="KAHPl",ID="KAHPl",},
             sndvol = 1,snd = function(val) return val and "kr_close" or "kr_open" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
             noTooltip = true,
@@ -758,12 +758,6 @@ ENT.ButtonMap["Block7"] = {
             sprite = {bright=0.2,size=.5,scale=0.03,z=20,color=Color(255,130,90)},
         }},
     }
-}
-ENT.ClientProps["VKSTIST"] = {
-    model = "",
-    pos = Vector(0,0,0),
-    ang = Angle(0,0,0),
-    hideseat = 0.5,
 }
 
 ENT.ButtonMap["Block1"] = {
@@ -1704,7 +1698,7 @@ ENT.ClientProps["reverser"] = {
 }
 ENT.ClientProps["krureverser"] = {
     model = "models/metrostroi_train/reversor/reversor_classic.mdl",
-    pos = Vector(443.8,-24.5,-3.2),
+    pos = Vector(443.5,-24.18,-3.2),
     ang = Angle(0,-90,60),
     hideseat=0.2,
     modelcallback = function(ent)
@@ -2040,6 +2034,21 @@ ENT.ButtonMap["AirDistributor"] = {
 
     buttons = {
         {ID = "AirDistributorDisconnectToggle",x=0,y=0,w= 170,h = 80,tooltip="",var="AD",states={"Train.Buttons.On","Train.Buttons.Off"}},
+    }
+}
+
+ENT.ButtonMap["AutostopValve"] = {
+    pos = Vector(365.8,-67.6,-56),
+    ang = Angle(0,0,90),
+    width = 130,
+    height = 40,
+    scale = 0.1,
+    hideseat=0.1,
+    hide=true,
+    screenHide = true,
+
+    buttons = {
+        {ID = "AutostopValveSet",x=0,y=0,w= 130,h = 40,tooltip="Сорвать срывной клапан"},
     }
 }
 
@@ -3130,8 +3139,8 @@ function ENT:Think()
     --self:SetSoundState("rolling_medium1",0 or rol40*rollings,rol40p) --57
     self:SetSoundState("rolling_high2"  ,rol70*rollings,rol70p) --70
 
-    self.ReleasedPdT = math.Clamp(self.ReleasedPdT + 2*(-self:GetPackedRatio("BrakeCylinderPressure_dPdT",0)-self.ReleasedPdT)*dT,0,1)
-    local release1 = math.Clamp((self.ReleasedPdT-0.1)/0.8,0,1)^2
+    self.ReleasedPdT = math.Clamp(self.ReleasedPdT + 2*(-self:GetPackedRatio("BrakeCylinderPressure_dPdT",0)-0.8*self.ReleasedPdT)*dT,0,1)
+    local release1 = math.Clamp((1.1*self.ReleasedPdT-0.1)/0.48,0,8)^2
     self:SetSoundState("release1",release1,1)
     self:SetSoundState("release2",(math.Clamp(0.3-release1,0,0.3)/0.3)*(release1/0.3),1.0)
     local parking_brake = self:GetPackedRatio("ParkingBrakePressure_dPdT",0)
@@ -3194,9 +3203,9 @@ function ENT:Think()
         self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
     end
     local emergencyValveEPK = self:GetPackedRatio("EmergencyValveEPK_dPdT",0)
-    self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*dT,0,1)
+    self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*12*dT,0,1)
     if self.EmergencyValveEPKRamp < 0.01 then self.EmergencyValveEPKRamp = 0 end
-    self:SetSoundState("epk_brake",self.EmergencyValveEPKRamp,1.0)
+    self:SetSoundState("epk_brake",self.EmergencyValveEPKRamp,2.8)
 
 --[[
     local emergencyBrakeValve = self:GetPackedRatio("EmergencyBrakeValve_dPdT", 0)
@@ -3351,6 +3360,9 @@ function ENT:DrawPost()
 
     self:DrawOnPanel("AirDistributor",function()
         draw.DrawText(self:GetNW2Bool("AD") and "Air Distributor ON" or "Air Distributor OFF","Trebuchet24",0,0,Color(0,0,0,255))
+    end)
+    self:DrawOnPanel("AutostopValve",function()
+        draw.DrawText("Autostop Valve", "Trebuchet24",0,6,Color(0,0,0,255))
     end)
 end
 

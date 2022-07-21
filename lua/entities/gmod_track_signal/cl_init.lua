@@ -589,7 +589,7 @@ local function enableDebug()
     if debug:GetBool() then
         hook.Add("PreDrawEffects","MetrostroiSignalDebug",function()
             for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
-                if IsValid(sig) and LocalPlayer():GetPos():Distance(sig:GetPos()) < 384 then
+                if IsValid(sig) and LocalPlayer():GetPos():DistToSqr(sig:GetPos()) < 147456 then
                     local pos = sig:LocalToWorld(Vector(48,0,150))
                     local ang = sig:LocalToWorldAngles(Angle(0,180,90))
                     cam.Start3D2D(pos, ang, 0.25)

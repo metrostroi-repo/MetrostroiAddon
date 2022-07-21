@@ -268,7 +268,7 @@ function ENT:Think()
     local BoardTime = 8+7*self.HorliftStation
     for k,v in pairs(ents.FindByClass("gmod_subway_*")) do
         if v.Base ~= "gmod_subway_base" and v:GetClass() ~= "gmod_subway_base" then continue end
-        if not IsValid(v) or v:GetPos():Distance(self:GetPos()) > self.PlatformStart:Distance(self.PlatformEnd) then continue end
+        if not IsValid(v) or v:GetPos():DistToSqr(self:GetPos()) > self.PlatformStart:DistToSqr(self.PlatformEnd) then continue end
 
         local platform_distance = ((self.PlatformStart-v:GetPos()) - ((self.PlatformStart-v:GetPos()):Dot(self.PlatformNorm))*self.PlatformNorm):Length()
         local vertical_distance = math.abs(v:GetPos().z - self.PlatformStart.z)

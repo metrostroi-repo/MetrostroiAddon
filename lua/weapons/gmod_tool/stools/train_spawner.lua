@@ -504,6 +504,7 @@ function TOOL:RightClick(trace)
                     for k,v in pairs(ent.CustomSpawnerUpdates) do if k ~= "BaseClass" then v(ent) end end
                     hook.Run("MetrostroiSpawnerUpdate",ent,self.Settings)
                     ent:UpdateTextures()
+                    ent._Settings = self.Settings
                     table.insert(trains,ent)
                     if self.Train.Spawner.postfunc then self.Train.Spawner.postfunc(trains,self.Settings.WagNum) end
                 end

@@ -615,17 +615,20 @@ local function colAlpha(col,a)
 end
 hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,isDD)
     if isDD then return end
+    local inSeat = LocalPlayer().InMetrostroiTrain
     for ent in pairs(Metrostroi.SpawnedTrains) do
         if ent:IsDormant() then continue end
         if MetrostroiStarted and MetrostroiStarted~=true or ent.RenderBlock then
-            local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
-            cam.Start3D2D(ent:LocalToWorld(Vector(0,-200,100)),ent:LocalToWorldAngles(Angle(0,90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
-            cam.End3D2D()
-            cam.Start3D2D(ent:LocalToWorld(Vector(0,200,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
-            cam.End3D2D()
-            return
+            if not inSeat then
+                local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
+                cam.Start3D2D(ent:LocalToWorld(Vector(0,-150,100)),ent:LocalToWorldAngles(Angle(0,90,90)),1.5)
+                    draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                cam.End3D2D()
+                cam.Start3D2D(ent:LocalToWorld(Vector(0,150,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),1.5)
+                    draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                cam.End3D2D()
+            end
+            continue
         end
         cam.IgnoreZ(true)
         for i,vHandle in pairs(ent.Sprites) do
@@ -665,7 +668,7 @@ local function enableDebug()
                 if ent.ButtonMap ~= nil then
                     draw.NoTexture()
                     for kp,panel in pairs(ent.ButtonMap) do
-                        if kp ~= "BaseClass" and LocalPlayer():GetPos():Distance(ent:LocalToWorld(panel.pos)) < 512 then
+                        if kp ~= "BaseClass" and LocalPlayer():GetPos():DistToSqr(ent:LocalToWorld(panel.pos)) < 262144 then
                             ent:DrawOnPanel(kp,function()
                                 surface.SetDrawColor(0,0,255)
                                 if not ent:ShouldDrawPanel(kp) then surface.SetDrawColor(255,0,0) end
@@ -2321,8 +2324,8 @@ end
 local function sendPanelTouch(panel,x,y,outside,state)
     net.Start("metrostroi-panel-touch")
     net.WriteString(panel or "")
-    net.WriteInt(x,11)
-    net.WriteInt(y,11)
+    net.WriteUInt(x,11)
+    net.WriteUInt(y,11)
     net.WriteBool(outside)
     net.WriteBool(state)
     net.SendToServer()

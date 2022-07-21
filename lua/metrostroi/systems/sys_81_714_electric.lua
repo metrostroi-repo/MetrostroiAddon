@@ -66,7 +66,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local isDot2 = self.Type == 5
 
     local Panel = Train.Panel
-    Panel.V1 = BO
+    Panel.V1 = T[10]
 
     --Поездная часть
     S["33D"] = T[10]*Train.A54.Value*Train.A84.Value
