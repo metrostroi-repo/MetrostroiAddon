@@ -678,7 +678,7 @@ ENT.ClientProps["voltmeter"] = {
 
 ENT.ClientProps["volt1"] = {
     model = "models/metrostroi_train/81-710/ezh3_voltages.mdl",
-    pos = Vector(463.263306,-19.963984,7.809407),
+    pos = Vector(463.263306,-19.963984,7.709407),
     ang = Angle(-90.000000,0.000000,0.000000),
     bscale = Vector(1,1,1.3),
     hideseat = 0.2,
@@ -1018,7 +1018,7 @@ function ENT:Think()
     self:Animate("controller",self:GetPackedRatio("ControllerPosition"),0, 0.31,  2,false)
     self:Animate("reverser",self:GetPackedRatio("ReverserPosition"),0.6, 0.4,  4,false)
     self:Animate("rcureverser",self:GetPackedBool("RCUPosition") and 1 or 0,0.77,0,3,false)
-    self:Animate("volt1", self:GetPackedRatio("BatteryVoltage"),0.6182,0.39,45,3)
+    self:Animate("volt1", self:GetPackedRatio("BatteryVoltage"),0.62,0.385,45,3)
 
     self:ShowHide("reverser",self:GetNW2Int("WrenchMode",0)==1)
     self:ShowHide("rcureverser",self:GetNW2Int("WrenchMode",0)==3)

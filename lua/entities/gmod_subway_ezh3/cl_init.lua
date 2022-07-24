@@ -350,7 +350,7 @@ ENT.ButtonMap["Panel"] = {
         sprite = {bright=0.20,size=0.25,scale=0.05,vscale=0.04,color=Color(136, 159, 211),y=0,z=-3,lamp="light_SD",hidden="ezh3_lsd"}
     }},
 
-    {ID = "!BatteryVoltage", x=120-80,y=25,tooltip="",w=60, h=50,tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*100) end},
+    {ID = "!BatteryVoltage", x=120-80,y=25,tooltip="",w=60, h=50,tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*150) end},
     {ID = "!EnginesCurrent", x=120-8,y=25,tooltip="",w=60, h=50,tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.EnginesCurrent"),ent:GetPackedRatio("EnginesCurrent")*1000-500) end},
     {ID = "!HighVoltage", x=120+80-18,y=25,tooltip="",w=60, h=50,tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.HighVoltage"),ent:GetPackedRatio("EnginesVoltage")*1000) end},
     {ID = "!Speedometer", x=352,y=25,tooltip="",w=85, h=70,tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),ent:GetPackedRatio("Speed")*100) end},
@@ -1158,7 +1158,7 @@ ENT.ClientProps["voltmeter"] = {
 
 ENT.ClientProps["ampermeter"] = {
     model = "models/metrostroi_train/81-710/ezh3_voltages.mdl",
-    pos = Vector(448.20+10.09,-24.66,-6.69),
+    pos = Vector(448.20+10.09,-24.69,-6.69),
     ang = Angle(-62,0,0),
     hideseat = 0.2,
 }
@@ -1166,7 +1166,7 @@ ENT.ClientProps["ampermeter"] = {
 ENT.ClientProps["volt1"] = {
     model = "models/metrostroi_train/81-710/ezh3_voltages.mdl",
     pos = Vector(448.20+10.35,-20.57,-6.69),
-    ang = Angle(-62,0,0),
+    ang = Angle(-62,-5,0),
     hideseat = 0.2,
 }
 ENT.ClientProps["speed1"] = {
@@ -1719,7 +1719,7 @@ function ENT:Think()
     self:Animate("brake_cylinder",self:GetPackedRatio("BCPressure"), 0.052, 0.794,nil,2)--,,0.03)
     self:Animate("voltmeter",self:GetPackedRatio("EnginesVoltage"), 0.632,0.36,92,2)
     self:Animate("ampermeter",self:GetPackedRatio("EnginesCurrent"), 0.632,0.36,nil, nil,92,20,3)
-    self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.613,0.455,72,2)
+    self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.632,0.368,45,2)
     self:Animate("speed1",self:GetPackedRatio("Speed"),0.645, 0.363, nil, nil,  90,200,20)
 
 

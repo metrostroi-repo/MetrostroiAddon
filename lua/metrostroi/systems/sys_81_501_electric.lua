@@ -261,6 +261,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train, dT)
         )/750*(0.5+0.5*B*Train.VB.Value*Train.KZ1.Value)
     ))
     Panel.MainLights2 = Panel.MainLights1*Train.KO.Value
+    Train.Battery:TriggerInput("Charge", Train.VB.Value*Panel.MainLights1)
 
     Train.KK:TriggerInput("Set",T[22]*(1-Train.TRK.Value))
     Train.KO:TriggerInput("Close",T[27])
