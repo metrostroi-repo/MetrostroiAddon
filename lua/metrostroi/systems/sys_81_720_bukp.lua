@@ -620,8 +620,8 @@ if SERVER then
                             local orientation = train.Orientation
                             Train:SetNW2Bool("VityazWagOr"..i,orientation)
                             for d=1,4 do
-                                Train:SetNW2Bool("VityazDoor"..d.."L"..i,train["Door"..(orientation and d or d+4).."Closed"])
-                                Train:SetNW2Bool("VityazDoor"..d.."R"..i,train["Door"..(orientation and d+4 or d).."Closed"])
+                                Train:SetNW2Bool("VityazDoor"..d.."L"..i,train["Door"..(orientation and d or 9-d).."Closed"])
+                                Train:SetNW2Bool("VityazDoor"..d.."R"..i,train["Door"..(orientation and d+4 or 5-d).."Closed"])
                             end
                         end
                     elseif self.State2 == 6 then
