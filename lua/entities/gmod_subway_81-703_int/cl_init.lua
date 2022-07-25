@@ -410,7 +410,7 @@ ENT.ButtonMap["BatteryVoltage"] = {
     scale = 0.0625,
 
     buttons = {
-        {ID = "!BatteryVoltage", x=0,y=0,w=60,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*100) end},
+        {ID = "!BatteryVoltage", x=0,y=0,w=60,h=60,tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*150) end},
     }
 }
 
@@ -1184,7 +1184,7 @@ function ENT:Think()
     self:Animate("rcureverser",self:GetPackedBool("RCUPosition") and 1 or 0,0.77,0,3,false)
     self:ShowHide("reverser",self:GetNW2Int("WrenchMode",0)==1)
     self:ShowHide("rcureverser",self:GetNW2Int("WrenchMode",0)==3)
-    self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),            0.637,0.4885,45,3)
+    self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.62,0.38,45,3)
 
     self:Animate("brake_line",self:GetPackedRatio("BLPressure"),0.6285, 0.84,  256,2)--,,0.01)
     self:Animate("train_line",self:GetPackedRatio("TLPressure"),0.6285, 0.843,  256,2)--,,0.01)

@@ -334,7 +334,7 @@ function ENT:Think()
     self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure",  math.min(2.7,Pneumatic.BrakeCylinderPressure)/6.0)
     self:SetPackedRatio("EnginesVoltage", self.Electric.Main750V/1000.0)
-    self:SetPackedRatio("BatteryVoltage",self.Panel["V1"]*self.Battery.Voltage/100)
+    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
     self:SetPackedBool("RT300",self.Electric.ThyristorControllerPower*self.Electric.ThyristorControllerWork>0)
