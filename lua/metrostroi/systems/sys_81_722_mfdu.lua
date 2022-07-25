@@ -602,8 +602,8 @@ if SERVER then
                             Train:SetPackedBool("MFDUDF"..i,train.TRear)
                             Train:SetPackedBool("MFDUDB"..i,train.TFront)
                             for i2=0,3 do
-                                Train:SetPackedBool("MFDUDL"..i2.."_"..i,not train["Door"..(i2+5).."Closed"])
-                                Train:SetPackedBool("MFDUDR"..i2.."_"..i,not train["Door"..(i2+1).."Closed"])
+                                Train:SetPackedBool("MFDUDL"..i2.."_"..i,not train["Door"..(8-i2).."Closed"])
+                                Train:SetPackedBool("MFDUDR"..i2.."_"..i,not train["Door"..(4-i2).."Closed"])
                             end
                         end
                     end
