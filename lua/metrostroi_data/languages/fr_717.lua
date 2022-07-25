@@ -1053,8 +1053,8 @@ Entities.gmod_subway_81-714_mvm.Buttons.Stopkran.EmergencyBrakeValveToggle = @[C
 
 Entities.gmod_subway_81-714_mvm.Buttons.Voltages.!BatteryVoltage        = @[Common.ALL.BatteryVoltage] #NEW
 Entities.gmod_subway_81-714_mvm.Buttons.Voltages.!BatteryCurrent        = @[Common.ALL.BatteryCurrent] #NEW
-Entities.gmod_subway_81-714_mvm.Buttons.Pressures.!BCPressure           = @[Common.ALL.BLTLPressure] #NEW
-Entities.gmod_subway_81-714_mvm.Buttons.Pressures.!BLTLPressure         = @[Common.ALL.BCPressure] #NEW
+Entities.gmod_subway_81-714_mvm.Buttons.Pressures.!BCPressure           = @[Common.ALL.BCPressure] #NEW
+Entities.gmod_subway_81-714_mvm.Buttons.Pressures.!BLTLPressure         = @[Common.ALL.BLTLPressure] #NEW
 
 #gmod_subway_81-714_lvz
 Entities.gmod_subway_81-714_lvz.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle            = @[Common.ALL.FrontBrakeLineIsolationToggle]
@@ -1131,8 +1131,8 @@ Entities.gmod_subway_81-714_lvz.Buttons.Stopkran.EmergencyBrakeValveToggle = @[C
 
 Entities.gmod_subway_81-714_lvz.Buttons.Voltages.!BatteryVoltage        = @[Common.ALL.BatteryVoltage] #NEW
 Entities.gmod_subway_81-714_lvz.Buttons.Voltages.!BatteryCurrent        = @[Common.ALL.BatteryCurrent] #NEW
-Entities.gmod_subway_81-714_lvz.Buttons.Pressures.!BCPressure           = @[Common.ALL.BLTLPressure] #NEW
-Entities.gmod_subway_81-714_lvz.Buttons.Pressures.!BLTLPressure         = @[Common.ALL.BCPressure] #NEW
+Entities.gmod_subway_81-714_lvz.Buttons.Pressures.!BCPressure           = @[Common.ALL.BCPressure] #NEW
+Entities.gmod_subway_81-714_lvz.Buttons.Pressures.!BLTLPressure         = @[Common.ALL.BLTLPressure] #NEW
 
 #Spawner:
 Entities.gmod_subway_81-717_mvm.Spawner.Announcer.Name  = @[Common.Spawner.Announcer]
