@@ -52,6 +52,7 @@ Panel.RouteNumber       = Номер маршрута
 Panel.FOV               = Поле зрения
 Panel.Z                 = Высота камеры
 Panel.RenderDistance    = Дальность прорисовки
+Panel.RenderSignals     = Прорисовка светофоров
 Panel.ReloadClient      = Перезагрузить клиентскую часть
 
 Panel.ClientAdvanced    = Клиент (дополнительно)

@@ -41,6 +41,7 @@ Panel.MinimizedShow     = Ne töltse be az elemeket, \nha a program tálcán van
 Panel.FOV               = FOV
 Panel.Z                 = Kamera magassága
 Panel.RenderDistance    = Renderelési távolság
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Kliens oldal újraindítása
 
 Panel.ClientAdvanced    = Kliens (haladó)

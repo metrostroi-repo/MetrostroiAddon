@@ -42,6 +42,7 @@ local function ClientPanel(panel)
     panel:NumSlider(Metrostroi.GetPhrase("Panel.FOV"),"metrostroi_cabfov",65,100)
     panel:NumSlider(Metrostroi.GetPhrase("Panel.Z"),"metrostroi_cabz",-10,10)
     panel:NumSlider(Metrostroi.GetPhrase("Panel.RenderDistance"),"metrostroi_renderdistance",960,3072)
+    panel:NumSlider(Metrostroi.GetPhrase("Panel.RenderSignals"),"metrostroi_signal_distance",6144,16384)
     panel:Button(Metrostroi.GetPhrase("Panel.ReloadClient"),"metrostroi_reload_client",true)
 
     function DRouteNumber:OnChange()
