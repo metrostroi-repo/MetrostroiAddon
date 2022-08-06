@@ -555,7 +555,7 @@ function ENT:Think()
             self.WindowEnd = self.WindowStart
         elseif self.WindowEnd < self:PoolSize() then
             local growthDelta = math.max(0,(target-self:PopulationCount())*0.005)
-            if growthDelta < 1.0 then -- Accumulate fractional rate
+            if growthDelta > 0.0 and growthDelta < 1.0 then -- Accumulate fractional rate
                 self.GrowthAccumulation = (self.GrowthAccumulation or 0) + growthDelta
                 if self.GrowthAccumulation > 1.0 then
                     growthDelta = 1
