@@ -41,6 +41,7 @@ Panel.MinimizedShow     = 창 최소화시 구성요소 언로드 하지 않기
 Panel.FOV               = 시야각(FOV)
 Panel.Z                 = 시점 높이
 Panel.RenderDistance    = 렌더링 거리
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = 사용자 시스템 다시 불러오기
 
 Panel.ClientAdvanced    = 사용자 (고급설정)

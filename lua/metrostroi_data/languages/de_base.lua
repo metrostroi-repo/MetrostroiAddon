@@ -43,6 +43,7 @@ Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = Sichtfeld
 Panel.Z                 = Camera height #NEW
 Panel.RenderDistance    = Render distanz
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Clientseitig neuladen
 
 Panel.ClientAdvanced    = Client (Fortgeschritten)
