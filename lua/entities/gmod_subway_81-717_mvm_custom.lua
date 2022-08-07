@@ -92,9 +92,8 @@ ENT.Spawner = {
                 ent.L_1:TriggerInput("Set",val==1 and 1 or 0)
                 ent.L_3:TriggerInput("Set",val==1 and 1 or 0)
                 ent.L_4:TriggerInput("Set",val==1 and 1 or 0)
-                ent.EPK:TriggerInput("Set",(ent.Plombs.RC1 and val==1) and 1 or 0)
-				local kran = ent:GetNW2String("Cran")
-                if kran == "2" then--ent.Pneumatic.ValveType == 2 then
+                ent.EPK:TriggerInput("Set",(ent.Plombs.RC1 and val==1) and 1 or 0) 
+                if ent:GetNW2String("Cran") == "2" then
                     ent.DriverValveDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
                     ent.Pneumatic:TriggerInput("BrakeSet",(val~=2) and (not first and 6 or 2) or 6)
                 else
