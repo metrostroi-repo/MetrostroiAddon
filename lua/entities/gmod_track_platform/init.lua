@@ -362,8 +362,8 @@ function ENT:Think()
             if not left_side then door_count = #v.RightDoorPositions end
 
             -- Get maximum boarding rate for normal russian subway train doors
-            local max_boarding_rate = getPassengerRate(v:GetNW2Int("PassengerCount")) * 1.4 * door_count * dT
-            --print(Format("R:%.2f\tS:%.2f\tP:% 3d",max_boarding_rate,getPassengerRate(v:GetNW2Int("PassengerCount")),v:GetNW2Int("PassengerCount")))
+            local max_boarding_rate = getPassengerRate(v:GetNW2Float("PassengerCount")) * 1.4 * door_count * dT
+            --print(Format("R:%.2f\tS:%.2f\tP:% 3d",max_boarding_rate,getPassengerRate(v:GetNW2Float("PassengerCount")),v:GetNW2Float("PassengerCount")))
             -- Get boarding rate based on passenger density
             local boarding_rate = math.min(max_boarding_rate,passenger_count)
             if self.PlatformLast then boarding_rate = 0 end
@@ -376,8 +376,8 @@ function ENT:Think()
             --if v.AnnouncementToLeaveWagonAcknowledged then
             if v.AnnouncementToLeaveWagonAcknowledged then
                 boarded   = 0
-                left      = math.ceil(math.min(math.max(2,leaving_rate + 0.5),v:GetNW2Int("PassengerCount"))*speedLimit*1.5)
-                count = v:GetNW2Int("PassengerCount")
+                left      = math.ceil(math.min(math.max(2,leaving_rate + 0.5),v:GetNW2Float("PassengerCount"))*speedLimit*1.5)
+                count = v:GetNW2Float("PassengerCount")
             else
                 count = self:PopulationCount() + v.PassengersToLeave
                 boarded   = math.ceil(math.min(math.max(2,boarding_rate+0.5),self:PopulationCount())*speedLimit)
@@ -446,7 +446,7 @@ function ENT:Think()
                 BoardTime = math.max(BoardTime,8+7*self.HorliftStation+math.max((v.PassengersToLeave or 0)*dT,self:PopulationCount()*dT)*0.5)
             end
             -- Add doors to boarding list
-            --print("BOARDING",boarding_rate,"DELTA = "..passenger_delta,self.PlatformLast,v:GetNW2Int("PassengerCount"))
+            --print("BOARDING",boarding_rate,"DELTA = "..passenger_delta,self.PlatformLast,v:GetNW2Float("PassengerCount"))
         end
         if v.UPO then v.UPO.AnnouncerPlay = self.AnnouncerPlay end
         v.BoardTimer = self.BoardTimer
@@ -548,21 +548,21 @@ function ENT:Think()
     end]]
     -- Add passengers
     if (not self.PlatformLast) and (#boardingDoorList == 0) then
-        local target = (Metrostroi.PassengersScale or 50)*self.PopularityIndex --300
+        local target = math.min((Metrostroi.PassengersScale or 50)*self.PopularityIndex, self:PoolSize() - 1) --300
         -- then target = target*0.1 end
 
         if target <= 0 then
             self.WindowEnd = self.WindowStart
-        elseif self.WindowEnd < self:PoolSize() then
+        else
             local growthDelta = math.max(0,(target-self:PopulationCount())*0.005)
-            if growthDelta > 0.0 and growthDelta < 1.0 then -- Accumulate fractional rate
+            if growthDelta < 1.0 then -- Accumulate fractional rate
                 self.GrowthAccumulation = (self.GrowthAccumulation or 0) + growthDelta
                 if self.GrowthAccumulation > 1.0 then
                     growthDelta = 1
                     self.GrowthAccumulation = self.GrowthAccumulation - 1.0
                 end
             end
-            self.WindowEnd = math.min(self:PoolSize(), self.WindowEnd + math.floor(growthDelta+0.5))
+            self.WindowEnd = (self.WindowEnd + math.floor(growthDelta+0.5)) % self:PoolSize()
         end
     end
 
