@@ -145,6 +145,7 @@ Entities.gmod_subway_81-717_mvm.Name  = 81-717 (Номерной МСК голо
 Entities.gmod_subway_81-717_mvm_custom.Name     = 81-717 (Номерной МСК кастом)
 Entities.gmod_subway_81-714_mvm.Name  = 81-714 (Номерной МСК промежуточный)
 Entities.gmod_subway_81-717_lvz.Name  = 81-717 (Номерной СПБ головной)
+Entities.gmod_subway_81-717_lvz_custom.Name     = 81-717 (Номерной СПБ кастом)
 Entities.gmod_subway_81-714_lvz.Name  = 81-714 (Номерной СПБ промежуточный)
 Entities.gmod_subway_81-718.Name      = 81-718 (ТИСУ головной)
 Entities.gmod_subway_81-719.Name      = 81-719 (ТИСУ промежуточный)
@@ -197,6 +198,45 @@ Spawner.Close                           = Закрыть
 Spawner.Trains1                         = Разрешено ваг.
 Spawner.Trains2                         = На человека
 Spawner.WagNum                          = Количество вагонов
+Spawner.Select                          = Выбрать
+
+Spawner.Consist.ConsistEditor           = Редактор составов
+Spawner.Consist.Information             = Информация:
+Spawner.Consist.InformationSelect       = Информация: Выберите состав
+Spawner.Consist.Invalid                 = Информация: Недействительный состав
+
+Spawner.Consist.Type                    = Тип: %s
+Spawner.Consist.WagNum                  = @[Spawner.WagNum]: %d
+Spawner.Consist.Name                    = Имя: %s
+Spawner.Consist.Author                  = Автор: %s
+
+Spawner.Consist.Spawn                   = Заспавнить
+Spawner.Consist.Edit                    = Изменить
+Spawner.Consist.New                     = Новый состав
+Spawner.Consist.Delete                  = Удалить состав
+
+Spawner.Consist.Create                  = Создать новый состав
+Spawner.Consist.CreateName              = Имя состава
+Spawner.Consist.ErrorName               = Введите имя состава
+Spawner.Consist.Error                   = Ошибка
+Spawner.Consist.ErrorNameExists         = Состав с таким именем уже существует
+Spawner.Consist.Overwrite               = Перезаписать состав
+Spawner.Consist.Cancel                  = Отмена
+
+Spawner.ConsistPreview.Preview          = Предпросмотр
+
+Spawner.ConsistEditor.Menu              = Меню
+Spawner.ConsistEditor.Save              = Сохранить
+Spawner.ConsistEditor.SaveAs            = Сохранить как
+Spawner.ConsistEditor.ShowLongName      = Показывать длинное название
+Spawner.ConsistEditor.ApplyForAll       = Применять параметры для всех вагонов
+Spawner.ConsistEditor.Wagon             = Вагон %d
+Spawner.ConsistEditor.Info              = Инфо
+
+Spawner.ConsistEditor.HotKeys           = Горячие клавишы:
+Spawner.ConsistEditor.HotKeys1          = Стрелки/Цифры используется для переключении вкладок
+Spawner.ConsistEditor.HotKeys2          = Shift + F используется для смены настройки "@[Spawner.ConsistEditor.ApplyForAll]"
+
 Spawner.PresetTitle                     = Пресеты
 Spawner.Preset.New                      = Создать новый
 Spawner.Preset.Unsaved                  = Сохранить текущий

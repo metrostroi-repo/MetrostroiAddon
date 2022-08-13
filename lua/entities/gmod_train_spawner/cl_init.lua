@@ -1,650 +1,1580 @@
 include("shared.lua")
-local MaxHorisontal = 14
-local frame = nil
-local pFrame = nil
-local wFrame = nil
-local MaxWagons = 0
-local MaxWagonsOnPlayer = 0
-local Settings = {
-	Train = 1,
-	WagNum = 3,
-	AutoCouple = true,
-}
-ENT.Settings = Settings
 
 if not file.Exists("metrostroi_train_spawner.txt","DATA") then
-	file.Write("metrostroi_train_spawner.txt","")
+    file.Write("metrostroi_train_spawner.txt","")
 end
 
-local function UpdateConCMD()
-	file.Write("metrostroi_train_spawner.txt",util.TableToJSON(Settings,true))
-	--[[
-	for k,v in pairs(Settings) do
-		RunConsoleCommand("train_spawner_"..k:lower(), v)
-	end]]
+if not file.Exists("metrostroi_consists/","DATA") then
+    file.CreateDir("metrostroi_consists")
 end
 
-local function LoadConCMD()
-	Settings = util.JSONToTable(file.Read("metrostroi_train_spawner.txt","DATA")) or Settings
-	if not Settings[Settings.Train] then Settings[Settings.Train] = {} end
-	--PrintTable(Settings)
-end
-local Pos = 0
-local VGUI = {}
-local function CreateList(name,text,tbl,OnSelect,stbl)
-	tbl = tbl or {}
-	stbl = stbl or Settings[Settings.Train]
-	if type(tbl)=="function" then tbl = tbl() or {} end
-	local count = 0;for k,v in pairs(tbl) do count = count+1 end
-	if count<=1 then
-		stbl[name] = next(tbl)
-		return
-	end
-	local ListLabel = vgui.Create("DLabel", frame)
-	--	ListLabel:SetPos(5 + 300*math.floor(Pos/MaxHorisontal), 24+24*(Pos%MaxHorisontal))
-	ListLabel:SetPos(5 + 270*math.floor(Pos/MaxHorisontal),24+24*(Pos%MaxHorisontal))
-	ListLabel:SetSize(115,28)
-	ListLabel:SetText(text)
-	ListLabel:SetExpensiveShadow(1,Color(0,0,0,200))
-
-	local List = vgui.Create("DComboBox", frame)--
-	List:SetTooltip(text)
-	List.Call = OnSelect
-	List:SetPos(130 + 270*math.floor(Pos/MaxHorisontal),28+24*(Pos%MaxHorisontal))
-	--	List:SetPos(130 + 300*math.floor(Pos/MaxHorisontal), 28+24*(Pos%MaxHorisontal))
-	List:SetWide(120)
-	if #tbl == count then
-		for i=1,#tbl do
-			List:AddChoice(tbl[i], i, stbl[name] == i)
-		end
-	else
-		for k,v in pairs(tbl) do
-			if type(v) == "table" and v.name then k = v.name end
-			List:AddChoice(v, k, stbl[name] == k)
-		end
-	end
-	if not List:GetOptionData(1)  then ListLabel:Remove() List:Remove() return end
-	if not List:GetSelectedID() then
-		local done
-		for i,v in pairs(List.Choices) do
-			if v:find("Random") then
-				List:ChooseOptionID(i)
-				stbl[name] = List:GetOptionData(i)
-				done = true
-				break
-			end
-		end
-		if not done then
-			List:ChooseOptionID(1)
-			stbl[name] = List:GetOptionData(1)
-		end
-	end
-	List.OnSelect = function(self,_, _, index)
-        for _,v in ipairs(VGUI) do v(nil,nil,true) end
-		stbl[name] = index
-		if OnSelect then OnSelect(List,VGUI) end
-	end
-	List.ID = table.insert(VGUI,function(val, disabled, reset)
-		if reset then
-			if List.Disable then List:SetEnabled(true) end
-		elseif val or disabled then
-			if val ~= nil then List:ChooseOptionID(val) end
-			List:SetEnabled(not disabled)
-			List.Disable = disabled
-		else
-			ListLabel:Remove()
-			List:Remove()
-		end
-		--local on = Types[Settings.Train]:find(name) and tbl
-		--List:SetVisible(on)
-		--ListLabel:SetVisible(on)
-		--if on then
-		--end
-	end)
-	VGUI[name] = List
-	Pos = Pos + 1
-	--if Types[Settings.Train]:find(name) and #tbl > 0  then Pos = Pos + 1 end
+local function GetConsistsList()
+    local files = file.Find("metrostroi_consists/*.txt", "DATA")
+    for k, v in pairs(files) do
+        files[k] = string.sub(v, 1, -5)
+    end
+    return files
 end
 
-local function CreateSlider(name,decimals,min,max,text,OnSelect,stbl)
-	stbl = stbl or Settings[Settings.Train]
-	local Slider = vgui.Create("DNumSlider", frame)
-	Slider.Call = OnSelect
-	--Slider:SetPos(5 + 300*math.floor(Pos/MaxHorisontal), 28+24*(Pos%MaxHorisontal)-7)
-	Slider:SetPos(5 + 270*math.floor(Pos/MaxHorisontal), 28+24*(Pos%MaxHorisontal)-7+4)
-	Slider:SetWide(290)
-	Slider:SetTall(28)
-	Slider:SetMinMax(min, max)
-	Slider:SetDecimals(decimals)
-	Slider:SetText(text..":")
-	--if stbl[name]  > max then stbl[name] = max end FIXME
-	Slider:SetValue(stbl[name])
-	Slider:SetTooltip(text)
-	Slider.Label:SetExpensiveShadow(1,Color(0,0,0,200))
-	Slider.Label:SetSize(125,28)
-	Slider.TextArea:SetTextColor(Slider.Label:GetTextColor())
-
-	--local _old = Slider.ValueChanged
-	function Slider:Think(...)
-		if not self.Editing and self:IsEditing() then
-			self.Editing = true
-		elseif self.Editing and not self:IsEditing() then
-			self.Editing = false
-			local val = self:GetValue()
-			if OnSelect then val = OnSelect(Slider,VGUI) or val end
-			stbl[name] = math.Round(val,decimals)
-			Slider:SetValue(stbl[name])
-		end
-	end
-	Slider.ID = table.insert(VGUI,function(val, disabled, reset)
-	  if reset then
-	    if Slider.Disable then Slider:SetEnabled(true) Slider.Disable = nil end
-	    return
-	  end
-		if val or disabled then
-			if val ~= nil then Slider:SetValue(val) end
-			Slider:SetEnabled(not disabled)
-			Slider.Disable = disabled
-			return
-		end
-		Slider:Remove()
-		--local on = Types[Settings.Train]:find(name)
-		--Slider:SetVisible(on)
-		--if on then
-		--end
-	end)
-	VGUI[name] = Slider
-	Pos = Pos + 1
-	--if Types[Settings.Train]:find(name) then Pos = Pos + 1 end
+local function ReadConsist(filename)
+    local obj = util.JSONToTable(file.Read("metrostroi_consists/" .. filename .. ".txt"), "DATA") or {}
+    return obj
 end
 
-local function CreateCheckBox(name,text,OnSelect,stbl)
-	stbl = stbl or Settings[Settings.Train]
-	--if not Types[Settings.Train]:find(name) then return end
-	local CBLabel = vgui.Create("DLabel", frame)--
-	CBLabel:SetPos(5  + 270*math.floor(Pos/MaxHorisontal),27+24*(Pos%MaxHorisontal)-4)
-	--CBLabel:SetPos(5 + 300*math.floor(Pos/MaxHorisontal), 25+24*(Pos%MaxHorisontal))
-	CBLabel:SetText(text)
-	CBLabel:SetWide(125)
-	CBLabel:SetTall(28)
-	CBLabel:ApplySchemeSettings(true)
-	--CBLabel:SetAutoStretchVertical(true)
-	CBLabel:SetExpensiveShadow(1,Color(0,0,0,200))
-	local CB = vgui.Create("DCheckBox", frame)
-	CB:SetTooltip(text)
-	CB.Call = OnSelect
-	CB:SetPos(130 + 270*math.floor(Pos/MaxHorisontal),31+24*(Pos%MaxHorisontal))
-	--CB:SetPos(130 + 300*math.floor(Pos/MaxHorisontal), 28+24*(Pos%MaxHorisontal))
-	CB:SetValue(stbl[name])
-	CB.OnChange = function(self)
-        for _,v in ipairs(VGUI) do v(nil,nil,true) end
-		stbl[name] = CB:GetChecked()
-		if OnSelect then OnSelect(CB,VGUI) end
-	end
-	CB.ID = table.insert(VGUI,function(val, disabled, reset)
-	  if reset then
-	    if CB.Disable then CB:SetEnabled(true) CB.Disable = nil end
-	    return
-	  end
-		if val or disabled then
-			if val ~= nil then CB:SetValue(val) end
-			CB:SetEnabled(not disabled)
-			CB.Disable = disabled
-			return
-		end
-		CBLabel:Remove()
-		CB:Remove()
-		--local on = Types[Settings.Train]:find(name)
-		--CBLabel:SetVisible(on)
-		--CB:SetVisible(on)
-		--if on then
-		--end
-	end)
-	VGUI[name] = CB
-	Pos = Pos + 1
-	--if Types[Settings.Train]:find(name) then Pos = Pos + 1 end
+local function WriteConsist(filename, obj)
+    file.Write("metrostroi_consists/" .. filename .. ".txt", util.TableToJSON(obj or {}, false))
 end
 
-local function UpdateTrainList(fromPresets)
-	Pos = 2
-	for k,v in ipairs(VGUI) do
-		if k > 2 then
-			v()
-			VGUI[k] = nil
-		end
-	end
-	if not VGUI.Train:GetSelectedID() then
-		VGUI.Train:ChooseOptionID(1)
-		Settings.Train = VGUI.Train:GetOptionData(1)
-	end
-	if not Settings[Settings.Train] then Settings[Settings.Train] = {} end
-	for k,name in pairs(Metrostroi.TrainClasses) do
-		local ENT = scripted_ents.Get(name)
-		if not ENT.Spawner or ENT.ClassName ~= Settings.Train  then continue end
-		for i, menu in ipairs(ENT.Spawner) do
-			if menu[3] == "List" then
-				if Settings[Settings.Train][menu[1]] == nil then
-					Settings[Settings.Train][menu[1]] = menu[5]
-				end
-				CreateList(menu[1],menu[2],menu[4],menu[7])
-			elseif menu[3] == "Boolean" then
-				if Settings[Settings.Train][menu[1]] == nil then
-					Settings[Settings.Train][menu[1]] = menu[4]
-				end
-				CreateCheckBox(menu[1],menu[2],menu[6])
-			elseif menu[3] == "Slider" then
-				if Settings[Settings.Train][menu[1]] == nil then
-					Settings[Settings.Train][menu[1]] = menu[7]
-				end
-				CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
-				--"NM",1,0.1,9,"Train Line Pressure"
-			elseif type(menu[1]) == "number" then
-				Pos=Pos+menu[1]
-			elseif #menu==0 then
-				Pos=Pos+1
-			end
-			--Trains[k] = v.SubwayTrain.Name
-		end
-	end
-	--defaults
-	for k,v in pairs(VGUI) do
-		if k ~= "Train" and type(v) ~= "function" and v.Call then v:Call(VGUI) end
-	end
-	VGUI.WagNum:ValueChanged()
-	frame:SetSize(262 + 262*math.floor((Pos-1)/MaxHorisontal)+10, 58+24*math.min(MaxHorisontal,Pos))
-	frame:Center()
-	if VGUI.Close then VGUI.Close() end
-	if VGUI.spawn then VGUI.spawn() end
-	if VGUI.Presets then VGUI.Presets() end
-	if VGUI.Wagons then VGUI.Wagons() end
-	if VGUI.PFrame and fromPresets ~= true then VGUI.PFrame(true) end
-	if VGUI.WFrame then VGUI.WFrame() end
-end
-local function Draw()
-	local Trains = {}
-	for _,name in pairs(Metrostroi.TrainClasses) do
-		local ENT = scripted_ents.Get(name)
-		if not ENT.Spawner or not ENT.SubwayTrain then continue end
-		local ENTl = list.Get("SpawnableEntities")[name]
-		--Trains[ENT.ClassName] = ENT.SubwayTrain.Name.."("..ENT.SubwayTrain.Manufacturer..")"
-		Trains[ENT.ClassName] = ENTl and ENTl.PrintName or ENT.Spawner and ENT.Spawner.Name or ENT.SubwayTrain.Name.."("..ENT.SubwayTrain.Manufacturer..")"
-	end
-	CreateList("Train",Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer),Trains,UpdateTrainList,Settings)
-	CreateSlider("WagNum",0,1, GetGlobalInt("metrostroi_maxwagons"),Metrostroi.GetPhrase("Spawner.WagNum"),function(slider)
-		local WagNumTable
-		for k,name in pairs(Metrostroi.TrainClasses) do
-			local ENT = scripted_ents.Get(name)
-			if not ENT.Spawner or ENT.ClassName ~= Settings.Train  then continue end
-			WagNumTable = ENT.Spawner.WagNumTable
-			break
-		end
-		if WagNumTable then
-			local retval = WagNumTable[1]
-			for i=2,#WagNumTable do
-				if WagNumTable[i] <= math.Round(slider:GetValue(),0) then
-					retval = WagNumTable[i]
-				end
-			end
-			return retval
-		end
-	end,Settings)
-	--CreateCheckBox("AutoCouple",Metrostroi.GetPhrase("Spawner.AutoCouple"),nil,Settings)
-
-	UpdateTrainList()
+local function ExistsConsist(filename)
+    return file.Exists("metrostroi_consists/" .. filename .. ".txt", "DATA")
 end
 
-local function savePresetData(trainArr,presetArr)
-	for k,v in pairs(trainArr) do
-		if k == "Presets" or k == "Specials" then continue end
-		presetArr[k] = v
-	end
+local function DeleteConsist(filename)
+    if ExistsConsist(filename) then
+        file.Delete("metrostroi_consists/" .. filename .. ".txt")
+    end
 end
 
-local function getPresetName(name, presets, ignoreOwn)
-	local maxrep = tonumber(name:match("(.+)[%s*]%((%d+)%)$")) or 0
-
-	for i,v in ipairs(presets) do
-		local name2,nameid = v.PresetName:match("(.+)[%s*]%((%d+)%)$")
-		if (not ignoreOwn or i ~= presets.Selected) and (v.PresetName == name or name2 == name) then
-			maxrep = math.max(1,tonumber(nameid) or 1)
-		end
-	end
-	return maxrep > 0 and Format("%s (%d)",name:match("(.+)[%s*]%(%d+%)$") or name,maxrep+1) or name
+local function ReadSettings()
+    return util.JSONToTable(file.Read("metrostroi_train_spawner.txt","DATA"))
 end
 
-local function createPresetsFrame()
-	if IsValid(pFrame) then return end
-	pFrame = vgui.Create("DFrame",frame)
-	pFrame:SetTitle(Metrostroi.GetPhrase("Spawner.PresetTitle"))
-	pFrame:SetDrawOnTop(false)
-	pFrame.btnMaxim:SetVisible(false)
-	pFrame.btnMinim:SetVisible(false)
-	--frame:SetSize(275, 34+24*17)
-	pFrame:SetDraggable(true)
-	pFrame:SetSizable(false)
-	pFrame:MakePopup()
-	pFrame:SetZPos(frame:GetZPos()+1)
-	pFrame:SetSize(262+10, 58+24*1)
-	--pFrame:Center()
-	pFrame.OnRemove = function()
-		if IsValid(WFrame) then
-			VGUI.WFrame()
-		end
-	end
-
-	--[[local ListLabel = vgui.Create("DLabel", frame)
-	--	ListLabel:SetPos(5 + 300*math.floor(Pos/MaxHorisontal), 24+24*(Pos%MaxHorisontal))
-	ListLabel:SetPos(5 + 270*math.floor(Pos/MaxHorisontal),24+24*(Pos%MaxHorisontal))
-	ListLabel:SetSize(115,28)
-	ListLabel:SetText(text)
-	ListLabel:SetExpensiveShadow(1,Color(0,0,0,200))]]
-
-	local Presets = vgui.Create("DComboBox", pFrame)--
-	Presets:SetPos(5,28)
-	--	Presets:SetPos(130 + 300*math.floor(Pos/MaxHorisontal), 28+24*(Pos%MaxHorisontal))
-	Presets:SetWide(272-8-72-5)
-
-
-	local PAdd = vgui.Create("DButton", pFrame)
-	PAdd:SetWide(24)
-	PAdd:SetPos(272-7-72, 28)
-	PAdd:SetTooltip(Metrostroi.GetPhrase("Spawner.Preset.NewTooltip"))
-	PAdd:SetImage("icon16/add.png")
-	local PUpdate = vgui.Create("DButton", pFrame)
-	PUpdate:SetWide(24)
-	PUpdate:SetPos(272-6-48, 28)
-	PUpdate:SetTooltip(Metrostroi.GetPhrase("Spawner.Preset.UpdateTooltip"))
-	PUpdate:SetText("")
-	PUpdate:SetImage("icon16/arrow_refresh.png")
-	local PRemove = vgui.Create("DButton", pFrame)
-	PRemove:SetWide(24)
-	PRemove:SetPos(272-5-24, 28)
-	PRemove:SetTooltip(Metrostroi.GetPhrase("Spawner.Preset.RemoveTooltip"))
-	PRemove:SetText("")
-	PRemove:SetImage("icon16/cross.png")
-
-	local PNameLabel = vgui.Create("DLabel", pFrame)
-	PNameLabel:SetPos(5,24+24*1+4)
-	PNameLabel:SetSize(115,28)
-	PNameLabel:SetText(Metrostroi.GetPhrase("Spawner.Presets.Name"))
-	PNameLabel:SetWide(100)
-	PNameLabel:SetExpensiveShadow(1,Color(0,0,0,200))
-	local PName = vgui.Create("DTextEntry", pFrame)
-	PName:SetPos(132,24+24*1+4)
-	PName:SetSize(135,20)
-	PName:SetText("")
-	PName:SetPlaceholderText(Metrostroi.GetPhrase("Spawner.Presets.NamePlaceholder"))
-
-	Presets.OnSelect = function(pnl,i, text)
-		if i == 1 then
-			PName:SetText("My preset name")
-		else
-			local presets = Settings[Settings.Train] and Settings[Settings.Train].Presets
-
-			if presets and pnl.selected ~= -1 then
-				if not presets.Selected or presets.Selected == 0 then
-					if not presets[0] then presets[0] = {} end
-					savePresetData(Settings[Settings.Train],presets[0])
-				end
-				presets.Selected = i-2
-				for k,v in pairs(presets[presets.Selected] or {}) do
-					if k == "PresetName" then continue end
-					Settings[Settings.Train][k] = v
-				end
-				UpdateTrainList(true)
-			end
-			if i == 2 then
-				PName:SetText("")
-			else
-				PName:SetText(text)
-			end
-		end
-	end
-
-	VGUI["PFrame"] = function(firstDraw)
-		if not IsValid(pFrame) then return end
-		local presets = Settings[Settings.Train] and Settings[Settings.Train].Presets
-
-		Presets:Clear()
-		Presets:AddChoice(Metrostroi.GetPhrase("Spawner.Preset.New"),-2,nil,"icon16/add.png")
-		Presets:AddChoice(Metrostroi.GetPhrase("Spawner.Preset.Unsaved"),-1,nil,"icon16/disk.png")
-		Presets:SetText(Metrostroi.GetPhrase("Spawner.Preset.NotSelected"))
-		PName:SetText("")
-
-		if firstDraw then Presets.selected = -1 end
-		if presets then
-			--presets.Selected = false
-			for i,v in ipairs(presets) do
-				Presets:AddChoice(v.PresetName or Format("N/A (%d)",i),i,not firstDraw and presets.Selected == i,nil and "icon16/add.png")
-			end
-		end
-		if Presets:GetSelectedID() == -1 then
-			Presets:ChooseOptionID(2)
-			if presets then presets.Selected = false end
-		end
-
-		if not pFrame.Moved then
-			local posX,posY = frame:GetPos()
-			pFrame:SetPos(posX+5,posY+30)
-			pFrame.Moved = true
-		end
-	end
-
-	PName.MainPaint = PName.Paint
-	PName.Paint = function(pnl, w, h)
-		pnl.MainPaint(pnl,w,h)
-		if pnl.Error then
-			surface.SetDrawColor(255,100,0,150)
-			surface.DrawRect(1,1,w-2,h-2)
-		end
-	end
-	PName.CheckEmpty = function(pnl)
-		pnl.Error = pnl:GetText():Trim() == ""
-		if pnl.Error == "" then
-			pnl:SetPlaceholderText(Metrostroi.GetPhrase("Spawner.Presets.NameError"))
-		else
-			pnl:SetPlaceholderText(Metrostroi.GetPhrase("Spawner.Presets.NamePlaceholder"))
-		end
-		pnl:SetUpdateOnType(pnl.Error)
-		return pnl.Error
-	end
-	PName.OnValueChange = PName.CheckEmpty
-	PAdd.DoClick = function()
-		if PName:CheckEmpty() or not Settings[Settings.Train] then return end
-		if not Settings[Settings.Train].Presets then Settings[Settings.Train].Presets = {} end
-		local presets = Settings[Settings.Train].Presets
-
-		presets.Selected = #presets+1
-		local settings = {
-			PresetName = getPresetName(PName:GetValue(),presets)
-		}
-		savePresetData(Settings[Settings.Train],settings)
-		table.insert(presets,settings)
-
-		VGUI.PFrame()
-	end
-	PUpdate.DoClick = function()
-		local presets = Settings[Settings.Train] and Settings[Settings.Train].Presets
-		if not presets or #presets == 0 or not presets.Selected or presets.Selected > #presets then return end
-
-		local settings = {
-			PresetName = getPresetName(PName:GetValue(),presets,true)
-		}
-		savePresetData(Settings[Settings.Train],settings)
-		presets[presets.Selected] = settings
-
-		VGUI.PFrame()
-	end
-	PRemove.DoClick = function()
-		local presets = Settings[Settings.Train] and Settings[Settings.Train].Presets
-		if not presets or #presets == 0 or not presets.Selected or presets.Selected > #presets then return end
-		table.remove(presets,presets.Selected)
-		presets.Selected = false
-
-		VGUI.PFrame(true)
-	end
-	pFrame.OrigThink = pFrame.Think
-	pFrame.Think = function(...)
-		pFrame.OrigThink(...)
-		if not pFrame:IsActive() and frame:IsActive() then pFrame:MakePopup() end
-	end
-
-	VGUI.PFrame(true)
+local function WriteSettings(tbl)
+    file.Write("metrostroi_train_spawner.txt", util.TableToJSON(tbl, true))
 end
-local function createWagonsFrame()
-	if IsValid(wFrame) then return end
-	wFrame = vgui.Create("DFrame",frame)
-	wFrame:SetTitle(Metrostroi.GetPhrase("Spawner.WagonsTitle"))
-	wFrame:SetDrawOnTop(true)
-	wFrame:SetZPos(frame:GetZPos())
-	wFrame.btnMaxim:SetVisible(false)
-	wFrame.btnMinim:SetVisible(false)
-	--frame:SetSize(275, 34+24*17)
-	wFrame:SetDraggable(true)
-	wFrame:SetSizable(false)
-	wFrame:MakePopup()
-	wFrame:SetZPos(frame:GetZPos()+1)
-	wFrame:SetSize(262 + 262*math.floor((1-1)/MaxHorisontal)+10, 58+24*math.min(MaxHorisontal,1))
-	--wFrame:Center()
-	VGUI["WFrame"] = function()
-		if not IsValid(wFrame) then return end
-		local posX,posY = frame:GetPos()
-		wFrame:SetPos(posX+7,posY+32)
-	end
-	wFrame.OnRemove = function()
-		if IsValid(PFrame) then
-			VGUI.PFrame()
-		end
-	end
-	VGUI.WFrame()
+
+local function GetTrainName(class, consist)
+    local ENT = scripted_ents.Get(class)
+    if consist then
+        if not (ENT.Spawner or ENT.SubwayTrain) then return end
+    else
+        if not ENT.Spawner or not ENT.SubwayTrain then return end
+    end
+    local ENT_list = list.Get("SpawnableEntities")[class]
+
+    local name = ENT_list and ENT_list.PrintName or ENT.Spawner and ENT.Spawner.Name or ENT.SubwayTrain.Name.."("..ENT.SubwayTrain.Manufacturer..")"
+    return name, ENT
 end
-local function createFrame()
-	MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
-	MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
-	--if GetConVar("gmod_toolmode"):GetString() == "train_spawner" then RunConsoleCommand("gmod_toolmode", "weld") end
-	if IsValid(frame) then return end
-	Pos = 0
-	VGUI = {}
-	frame = vgui.Create("DFrame")
-	frame:SetDeleteOnClose(true)
-	frame:SetTitle(Metrostroi.GetPhrase("Spawner.Title"))
-	frame.btnMaxim:SetVisible(false)
-	frame.btnMinim:SetVisible(false)
-	--frame:SetSize(275, 34+24*17)
-	frame:SetDraggable(false)
-	frame:SetSizable(false)
-	frame:MakePopup()
-	frame.OnRemove = function(panel)
-		if IsValid(pFrame) then pFrame:Remove() end
-		if IsValid(wFrame) then wFrame:Remove() end
-		UpdateConCMD()
-	end
 
-	--frame:SetSize(262 + 262*math.floor((Pos-1)/MaxHorisontal)+10, 58+24*math.min(MaxHorisontal,Pos))
-	--frame:Center()
-	local Close = vgui.Create("DButton", frame)
-	Close:SetWide(80)
-	Close:SetPos(5, frame:GetTall() - Close:GetTall() - 5)
-	Close:SetText(Metrostroi.GetPhrase("Spawner.Close"))
+local function GetPath(name)
+    name = string.lower(name)
+    name = string.Replace(name, "\\", "-") -- никто не объяснил как это сделать паттернами :(
+    name = string.Replace(name, "/", "-")
+    name = string.Replace(name, ":", "-")
+    name = string.Replace(name, "*", "-")
+    name = string.Replace(name, "?", "-")
+    name = string.Replace(name, '"', "-")
+    name = string.Replace(name, "<", "-")
+    name = string.Replace(name, ">", "-")
+    name = string.Replace(name, "|", "-")
+    name = string.Replace(name, "+", "-")
 
-	Close.DoClick = function()
-		frame:Close()
-	end
-	VGUI["Close"] = function()
-		if IsValid(Close) and IsValid(frame) then Close:SetPos(5, frame:GetTall() - Close:GetTall() - 5) end
-	end
+    return name
+end
 
-	local spawn = vgui.Create("DButton", frame)
-	spawn:SetWide(80)
-	spawn:SetPos(frame:GetWide() - Close:GetWide() - 5, frame:GetTall() - Close:GetTall() - 5)
-	spawn:SetText(Metrostroi.GetPhrase("Spawner.Spawn"))
-	VGUI["spawn"] = function()
-		if IsValid(spawn) and IsValid(frame) then spawn:SetPos(frame:GetWide() - Close:GetWide() - 5, frame:GetTall() - Close:GetTall() - 5) end
-	end
+FRAME = {}
 
-	spawn.DoClick = function()
-		--[[
-		local Tool = GetConVar("gmod_toolmode"):GetString()
-		if Tool == "train_spawner" then Tool = "weld" end
-		RunConsoleCommand("train_spawner_oldT", Tool)
-		RunConsoleCommand("train_spawner_oldW", LocalPlayer():GetActiveWeapon():GetClass())
-		RunConsoleCommand("gmod_tool", "train_spawner")
-		]]
-		local tbl = {}
-		tbl = table.Copy(Settings[Settings.Train])
-		tbl.Train = Settings.Train
-		tbl.AutoCouple = Settings.AutoCouple
-		tbl.WagNum = Settings.WagNum or 1
+function FRAME:Init() end
+
+function FRAME:CreateError(msg)
+    self.Error = vgui.Create("DLabel", self)
+    self.Error:SetText("Error: " .. msg)
+    self.Error:SetColor(Color(255, 0, 0))
+    self.Error:Dock(FILL)
+    self.Error:SetContentAlignment(5)
+    self.Error:SetExpensiveShadow(1,Color(0,0,0,200))
+end
+
+function FRAME:Setup(train, settings, entSettings, frame)
+    self.Settings = settings
+    self.TrainClass = train
+
+    local ent = scripted_ents.Get(train)
+    if not ent then
+        self:CreateError("ENT is nil\nTrain Class: " .. train)
+        return
+    end
+
+    if not entSettings then
+        self:CreateError("ENT №2 is nil\nTrain Class: " .. train)
+        return
+    end
+    if not entSettings.Spawner then
+        self:CreateError("ENT.Spawner is nil\nTrain Class: " .. train)
+        return
+    end
+
+    self.Train = ent
+    self.EntSettings = entSettings
+
+    self.IsInterim = entSettings.Spawner.interim == ent.ClassName
+
+    self.Pos = 0
+    self.MaxHorizontal = 20
+
+    self.OffsetY = 4
+
+    self.ConsistFrame = frame
+
+    self:Load()
+end
+
+function FRAME:Paint(w, h)
+    draw.RoundedBox(4, 0, 0, w, h, Color(72, 72, 72, self:GetAlpha()))
+    draw.RoundedBox(4, 1, 1, w-2, h-2, Color(108, 111, 114, self:GetAlpha()))
+end
+
+function FRAME:Load()
+    local function incPos(a) self.Pos=self.Pos+(a or 1) end
+
+    local def_settings = ReadSettings()
+    local def_train = def_settings[self.EntSettings.ClassName]
+    
+    self.Objects = {}
+    self.ObjectsTypes = {}
+
+    local spawnertbl = Metrostroi.TrainSpawner.GetProperties(self.EntSettings.ClassName)
+
+    for i, menu in ipairs(spawnertbl) do
+        if menu[3] == "List" then
+            if self.Settings[menu[1]] == nil then
+                self.Settings[menu[1]] = def_train[menu[1]] or menu[5]
+            end
+            self.Objects[menu[1]] = self:CreateList(menu[1],menu[2],menu[4],menu[7])
+            self.ObjectsTypes[menu[1]] = "List"
+        elseif menu[3] == "Boolean" then
+            if self.Settings[menu[1]] == nil then
+                self.Settings[menu[1]] = def_train[menu[1]] or menu[4]
+            end
+            self.Objects[menu[1]] = self:CreateCheckBox(menu[1],menu[2],menu[6])
+            self.ObjectsTypes[menu[1]] = "Boolean"
+        elseif menu[3] == "Slider" then
+            if self.Settings[menu[1]] == nil then
+                self.Settings[menu[1]] = def_train[menu[1]] or menu[7]
+            end
+            self.Objects[menu[1]] = self:CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
+            self.ObjectsTypes[menu[1]] = "Slider"
+        elseif menu[3] == "Selective" then
+            if self.Settings[menu[1]] == nil then
+                self.Settings[menu[1]] = def_train[menu[1]] or menu[5]
+            end
+            self.Objects[menu[1]] = self:CreateSelective(menu[1],menu[2],menu[4],menu[7])
+            self.ObjectsTypes[menu[1]] = "Selective"
+        elseif type(menu[1]) == "number" then
+            incPos(menu[1])
+        elseif #menu==0 then
+            incPos()
+        end
+    end
+end
+
+function FRAME:CreateSelective(name, text, tbl, func, out_tbl)
+    tbl = tbl or {}
+    out_tbl = out_tbl or self.Settings
+    
+    if type(tbl)=="function" then tbl = tbl() or {} end
+
+    local count = table.Count(tbl)
+
+    out_tbl[name] = out_tbl[name] or { true }
+
+    if count<=1 then
+        out_tbl[name] = { true }
+        return
+    end
+
+    local y = self.OffsetY
+    local SelectiveLabel = vgui.Create("DLabel", self)
+    SelectiveLabel:SetPos(5 + 270*math.floor(self.Pos/self.MaxHorizontal),y+24*(self.Pos%self.MaxHorizontal))
+    SelectiveLabel:SetSize(115,28)
+    SelectiveLabel:SetText(text)
+    SelectiveLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+
+    local SelectiveButton = vgui.Create("DButton", self)
+    SelectiveButton:SetTooltip(text)
+    SelectiveButton:SetPos(130 + 270*math.floor(self.Pos/self.MaxHorizontal),y+4+24*(self.Pos%self.MaxHorizontal))
+    SelectiveButton:SetWide(120)
+    SelectiveButton:SetText(Metrostroi.GetPhrase("Spawner.Select"))
+    SelectiveButton.DoClick = function(btn)
+        local frame = vgui.Create("DFrame")
+        frame:SetSize(500, 300)
+        frame:Center()
+        frame:MakePopup()
+        frame:SetTitle(Metrostroi.GetPhrase("Spawner.Select"))
+
+        local selective = vgui.Create("DListView", frame)
+        selective:SetMultiSelect(true)
+        selective:AddColumn(text)
+
+        local item_count = 0
+
+        if #tbl == count then
+            for i=1,#tbl do
+                local line = selective:AddLine(tbl[i])
+                line:SetSelected(table.HasValue(out_tbl[name], i))
+                item_count = item_count + 1
+            end
+        else
+            for k,v in pairs(tbl) do
+                if type(v) == "table" and v.name then k = v.name end
+                local line = selective:AddLine(v)
+                line:SetSelected(table.HasValue(out_tbl[name], k))
+                item_count = item_count + 1
+            end
+        end
+
+        if not selective:GetSelectedLine() then
+            selective:SelectFirstItem()
+            out_tbl[name][1] = true
+        end
+
+        local select = vgui.Create("DButton", frame)
+        select:Dock(BOTTOM)
+        select:SetText(Metrostroi.GetPhrase("Spawner.Select"))
+
+        selective:Dock(FILL)
+    
+        select.DoClick = function()
+            out_tbl[name] = {}
+            for i=1, item_count do
+                if selective.Lines[i]:IsLineSelected() then
+                    out_tbl[name][#out_tbl[name] + 1] = i
+                end
+            end
+            self.ConsistFrame:TriggerChange(out_tbl[name], name, self)
+            frame:Remove()
+        end
+    end
+
+    self.Pos = self.Pos + 1
+
+    return SelectiveButton
+end
+
+function FRAME:CreateList(name, text, tbl, func, out_tbl)
+    tbl = tbl or {}
+    out_tbl = out_tbl or self.Settings
+    
+    if type(tbl)=="function" then tbl = tbl() or {} end
+
+    local count = table.Count(tbl)
+
+    if count<=1 then
+        out_tbl[name] = next(tbl)
+        return
+    end
+
+    local y = self.OffsetY
+    local ListLabel = vgui.Create("DLabel", self)
+    ListLabel:SetPos(5 + 270*math.floor(self.Pos/self.MaxHorizontal),y+24*(self.Pos%self.MaxHorizontal))
+    ListLabel:SetSize(115,28)
+    ListLabel:SetText(text)
+    ListLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+
+    local List = vgui.Create("DComboBox", self)--
+    List:SetTooltip(text)
+    List:SetPos(130 + 270*math.floor(self.Pos/self.MaxHorizontal),y+4+24*(self.Pos%self.MaxHorizontal))
+    List:SetWide(120)
+
+    if #tbl == count then
+        for i=1,#tbl do
+            List:AddChoice(tbl[i], i, out_tbl[name] == i)
+        end
+    else
+        for k,v in pairs(tbl) do
+            if type(v) == "table" and v.name then k = v.name end
+            List:AddChoice(v, k, out_tbl[name] == k)
+        end
+    end
+
+    if not List:GetOptionData(1)  then ListLabel:Remove() List:Remove() return end
+    if not List:GetSelectedID() then
+        local done
+        for i,v in pairs(List.Choices) do
+            if v:find("Random") then
+                List:ChooseOptionID(i)
+                out_tbl[name] = List:GetOptionData(i)
+                done = true
+                break
+            end
+        end
+        if not done then
+            List:ChooseOptionID(1)
+            out_tbl[name] = List:GetOptionData(1)
+        end
+    end
+
+    local frame = self.ConsistFrame
+
+    List.OnSelect = function(this,_, _, index)
+        if frame.Block then return end
+        out_tbl[name] = index
+        if func then func(List, self) end
+        frame:TriggerChange(out_tbl[name], name, self)
+    end
+
+    self.Pos = self.Pos + 1
+
+    return List
+end
+
+function FRAME:CreateSlider(name, decimals, min, max, text, func, out_tbl)
+    out_tbl = out_tbl or self.Settings
+    local y = self.OffsetY
+    local Slider = vgui.Create("DNumSlider", self)
+    Slider:SetPos(5 + 270*math.floor(self.Pos/self.MaxHorizontal), y+4+24*(self.Pos%self.MaxHorizontal)-7+4)
+    Slider:SetWide(290)
+    Slider:SetTall(28)
+    Slider:SetMinMax(min, max)
+    Slider:SetDecimals(decimals)
+    Slider:SetText(text..":")
+    Slider:SetValue(out_tbl[name])
+    Slider:SetTooltip(text)
+    Slider.Label:SetExpensiveShadow(1,Color(0,0,0,200))
+    Slider.Label:SetSize(125,28)
+    Slider.TextArea:SetTextColor(Slider.Label:GetTextColor())
+
+    local frame = self.ConsistFrame
+    local tab = self
+
+    function Slider:Think(...)
+        if not self.Editing and self:IsEditing() then
+            self.Editing = true
+        elseif self.Editing and not self:IsEditing() then
+            self.Editing = false
+            local val = self:GetValue()
+            if frame.Block then return end
+            if func then val = func(Slider) or val end
+            out_tbl[name] = math.Round(val,decimals)
+            Slider:SetValue(out_tbl[name])
+            frame:TriggerChange(out_tbl[name], name, tab)
+        end
+    end
+
+    self.Pos = self.Pos + 1
+
+    return Slider
+end
+
+function FRAME:CreateCheckBox(name, text, func, out_tbl)
+    out_tbl = out_tbl or self.Settings
+    local y = self.OffsetY
+    local CBLabel = vgui.Create("DLabel", self)
+    CBLabel:SetPos(5  + 270*math.floor(self.Pos/self.MaxHorizontal),y+3+24*(self.Pos%self.MaxHorizontal)-4)
+    CBLabel:SetText(text)
+    CBLabel:SetWide(125)
+    CBLabel:SetTall(28)
+    CBLabel:ApplySchemeSettings(true)
+    CBLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+    local CB = vgui.Create("DCheckBox", self)
+    CB:SetTooltip(text)
+    CB:SetPos(130 + 270*math.floor(self.Pos/self.MaxHorizontal),y+7+24*(self.Pos%self.MaxHorizontal))
+    CB:SetValue(out_tbl[name] or false)
+
+    local frame = self.ConsistFrame
+
+    CB.OnChange = function(cb)
+        if frame.Block then return end
+        out_tbl[name] = CB:GetChecked()
+        if func then func(CB) end
+        frame:TriggerChange(out_tbl[name], name, self)
+    end
+
+    self.Pos = self.Pos + 1
+
+    return CB
+end
+
+function FRAME:CreateEntry(name, text, func, allowinput, out_tbl) end
+
+vgui.Register("MSConsistTab", FRAME)
+
+FRAME = {}
+
+function FRAME:Init()
+    self:SetDeleteOnClose(true)
+    self:SetSize(ScrW() / 1.1, ScrH() / 1.1)
+    self:SetTitle(Metrostroi.GetPhrase("Spawner.ConsistPreview.Preview"))
+end
+
+function FRAME:GetTrainPos(pos)
+    local distance = 960
+
+    return Vector(-(distance*(pos - 1)), 0, 0)
+end
+
+function FRAME:SpawnModel(model, pos, rot)
+    local ang = rot and Angle(0, 180, 0) or Angle(0, 0, 0)
+
+    local ent = ClientsideModel( model, RENDERGROUP_OTHER )
+    if ( !IsValid( ent ) ) then return end
+
+    ent:SetNoDraw( true )
+    ent:SetIK( false )
+
+    ent:SetPos(pos)
+    ent:SetAngles(ang)
+
+    return ent
+end
+
+function FRAME:SpawnTrainModel(model, pos, rot, wag)
+    local texture = Metrostroi.Skins["train"][wag.Texture]
+    local passtexture = Metrostroi.Skins["pass"][wag.PassTexture]
+    local cabintexture = Metrostroi.Skins["cab"][wag.CabTexture]
+
+    local ent = self:SpawnModel(model, pos, rot)
+
+    ent.GetBodyColor = function()
+        return Vector(1, 1, 1)
+    end
+
+    ent.GetDirtLevel = function()
+        return 0
+    end
+    
+    for k2 in pairs(ent:GetMaterials()) do ent:SetSubMaterial(k2-1,"") end
+    for k2,v2 in pairs(ent:GetMaterials()) do
+        local tex = string.Explode("/",v2)
+        tex = tex[#tex]
+        if cabintexture and cabintexture.textures and cabintexture.textures[tex] then
+            ent:SetSubMaterial(k2-1,cabintexture.textures[tex])
+        end
+        if passtexture and passtexture.textures and passtexture.textures[tex] then
+            ent:SetSubMaterial(k2-1,passtexture.textures[tex])
+        end
+        if texture and texture.textures and texture.textures[tex] then
+            ent:SetSubMaterial(k2-1,texture.textures[tex])
+        end
+    end
+
+    return ent
+end
+
+function FRAME:SpawnWagon(wag, i, max)
+    hook.Run("MetrostroiTrainSpawnerPreview-WagonSpawn", self.MainFrame, self, wag["__class"], wag, i, max)
+
+    local model = scripted_ents.Get(wag["__class"]).Model or self.MainFrame.Train.Model
+
+    local models = {model}
+
+    if not hook.Run("MetrostroiTrainSpawnerPreview-PreventSpawnerModels", self.MainFrame, self, wag["__class"], wag, i, max) then
+        if i == 1 or i == max then models = self.MainFrame.Train.Spawner.model end
+    end
+
+    for k, v in pairs(models) do
+        local ent = self:SpawnTrainModel(v, self:GetTrainPos(i), i == max, wag)
+
+        table.insert(self.Models, ent)
+    end
+
+    hook.Run("MetrostroiTrainSpawnerPreview-PostWagonSpawn", self.MainFrame, self, wag["__class"], wag, i, max)
+end
+
+function FRAME:Setup(mainframe)
+    self.ModelPanel = vgui.Create( "DAdjustableModelPanel", self )
+    self.ModelPanel:Dock(FILL)
+    self.ModelPanel:SetModel( LocalPlayer():GetModel() )
+
+    self.ModelPanel.LayoutEntity = function() end
+    
+    self.ModelPanel:SetFOV(90)
+
+    self.ModelPanel.PreDrawModel = function()
+        for k, v in pairs(self.Models) do
+            v:DrawModel()
+        end
+
+        return false
+    end
+
+    self.ModelPanel.vCamPos = mainframe.PreviewCamPos or self.ModelPanel.vCamPos
+    self.ModelPanel.aLookAngle = mainframe.PreviewLookAngle or self.ModelPanel.aLookAngle
+    self.ModelPanel.vLookatPos = mainframe.PreviewLookatPos or self.ModelPanel.vLookatPos
+
+    self.Models = {}
+
+    if not mainframe.Train then return end
+    if not mainframe.Train.Spawner then return end
+
+    self.MainFrame = mainframe
+
+    for k, v in pairs(mainframe.Wagons) do
+        self:SpawnWagon(v, k, #mainframe.Wagons)
+    end
+
+    mainframe:Hide()
+end
+
+function FRAME:Paint(w, h)
+    draw.RoundedBox(2, 0, 0, w, h, Color(127, 127, 127, 127))
+end
+
+function FRAME:OnRemove()
+    for k, v in pairs(self.Models) do
+        if IsValid(v) then
+            v:Remove()
+        end
+    end
+
+    self.MainFrame.PreviewCamPos = self.ModelPanel.vCamPos
+    self.MainFrame.PreviewLookAngle = self.ModelPanel.aLookAngle
+    self.MainFrame.PreviewLookatPos = self.ModelPanel.vLookatPos
+
+    self.MainFrame:Show()
+end
+
+vgui.Register("MSConsistPreview", FRAME, "DFrame")
+
+FRAME = {}
+
+function FRAME:Init()
+    self:SetDeleteOnClose(true)
+    self:SetSize(824, 560)
+end
+
+function FRAME:GetSmallName(str)
+    st = string.find(str, "%s*%(")
+    if st then
+        return string.Trim(utf8.sub(str, 1, st-1))
+    else
+        return str
+    end
+end
+
+function FRAME:SaveConsist()
+    local con = self.Consist
+    for k, v in pairs(con) do
+        if string.StartWith(k, "__") then -- delete temp __ fieilds
+            con[k] = nil
+        end
+    end
+    for i, wag in pairs(con.Wagons) do
+        for k, v in pairs(wag) do
+            if string.StartWith(k, "__") then -- delete temp __ fieilds
+                con.Wagons[i][k] = nil
+            end
+            con.Wagons[i].Order = i
+        end
+    end
+    WriteConsist(self.Filename, con)
+end
+
+function FRAME:UpdateNames(change, atab)
+    if change then
+        self.ShowLongName = not self.ShowLongName
+    end
+
+    local id
+    for k, v in pairs(self.Sheet:GetItems()) do
+        local tab = v.Tab
+        if tab == (atab or self.Sheet:GetActiveTab()) then id = k break end
+    end
+    local name = GetTrainName(self.Wagons[id]["__class"], true)
+    name = self.ShowLongName and name or self:GetSmallName(name)
+    self:SetTitle(self.DefTitle .. " [" .. name .. "]")
+end
+
+function FRAME:OnRemove()
+    self:SaveConsist()
+end
+
+function FRAME:TriggerChange(newval, name, tab)
+    if not self.ApplyForAll then return end
+
+    self.Block = true
+    for k, v in pairs(self.Sheet:GetItems()) do
+        local distTab = v.Panel
+        if distTab == tab then continue end
+        local typ = distTab.ObjectsTypes[name]
+        local obj = distTab.Objects[name]
+        
+        self.Wagons[k][name] = newval
+        
+        if not obj or not typ then continue end
+
+        if typ == "Slider" then
+            obj:SetValue(newval)
+        elseif typ == "List" then
+            if type(newval) == "string" then
+                for k2, v2 in pairs(obj.Data) do
+                    if v2 == newval then obj:ChooseOptionID(k2) end
+                end
+            else
+                obj:ChooseOptionID(newval)
+            end
+        elseif typ == "Boolean" then
+            obj:SetChecked(newval)
+        end
+    end
+    self.Block = false
+end
+
+function FRAME:Setup(con, filename)
+    if not con then
+        con = ReadConsist(filename)
+        if #con == 0 then
+            return
+        end
+    end
+
+    local train = con.Train
+
+    local ent = scripted_ents.Get(train)
+    if not ent then
+        error("ENT is nil\tTrain Class: " .. train)
+    end
+    if not ent.Spawner then
+        error("ENT.Spawner is nil\tTrain Class: " .. train)
+    end
+
+    self.Train = ent
+    self.TrainClass = train
+
+    self.Consist = con
+    self.Consist.Author = self.Consist.Author or LocalPlayer():Nick()
+    self.Filename = filename
+
+    self.DefTitle = Metrostroi.GetPhrase("Spawner.Consist.ConsistEditor") .. " (" .. con.Name .. ")"
+    self:SetTitle(self.DefTitle)
+
+    self.Head = ent.Spawner.head or train
+    self.Interim = ent.Spawner.interim or train
+
+    self.Sheet = vgui.Create("DPropertySheet", self)
+    self.Sheet:Dock(FILL)
+    self.Sheet.OnActiveTabChanged = function(_, _, tab)
+        self:UpdateNames(false, tab)
+    end
+
+    local wagons = {}
+
+    for i=1, self.Consist.WagNum do
+        local wag = self.Consist.Wagons[i] or {}
+        wag["__class"] = wag["__class"] or (i == 1 or i == self.Consist.WagNum) and self.Head or self.Interim
+        local order = wag.Order or i
+        wagons[order] = wag
+        wag.Order = nil
+    end
+
+    self.Consist.Wagons = wagons
+    self.Wagons = self.Consist.Wagons
+
+    for k, v in pairs(self.Wagons) do
+        local tab = vgui.Create("MSConsistTab", self.Sheet)
+        local name = GetTrainName(v["__class"], true) or v["__class"]
+        tab:Setup(v["__class"], self.Wagons[k], self.Train, self)
+
+        self.Sheet:AddSheet(Format(Metrostroi.GetPhrase("Spawner.ConsistEditor.Wagon"), tonumber(k)), tab).Tab.ID = k
+    end
+
+    self.TabCount = #self.Wagons
+
+    self.ShowLongName = true
+    self.ApplyForAll = false
+    self.Block = false
+
+    self:UpdateNames()
+
+    self.MenuButton = vgui.Create("DButton", self)
+    self.MenuButton:SetSize(80, self.MenuButton:GetTall()-4)
+    self.MenuButton:SetPos(self:GetWide()-self.MenuButton:GetWide()-100, 3)
+    self.MenuButton:SetText(Metrostroi.GetPhrase("Spawner.ConsistEditor.Menu"))
+
+    self.MenuButton.DoClick = function()
+        local menu = DermaMenu()
+
+        menu:AddOption(Metrostroi.GetPhrase("Spawner.ConsistEditor.Save"))
+        menu:AddOption(Metrostroi.GetPhrase("Spawner.ConsistEditor.SaveAs"))
+        menu:AddSpacer()
+        menu:AddOption(Metrostroi.GetPhrase("Spawner.ConsistEditor.ShowLongName"), function() self:UpdateNames(true) end):SetIcon(self.ShowLongName and "icon16/tick.png" or "icon16/cross.png")
+        menu:AddSpacer()
+        menu:AddOption(Metrostroi.GetPhrase("Spawner.ConsistEditor.ApplyForAll"), function() self.ApplyForAll = not self.ApplyForAll end):SetIcon(self.ApplyForAll and "icon16/tick.png" or "icon16/cross.png")
+        
+        menu:Open()
+    end
+
+    
+    self.InfoButton = vgui.Create("DButton", self)
+    self.InfoButton:SetSize(80, self.InfoButton:GetTall()-4)
+    self.InfoButton:SetPos(self:GetWide()-self.InfoButton:GetWide()*2-100, 3)
+    self.InfoButton:SetText(Metrostroi.GetPhrase("Spawner.ConsistEditor.Info"))
+
+    self.InfoButton.DoClick = function()
+        local frame = vgui.Create("DFrame")
+        frame:SetSize(500, 90)
+        frame:Center()
+        frame:MakePopup()
+        frame:SetTitle(Metrostroi.GetPhrase("Spawner.ConsistEditor.Info"))
+        
+        local fields = {
+            Metrostroi.GetPhrase("Spawner.ConsistEditor.HotKeys"),
+            Metrostroi.GetPhrase("Spawner.ConsistEditor.HotKeys1"),
+            Metrostroi.GetPhrase("Spawner.ConsistEditor.HotKeys2"),
+        }
+
+        local info = vgui.Create("DLabel", frame)
+        info:SetText(table.concat(fields, "\n"))
+        info:SizeToContents()
+        info:Dock(TOP)
+    end
+
+    self.SpawnButton = vgui.Create("DButton", self)
+    self.SpawnButton:SetSize(80, self.SpawnButton:GetTall()-4)
+    self.SpawnButton:SetPos(self:GetWide()-self.SpawnButton:GetWide()*3-100, 3)
+    self.SpawnButton:SetText(Metrostroi.GetPhrase("Spawner.Consist.Spawn"))
+
+    self.SpawnButton.DoClick = function()
+        self:SaveConsist()
+
 		net.Start("train_spawner_open")
-			net.WriteTable(tbl)
-		net.SendToServer()
-		local tool = LocalPlayer():GetTool("train_spawner")
-		tool.Settings = tbl
-		local ENT = scripted_ents.Get(tool.Settings.Train)
-		if ENT and ENT.Spawner then tool.Train = ENT end
-		frame:Close()
-	end
+            net.WriteBool(true)
+            net.WriteTable(self.Consist)
+        net.SendToServer()
+        local tool = LocalPlayer():GetTool("train_spawner")
+        tool.IsConsist = true
+        tool.Consist = self.Consist
 
-	local Presets = vgui.Create("DButton", frame)
-	Presets:SetWide(24)
-	--Presets:SetPos(5, spawn:GetPos() + 5)
-	Presets:SetText("")
-	Presets:SetImage("icon16/book.png")
+        self:Close()
+    end
 
-	Presets.DoClick = function()
-		if IsValid(pFrame) then pFrame:Remove() else
-			createPresetsFrame()
-			pFrame.OnRemove = function() if IsValid(Presets) then Presets:SetImage("icon16/book.png") end end
-		end
-		Presets:SetImage(IsValid(pFrame) and "icon16/book_edit.png" or "icon16/book.png")
-	end
-	VGUI["Presets"] = function()
-		if not IsValid(Presets) or not IsValid(frame) then return end
-		local posX,posY,width = Close:GetBounds()
-		Presets:SetPos(posX + width + 5, posY)
-	end
+    self.PreviewButton = vgui.Create("DButton", self)
+    self.PreviewButton:SetSize(80, self.PreviewButton:GetTall()-4)
+    self.PreviewButton:SetPos(self:GetWide()-self.PreviewButton:GetWide()*4-100, 3)
+    self.PreviewButton:SetText(Metrostroi.GetPhrase("Spawner.ConsistPreview.Preview"))
 
-	local Wagons = vgui.Create("DButton", frame)
-	Wagons:SetWide(24)
-	--Wagons:SetPos(5, spawn:GetPos() + 5)
-	Wagons:SetText("")
-	Wagons:SetImage("icon16/table.png")
-
-	Wagons.DoClick = function()
-		if IsValid(wFrame) then wFrame:Remove() else
-			createWagonsFrame()
-			wFrame.OnRemove = function() Wagons:SetImage("icon16/table.png") end
-		end
-		Wagons:SetImage(IsValid(wFrame) and "icon16/table_edit.png" or "icon16/table.png")
-	end
-	VGUI["Wagons"] = function()
-		if not IsValid(Wagons) or not IsValid(frame) then return end
-		local posX,posY,width = Presets:GetBounds()
-		Wagons:SetPos(posX + width + 5, posY)
-	end
-
-	LoadConCMD()
-	Draw()
+    self.PreviewButton.DoClick = function()
+        local frame = vgui.Create("MSConsistPreview")
+        frame:Center()
+        frame:MakePopup()
+        frame:Setup(self)
+    end
 end
+
+function FRAME:OnKeyCodePressed( code )
+    local num = code-1
+    if num >= 0 and num <= 9 then
+        local tab = self.Sheet:GetItems()[num]
+        if not tab then return end
+        self.Sheet:SetActiveTab(tab.Tab)
+    end
+
+    local curr = self.Sheet:GetActiveTab().ID
+    if code == KEY_LEFT then
+        if curr ~= 1 then
+            curr = curr - 1
+            local tab = self.Sheet:GetItems()[curr].Tab
+            self.Sheet:SetActiveTab(tab)
+        end
+    end
+    if code == KEY_RIGHT then
+        if curr ~= self.TabCount then
+            curr = curr + 1
+            local tab = self.Sheet:GetItems()[curr].Tab
+            self.Sheet:SetActiveTab(tab)
+        end
+    end
+    if code == KEY_F and input.IsShiftDown() then
+        self.ApplyForAll = not self.ApplyForAll
+    end
+    if code == KEY_G and input.IsShiftDown() then
+        self:UpdateNames(true)
+    end
+end
+
+vgui.Register("MSConsistFrame", FRAME, "DFrame")
+
+FRAME = {}
+
+local function ExtendedFrame()
+    local frame = vgui.Create("DFrame")
+    frame:SetSize(280, 200)
+    frame:Center()
+    frame:SetTitle(Metrostroi.GetPhrase("Spawner.Consist.ConsistEditor"))
+    frame:MakePopup()
+
+    local sel_con = vgui.Create("DComboBox", frame)
+    sel_con:SetPos(5, 30)
+    sel_con:SetSize(270, 20)
+    sel_con:SetValue(Metrostroi.GetPhrase("Spawner.Select"))
+
+    local info = vgui.Create("DLabel", frame)
+    info:SetPos(5, 60)
+    info:SetText(Metrostroi.GetPhrase("Spawner.Consist.InformationSelect"))
+    info:SetExpensiveShadow(1,Color(0,0,0,200))
+    info:SizeToContents()
+    local col = info:GetColor()
+
+    local fr_w = frame:GetWide()
+    local fr_h = frame:GetTall()
+
+    local spawn = vgui.Create("DButton", frame)
+    local sp_h = spawn:GetTall()
+    spawn:SetWide(fr_w - 10)
+    spawn:SetPos(5, fr_h - sp_h*2 - 5)
+    spawn:SetText(Metrostroi.GetPhrase("Spawner.Consist.Spawn"))
+    spawn:SetEnabled(false)
+
+    local edit = vgui.Create("DButton", frame)
+    local ed_h = edit:GetTall()
+    edit:SetWide((fr_w - 10) / 3)
+    local ed_w = edit:GetWide()
+    edit:SetPos(5, fr_h - ed_h - 5)
+    edit:SetText(Metrostroi.GetPhrase("Spawner.Consist.Edit"))
+    edit:SetEnabled(false)
+
+    local new = vgui.Create("DButton", frame)
+    new:SetWide((fr_w - 10) / 3)
+    local nw_w = new:GetWide()
+    new:SetPos((nw_w )*1 + 5, fr_h - ed_h - 5)
+    new:SetText(Metrostroi.GetPhrase("Spawner.Consist.New"))
+
+    
+    local delete = vgui.Create("DButton", frame)
+    delete:SetWide((fr_w - 10) / 3)
+    local dl_w = delete:GetWide()
+    delete:SetPos((dl_w)*2 + 5, fr_h - ed_h - 5)
+    delete:SetText(Metrostroi.GetPhrase("Spawner.Consist.Delete"))
+    delete:SetEnabled(false)
+
+    local cons = GetConsistsList()
+
+    for k, v in pairs(cons) do
+        sel_con:AddChoice(v, k)
+    end
+
+    sel_con.OnSelect = function(self, i, t ,d)
+        local con = ReadConsist(t)
+        info:SetColor(col)
+        if not con.Train then
+            info:SetText(Metrostroi.GetPhrase("Spawner.Consist.Invalid"))
+            info:SizeToContents()
+            info:SetColor(Color(255, 0, 0))
+            spawn:SetEnabled(false)
+            edit:SetEnabled(false)
+            delete:SetEnabled(false)
+            return 
+        end
+        local name, ENT = GetTrainName(con.Train)
+        if not ENT then
+            info:SetText(Metrostroi.GetPhrase("Spawner.Consist.Invalid"))
+            info:SizeToContents()
+            info:SetColor(Color(255, 0, 0))
+            spawn:SetEnabled(false)
+            edit:SetEnabled(false)
+            delete:SetEnabled(false)
+            return
+        end
+        local txt = ""
+        txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Name"), con.Name or "GenericName")
+        txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Type"), name or "GenericTrain")
+        txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.WagNum"), con.WagNum or 0)
+        txt = txt .. "\n" .. Format(Metrostroi.GetPhrase("Spawner.Consist.Author"), con.Author or "N/A")
+        
+        info:SetText(Metrostroi.GetPhrase("Spawner.Consist.Information") .. txt)
+        info:SizeToContents()
+        spawn:SetEnabled(true)
+        edit:SetEnabled(true)
+        delete:SetEnabled(true)
+    end
+
+    edit.DoClick = function(self)
+        local name = sel_con:GetOptionData(sel_con:GetSelectedID())
+
+        local consisteditor = vgui.Create("MSConsistFrame")
+        consisteditor:Center()
+        consisteditor:MakePopup()
+        consisteditor:Setup(ReadConsist(cons[name]), cons[name])
+
+        frame:Remove()
+    end
+
+    new.DoClick = function(self)
+        local MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
+        local MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
+
+        local frame_new = vgui.Create("DFrame")
+        frame_new:SetSize(265, 150)
+        frame_new:Center()
+        frame_new:SetTitle(Metrostroi.GetPhrase("Spawner.Consist.New"))
+        frame_new:MakePopup()
+
+        local Settings = ReadSettings()
+        local Train = Settings.Train or ""
+        local WagNum = Settings.WagNum or 2
+
+        WagNum = math.Clamp(WagNum, 1, GetGlobalInt("metrostroi_maxwagons"))
+        
+        --EXTREME GOVNOCODE START
+        do
+            local ListText = Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer)
+            local Trains = {}
+            
+            for _,class in pairs(Metrostroi.TrainClasses) do
+                local name, ENT = GetTrainName(class)
+                if not ENT then continue end
+
+                Trains[ENT.ClassName] = name
+            end
+
+            local ListLabel = vgui.Create("DLabel", frame_new)
+            ListLabel:SetPos(5 + 270*math.floor(0/14),24+24*(0%14))
+            ListLabel:SetSize(115,28)
+            ListLabel:SetText(ListText)
+            ListLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+
+            local List = vgui.Create("DComboBox", frame_new)
+            List:SetTooltip(ListText)
+            List:SetPos(130 + 270*math.floor(0/14),28+24*(0%14))
+            List:SetWide(120)
+
+            for k,v in pairs(Trains) do
+                List:AddChoice(v, k, k == Train)
+            end
+
+            if not List:GetSelectedID() then
+                List:ChooseOptionID(1)
+                Train = List:GetOptionData(1)
+            end
+
+            List.OnSelect = function(self,_, _, index)
+                Train = index
+                if func then func(List) end
+            end
+            
+            local WagNumText = Metrostroi.GetPhrase("Spawner.WagNum")
+            local Slider = vgui.Create("DNumSlider", frame_new)
+            Slider:SetPos(5 + 270*math.floor(1/14), 28+24*(1%14)-7+4)
+            Slider:SetWide(290)
+            Slider:SetTall(28)
+            Slider:SetMinMax(1, GetGlobalInt("metrostroi_maxwagons"))
+            Slider:SetDecimals(0)
+            Slider:SetText(WagNumText..":")
+            Slider:SetValue(WagNum)
+            Slider:SetTooltip(WagNumText)
+            Slider.Label:SetExpensiveShadow(1,Color(0,0,0,200))
+            Slider.Label:SetSize(125,28)
+            Slider.TextArea:SetTextColor(Slider.Label:GetTextColor())
+
+            function Slider:Think(...)
+                if not self.Editing and self:IsEditing() then
+                    self.Editing = true
+                elseif self.Editing and not self:IsEditing() then
+                    self.Editing = false
+                    local val = self:GetValue()
+                    local WagNumTable
+                    for k,name in pairs(Metrostroi.TrainClasses) do
+                        local ENT = scripted_ents.Get(name)
+                        if not ENT.Spawner or ENT.ClassName ~= Train  then continue end
+                        WagNumTable = ENT.Spawner.WagNumTable
+                        break
+                    end
+                    if WagNumTable then
+                        local retval = WagNumTable[1]
+                        for i=2,#WagNumTable do
+                            if WagNumTable[i] <= math.Round(Slider:GetValue(),0) then
+                                retval = WagNumTable[i]
+                            end
+                        end
+                        val = retval
+                    end
+                    WagNum = math.Round(val,decimals)
+                    Slider:SetValue(WagNum)
+                end
+            end
+        end
+        --EXTREME GOVNOCODE END
+        
+        local name_label = vgui.Create("DLabel", frame_new)
+        name_label:SetPos(5 + 270*math.floor(2/14),24+24*(2%14))
+        name_label:SetSize(115,28)
+        name_label:SetText(Metrostroi.GetPhrase("Spawner.Consist.CreateName"))
+        name_label:SetExpensiveShadow(1,Color(0,0,0,200))
+
+        local name_entry = vgui.Create("DTextEntry", frame_new)
+        name_entry:SetPos(130 + 270*math.floor(2/14),28+24*(2%14))
+        name_entry:SetWide(120)
+
+        local create = vgui.Create("DButton", frame_new)
+        create:SetWide(frame_new:GetWide() - 10)
+        create:SetPos(5, frame_new:GetTall() - create:GetTall() - 5)
+        create:SetText(Metrostroi.GetPhrase("Spawner.Consist.Create"))
+
+        create.DoClick = function()
+            local name = string.Trim(name_entry:GetValue())
+            if name == "" then
+                local err_label = vgui.Create("DLabel", frame_new)
+                err_label:SetPos(5 + 270*math.floor(3/14),28+24*(3%14))
+                err_label:SetText(Metrostroi.GetPhrase("Spawner.Consist.ErrorName"))
+                err_label:SetWide(frame_new:GetWide() - 5)
+                err_label:SetContentAlignment(5)
+                err_label:SetColor(Color(255, 0, 0))
+                err_label:SetExpensiveShadow(1,Color(0,0,0,200))
+
+                timer.Simple(4, function()
+                    err_label:Remove()
+                end)
+
+                return
+            end
+            
+            local Filename = GetPath(name)
+
+            local function createAndOpen()
+                local Consist = {
+                    Name = name,
+                    WagNum = WagNum,
+                    Train = Train,
+                    Author = LocalPlayer():Nick(),
+                    Wagons = {},
+                }
+
+                local consisteditor = vgui.Create("MSConsistFrame")
+                consisteditor:Center()
+                consisteditor:MakePopup()
+                consisteditor:Setup(Consist, Filename)
+
+                frame_new:Remove()
+            end
+
+            local Exists = ExistsConsist(Filename)
+            if Exists then
+                local exists_frame = vgui.Create("DFrame") -- Пирамида смайла
+                exists_frame:SetSize(260, 80)
+                exists_frame:Center()
+                exists_frame:SetTitle(Metrostroi.GetPhrase("Spawner.Consist.Error"))
+                exists_frame:MakePopup()
+
+                exists_frame.OnRemove = function(self)
+                    create:SetEnabled(true)
+                end
+
+                local exists_label = vgui.Create("DLabel", exists_frame)
+                exists_label:Dock(FILL)
+                exists_label:DockMargin(4, 2, 4, 4)
+                exists_label:SetText(Metrostroi.GetPhrase("Spawner.Consist.ErrorNameExists"))
+                exists_label:SetContentAlignment(8)
+
+                local cancel = vgui.Create("DButton", exists_frame)
+                cancel:SetWide(exists_frame:GetWide()/2-5)
+                cancel:SetPos(5, exists_frame:GetTall() - cancel:GetTall() - 5)
+                cancel:SetText(Metrostroi.GetPhrase("Spawner.Consist.Cancel"))
+                cancel.DoClick = function()
+                    exists_frame:Remove()
+                    create:SetEnabled(true)
+                end
+
+                local overwrite = vgui.Create("DButton", exists_frame)
+                overwrite:SetWide(exists_frame:GetWide()/2-5)
+                overwrite:SetPos(5 + overwrite:GetWide(), exists_frame:GetTall() - overwrite:GetTall() - 5)
+                overwrite:SetText(Metrostroi.GetPhrase("Spawner.Consist.Overwrite"))
+                overwrite.DoClick = function()
+                    exists_frame:Remove()
+                    createAndOpen()
+                end
+
+                create:SetEnabled(false)
+
+                return
+            end
+
+            createAndOpen()
+        end
+
+        frame:Remove()
+    end
+
+    delete.DoClick = function(self)
+        local name = sel_con:GetOptionData(sel_con:GetSelectedID())
+        DeleteConsist(cons[name])
+        frame:Remove()
+
+        ExtendedFrame()
+    end
+
+    spawn.DoClick = function(self)
+        local name = sel_con:GetOptionData(sel_con:GetSelectedID())
+        local con = ReadConsist(cons[name])
+		net.Start("train_spawner_open")
+            net.WriteBool(true)
+            net.WriteTable(con)
+        net.SendToServer()
+        local tool = LocalPlayer():GetTool("train_spawner")
+        tool.IsConsist = true
+        tool.Consist = con
+        frame:Close()
+    end
+end
+
+function FRAME:Init()
+    self:SetDeleteOnClose(true)
+    self:SetTitle(Metrostroi.GetPhrase("Spawner.Title"))
+    self:LoadSettings()
+    self.Pos = 0
+    self.MaxHorizontal = 14
+    self.Resizeable = {}
+    self:SetSize(800, 600)
+    self:Center()
+
+    self.Spawn = vgui.Create("DButton", self)
+    self.Spawn:SetWide(80)
+    self.Spawn:SetText(Metrostroi.GetPhrase("Spawner.Spawn"))
+
+    self.Spawn.DoClick = function()
+        local tbl = {}
+        tbl = table.Copy(self.Settings[self.Settings.Train])
+        tbl.Train = self.Settings.Train
+        tbl.AutoCouple = true
+        tbl.WagNum = self.Settings.WagNum
+		net.Start("train_spawner_open")
+            net.WriteBool(false)
+            net.WriteTable(tbl)
+        net.SendToServer()
+        local tool = LocalPlayer():GetTool("train_spawner")
+        tool.Settings = tbl
+        tool.IsConsist = false
+        local ENT = scripted_ents.Get(tool.Settings.Train)
+        if ENT and ENT.Spawner then tool.Train = ENT end
+        self:Close()
+    end
+
+    self.Extended = vgui.Create("DButton", self)
+    self.Extended:SetWide(120)
+    self.Extended:SetText(Metrostroi.GetPhrase("Spawner.Consist.ConsistEditor"))
+
+    self.Extended.DoClick = function()
+        ExtendedFrame()
+
+        self:Close()
+    end
+
+    table.insert(self.Resizeable, 
+    function(self)
+        if not IsValid(self.Spawn) then return end
+        self.Spawn:SetPos(self:GetWide() - self.Spawn:GetWide() - 5, self:GetTall() - self.Spawn:GetTall() - 5)
+    end)
+
+    table.insert(self.Resizeable, 
+    function(self)
+        if not IsValid(self.Extended) then return end
+        self.Extended:SetPos( 5, self:GetTall() - self.Spawn:GetTall() - 5)
+    end)
+
+    self:ApplyResize()
+
+    self.Objects = {}
+    self.ObjectsNamed = {}
+    self:Load()
+end
+
+function FRAME:ApplyResize()
+    for k, v in pairs(self.Resizeable) do
+        v(self)
+    end
+end
+
+function FRAME:Load()
+    local MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
+    local MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
+
+    local Trains = {}
+    for _,class in pairs(Metrostroi.TrainClasses) do
+        local name, ENT = GetTrainName(class)
+        if not ENT then continue end
+
+        Trains[ENT.ClassName] = name
+    end
+
+    self:CreateList("Train",Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer),Trains,function() self:UpdateFrame() end,self.Settings)
+    self:CreateSlider("WagNum",0,1, GetGlobalInt("metrostroi_maxwagons"),Metrostroi.GetPhrase("Spawner.WagNum"),function(slider)
+        local WagNumTable
+        for k,name in pairs(Metrostroi.TrainClasses) do
+            local ENT = scripted_ents.Get(name)
+            if not ENT.Spawner or ENT.ClassName ~= self.Settings.Train  then continue end
+            WagNumTable = ENT.Spawner.WagNumTable
+            break
+        end
+        if WagNumTable then
+            local retval = WagNumTable[1]
+            for i=2,#WagNumTable do
+                if WagNumTable[i] <= math.Round(slider:GetValue(),0) then
+                    retval = WagNumTable[i]
+                end
+            end
+            return retval
+        end
+    end,self.Settings)
+
+    self:UpdateFrame()
+end
+
+function FRAME:UpdateFrame()
+    self.Pos = 2
+
+    for k, v in pairs(self.Objects) do
+        if k < 4 then continue end
+        self.Objects[k]:Remove()
+        self.Objects[k] = nil
+    end
+
+    for k, v in pairs(self.ObjectsNamed) do
+        if k == "Train" or k == "WagNum" then continue end
+        self.ObjectsNamed[k] = nil
+    end
+
+    if not self.ObjectsNamed["Train"]:GetSelectedID() then
+        self.ObjectsNamed["Train"]:ChooseOptionID(1)
+        self.Settings.Train = self.ObjectsNamed["Train"]:GetOptionData(1)
+    end
+
+    local function incPos(a) self.Pos=self.Pos+(a or 1) end
+
+    if not self.Settings[self.Settings.Train] then self.Settings[self.Settings.Train] = {} end
+
+    -- for k,name in pairs(Metrostroi.TrainClasses) do
+    --     local ENT = scripted_ents.Get(name)
+    --     if not ENT.Spawner or ENT.ClassName ~= self.Settings.Train  then continue end
+    --     for i, menu in ipairs(ENT.Spawner) do
+    --         if menu[3] == "List" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[5]
+    --             end
+    --             self:CreateList(menu[1],menu[2],menu[4],menu[7])
+    --         elseif menu[3] == "Boolean" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[4]
+    --             end
+    --             self:CreateCheckBox(menu[1],menu[2],menu[6])
+    --         elseif menu[3] == "Slider" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[7]
+    --             end
+    --             self:CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
+    --         elseif menu[3] == "Selective" then
+    --             if self.Settings[self.Settings.Train][menu[1]] == nil then
+    --                 self.Settings[self.Settings.Train][menu[1]] = menu[5]
+    --             end
+    --             self:CreateSelective(menu[1],menu[2],menu[4],menu[7])
+    --         elseif type(menu[1]) == "number" then
+    --             incPos(menu[1])
+    --         elseif #menu==0 then
+    --             incPos()
+    --         end
+    --     end
+    -- end
+
+    for i, menu in pairs(Metrostroi.TrainSpawner.GetProperties(self.Settings.Train)) do
+        if menu[3] == "List" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[5]
+            end
+            self:CreateList(menu[1],menu[2],menu[4],menu[7])
+        elseif menu[3] == "Boolean" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[4]
+            end
+            self:CreateCheckBox(menu[1],menu[2],menu[6])
+        elseif menu[3] == "Slider" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[7]
+            end
+            self:CreateSlider(menu[1],menu[4],menu[5],menu[6],tostring(menu[2]))
+        elseif menu[3] == "Selective" then
+            if self.Settings[self.Settings.Train][menu[1]] == nil then
+                self.Settings[self.Settings.Train][menu[1]] = menu[5]
+            end
+            self:CreateSelective(menu[1],menu[2],menu[4],menu[7])
+        elseif type(menu[1]) == "number" then
+            incPos(menu[1])
+        elseif #menu==0 then
+            incPos()
+        end
+    end
+
+    self:SetSize(262 + 262*math.floor((self.Pos-1)/self.MaxHorizontal)+10, 58+24*math.min(self.MaxHorizontal,self.Pos))
+    self:ApplyResize()
+    self:Center()
+end
+
+function FRAME:CreateSelective(name, text, tbl, func, out_tbl)
+    tbl = tbl or {}
+    out_tbl = out_tbl or self.Settings[self.Settings.Train]
+    
+    if type(tbl)=="function" then tbl = tbl() or {} end
+
+    local count = table.Count(tbl)
+
+    out_tbl[name] = out_tbl[name] or { true }
+
+    --[[
+        structure in self.Settings
+        name = Selective
+        
+        then
+
+                                    numbers mean selected cells
+        self.Settings[train]["Selective"] = {1, 2, 3, 5, 7} -- ✓
+
+        or
+
+        self.Settings[train]["Selective"] = {
+            [1] = 1, -- selected
+            [2] = 1, -- selected
+            [3] = 1, -- selected
+            [4] = 0, -- not selected
+            [5] = 1, -- selected
+            [6] = 0, -- not selected
+            [7] = 1, -- selected
+        }
+    ]]
+
+    if count<=1 then
+        out_tbl[name] = { true }
+        return
+    end
+
+    local SelectiveLabel = vgui.Create("DLabel", self)
+    SelectiveLabel:SetPos(5 + 270*math.floor(self.Pos/self.MaxHorizontal),24+24*(self.Pos%self.MaxHorizontal))
+    SelectiveLabel:SetSize(115,28)
+    SelectiveLabel:SetText(text)
+    SelectiveLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+
+    local SelectiveButton = vgui.Create("DButton", self)
+    SelectiveButton:SetTooltip(text)
+    SelectiveButton:SetPos(130 + 270*math.floor(self.Pos/self.MaxHorizontal),28+24*(self.Pos%self.MaxHorizontal))
+    SelectiveButton:SetWide(120)
+    SelectiveButton:SetText(Metrostroi.GetPhrase("Spawner.Select"))
+    SelectiveButton.DoClick = function(btn)
+        local frame = vgui.Create("DFrame")
+        frame:SetSize(500, 300)
+        frame:Center()
+        frame:MakePopup()
+        frame:SetTitle(Metrostroi.GetPhrase("Spawner.Select"))
+
+        local selective = vgui.Create("DListView", frame)
+        selective:SetMultiSelect(true)
+        selective:AddColumn(text)
+
+        local item_count = 0
+
+        if #tbl == count then
+            for i=1,#tbl do
+                local line = selective:AddLine(tbl[i])
+                print(out_tbl[name])
+                line:SetSelected(table.HasValue(out_tbl[name], i))
+                item_count = item_count + 1
+            end
+        else
+            for k,v in pairs(tbl) do
+                if type(v) == "table" and v.name then k = v.name end
+                local line = selective:AddLine(v)
+                line:SetSelected(table.HasValue(out_tbl[name], k))
+                item_count = item_count + 1
+            end
+        end
+
+        if not selective:GetSelectedLine() then
+            selective:SelectFirstItem()
+            out_tbl[name][1] = true
+        end
+
+        local select = vgui.Create("DButton", frame)
+        select:Dock(BOTTOM)
+        select:SetText(Metrostroi.GetPhrase("Spawner.Select"))
+
+        selective:Dock(FILL)
+    
+        select.DoClick = function()
+            out_tbl[name] = {}
+            for i=1, item_count do
+                if selective.Lines[i]:IsLineSelected() then
+                    out_tbl[name][#out_tbl[name] + 1] = i
+                end
+            end
+            frame:Remove()
+        end
+    end
+
+    table.insert(self.Objects, SelectiveLabel)
+    table.insert(self.Objects, SelectiveButton)
+    self.ObjectsNamed[name] = SelectiveButton
+    self.Pos = self.Pos + 1
+end
+
+function FRAME:CreateList(name, text, tbl, func, out_tbl)
+    tbl = tbl or {}
+    out_tbl = out_tbl or self.Settings[self.Settings.Train]
+    
+    if type(tbl)=="function" then tbl = tbl() or {} end
+
+    local count = table.Count(tbl)
+
+    if count<=1 then
+        out_tbl[name] = next(tbl)
+        return
+    end
+
+    local ListLabel = vgui.Create("DLabel", self)
+    ListLabel:SetPos(5 + 270*math.floor(self.Pos/self.MaxHorizontal),24+24*(self.Pos%self.MaxHorizontal))
+    ListLabel:SetSize(115,28)
+    ListLabel:SetText(text)
+    ListLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+
+    local List = vgui.Create("DComboBox", self)--
+    List:SetTooltip(text)
+    List:SetPos(130 + 270*math.floor(self.Pos/self.MaxHorizontal),28+24*(self.Pos%self.MaxHorizontal))
+    List:SetWide(120)
+
+    if #tbl == count then
+        for i=1,#tbl do
+            List:AddChoice(tbl[i], i, out_tbl[name] == i)
+        end
+    else
+        for k,v in pairs(tbl) do
+            if type(v) == "table" and v.name then k = v.name end
+            List:AddChoice(v, k, out_tbl[name] == k)
+        end
+    end
+
+    if not List:GetOptionData(1)  then ListLabel:Remove() List:Remove() return end
+    if not List:GetSelectedID() then
+        local done
+        for i,v in pairs(List.Choices) do
+            if v:find("Random") then
+                List:ChooseOptionID(i)
+                out_tbl[name] = List:GetOptionData(i)
+                done = true
+                break
+            end
+        end
+        if not done then
+            List:ChooseOptionID(1)
+            out_tbl[name] = List:GetOptionData(1)
+        end
+    end
+
+    List.OnSelect = function(_, _, _, index)
+        out_tbl[name] = index
+        if func then func(List, self) end
+    end
+
+    table.insert(self.Objects, ListLabel)
+    table.insert(self.Objects, List)
+    self.ObjectsNamed[name] = List
+    self.Pos = self.Pos + 1
+end
+
+function FRAME:CreateSlider(name, decimals, min, max, text, func, out_tbl)
+    out_tbl = out_tbl or self.Settings[self.Settings.Train]
+    local Slider = vgui.Create("DNumSlider", self)
+    Slider:SetPos(5 + 270*math.floor(self.Pos/self.MaxHorizontal), 28+24*(self.Pos%self.MaxHorizontal)-7+4)
+    Slider:SetWide(290)
+    Slider:SetTall(28)
+    Slider:SetMinMax(min, max)
+    Slider:SetDecimals(decimals)
+    Slider:SetText(text..":")
+    Slider:SetValue(out_tbl[name])
+    Slider:SetTooltip(text)
+    Slider.Label:SetExpensiveShadow(1,Color(0,0,0,200))
+    Slider.Label:SetSize(125,28)
+    Slider.TextArea:SetTextColor(Slider.Label:GetTextColor())
+
+    function Slider:Think(...)
+        if not self.Editing and self:IsEditing() then
+            self.Editing = true
+        elseif self.Editing and not self:IsEditing() then
+            self.Editing = false
+            local val = self:GetValue()
+            if func then val = func(Slider) or val end
+            out_tbl[name] = math.Round(val,decimals)
+            Slider:SetValue(out_tbl[name])
+        end
+    end
+
+    table.insert(self.Objects,Slider)
+    self.ObjectsNamed[name] = Slider
+    self.Pos = self.Pos + 1
+end
+
+function FRAME:CreateCheckBox(name, text, func, out_tbl)
+    out_tbl = out_tbl or self.Settings[self.Settings.Train]
+    local CBLabel = vgui.Create("DLabel", self)
+    CBLabel:SetPos(5  + 270*math.floor(self.Pos/self.MaxHorizontal),27+24*(self.Pos%self.MaxHorizontal)-4)
+    CBLabel:SetText(text)
+    CBLabel:SetWide(125)
+    CBLabel:SetTall(28)
+    CBLabel:ApplySchemeSettings(true)
+    CBLabel:SetExpensiveShadow(1,Color(0,0,0,200))
+    local CB = vgui.Create("DCheckBox", self)
+    CB:SetTooltip(text)
+    CB:SetPos(130 + 270*math.floor(self.Pos/self.MaxHorizontal),31+24*(self.Pos%self.MaxHorizontal))
+    CB:SetValue(out_tbl[name])
+    CB.OnChange = function(self)
+        out_tbl[name] = CB:GetChecked()
+        if func then func(CB) end
+    end
+
+    table.insert(self.Objects, CBLabel)
+    table.insert(self.Objects, CB)
+    self.ObjectsNamed[name] = CB
+    self.Pos = self.Pos + 1
+end
+
+local SetSettings = false
+
+function FRAME:LoadSettings()
+    local Settings = {
+        Train = 1,
+        WagNum = 3,
+        AutoCouple = true,
+    }
+
+    self.Settings = ReadSettings() or Settings
+
+    if SetSettings ~= false then 
+        table.Merge(self.Settings, table.Copy(SetSettings))
+        SetSettings = false
+    end
+end
+
+function FRAME:SaveSettings()
+    WriteSettings(self.Settings)
+end
+
+function FRAME:OnRemove()
+    self:SaveSettings()
+end
+
+vgui.Register("MSSpawnerFrame", FRAME, "DFrame")
 
 net.Receive("train_spawner_open",function()
-	local tbl = net.ReadTable()
-	local tool = LocalPlayer():GetTool("train_spawner")
-	Settings[tbl.Train] = tbl
-	Settings.Train = tbl.Train
-	tool.Settings = tbl
-	UpdateConCMD()
+    local consist = net.ReadBool()
+    local tool = LocalPlayer():GetTool("train_spawner")
+    if not consist then
+        local tbl = net.ReadTable()
+        local Settings = {}
+        Settings[tbl.Train] = tbl
+        Settings.Train = tbl.Train
+        tool.IsConsist = false
+        tool.Settings = tbl
+        SetSettings = Settings
+    else
+        local tbl = net.ReadTable()
+        if not tbl.Name or not tbl.Train then return end
+        local Consist = {}
+        Consist = tbl
+        tool.IsConsist = true
+        tool.Consist = tbl
+        
+        local filename = GetPath(tbl.Name)
+
+        local consisteditor = vgui.Create("MSConsistFrame")
+        consisteditor:Center()
+        consisteditor:MakePopup()
+        consisteditor:Setup(Consist, filename)
+    end
 end)
-net.Receive("MetrostroiTrainSpawner",createFrame)
-net.Receive("MetrostroiMaxWagons", function()
-	MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
-	MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
-	if trainTypeT and trainTypeT:IsValid() then
-		trainTypeT:SetText(Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer))
-	end
-end)
-net.Receive("MetrostroiTrainCount", function()
-	if trainTypeT and trainTypeT:IsValid() then
-		trainTypeT:SetText(Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer))
-	end
+net.Receive("MetrostroiTrainSpawner", function()
+    local frame = vgui.Create("MSSpawnerFrame")
+    frame:MakePopup()
 end)
