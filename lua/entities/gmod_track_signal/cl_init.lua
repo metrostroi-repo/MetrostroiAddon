@@ -199,13 +199,14 @@ net.Receive("metrostroi-signal", function()
 end)
 
 local C_RenderDistance      = GetConVar("metrostroi_signal_distance")
+local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
 
 local timer = CurTime()
 hook.Add("Think","MetrostroiRenderSignals", function()
-    if CurTime() - timer < 1.5 or not IsValid(LocalPlayer()) then return end
+    if CurTime() - timer < 1.5 or not IsValid(LocalPlayer()) or C_ScreenshotMode:GetBool() then return end
     timer = CurTime()
     local plyPos = LocalPlayer():GetPos()
-    local dist = C_RenderDistance:GetInt()
+    local dist = C_RenderDistance:GetInt()/0.01905
     for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
         if not IsValid(sig) then continue end
         local sigPos = sig:GetPos()
@@ -220,7 +221,7 @@ function ENT:Think()
     self.PrevTime = self.PrevTime or RealTime()
     self.DeltaTime = (RealTime() - self.PrevTime)
     self.PrevTime = RealTime()
-    if (self:IsDormant() or Metrostroi and Metrostroi.ReloadClientside or self.RenderDisable) and not self.ReloadModels then
+    if (self:IsDormant() or Metrostroi and Metrostroi.ReloadClientside or self.RenderDisable and not C_ScreenshotMode:GetBool()) and not self.ReloadModels then
         if self.ModelsCreated then
             self:RemoveModels()
         end
