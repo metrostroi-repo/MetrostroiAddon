@@ -37,6 +37,8 @@ function TRAIN_SYSTEM:Initialize()
 
     self.Train:LoadSystem("RCU","Relay","Switch", {bass = true})
 
+    self.Train:LoadSystem("OtklAVU","Relay","Switch", {bass = true})
+
     self.Train:LoadSystem("R_UNch","Relay","Switch", {bass = true})
     self.Train:LoadSystem("R_ZS","Relay","Switch", {bass = true})
     self.Train:LoadSystem("R_G","Relay","Switch", {bass = true})
@@ -67,6 +69,7 @@ function TRAIN_SYSTEM:Initialize()
     self.PanelLights = 0
 
     self.Ring = 0
+    self.AVU = 0
 
     self.VPR = 0
 
@@ -81,5 +84,5 @@ function TRAIN_SYSTEM:ClientInitialize()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "V1","GRP","RRP","TW18","SD","PP1","PP6","SDW","BrY","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","PanelLights","AnnouncerPlaying","VPR","Ring","CBKIPower","PCBKPower"}
+    return { "V1","GRP","RRP","TW18","SD","PP1","PP6","SDW","BrY","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","PanelLights","AnnouncerPlaying","VPR","Ring","AVU","CBKIPower","PCBKPower"}
 end

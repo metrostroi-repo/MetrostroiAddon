@@ -918,8 +918,22 @@ ENT.ButtonMap["UAVAPanel"] = {
             sndmin=30, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
         {ID = "UAVACToggle",x=60, y=0, w=120, h=150, tooltip="",var="UAVAC",states={"Train.Buttons.UAVAOff","Train.Buttons.UAVAOn"}},
-        {ID = "UKSDisconnectToggle",x=60, y=150, w=120, h=50, tooltip="",var="UKSDisconnect",states={"Train.Buttons.Closed","Train.Buttons.Opened"}, model = {
-            plomb = {var="UAVAPl", ID="UAVAPl",},
+    }
+}
+
+ENT.ButtonMap["UKSPanel"] = {
+    pos = Vector(403.1,-25,0),
+    ang = Angle(90,0,0),
+    width = 100,
+    height = 100,
+    scale = 0.0625,
+    
+    buttons = {
+        {ID = "UKSDisconnectToggle",x=0, y=0, w=100, h=100, tooltip="", model = {
+            model = "models/metrostroi_train/81-717/buttons/breaker_common001.mdl",z=15,ang=180,
+            var="UKSDisconnect",speed=0.5,vmin=1,vmax=0.87,
+            sndvol = 0.8,snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80,sndmax = 1e3/3,sndang = Angle(-90,0,0),
+            plomb = {model = "models/metrostroi_train/81/plomb_b.mdl",ang=30,x=28,y=-18,var="UKSDisconnectPl",ID="UKSDisconnectPl",z=-15,},            
         }},
     }
 }

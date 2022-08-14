@@ -213,6 +213,8 @@ Entities.gmod_subway_81-703.Buttons.RRI.RRIRewindSet2           = @[Common.RRI.R
 Entities.gmod_subway_81-703.Buttons.RRI.RRIRewindSet0           = @[Common.RRI.RRIRewindSet0]
 Entities.gmod_subway_81-703.Buttons.RRI.RRIAmplifierToggle      = @[Common.RRI.RRIAmplifierToggle]
 Entities.gmod_subway_81-703.Buttons.RRI.!RRIOn                  = @[Common.RRI.RRIOn]
+Entities.gmod_subway_81-703.Buttons.AVU.OtklAVUToggle           = @[Common.ALL.OAVU]
+Entities.gmod_subway_81-703.Buttons.AVU.!AVULight               = @[Common.ALL.LAVU]
 
 Entities.gmod_subway_81-703.Buttons.Stopkran.EmergencyBrakeValveToggle                      = @[Common.ALL.EmergencyBrakeValve]
 Entities.gmod_subway_81-703.Buttons.ParkingBrake.ParkingBrakeLeft                           = @[Common.703.ParkingBrakeLeft]
