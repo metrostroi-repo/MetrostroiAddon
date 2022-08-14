@@ -238,6 +238,7 @@ function ENT:Think()
                     --    --ent.Spawned = true
                     --end)
                     self.ClientModels[i] = ClientsideModel(self.Pool[i].model,RENDERGROUP_OPAQUE)
+                    if not IsValid(self.ClientModels[i]) then continue end
                     self.ClientModels[i]:SetPos(self.Pool[i].pos)
                     self.ClientModels[i]:SetAngles(self.Pool[i].ang)
                     self.ClientModels[i]:SetSkin(math.floor(self.ClientModels[i]:SkinCount()*self.Pool[i].skin))
@@ -292,6 +293,7 @@ function ENT:Think()
         --    --ent.Spawned = true
         --end)
         local ent= ClientsideModel(self.Pool[i].model,RENDERGROUP_OPAQUE)
+        if not IsValid(ent) then break end
         ent:SetPos(pos)
         ent:SetSkin(math.floor(ent:SkinCount()*self.Pool[i].skin))
         ent:SetModelScale(self.Pool[i].scale,0)

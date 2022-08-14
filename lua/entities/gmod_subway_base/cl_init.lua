@@ -392,6 +392,7 @@ function ENT:SpawnCSEnt(k,override)
         local model = v.model
         if v.modelcallback then model = v.modelcallback(self) or v.model end
         local cent = ClientsideModel(model,RENDERGROUP_OPAQUE)
+        if not IsValid(cent) then return false end
         cent.GetBodyColor = function()
             if not IsValid(self) then return Vector(1) end
             return self:GetBodyColor()
@@ -1346,6 +1347,7 @@ function ENT:Think()
         for i,v in ipairs(self.LeftDoorPositions) do
             if self:GetPackedBool("DoorLS"..i) and not IsValid(stucked[i]) then
                 local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
+                if not IsValid(ent) then break end
                 ent:SetPos(self:LocalToWorld(Vector(v.x,v.y,self:GetStandingArea().z)))
                 ent:SetAngles(self:LocalToWorldAngles(Angle(0,v.y < 0 and -90 or 90,0)))
                 ent:SetSkin(math.floor(ent:SkinCount()*math.random()))
@@ -1368,6 +1370,7 @@ function ENT:Think()
         for i,v in ipairs(self.RightDoorPositions) do
             if self:GetPackedBool("DoorRS"..i) and not IsValid(stucked[-i]) then
                 local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
+                if not IsValid(ent) then break end
                 ent:SetPos(self:LocalToWorld(Vector(v.x,v.y,self:GetStandingArea().z)))
                 ent:SetAngles(self:LocalToWorldAngles(Angle(0,v.y < 0 and -90 or 90,0)))
                 ent:SetSkin(math.floor(ent:SkinCount()*math.random()))
@@ -1403,6 +1406,7 @@ function ENT:Think()
                 --local ent = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
                 --ent:SetModel(table.Random(self.PassengerModels))
                 local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
+                if not IsValid(ent) then break end
                 ent:SetPos(self:LocalToWorld(pos))
                 ent:SetAngles(Angle(0,math.random(0,360),0))
                 --[[
