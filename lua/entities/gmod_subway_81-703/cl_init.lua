@@ -265,7 +265,7 @@ ENT.ButtonMap["AVMain"] = {
 }
 
 ENT.ButtonMap["AVU"] = {
-    pos = Vector(456.9,-18,35.5),
+    pos = Vector(455.35,-19.02,35.5),
     ang = Angle(0,-95.5,90),
     width = 95,
     height = 85,
