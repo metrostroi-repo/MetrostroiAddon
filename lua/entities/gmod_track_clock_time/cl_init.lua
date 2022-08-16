@@ -31,6 +31,7 @@ function ENT:Think()
             --  --ent.Spawned = true
             --end)
             self.Digits[k] = ClientsideModel(model,RENDERGROUP_OPAQUE)
+            if not IsValid(self.Digits[k]) then break end
             self.Digits[k]:SetPos(self:LocalToWorld(v[1]))
             self.Digits[k]:SetAngles(self:GetAngles())
             self.Digits[k]:SetSkin(10)

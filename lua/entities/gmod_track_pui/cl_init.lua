@@ -59,6 +59,7 @@ function ENT:Think()
             --    --ent.Spawned = true
             --end)
             self.Digits[k] = ClientsideModel("models/metrostroi/mus_clock/pui_ind_"..v[2]..".mdl",RENDERGROUP_OPAQUE)
+            if not IsValid(self.Digits[k]) then continue end
             self.Digits[k]:SetPos(self:LocalToWorld(v[1]))
             self.Digits[k]:SetAngles(self:GetAngles())
             self.Digits[k]:SetSkin(1)
@@ -80,11 +81,13 @@ function ENT:Think()
         --    --ent.Spawned = true
         --end)
         self.Digits[0] = ClientsideModel("models/metrostroi/mus_clock/pui_lamp.mdl",RENDERGROUP_OPAQUE)
-        self.Digits[0]:SetPos(self:GetAttachment(self:LookupAttachment("lamp")).Pos)
-        self.Digits[0]:SetAngles(self:GetAngles())
-        self.Digits[0]:SetParent(self)
-        self.Digits[0]:SetRenderMode( RENDERMODE_TRANSALPHA )
-        self.Digits[0]:SetColor(Color(255,255,255,lamp*255))
+        if IsValid(self.Digits[0]) then
+            self.Digits[0]:SetPos(self:GetAttachment(self:LookupAttachment("lamp")).Pos)
+            self.Digits[0]:SetAngles(self:GetAngles())
+            self.Digits[0]:SetParent(self)
+            self.Digits[0]:SetRenderMode( RENDERMODE_TRANSALPHA )
+            self.Digits[0]:SetColor(Color(255,255,255,lamp*255))
+        end
     elseif IsValid(self.Digits[0]) and lamp > 0 then
         self.Digits[0]:SetColor(Color(255,255,255,lamp*255))
     elseif IsValid(self.Digits[0]) and lamp == 0 then

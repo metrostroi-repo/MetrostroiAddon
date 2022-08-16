@@ -99,9 +99,11 @@ function ENT:Think()
 		end
 		if self.Left then pos = pos*Vector(1,-1,1) end
 		if self.Left and self.ModelProp.rotate then ang = ang-Angle(0,180,0) end
-		self.Model:SetParent(self)
-		self.Model:SetPos(self:LocalToWorld(pos))
-		self.Model:SetAngles(self:LocalToWorldAngles(ang))
+		if IsValid(self.Model) then
+			self.Model:SetParent(self)
+			self.Model:SetPos(self:LocalToWorld(pos))
+ 			self.Model:SetAngles(self:LocalToWorldAngles(ang))
+ 		end
 	end
 	return true
 end

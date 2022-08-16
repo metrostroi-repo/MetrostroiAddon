@@ -13,6 +13,7 @@ function ENT:Think()
             --self.Arrows[i] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
             --self.Arrows[i]:SetModel( model )
             self.Arrows[i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
+            if not IsValid(self.Arrows[i]) then break end
             self.Arrows[i]:SetPos(self:GetPos())
             self.Arrows[i]:SetAngles(self:GetAngles())
             self.Arrows[i]:SetParent(self)
@@ -23,13 +24,15 @@ function ENT:Think()
         self:EmitSound("mus/clock_click"..math.random(1,8)..".wav",65,math.random(95,105),0.5)
         self.OldSec = d.sec
         self.SecPull = RealTime()+0.05
-        self.Arrows[1]:SetPoseParameter("position",(0.5+d.hour/24+d.min/1440)%1)
-        self.Arrows[2]:SetPoseParameter("position",d.min/60+d.sec/3600)
+        if IsValid(self.Arrows[1]) then self.Arrows[1]:SetPoseParameter("position",(0.5+d.hour/24+d.min/1440)%1) end
+        if IsValid(self.Arrows[2]) then self.Arrows[2]:SetPoseParameter("position",d.min/60+d.sec/3600) end
     end
-    if RealTime()-self.SecPull > 0 or d.sec < 30 then
-        self.Arrows[3]:SetPoseParameter("position",d.sec/60)
-    else
-        self.Arrows[3]:SetPoseParameter("position",d.sec/60 +(d.sec-15)/60*0.002)
+    if IsValid(self.Arrows[3]) then
+        if RealTime()-self.SecPull > 0 or d.sec < 30 then
+            self.Arrows[3]:SetPoseParameter("position",d.sec/60)
+        else
+            self.Arrows[3]:SetPoseParameter("position",d.sec/60 +(d.sec-15)/60*0.002)
+        end
     end
 
     --[[
