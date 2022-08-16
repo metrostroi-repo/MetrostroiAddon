@@ -44,6 +44,7 @@ Panel.FOV               = Champ de vision (FOV)
 Panel.Z                 = Hauteur de caméra
 Panel.RenderDistance    = Rendu à distance
 Panel.RenderSignals     = Traced signals #NEW #FIXME
+Panel.RenderPassengers  = Traced passengers #NEW #FIXME
 Panel.ReloadClient      = Redémarrer le client
 
 Panel.ClientAdvanced    = Client (avancé)

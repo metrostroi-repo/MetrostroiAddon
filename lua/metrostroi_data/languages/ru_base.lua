@@ -53,6 +53,7 @@ Panel.FOV               = Поле зрения
 Panel.Z                 = Высота камеры
 Panel.RenderDistance    = Дальность прорисовки
 Panel.RenderSignals     = Прорисовка светофоров
+Panel.RenderPassengers  = Прорисовка пассажиров
 Panel.ReloadClient      = Перезагрузить клиентскую часть
 
 Panel.ClientAdvanced    = Клиент (дополнительно)

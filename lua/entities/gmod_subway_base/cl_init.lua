@@ -297,6 +297,7 @@ end
 
 local C_DisableHUD          = GetConVar("metrostroi_disablehud")
 local C_RenderDistance      = GetConVar("metrostroi_renderdistance")
+local C_PassRenderDistance  = GetConVar("metrostroi_passengers_distance")
 local C_SoftDraw            = GetConVar("metrostroi_softdrawmultipier")
 local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
 local C_DrawDebug           = GetConVar("metrostroi_drawdebug")
@@ -865,7 +866,7 @@ function ENT:OnRemove(nfinal)
         end
     end
     for _,v in pairs(self.PassengerEnts or {}) do
-        SafeRemoveEntity(v)
+        SafeRemoveEntity(v.ent)
     end
     for _,v in pairs(self.PassengerEntsStucked or {}) do
         SafeRemoveEntity(v)
@@ -1363,7 +1364,7 @@ function ENT:Think()
                 else
                     self:PlayOnceFromPos("PassStuckL"..i,"subway_trains/common/door/pass_stuck.mp3",5,0.9+math.random()*0.2,150,400,v)
                 end
-            elseif not self:GetPackedBool("DoorLS"..i) and IsValid(stucked[i]) then
+            elseif IsValid(stucked[i]) and (not self:GetPackedBool("DoorLS"..i) or stucked[i]:IsDormant()) then
                 SafeRemoveEntity(stucked[i])
             end
         end
@@ -1386,17 +1387,17 @@ function ENT:Think()
                 else
                     self:PlayOnceFromPos("PassStuckR"..i,"subway_trains/common/door/pass_stuck.mp3",5,0.9+math.random()*0.2,150,400,v)
                 end
-            elseif not self:GetPackedBool("DoorRS"..i) and IsValid(stucked[-i]) then
+            elseif IsValid(stucked[-i]) and (not self:GetPackedBool("DoorRS"..i) or stucked[-i]:IsDormant()) then
                 SafeRemoveEntity(stucked[-i])
             end
         end
         if #self.PassengerEnts ~= self:GetNW2Float("PassengerCount") then
             -- Passengers go out
             while #self.PassengerEnts > self:GetNW2Float("PassengerCount") do
-                local ent = self.PassengerEnts[#self.PassengerEnts]
+                local tbl = self.PassengerEnts[#self.PassengerEnts]
                 table.remove(self.PassengerPositions,#self.PassengerPositions)
                 table.remove(self.PassengerEnts,#self.PassengerEnts)
-                ent:Remove()
+                SafeRemoveEntity(tbl.ent)
             end
             -- Passengers go in
             while #self.PassengerEnts < self:GetNW2Float("PassengerCount") do
@@ -1405,10 +1406,10 @@ function ENT:Think()
 
                 --local ent = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
                 --ent:SetModel(table.Random(self.PassengerModels))
-                local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
-                if not IsValid(ent) then break end
-                ent:SetPos(self:LocalToWorld(pos))
-                ent:SetAngles(Angle(0,math.random(0,360),0))
+                local tbl = {}
+                tbl.mdl = table.Random(self.PassengerModels)
+                tbl.pos = pos
+                tbl.ang = Angle(0,math.random(0,360),0)
                 --[[
                 hook.Add("MetrostroiBigLag",ent,function(ent)
                     ent:SetPos(self:LocalToWorld(pos))
@@ -1416,11 +1417,29 @@ function ENT:Think()
                     --if ent.Spawned then hook.Remove("MetrostroiBigLag",ent) end
                     --ent.Spawned = true
                 end)]]
-                ent:SetSkin(math.floor(ent:SkinCount()*math.random()))
-                ent:SetModelScale(0.98 + (-0.02+0.04*math.random()),0)
-                ent:SetParent(self)
+                tbl.scale = 0.98 + (-0.02+0.04*math.random())
                 table.insert(self.PassengerPositions,pos)
-                table.insert(self.PassengerEnts,ent)
+                table.insert(self.PassengerEnts,tbl)
+            end
+        end
+        if (CurTime() - (self.ModelCheckTimer or 0) > 1.0) then
+            self.ModelCheckTimer = CurTime()
+            local plyPos = LocalPlayer():GetPos()
+            local dist = C_PassRenderDistance:GetInt()/0.01905
+            for _,tbl in pairs(self.PassengerEnts) do
+                if not IsValid(tbl.ent) and plyPos:Distance(tbl.pos) <= dist then
+                    local ent = ClientsideModel(tbl.mdl, RENDERGROUP_OPAQUE)
+                    if not IsValid(ent) then continue end
+                    ent:SetPos(self:LocalToWorld(tbl.pos))
+                    ent:SetAngles(self:LocalToWorldAngles(tbl.ang))
+                    if not tbl.skin then tbl.skin = math.floor(ent:SkinCount()*math.random()) end
+                    ent:SetSkin(tbl.skin)
+                    ent:SetModelScale(tbl.scale,0)
+                    ent:SetParent(self)
+                    tbl.ent = ent
+                elseif IsValid(tbl.ent) and (plyPos:Distance(tbl.pos) > dist or tbl.ent:IsDormant()) then
+                    SafeRemoveEntity(tbl.ent)
+                end
             end
         end
     end
@@ -2644,6 +2663,7 @@ function ENT:SetLightPower(index,power,brightness)
     -- Create light
     if lightData[1] == "light" or lightData[1] == "glow" then
         local light = ents.CreateClientside("gmod_train_sprite")
+        if not IsValid(light) then return end
         light:SetPos(self:LocalToWorld(lightData[2]))
         --light:SetLocalAngles(lightData[3])
 
@@ -2690,6 +2710,7 @@ function ENT:SetLightPower(index,power,brightness)
         self.GlowingLights[index] = light
     elseif lightData[1] == "dynamiclight" then
         local light = ents.CreateClientside("gmod_train_dlight")
+        if not IsValid(light) then return end
         light:SetParent(self)
 
         -- Set position
