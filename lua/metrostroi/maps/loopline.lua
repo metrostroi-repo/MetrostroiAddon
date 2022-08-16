@@ -27,13 +27,13 @@ Metrostroi.AddLastStationTex("720",656,"models/metrostroi_schemes/destination_ta
 Metrostroi.AddPassSchemeTex("717_new","1 Line",{
     "models/metrostroi_schemes/mus_loopline",
 })
-Metrostroi.AddPassSchemeTex("720","Crossline",{
-    "metrostroi_skins/81-720_schemes/loopliner",
-    "metrostroi_skins/81-720_schemes/loopline",
+Metrostroi.AddPassSchemeTex("720","Loopline",{
+    "metrostroi_skins/81-720_schemes/loop",
+    "metrostroi_skins/81-720_schemes/loopr",
 })
-Metrostroi.AddPassSchemeTex("722","Crossline",{
-    "metrostroi_skins/81-722_schemes/loopliner",
-    "metrostroi_skins/81-722_schemes/loopline",
+Metrostroi.AddPassSchemeTex("722","Loopline",{
+    "metrostroi_skins/81-722_schemes/loop",
+    "metrostroi_skins/81-722_schemes/loopr",
 })
 Metrostroi.TickerAdverts = {
     "МЕТРОПОЛИТЕН ИМЕНИ ГАРРИ НЬЮМАНА ПРИГЛАШАЕТ НА РАБОТУ РЕАЛЬНЕ МАФЕНЕСТОВ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,ТЕЛЕФОН ДЛЯ СПРАВОК 8 (800) 555-35-35",
@@ -71,7 +71,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO",{
     spec_line5= {"subway_announcers/sarmat_upo/rhino/loop/spec_line5.mp3",1.748700},
 },{
     {
-        LED = {5,6,5,6,5,5},
+        LED = {6,5,5,6,5,5},
         Name = "Кольцевой",
         Loop = true,
         {
@@ -251,7 +251,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
     to_slavnaya_strana_f = {"subway_announcers/asnp/pyaseckaya/loopline/to_slavnaya_strana.mp3",3.839063},
 },{
     {
-        LED = {5,5,5,5,5,5},
+        LED = {5,10,5,5,5},
         Name = "Line 1",
         Loop = true,
         BlockDoors = true,
@@ -382,7 +382,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
     to_slavnaya_strana_f = {"subway_announcers/riu/pyaseckaya/loopline/to_slavnaya_strana.mp3",3.939138},
 },{
     {
-        LED = {5,5,5,5,5,5},
+        LED = {5,10,5,5,5},
         Name = "Line 1",
         Loop = true,
         BlockDoors = true,
@@ -475,7 +475,7 @@ Metrostroi.SetRRIAnnouncer({
     to_slavnaya_strana = {"subway_announcers/rri/boiko/loopline/to_slavnaya_strana.mp3",5.505760},
 },{
     {
-        LED = {5,5,5,5,5,5},
+        LED = {5,10,5,5,5},
         Loop = true,
         Name = "Line 1",
         spec_last = {"last"},
@@ -571,7 +571,7 @@ Metrostroi.StationConfigurations = {
         }
     },
     pto = {
-        pto = {"пто","ПТО"},
+        names = {"пто","ПТО"},
         positions = {
             {Vector(-4539,5624,-4597),Angle(0,0,0)},
         }
