@@ -31,6 +31,8 @@ Panel.DrawCams          = 카메라 렌더링
 Panel.DisableHUD        = 운전석 착석시 HUD 비활성
 Panel.DisableCamAccel   = 시점 흔들림 사용 안함
 Panel.DisableHoverText  = 주석 텍스트 표시 안함
+Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = 스크린샷 모드 (낮은 FPS)
 Panel.ShadowsHeadlight  = 전조등 그림자 활성
 Panel.RedLights         = 적색등의 다이나믹 라이트 사용
@@ -39,6 +41,7 @@ Panel.MinimizedShow     = 창 최소화시 구성요소 언로드 하지 않기
 Panel.FOV               = 시야각(FOV)
 Panel.Z                 = 시점 높이
 Panel.RenderDistance    = 렌더링 거리
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = 사용자 시스템 다시 불러오기
 
 Panel.ClientAdvanced    = 사용자 (고급설정)

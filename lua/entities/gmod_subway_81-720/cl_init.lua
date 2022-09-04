@@ -252,7 +252,7 @@ ENT.ButtonMap["PUL"] = {
             sndvol = 0.3, snd = function(val) return val and "button_square_on" or "button_square_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
             sprite = {bright=0.5,size=0.25,scale=0.03,vscale=0.03,color=Color(255,80,100),z=0},
         }},
-        {ID = "!DoorLeftLamp",x=47, y=149, radius=8, tooltip = "Работа кнопки левых дверей",model = {
+        {ID = "!DoorLeftLamp",x=47.4, y=148.5, radius=8, tooltip = "Работа кнопки левых дверей",model = {
             lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",var="DoorLeftLamp",z=-3, color=Color(120,255,50)},
             sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-1},
         }},
@@ -339,7 +339,7 @@ ENT.ButtonMap["PUR"] = {
             var="DoorRight",speed=12, vmin=0, vmax=1,
             sndvol = 0.5, snd = function(val) return val and "button_press" or "button_release" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
-        {ID = "!DoorRightLamp",x=108.5, y=144, radius=8, tooltip = "Работа кнопки правых дверей",model = {
+        {ID = "!DoorRightLamp",x=108.7, y=143.7, radius=8, tooltip = "Работа кнопки правых дверей",model = {
             lamp = {model = "models/metrostroi_train/81-502/lamps/svetodiod_small_502.mdl",var="DoorRightLamp",z=-3, color=Color(120,255,50)},
             sprite = {bright=0.4,size=0.25,scale=0.02,vscale=0.02,color=Color(175,250,20),z=-1},
         }},

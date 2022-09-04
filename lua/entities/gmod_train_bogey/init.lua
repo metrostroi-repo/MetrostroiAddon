@@ -419,32 +419,29 @@ function ENT:CheckContact(pos,dir,id,cpos)
     return result.Hit
 end
 
-local C_Reqiure3rdRail = GetConVar("metrostroi_train_requirethirdrail")
+local C_Require3rdRail = GetConVar("metrostroi_train_requirethirdrail")
 
 function ENT:CheckVoltage(dT)
     -- Check contact states
     if (CurTime() - self.CheckTimeout) <= 0.25 then return end
     self.CheckTimeout = CurTime()
-    local supported = C_Reqiure3rdRail:GetInt() > 0 and Metrostroi.MapHasFullSupport()
+    local supported = C_Require3rdRail:GetInt() > 0 and Metrostroi.MapHasFullSupport()
     local feeder = self.Feeder and Metrostroi.Voltages[self.Feeder]
-    local volt = feeder or Metrostroi.Voltage or 750
+    local contacts = not self.DisableContacts and not self.DisableContactsManual
+    local volt = contacts and (feeder or Metrostroi.Voltage or 750) or 0
 
     -- Non-metrostroi maps
     if not supported then
         self.Voltage = volt
-        self.NextStates[1] = true
-        self.NextStates[2] = true
+        self.NextStates[1] = contacts
+        self.NextStates[2] = contacts
+        self.ContactStates = self.NextStates 
         return
     end
 
     self.VoltageDropByTouch = 0
-    self.NextStates[1] = self:CheckContact(self.PantLPos,Vector(0,-1,0),1,self.PantLCPos)
-    self.NextStates[2] = self:CheckContact(self.PantRPos,Vector(0, 1,0),2,self.PantRCPos)
-
-    if self.DisableContacts or self.DisableContactsManual then
-        self.NextStates[1] = false
-        self.NextStates[2] = false
-    end
+    self.NextStates[1] = contacts and self:CheckContact(self.PantLPos,Vector(0,-1,0),1,self.PantLCPos)
+    self.NextStates[2] = contacts and self:CheckContact(self.PantRPos,Vector(0, 1,0),2,self.PantRCPos)
 
     -- Detect changes in contact states
     for i=1,2 do

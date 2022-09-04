@@ -32,6 +32,7 @@ Panel.DisableHUD        = Désactive le HUD sur le siège du conducteur
 Panel.DisableCamAccel   = Désactive l'accéleration de caméra
 Panel.DisableHoverText  = Désactive le texte de légende
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = Mode screenshot (IPS bas)
 Panel.ShadowsHeadlight  = Active les ombres des phares
 Panel.RedLights         = Activer la lumière dynamique\ndes feux rouges
@@ -42,6 +43,7 @@ Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = Champ de vision (FOV)
 Panel.Z                 = Hauteur de caméra
 Panel.RenderDistance    = Rendu à distance
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Redémarrer le client
 
 Panel.ClientAdvanced    = Client (avancé)
