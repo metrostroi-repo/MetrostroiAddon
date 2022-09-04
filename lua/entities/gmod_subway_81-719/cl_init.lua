@@ -818,20 +818,18 @@ for i=1,8 do
 end
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
-        model = "models/metrostroi_train/common/bort_numbers.mdl",
+        model = "models/metrostroi_train/81-714_mmz/bortnumber_" .. i .. ".mdl",
         pos = Vector(41+16+i*6.6-5*6.6/2,67.4,-17.8),
-        ang = Angle(0,180,0),
-        skin=i,
+        ang = Angle(0,90,0),
         hide = 1.5,
         callback = function(ent)
             ent.WagonNumber = false
         end,
     }
     ENT.ClientProps["TrainNumberR"..i] = {
-        model = "models/metrostroi_train/common/bort_numbers.mdl",
+        model = "models/metrostroi_train/81-714_mmz/bortnumber_" .. i .. ".mdl",
         pos = Vector(64+16-i*6.6-5*6.6/2,-67.4,-17.8),
-        ang = Angle(0,0,0),
-        skin=i,
+        ang = Angle(0,270,0),
         hide = 1.5,
         callback = function(ent)
             ent.WagonNumber = false
@@ -880,6 +878,7 @@ function ENT:Initialize()
         self.VentVol[i] = 0
     end
 end
+local bortnumber_format = "models/metrostroi_train/81-714_mmz/bortnumber_%d.mdl"
 function ENT:UpdateWagonNumber()
     for i=0,3 do
         local count = self.WagonNumber < 250 and 3 or 4
@@ -890,11 +889,11 @@ function ENT:UpdateWagonNumber()
             local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
             if IsValid(leftNum) then
                 leftNum:SetPos(self:LocalToWorld(Vector(41+16+i*6.6-count*6.6/2,67.4,-17.8)))
-                leftNum:SetSkin(num)
+                leftNum:SetModel(Format(bortnumber_format, num))
             end
             if IsValid(rightNum) then
                 rightNum:SetPos(self:LocalToWorld(Vector(64+16-i*6.6-count*6.6/2,-67.4,-17.8)))
-                rightNum:SetSkin(num)
+                rightNum:SetModel(Format(bortnumber_format, num))
             end
         end
     end
