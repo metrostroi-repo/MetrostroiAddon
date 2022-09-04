@@ -489,7 +489,6 @@ function ENT:Think()
             constraint.NoCollide(self.Wheels,self:GetNW2Entity("TrainEntity"),0,0)
         end
     end
-
     -- Update timing
     self.PrevTime = self.PrevTime or CurTime()
     self.DeltaTime = (CurTime() - self.PrevTime)

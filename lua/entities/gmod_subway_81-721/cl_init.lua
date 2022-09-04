@@ -204,10 +204,9 @@ ENT.ButtonMap["FrontDoor"] = {
 }
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
-        model = "models/metrostroi_train/common/bort_numbers.mdl",
+        model = "models/metrostroi_train/81-714_mmz/bortnumber_" .. i .. ".mdl",
         pos = Vector(57+i*6.6-4*6.6/2,66.3,18),
-        ang = Angle(0,180,-5),
-        skin=0,
+        ang = Angle(-5,90,0),
         hide = 1.5,
         callback = function(ent)
             ent.WagonNumber = false
@@ -216,10 +215,9 @@ for i=0,3 do
 end
 for i=0,3 do
     ENT.ClientProps["TrainNumberR"..i] = {
-        model = "models/metrostroi_train/common/bort_numbers.mdl",
+        model = "models/metrostroi_train/81-714_mmz/bortnumber_" .. i .. ".mdl",
         pos = Vector(61+i*6.6-4*6.6/2,-66.3,18),
-        ang = Angle(0,0,-5),
-        skin=0,
+        ang = Angle(-5,270,0),
         hide = 1.5,
         callback = function(ent)
             ent.WagonNumber = false
@@ -475,6 +473,7 @@ function ENT:Initialize()
     self.VentVol[i] = 0
     end
 end
+local bortnumber_format = "models/metrostroi_train/81-714_mmz/bortnumber_%d.mdl"
 function ENT:UpdateWagonNumber()
     for i=0,3 do
         --self:ShowHide("TrainNumberL"..i,i<count)
@@ -484,11 +483,11 @@ function ENT:UpdateWagonNumber()
             local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
             if IsValid(leftNum) then
                 leftNum:SetPos(self:LocalToWorld(Vector(60+i*6.6-4*6.6/2,66.3,18)))
-                leftNum:SetSkin(num)
+                leftNum:SetModel(Format(bortnumber_format, num))
             end
             if IsValid(rightNum) then
                 rightNum:SetPos(self:LocalToWorld(Vector(53-i*6.6+4*6.6/2,-66.3,18)))
-                rightNum:SetSkin(num)
+                rightNum:SetModel(Format(bortnumber_format, num))
             end
         --end
     end
