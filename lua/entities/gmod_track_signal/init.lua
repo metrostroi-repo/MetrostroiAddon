@@ -675,7 +675,9 @@ function ENT:Think()
 				self.RouteNumberOverrite = self.RouteNumber
 			end
 		end]]
-
+		
+		if self.InvationSignal then number = number.."W" end
+		
 		if self.KGU then number = number.."K" end
 		if number then self:SetNW2String("Number",number) end
 	end
