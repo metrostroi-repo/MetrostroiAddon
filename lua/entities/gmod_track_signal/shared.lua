@@ -244,6 +244,10 @@ ENT.TrafficLightModels[1] = {
 	M = { 40, "models/metrostroi/signals/mus/light_pathindicator3.mdl",  Vector(7,11, 25), 3.6, 3.4, 5},
 	noleft = true,
 }
+ENT.TrafficLightModels[1].G = ENT.TrafficLightModels[1].W
+ENT.TrafficLightModels[1].Y = ENT.TrafficLightModels[1].W
+ENT.TrafficLightModels[1].B = ENT.TrafficLightModels[1].W
+ENT.TrafficLightModels[1].R = ENT.TrafficLightModels[1].W
 
 --------------------------------------------------------------------------------
 -- Outside box

@@ -593,6 +593,7 @@ function TOOL:BuildCPanelCustom()
                 VSType:SetValue(name)
                 tool.Signal.Type = index
                 tool:SendSettings()
+				tool:BuildCPanelCustom()
             end
         CPanel:AddItem(VSType)
         local VNameT,VNameN = CPanel:TextEntry("Name:")
@@ -615,14 +616,52 @@ function TOOL:BuildCPanelCustom()
                 end
         if not tool.Signal.ARSOnly then
             local VLensT,VLensN = CPanel:TextEntry("Lenses:")
-                VLensT:SetTooltip("G - Green, Y - Yellow, R - Red,  B - Blue, W - White, M - Routing Pointer\nExample: GYG-RW-M")
+                VLensT:SetTooltip("G - Green, Y - Yellow, R - Red,  B - Blue, W - White, P - Invation, M - Routing Pointer\nExample: GYG-RW-M")
                 VLensT:SetValue(tool.Signal.Lenses or "")
                 VLensT:SetEnterAllowed(false)
                 function VLensT:OnChange()
                     local NewValue = ""
                     for i = 1,#self:GetValue() do
-                        NewValue = NewValue..((self:GetValue()[i] or ""):upper():match("[RYGWBM-]") or "")
+                        NewValue = NewValue..((self:GetValue()[i] or ""):upper():match("[RYGWBMP-]") or "")
                     end
+					
+					local Mpos = NewValue:find("M")
+					if Mpos then
+						--маршрутный указатель всегда отделяется минусами
+						if NewValue[Mpos - 1] ~= "" and NewValue[Mpos - 1] ~= "-" then NewValue = NewValue:sub(0,Mpos-1).."-"..NewValue:sub(Mpos)end
+						Mpos = NewValue:find("M")
+						if NewValue[Mpos + 1] ~= "" and NewValue[Mpos + 1] ~= "-" then NewValue = NewValue:sub(0,Mpos).."-"..NewValue:sub(Mpos+1)end
+						Mpos = NewValue:find("M")
+						
+						--маршрутный указатель может быть только один
+						local anotherMpos = NewValue:find("M",Mpos + 1)
+						while anotherMpos do
+							NewValue = NewValue:sub(0,Mpos)..NewValue:sub(Mpos + 1):gsub("M","")
+							anotherMpos = NewValue:find("M",Mpos + 1)
+						end
+						
+						--после маршрутного указателя может быть только пригласительный на мачтовом светофоре
+						
+					end
+					
+					-- запрет установки больше чем одного пригласиельного
+					-- local Ppos = NewValue:find("P")
+					-- if Ppos then
+						-- local anotherPpos = NewValue:find("P",Ppos + 1)
+						-- while anotherPpos do
+							-- NewValue = NewValue:sub(0,Ppos)..NewValue:sub(Ppos + 1):gsub("P","")
+							-- anotherPpos = NewValue:find("P",Ppos + 1)
+						-- end
+					-- end
+					
+					-- while NewValue[1] == "-" do NewValue = NewValue:sub(2) end
+					-- while NewValue[#NewValue] == "-" do NewValue = NewValue:sub(1,-2) end
+					local twoMinuses = NewValue:find("--",0,true)
+					while twoMinuses do
+						NewValue = NewValue:sub(0,twoMinuses)..NewValue:sub(twoMinuses+2)
+						twoMinuses = NewValue:find("--",0,true)
+					end
+					
                     local NewValueT = string.Explode("-",NewValue)
                     local maxval = tool.Signal.Type == 3 and 4 or 3
                     for id,text in ipairs(NewValueT) do
@@ -632,20 +671,8 @@ function TOOL:BuildCPanelCustom()
                             end
                             break
                         end
-                        if text:find("M") then
-                            if text[1] == "M" then
-                                NewValueT[id] = "M"
-                            else
-                                NewValueT[id] = text:gsub("M","")
-                                id = id + 1
-                                NewValueT[id] = "M"
-                            end
-                            for i = id+1,#NewValueT do
-                                table.remove(NewValueT, i)
-                            end
-                            break
-                        end
-                        text = text:match("[RYGWB]+") or ""
+						
+                        text = text:match("[RYGWBMP]+") or ""
                         --[[local WFind = id==3 and text:find("W") or nil
                         --print(MFind,id)
                         if WFind then

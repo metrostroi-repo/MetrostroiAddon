@@ -37,7 +37,7 @@ if not Metrostroi.Paths then
 
     Metrostroi.OldUpdateTime = 0
 end
-Metrostroi.SignalVersion = 1.2
+Metrostroi.SignalVersion = 1.3
 
 
 --------------------------------------------------------------------------------
@@ -1143,7 +1143,7 @@ local function loadSigns(name,keep)
         signs.Version = nil
     end
     local TwoToSix = false
-    if version ~= 1.2 then
+    if version ~= 1.2 and version ~= 1.3 then
         print(Format("Metrostroi: !!Converting from version %.1f!! signals converted to %s.",version,TwoToSix and "2/6" or "1/5"))
         if game.GetMap():find("gm_mus_loop") then
             TwoToSix = true
@@ -1170,6 +1170,12 @@ local function loadSigns(name,keep)
                 ent.Name = v.Name
                 ent.RouteNumberSetup = v.RouteNumberSetup
                 ent.LensesStr = v.LensesStr
+				--для старых версий сигналок в качестве пригласительного берется последний белый
+				if 1.3 ~= version and ent.LensesStr then
+					for i = #ent.LensesStr, 1, -1 do
+						if ent.LensesStr[i] == "W" then ent.LensesStr = ent.LensesStr:sub(0,i-1).."P"..ent.LensesStr:sub(i+1) break end
+					end
+				end
                 ent.Lenses = string.Explode("-",v.LensesStr)
                 ent.RouteNumber = v.RouteNumber
                 ent.IsolateSwitches = v.IsolateSwitches
@@ -1193,7 +1199,7 @@ local function loadSigns(name,keep)
                     print(Format("Metrostroi: !!Converting from version %.1f!! signal %s rotated.",version,ent.Name))
                     ent:SetAngles(ent:LocalToWorldAngles(ent:WorldToLocalAngles(ent:GetAngles())+Angle(0,180,0)))
                 end
-                if version ~= 1.2 then ent.TwoToSix = TwoToSix end
+                if version ~= 1.2 and version ~= 1.3 then ent.TwoToSix = TwoToSix end
                 ent:Spawn()
             elseif v.Class == "gmod_track_signs" then
                 ent.SignType = v.SignType

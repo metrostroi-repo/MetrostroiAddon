@@ -186,6 +186,8 @@ net.Receive("metrostroi-signal", function()
     ent.Name = net.ReadString()
     --ent.Name = " BUDAPEiT"..string.gsub(ent.Name,"[A-Za-z]*","")
     ent.Lenses = net.ReadString()
+	--клиент будет считать пригласительный как обычный белый
+	ent.Lenses = ent.Lenses:gsub("P","W")
     ent.ARSOnly = ent.Lenses == "ARSOnly"
     ent.RouteNumberSetup = net.ReadString()
     ent.Left = net.ReadBool()
@@ -302,6 +304,12 @@ function ENT:Think()
             self.LongOffset = self.LongOffset or Vector(0, 0, 0)
             if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
             if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*Vector(-1,1,1),Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
+			
+			--фикс позиции линз если первая белая одиночная
+			if not self.OneLensePosFixed and self.LightType == 1 and self.LensesTBL[1] and #self.LensesTBL[1] == 1 then
+					self.LongOffset = self.LongOffset + Vector(0,0,self.LensesTBL[1] == "M" and 15 or 25)
+					self.OneLensePosFixed = true
+			end
 
 
             if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
