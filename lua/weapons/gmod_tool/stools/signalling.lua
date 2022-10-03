@@ -654,8 +654,6 @@ function TOOL:BuildCPanelCustom()
 						-- end
 					-- end
 					
-					-- while NewValue[1] == "-" do NewValue = NewValue:sub(2) end
-					-- while NewValue[#NewValue] == "-" do NewValue = NewValue:sub(1,-2) end
 					local twoMinuses = NewValue:find("--",0,true)
 					while twoMinuses do
 						NewValue = NewValue:sub(0,twoMinuses)..NewValue:sub(twoMinuses+2)
@@ -700,6 +698,11 @@ function TOOL:BuildCPanelCustom()
                     self:SetCaretPos(#NewValue)
                 end
                 function VLensT:OnLoseFocus()
+                    --вначале и в конце убираю минусы если они есть
+                    local NewValue = self:GetValue()
+					while NewValue[1] == "-" do NewValue = NewValue:sub(2) end
+					while NewValue[#NewValue] == "-" do NewValue = NewValue:sub(1,-2) end
+                    self:SetText(NewValue)
                     tool.Signal.Lenses = self:GetValue()
                     tool:SendSettings()
                 end
