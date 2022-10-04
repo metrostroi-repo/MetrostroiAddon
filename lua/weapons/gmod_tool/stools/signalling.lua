@@ -84,7 +84,7 @@ function TOOL:SpawnAutoStop(ply,trace)
 	--если рядом есть автостоп линкующийся к тому же сигналу и он стоит в том же направлении (разница углов < 45), то просто подвинуть его
 	local ent, mindist
 	for k,v in pairs(ents.FindInSphere(trace.HitPos,64)) do
-		if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" or math.abs(v:GetAngles()[2] - ang[2]) > 45 then continue end
+		if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" or v.SignalLink ~= (ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink) or math.abs(v:GetAngles()[2] - ang[2]) > 45 then continue end
 		local dist = v:GetPos():DistToSqr(trace.HitPos)
 		if not mindist or dist < mindist then
 			mindist = dist
@@ -95,13 +95,13 @@ function TOOL:SpawnAutoStop(ply,trace)
 	if ent then
 		ent:SetPos(pos)
 		ent:SetAngles(ang)
-		ent.MaxSpeed = ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl and tonumber(ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed)
+		ent.MaxSpeed = ply.MetrostroiStoolAutoStop and tonumber(ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed)
 	else
 		ent = Metrostroi.SpawnAutostop(
 			pos,
 			ang, 
-			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink, 
-			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl and ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed
+			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink, 
+			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed
 		)
 	end
 	
@@ -1659,7 +1659,7 @@ function TOOL:Think()
         self.Signal = self.Signal or util.JSONToTable(string.Replace(GetConVar("signalling_signaldata"):GetString(),"'","\"")) or {}
         self.Sign = self.Sign or util.JSONToTable(string.Replace(GetConVar("signalling_signdata"):GetString(),"'","\"")) or {}
         self.Auto = self.Auto or util.JSONToTable(string.Replace(GetConVar("signalling_autodata"):GetString(),"'","\"")) or {}
-        self:SendSettings()
+        self:SendSettings(LocalPlayer().MetrostroiStoolAutoStop)
         self:BuildCPanelCustom()
         self.NotBuilt = nil
         NeedUpdate = nil
