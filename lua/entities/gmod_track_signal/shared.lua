@@ -243,6 +243,11 @@ ENT.TrafficLightModels[1] = {
 				}},
 	M = { 40, "models/metrostroi/signals/mus/light_pathindicator3.mdl",  Vector(7,11, 25), 3.6, 3.4, 5},
 	noleft = true,
+	first_lenses_group_offset = {
+		M = Vector(0,0,15),
+		[1] = Vector(0,0,25),
+		[2] = Vector(0,0,8)
+	}
 }
 ENT.TrafficLightModels[1].G = ENT.TrafficLightModels[1].W
 ENT.TrafficLightModels[1].Y = ENT.TrafficLightModels[1].W
@@ -300,7 +305,7 @@ ENT.TrafficLightModels[2] = {
 ENT.RenderOffset[3] = Vector(0,0,0)
 ENT.TrafficLightModels[3] = {
 	--["name"]	= Vector(-3-10,2.5+6,0),
-	name_one	= Vector(10.07-10,0.5+6,42.5),
+	name_one	= Vector(10.07-10,0.3+6,42.5),
 	[1]	= { 42, "models/metrostroi/signals/mus/fixed_outside_2.mdl", {
 				[0] = Vector(10.07-10,-29.7+2.5,27.55+38.7),
 				[1] = Vector(10.07-10,-29.7+2.5,16+38.7),
@@ -309,6 +314,7 @@ ENT.TrafficLightModels[3] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,16+38.7)},
 				}
 				}},
+	every_letter_offset = Vector(0,0.3,0),
 	noleft = true,
 }
 

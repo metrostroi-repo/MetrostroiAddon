@@ -215,7 +215,7 @@ hook.Add("Think","MetrostroiRenderSignals", function()
     end
 end)
 
-
+local vector_zero = Vector(0)
 function ENT:Think()
     local CurTime = CurTime()
     self:SetNextClientThink(CurTime + 0.0333)
@@ -301,15 +301,9 @@ function ENT:Think()
             end
             if LenseNum == 0 then OneLense = false end
             local offset = self.RenderOffset[self.LightType] or Vector(0, 0, 0)
-            self.LongOffset = self.LongOffset or Vector(0, 0, 0)
+            self.LongOffset = self.TrafficLightModels[self.LightType].first_lenses_group_offset and self.TrafficLightModels[self.LightType].first_lenses_group_offset[#self.LensesTBL[self.LightType]] or vector_zero
             if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
             if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*Vector(-1,1,1),Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
-			
-			--фикс позиции линз если первая белая одиночная
-			if not self.OneLensePosFixed and self.LightType == 1 and self.LensesTBL[1] and #self.LensesTBL[1] == 1 then
-					self.LongOffset = self.LongOffset + Vector(0,0,self.LensesTBL[1] == "M" and 15 or 25)
-					self.OneLensePosFixed = true
-			end
 
 
             if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
@@ -412,6 +406,7 @@ function ENT:Think()
             for i = double and 2 or 0,#self.Name-1 do
                 local id = (double and i-1 or i) - min
                 if double and i == 2 then offset = offset + TLM.DoubleOffset end
+				if self.TrafficLightModels[self.LightType].every_letter_offset then offset = offset + self.TrafficLightModels[self.LightType].every_letter_offset end
                 if self.Name[i+1] == " " then continue end
                 if self.Name[i+1] == "/" then min = min + 1; continue end
                 --if not IsValid(self.Models[2][i]) then
