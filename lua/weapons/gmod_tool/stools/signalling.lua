@@ -12,7 +12,7 @@ if SERVER then util.AddNetworkString "metrostroi-stool-signalling" end
 
 
 local Types = {"Signal","Sign","Autodrive",[0] = "Choose Type"}
-local TypesOfSignal = {"Inside","Outside big","Outside small"}
+local TypesOfSignal = {"Inside","Outside big","Outside small","Outside small"}
 local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street","STOP Street","Dangerous","Deadlock",
     "Stop marker","!(stop)","X","T Start","T End","T Sbor(engage)","Engines off","Engines on","C(horn)","T stop emer","Shod",
     "Left doors","Phone▲","Phone▼","1up","STOP Street cyka","NF outside","35 outside","40 outside","60 outside","70 outside","80 outside",
