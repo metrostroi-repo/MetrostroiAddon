@@ -322,9 +322,9 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
 
                 ent.PlateType = self.Auto.Type
                 local center = (tr.centerpos - tr.up * 9.5)
-                if self.Auto.Type == METROSTROI_ACOIL_DRIVE then
+                if (self.Auto.Type or 1) == METROSTROI_ACOIL_DRIVE then
                     local dist = 50
-                    if self.Auto.Dist == 1 then
+                    if (self.Auto.Dist or 1) == 1 then
                         ent.Model = "models/metrostroi/signals/autodrive/doska5.mdl"
                         dist = 5
                     elseif self.Auto.Dist == 2 then
@@ -345,7 +345,7 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
                         ent.StationPath = nil
                     end
 
-                    if self.Auto.Mode < 3 or self.Auto.Mode == 5 or 6 < self.Auto.Mode then ent.Power = true end
+                    if (self.Auto.Mode or 1) < 3 or self.Auto.Mode == 5 or 6 < self.Auto.Mode then ent.Power = true end
                     if ent.Right then
                         ent:SetPos(center + (tr.forward*(-(dist)/0.01905)+tr.right*-66+tr.up*5))
                     else
@@ -1066,6 +1066,7 @@ function TOOL:BuildCPanelCustom()
             tool:SendSettings()
             tool:BuildCPanelCustom()
         end
+        tool.Auto.Type = tool.Auto.Type or 1
         if tool.Auto.Type == METROSTROI_ACOIL_DOOR then
             local VRightOC = CPanel:CheckBox("Right doors")
             VRightOC:SetTooltip("Right doors")
