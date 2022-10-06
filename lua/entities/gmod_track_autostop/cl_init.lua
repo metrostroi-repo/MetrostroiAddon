@@ -36,7 +36,7 @@ function ENT:Think()
             self.ClientModel = nil 
             return true 
         end
-        return
+        return true
     end
     
     if IsValid(self.ClientModel) then
