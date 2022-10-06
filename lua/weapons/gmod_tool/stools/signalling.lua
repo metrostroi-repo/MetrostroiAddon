@@ -80,11 +80,13 @@ function TOOL:SpawnAutoStop(ply,trace)
     if not tr then return end
 	local ang = (-tr.right):Angle()
 	local pos = tr.centerpos - tr.up * 9.5
+    local siglink = ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink
+    if not siglink or siglink == "" then siglink = nil end
 	
 	--если рядом есть автостоп линкующийся к тому же сигналу и он стоит в том же направлении (разница углов < 45), то просто подвинуть его
 	local ent, mindist
 	for k,v in pairs(ents.FindInSphere(trace.HitPos,64)) do
-		if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" or v.SignalLink ~= (ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink) or math.abs(v:GetAngles()[2] - ang[2]) > 45 then continue end
+		if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" or v.SignalLink ~= siglink or math.abs(v:GetAngles()[2] - ang[2]) > 45 then continue end
 		local dist = v:GetPos():DistToSqr(trace.HitPos)
 		if not mindist or dist < mindist then
 			mindist = dist
@@ -100,7 +102,7 @@ function TOOL:SpawnAutoStop(ply,trace)
 		ent = Metrostroi.SpawnAutostop(
 			pos,
 			ang, 
-			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink, 
+			siglink,
 			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed
 		)
 	end
@@ -605,7 +607,7 @@ function TOOL:SendSettings(tbl)
     
     --читай комментарий в самом верху
     net.Start("metrostroi-stool-autostop")
-        net.WriteUInt(self.Type - 1, 2)
+        net.WriteUInt(self.Type - 1, 3)
         net.WriteTable(tbl or {})
     net.SendToServer()
 end
@@ -640,7 +642,7 @@ if SERVER then
     net.Receive("metrostroi-stool-autostop",function(_,ply)
 		if not IsValid(ply) then return end
         ply.MetrostroiStoolAutoStop = {}
-        ply.MetrostroiStoolAutoStop.CurType = net.ReadUInt(2)
+        ply.MetrostroiStoolAutoStop.CurType = net.ReadUInt(3)
         ply.MetrostroiStoolAutoStop.CurTbl = net.ReadTable()
     end)
 else

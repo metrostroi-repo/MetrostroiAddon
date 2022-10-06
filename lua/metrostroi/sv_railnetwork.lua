@@ -1371,9 +1371,7 @@ function Metrostroi.SpawnAutostop(pos,ang,siglink,maxspeed)
     if not IsValid(ent) then return end
     ent:SetPos(pos)
     ent:SetAngles(ang)
-    if siglink and siglink ~= ""  then
-        ent.SignalLink = siglink and siglink
-    end
+    ent.SignalLink = siglink
     ent.MaxSpeed = tonumber(maxspeed)
     ent:Spawn()
     return ent
