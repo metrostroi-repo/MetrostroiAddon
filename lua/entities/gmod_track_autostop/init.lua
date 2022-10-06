@@ -14,6 +14,8 @@ function ENT:LinkToSignal()
 end
 
 function ENT:Initialize()
+    self.MaxSpeed = tonumber(self.MaxSpeed)
+    if not self.SignalLink or self.SignalLink == "" then self.SignalLink = nil end
     self:LinkToSignal()
 end
 

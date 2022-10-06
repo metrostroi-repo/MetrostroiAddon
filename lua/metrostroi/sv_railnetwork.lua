@@ -1372,7 +1372,7 @@ function Metrostroi.SpawnAutostop(pos,ang,siglink,maxspeed)
     ent:SetPos(pos)
     ent:SetAngles(ang)
     ent.SignalLink = siglink
-    ent.MaxSpeed = tonumber(maxspeed)
+    ent.MaxSpeed = maxspeed
     ent:Spawn()
     return ent
 end

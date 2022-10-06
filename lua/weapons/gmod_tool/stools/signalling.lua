@@ -1,4 +1,3 @@
---я рот шатал того, как данные спавнера передаются между клиентом и сервером, еще и консольные команды какие-то. Поэтому поверх того что есть, накинул еще своего гавна
 TOOL.Category   = "Metro"
 TOOL.Name       = "Signalling Tool"
 TOOL.Command    = nil
@@ -6,6 +5,7 @@ TOOL.ConfigName = ""
 TOOL.ClientConVar["signaldata"] = ""
 TOOL.ClientConVar["signdata"] = ""
 TOOL.ClientConVar["autodata"] = ""
+TOOL.ClientConVar["autostopdata"] = ""
 TOOL.ClientConVar["type"] = 1
 TOOL.ClientConVar["routetype"] = 1
 
@@ -75,13 +75,34 @@ if CLIENT then
     --language.Add("Undone_signalling", "Undone ARS/signalling equipment")
 end
 
-function TOOL:SpawnAutoStop(ply,trace)
+function TOOL:SpawnAutoStop(ply,trace,param)
+    self.AutoStop = self.AutoStop or {}
     local tr = Metrostroi.RerailGetTrackData(trace.HitPos,ply:GetAimVector())
     if not tr then return end
 	local ang = (-tr.right):Angle()
 	local pos = tr.centerpos - tr.up * 9.5
-    local siglink = ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.SignalLink
+    local siglink = self.Autostop.SignalLink
     if not siglink or siglink == "" then siglink = nil end
+    
+    if param == 2 then
+		local mindist,ent
+		for k,v in pairs(ents.FindInSphere(trace.HitPos,64)) do
+			if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" then continue end
+			local dist = v:GetPos():DistToSqr(trace.HitPos)
+			if not mindist or mindist < dist then
+				mindist = dist
+				ent = v
+			end
+		end
+		if not ent then return true end
+		self.AutoStop.SignalLink = ent.SignalLink
+        self.AutoStop.MaxSpeed = ent.MaxSpeed
+        net.Start("metrostroi-stool-signalling")
+            net.WriteUInt(3,8)
+            net.WriteTable(self.AutoStop)
+        net.Send(self:GetOwner())
+        return ent
+    end
 	
 	--если рядом есть автостоп линкующийся к тому же сигналу и он стоит в том же направлении (разница углов < 45), то просто подвинуть его
 	local ent, mindist
@@ -97,17 +118,18 @@ function TOOL:SpawnAutoStop(ply,trace)
 	if ent then
 		ent:SetPos(pos)
 		ent:SetAngles(ang)
-		ent.MaxSpeed = ply.MetrostroiStoolAutoStop and tonumber(ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed)
+		ent.MaxSpeed = self.Autostop.MaxSpeed
 	else
 		ent = Metrostroi.SpawnAutostop(
 			pos,
 			ang, 
 			siglink,
-			ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurTbl.MaxSpeed
+			self.Autostop.MaxSpeed
 		)
+        
+        Metrostroi.UpdateSignalEntities()
 	end
 	
-	Metrostroi.UpdateSignalEntities()
     return ent
 end
 
@@ -477,12 +499,6 @@ function TOOL:LeftClick(trace)
     if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
     if not trace then return false end
     if trace.Entity and trace.Entity:IsPlayer() then return false end
-    
-    --читай комментарий в самом верху
-    if ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurType == 3 then
-        self:SpawnAutoStop(ply,trace)
-        return true
-    end
 
     local ent
     if self.Type == 1 then
@@ -491,6 +507,8 @@ function TOOL:LeftClick(trace)
         ent = self:SpawnSign(ply,trace)
     elseif self.Type == 3 then
         ent = self:SpawnAutoPlate(ply,trace)
+    elseif self.Type == 4 then
+        ent = self:SpawnAutoStop(ply,trace)
     end
 
     return true
@@ -509,13 +527,6 @@ function TOOL:RightClick(trace)
 
     local entlist = ents.FindInSphere(trace.HitPos,(self.Type == 3 and self.Auto.Type == 5) and 192 or 64)
     for k,v in pairs(entlist) do
-        --читай комментарий в самом верху
-        if ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurType == 3 then
-            if v:GetClass() == "gmod_track_autostop" then
-                if IsValid(v) then SafeRemoveEntity(v) end
-            end
-            continue
-        end
         if v:GetClass() == "gmod_track_signal" and self.Type == 1 then
             if IsValid(v) then SafeRemoveEntity(v) end
         end
@@ -529,6 +540,9 @@ function TOOL:RightClick(trace)
             if IsValid(v) then SafeRemoveEntity(v) end
         end
         if v:GetClass() == "gmod_track_pa_marker" and self.Type == 3 and self.Auto.Type == 5 then
+            if IsValid(v) then SafeRemoveEntity(v) end
+        end
+        if v:GetClass() == "gmod_track_autostop" and self.Type == 4 then
             if IsValid(v) then SafeRemoveEntity(v) end
         end
     end
@@ -545,25 +559,6 @@ function TOOL:Reload(trace)
     if not trace then return false end
     if trace.Entity and trace.Entity:IsPlayer() then return false end
     local ent
-	
-	--читай комментарий в самом верху
-	if ply.MetrostroiStoolAutoStop and ply.MetrostroiStoolAutoStop.CurType == 3 then
-		local mindist
-		for k,v in pairs(ents.FindInSphere(trace.HitPos,64)) do
-			if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" then continue end
-			local dist = v:GetPos():DistToSqr(trace.HitPos)
-			if not mindist or mindist < dist then
-				mindist = dist
-				ent = v
-			end
-		end
-		
-		if not ent then return true end
-		net.Start("metrostroi-stool-autostop")
-			net.WriteTable({SignalLink = ent.SignalLink, MaxSpeed = ent.MaxSpeed})
-		net.Send(ply)
-		return true
-	end
 
     if self.Type == 1 then
         ent = self:SpawnSignal(ply,trace,2)
@@ -571,13 +566,15 @@ function TOOL:Reload(trace)
         ent = self:SpawnSign(ply,trace,2)
     elseif self.Type == 3 then
         ent = self:SpawnAutoPlate(ply,trace,2)
+    elseif self.Type == 4 then
+        ent = self:SpawnAutoStop(ply,trace,2)
     end
     return true
 end
 
 
-if SERVER then util.AddNetworkString("metrostroi-stool-autostop") end
-function TOOL:SendSettings(tbl)
+
+function TOOL:SendSettings()
     if self.Type == 1 then
         if not self.Signal then return end
         RunConsoleCommand("signalling_signaldata",util.TableToJSON(self.Signal))
@@ -603,13 +600,15 @@ function TOOL:SendSettings(tbl)
             --net.WriteEntity(self)
             net.WriteTable(self.Auto)
         net.SendToServer()
+    elseif self.Type == 4 then
+        if not self.Autostop then return end
+        RunConsoleCommand("signalling_autostopdata",util.TableToJSON(self.Autostop))
+        net.Start "metrostroi-stool-signalling"
+            net.WriteUInt(3,8)
+            --net.WriteEntity(self)
+            net.WriteTable(self.Autostop)
+        net.SendToServer()
     end
-    
-    --читай комментарий в самом верху
-    net.Start("metrostroi-stool-autostop")
-        net.WriteUInt(self.Type - 1, 3)
-        net.WriteTable(tbl or {})
-    net.SendToServer()
 end
 
 net.Receive("metrostroi-stool-signalling", function(_, ply)
@@ -633,24 +632,15 @@ net.Receive("metrostroi-stool-signalling", function(_, ply)
             RunConsoleCommand("signalling_signaldata",util.TableToJSON(TOOL.Signal))
             NeedUpdate = true
         end
+    elseif typ == 3 then
+        TOOL.Autostop = net.ReadTable()
+        if CLIENT then
+            RunConsoleCommand("signalling_autostopdata",util.TableToJSON(TOOL.Autostop))
+            NeedUpdate = true
+        end
     end
     TOOL.Type = typ+1
 end)
-
---читай комментарий в самом верху
-if SERVER then
-    net.Receive("metrostroi-stool-autostop",function(_,ply)
-		if not IsValid(ply) then return end
-        ply.MetrostroiStoolAutoStop = {}
-        ply.MetrostroiStoolAutoStop.CurType = net.ReadUInt(3)
-        ply.MetrostroiStoolAutoStop.CurTbl = net.ReadTable()
-    end)
-else
-    net.Receive("metrostroi-stool-autostop",function(_,ply)
-        LocalPlayer().MetrostroiStoolAutoStop = net.ReadTable()
-		NeedUpdate = true
-    end)
-end
 
 function TOOL:BuildCPanelCustom()
     local tool = self
@@ -1618,11 +1608,10 @@ function TOOL:BuildCPanelCustom()
         end
     elseif tool.Type == 4 then
           local es = ""
-		  LocalPlayer().MetrostroiStoolAutoStop = LocalPlayer().MetrostroiStoolAutoStop or {}
     
           local VSNameT = CPanel:TextEntry("LinkToSignal:")
                 VSNameT:SetTooltip("Name of the Signal")
-                VSNameT:SetValue(LocalPlayer().MetrostroiStoolAutoStop and LocalPlayer().MetrostroiStoolAutoStop.SignalLink or es)
+                VSNameT:SetValue(tool.Autostop.SignalLink or es)
                 VSNameT:SetEnterAllowed(false)
                 function VSNameT:OnChange()
                     local val = self:GetValue():upper()
@@ -1630,13 +1619,13 @@ function TOOL:BuildCPanelCustom()
                     self:SetCaretPos(#val)
                 end
                 function VSNameT:OnLoseFocus()
-					LocalPlayer().MetrostroiStoolAutoStop.SignalLink = self:GetValue()
-                    tool:SendSettings(LocalPlayer().MetrostroiStoolAutoStop)
+					tool.Autostop.SignalLink = self:GetValue()
+                    tool:SendSettings()
                 end
           
           local VMSpeedT = CPanel:TextEntry("MaxSpeed:")
                 -- VMSpeedT:SetTooltip("Name. Letters or digits!\nFor example:IND2")
-                VMSpeedT:SetValue(LocalPlayer().MetrostroiStoolAutoStop and LocalPlayer().MetrostroiStoolAutoStop.MaxSpeed or es)
+                VMSpeedT:SetValue(tool.Autostop.MaxSpeed or es)
                 VMSpeedT:SetEnterAllowed(false)
                 function VMSpeedT:OnChange()
                     local val = self:GetValue():upper()
@@ -1650,8 +1639,8 @@ function TOOL:BuildCPanelCustom()
                     self:SetCaretPos(string.len(self:GetValue()))
                 end
                 function VMSpeedT:OnLoseFocus()
-					LocalPlayer().MetrostroiStoolAutoStop.MaxSpeed = self:GetValue()
-                    tool:SendSettings(LocalPlayer().MetrostroiStoolAutoStop)
+					tool.Autostop.MaxSpeed = self:GetValue()
+                    tool:SendSettings()
                 end
     end
 end
@@ -1662,7 +1651,8 @@ function TOOL:Think()
         self.Signal = self.Signal or util.JSONToTable(string.Replace(GetConVar("signalling_signaldata"):GetString(),"'","\"")) or {}
         self.Sign = self.Sign or util.JSONToTable(string.Replace(GetConVar("signalling_signdata"):GetString(),"'","\"")) or {}
         self.Auto = self.Auto or util.JSONToTable(string.Replace(GetConVar("signalling_autodata"):GetString(),"'","\"")) or {}
-        self:SendSettings(LocalPlayer().MetrostroiStoolAutoStop)
+        self.Autostop = self.Autostop or util.JSONToTable(string.Replace(GetConVar("signalling_autostopdata"):GetString(),"'","\"")) or {}
+        self:SendSettings()
         self:BuildCPanelCustom()
         self.NotBuilt = nil
         NeedUpdate = nil
