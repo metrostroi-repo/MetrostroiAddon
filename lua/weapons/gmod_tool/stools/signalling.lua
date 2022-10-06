@@ -1645,7 +1645,7 @@ function TOOL:BuildCPanelCustom()
                     
                         self:SetText(val)
                     end
-                    self:SetCaretPos(#val)
+                    self:SetCaretPos(string.len(self:GetValue()))
                 end
                 function VMSpeedT:OnLoseFocus()
 					LocalPlayer().MetrostroiStoolAutoStop.MaxSpeed = self:GetValue()

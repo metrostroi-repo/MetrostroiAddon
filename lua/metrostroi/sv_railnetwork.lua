@@ -1404,7 +1404,7 @@ function Metrostroi.Load(name,keep_signs)
     Metrostroi.IgnoreEntityUpdates = true
     loadSigns(name,keep_signs)
     loadAutoSigns(name,keep_signs)
-    Metrostroi.LoadAutostops(name)
+    Metrostroi.LoadAutostops(name,keep_signs)
 
     local pa_ents = ents.FindByClass("gmod_track_pa_marker")
     for _,v in pairs(pa_ents) do SafeRemoveEntity(v) end
