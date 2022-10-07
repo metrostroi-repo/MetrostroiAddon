@@ -206,11 +206,12 @@ ENT.TrafficLightModels[0] = {
 				}},
 
 	M = { 24, "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	first_lenses_group_offset = {M = Vector(0,0,-2)}
 }
 
 
 --------------------------------------------------------------------------------
--- Outside
+-- Outside big
 --------------------------------------------------------------------------------
 ENT.RenderOffset[1] = Vector(0,0,200)
 ENT.TrafficLightModels[1] = {
@@ -255,7 +256,7 @@ ENT.TrafficLightModels[1].B = ENT.TrafficLightModels[1].W
 ENT.TrafficLightModels[1].R = ENT.TrafficLightModels[1].W
 
 --------------------------------------------------------------------------------
--- Outside box
+-- Outside small
 --------------------------------------------------------------------------------
 ENT.RenderOffset[2] = Vector(0,0.,112)
 ENT.TrafficLightModels[2] = {
