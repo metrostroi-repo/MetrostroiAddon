@@ -301,7 +301,14 @@ function ENT:Think()
             end
             if LenseNum == 0 then OneLense = false end
             local offset = self.RenderOffset[self.LightType] or Vector(0, 0, 0)
-            self.LongOffset = self.LensesTBL[1] and self.TrafficLightModels[self.LightType].first_lenses_group_offset and self.TrafficLightModels[self.LightType].first_lenses_group_offset[self.LensesTBL[1]] or vector_zero
+            self.LongOffset = vector_zero
+            if self.TrafficLightModels[self.LightType].first_lenses_group_offset then
+                if self.LensesTBL[1] == "M" then
+                    self.LongOffset = self.LongOffset + self.TrafficLightModels[self.LightType].first_lenses_group_offset['M'] or vector_zero
+                else
+                    self.LongOffset = self.LongOffset + self.TrafficLightModels[self.LightType].first_lenses_group_offset[#self.LensesTBL[1]] or vector_zero
+                end
+            end
             if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
             if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*Vector(-1,1,1),Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
 
