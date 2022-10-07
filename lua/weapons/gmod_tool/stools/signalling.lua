@@ -778,6 +778,11 @@ function TOOL:BuildCPanelCustom()
                         end]]
                     end
                     local NewValue = table.concat(NewValueT,"-")
+                    --у карликового светофора запрещен маршрутный указатель и разрешена только одна группа линз и максимум две линзы
+                    if tool.Signal.Type == 4 then
+                        NewValue = NewValue:gsub("[M-]","")
+                        NewValue = NewValue:sub(1,2)
+                    end
                     self:SetText(NewValue)
                     self:SetCaretPos(#NewValue)
                 end
@@ -804,7 +809,7 @@ function TOOL:BuildCPanelCustom()
                     end
                     local oldpos = self:GetCaretPos()
                     self:SetText(NewValue:sub(1,5))
-                    self:SetCaretPos(math.min(5,oldpos))
+                    self:SetCaretPos(#self:GetValue())
                 end
                 function VRoutT:OnLoseFocus()
                     tool.Signal.RouteNumberSetup = self:GetValue()
