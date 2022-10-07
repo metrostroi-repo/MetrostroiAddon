@@ -368,7 +368,7 @@ function ENT:Think()
                 end
 
                 self.NamesOffset = self.NamesOffset + vec
-                local offsetAndLongOffset = offset + self.LongOffset
+                local offsetAndLongOffset = offset + self.LongOffset + (v == "M" and self.TrafficLightModels[self.LightType].MOffset or vector_zero) + (v ~= "M" and self.TrafficLightModels[self.LightType].LOffset or vector_zero)
                 if not self.Left or self.Double then    self:SpawnHeads(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M") end
                 if self.Left or self.Double then self:SpawnHeads((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M",true) end
                 if v ~= "M" then
