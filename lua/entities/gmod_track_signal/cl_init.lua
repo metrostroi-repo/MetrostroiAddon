@@ -99,7 +99,7 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
         self.RN = self.RN + 1
     end
     if notM then
-        if glass then
+        if glass and not GetConVar("metrostroi_signal_lenses"):GetBool() then
             local ID_glass = tostring(ID).."_glass"
             for i,tbl in pairs(glass) do
                 local ID_glassi = ID_glass..i
