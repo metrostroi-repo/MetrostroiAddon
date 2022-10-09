@@ -103,6 +103,15 @@ CreateClientConVar("metrostroi_disablehud",0,true)
 CreateClientConVar("metrostroi_renderdistance",1024,true)
 CreateClientConVar("metrostroi_signal_distance",8192,true)
 CreateClientConVar("metrostroi_screenshotmode",0,true)
+CreateClientConVar("metrostroi_signal_lenses",0,true)
+cvars.AddChangeCallback(
+    "metrostroi_signal_lenses",
+    function()
+        for k,v in pairs(ents.FindByClass("gmod_track_signal"))do
+            if IsValid(v) then v:OnRemove() end
+        end
+    end,
+    "reload_metrostroi_signal_lenses")
 CreateClientConVar("metrostroi_disableseatshadows",0,true)
 CreateClientConVar("metrostroi_softdrawmultipier",100,true)
 
