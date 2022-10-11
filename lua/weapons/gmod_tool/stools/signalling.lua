@@ -126,9 +126,8 @@ function TOOL:SpawnAutoStop(ply,trace,param)
 			siglink,
 			self.Autostop.MaxSpeed
 		)
-        
-        Metrostroi.UpdateSignalEntities()
 	end
+    Metrostroi.UpdateSignalEntities()
 	
     return ent
 end
