@@ -45,7 +45,7 @@ timer.Create("Metrostroi Autostop think",0.5,0,function()
         end
 
         for backautostop in pairs(backs)do
-            if train.AutostopsForw and train.AutostopsForw[backautostop] and backautostop:GetNW2Bool("Autostop") and (not backautostop.MaxSpeed or backautostop.MaxSpeed < train.Speed) then
+            if train.AutostopsForw[backautostop] and backautostop:GetNW2Bool("Autostop") and (not backautostop.MaxSpeed or backautostop.MaxSpeed < train.Speed) then
                 local nomsg = hook.Run("MetrostroiPassedAutostop",train,backautostop)
                 train.Pneumatic:TriggerInput("Autostop",nomsg and 0 or 1)
             end
