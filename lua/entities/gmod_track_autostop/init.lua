@@ -37,14 +37,9 @@ timer.Create("Metrostroi Autostop think",0.5,0,function()
             for _,autostop in pairs(Metrostroi.AutostopsForNode[pos.node1][Metrostroi.TrainDirections[train]][i==1] or et)do
                 if not IsValid(autostop) then continue end
                 if i == 1 then
-                    if autostop.TrackDir and autostop.TrackX < pos.x or not autostop.TrackDir and autostop.TrackX > pos.x then continue end
+                    if not (autostop.TrackDir and autostop.TrackX < pos.x or not autostop.TrackDir and autostop.TrackX > pos.x) then forws[autostop] = true end
                 else
-                    if autostop.TrackDir and autostop.TrackX > pos.x or not autostop.TrackDir and autostop.TrackX < pos.x then continue end
-                end
-                if i == 1 then 
-                    forws[autostop] = true
-                else
-                    backs[autostop] = true
+                    if not (autostop.TrackDir and autostop.TrackX > pos.x or not autostop.TrackDir and autostop.TrackX < pos.x) then backs[autostop] = true end
                 end
             end
         end
