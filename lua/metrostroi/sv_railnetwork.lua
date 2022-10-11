@@ -312,23 +312,25 @@ function Metrostroi.UpdateSignalEntities()
         for i = 0,1 do
             local dirstr = i == 1 and "next" or "prev"
             curnode = v.TrackNode[dirstr]
+            --alreadyhasautostop проверяется на следующий цикл после определения чтобы записать автостоп еще на следующий ноуд
+            --(это для защиты от слишком быстрого проезда двух автостопов на соседних ноудах)
+            local alreadyhasautostop
             while curnode do
-                local alreadyhasautostop
-                for _,autostop in pairs(tbl[curnode] or empty_table)do
-                    if autostop.TrackDir ~= v.TrackDir then continue end
-                    alreadyhasautostop = true
-                    break
-                end
                 Metrostroi.AutostopsForNode[curnode] = Metrostroi.AutostopsForNode[curnode] or {}
                 Metrostroi.AutostopsForNode[curnode][v.TrackDir] = Metrostroi.AutostopsForNode[curnode][v.TrackDir] or {}
                 Metrostroi.AutostopsForNode[curnode][v.TrackDir][not(v.TrackDir == (i == 1))] = Metrostroi.AutostopsForNode[curnode][v.TrackDir][not(v.TrackDir == (i == 1))] or {}
                 table.insert(Metrostroi.AutostopsForNode[curnode][v.TrackDir][not(v.TrackDir == (i == 1))], v)
                 if alreadyhasautostop then break end
+                for _,autostop in pairs(tbl[curnode] or empty_table)do
+                    if autostop.TrackDir ~= v.TrackDir then continue end
+                    alreadyhasautostop = true
+                    break
+                end
                 curnode = curnode[dirstr]
             end
         end
     end
-    
+
     --обновление привязки к сигналу
     for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
         if IsValid(v) then v:LinkToSignal() end

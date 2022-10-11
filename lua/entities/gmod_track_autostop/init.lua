@@ -30,7 +30,8 @@ timer.Create("Metrostroi Autostop think",0.5,0,function()
     for train,pos in pairs(Metrostroi.TrainPositions or et)do
         pos = pos[1]
         if not IsValid(train) or not train.SubwayTrain or not train.SubwayTrain.ALS or not train.SubwayTrain.ALS.HaveAutostop or not pos or Metrostroi.TrainDirections[train] == nil or not Metrostroi.AutostopsForNode or not Metrostroi.AutostopsForNode[pos.node1] or not Metrostroi.AutostopsForNode[pos.node1][Metrostroi.TrainDirections[train]] then continue end
-        local forw,back
+        --сделано таблицами, потому что если сохранять только ближний автостоп, при близкостоящих автостопах и их быстром проезде нe сработает ни один
+        local forws,backs = {}, {}
         for i = 0,1 do
             local res,minlen
             for _,autostop in pairs(Metrostroi.AutostopsForNode[pos.node1][Metrostroi.TrainDirections[train]][i==1] or et)do
@@ -40,20 +41,22 @@ timer.Create("Metrostroi Autostop think",0.5,0,function()
                 else
                     if autostop.TrackDir and autostop.TrackX > pos.x or not autostop.TrackDir and autostop.TrackX < pos.x then continue end
                 end
-                local len = math.abs(autostop.TrackX - pos.x)
-                if not minlen or len < minlen then
-                    minlen = len
-                    res = autostop
+                if i == 1 then 
+                    forws[autostop] = true
+                else
+                    backs[autostop] = true
                 end
             end
-            if i == 1 then forw = res else back = res end
         end
 
-        if train.AutostopForw and train.AutostopForw == back and back:GetNW2Bool("Autostop") and (not back.MaxSpeed or back.MaxSpeed < train.Speed) then
-            train.Pneumatic:TriggerInput("Autostop",nomsg and 0 or 1)
+        for backautostop in pairs(backs)do
+            if train.AutostopsForw and train.AutostopsForw[backautostop] and backautostop:GetNW2Bool("Autostop") and (not backautostop.MaxSpeed or backautostop.MaxSpeed < train.Speed) then
+                local nomsg = hook.Run("MetrostroiPassedAutostop",train,backautostop)
+                train.Pneumatic:TriggerInput("Autostop",nomsg and 0 or 1)
+            end
         end
-        train.AutostopForw = forw
-        train.AutostopBack = back
+        train.AutostopsForw = forws
+        -- train.AutostopsBack = backs
         -- print(forw,back)
     end
 end)
