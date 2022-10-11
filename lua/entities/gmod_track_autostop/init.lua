@@ -29,7 +29,7 @@ timer.Create("Metrostroi Autostop think",0.5,0,function()
     --тут определение следующего и предыдущего автостопа по ноуду для каждого паравоза. и вызов Train.Pneumatic:TriggerInput("Autostop",nomsg and 0 or 1) при проезде
     for train,pos in pairs(Metrostroi.TrainPositions or et)do
         pos = pos[1]
-        if not IsValid(train) or not pos or Metrostroi.TrainDirections[train] == nil or not Metrostroi.AutostopsForNode or not Metrostroi.AutostopsForNode[pos.node1] or not Metrostroi.AutostopsForNode[pos.node1][Metrostroi.TrainDirections[train]] then continue end
+        if not IsValid(train) or not train.SubwayTrain or not train.SubwayTrain.ALS or not train.SubwayTrain.ALS.HaveAutostop or not pos or Metrostroi.TrainDirections[train] == nil or not Metrostroi.AutostopsForNode or not Metrostroi.AutostopsForNode[pos.node1] or not Metrostroi.AutostopsForNode[pos.node1][Metrostroi.TrainDirections[train]] then continue end
         local forw,back
         for i = 0,1 do
             local res,minlen
