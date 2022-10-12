@@ -301,12 +301,11 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
                 if self.Path then
                     self.FirstStation = #rriL
                     self.LastStation = 1
-                    self.Station = self.FirstStation
                 else
                     self.FirstStation = 1
                     self.LastStation = #rriL
-                    self.Station = 1
                 end
+                self.Station = self.FirstStation
             else
                 self.LastStation = 0
             end
