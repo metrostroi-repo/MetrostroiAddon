@@ -22,6 +22,8 @@ if not Metrostroi.Paths then
     Metrostroi.GetARSJointCache = {}
     -- List of stations/platforms
     Metrostroi.Stations = {}
+    -- List of autostops for every node in every direction in forward and back
+    Metrostroi.AutostopsForNode = {}
 
     -- List of ARS subsections
     Metrostroi.ARSSubSections = {}
@@ -280,8 +282,13 @@ function Metrostroi.UpdateSignalEntities()
     print(Format("Metrostroi: Total signals: %u (normal: %u, repeaters: %u)", count, count-repeater, repeater))
     
     
-    --исопльзование этой функции написано очень неудобно, и если я добавлю новую, то будет много гемора
-    --поэтому инициализацию автостопов пишу сюда
+    --исопльзование UpdateSignalEntities написано очень неудобно, и если я добавлю новую, то будет много гемора (там надо будет в таймеры прописовать и хз куда еще)
+    --поэтому привязку автостопов пишу сюда
+    Metrostroi.LinkAutostopToNodes()
+
+end
+
+function Metrostroi.LinkAutostopToNodes()
     --пре-привязка к ноудам
     local tbl = {}
     for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
