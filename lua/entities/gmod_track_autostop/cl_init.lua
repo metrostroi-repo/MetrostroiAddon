@@ -34,7 +34,6 @@ function ENT:Think()
         if IsValid(self.ClientModel) then
             SafeRemoveEntity(self.ClientModel)
             self.ClientModel = nil 
-            return true 
         end
         return true
     end
