@@ -186,6 +186,8 @@ net.Receive("metrostroi-signal", function()
     ent.Name = net.ReadString()
     --ent.Name = " BUDAPEiT"..string.gsub(ent.Name,"[A-Za-z]*","")
     ent.Lenses = net.ReadString()
+	--клиент будет считать пригласительный как обычный белый
+	ent.Lenses = ent.Lenses:gsub("P","W")
     ent.ARSOnly = ent.Lenses == "ARSOnly"
     ent.RouteNumberSetup = net.ReadString()
     ent.Left = net.ReadBool()
@@ -213,7 +215,7 @@ hook.Add("Think","MetrostroiRenderSignals", function()
     end
 end)
 
-
+local vector_zero = Vector(0)
 function ENT:Think()
     local CurTime = CurTime()
     self:SetNextClientThink(CurTime + 0.0333)
@@ -299,7 +301,14 @@ function ENT:Think()
             end
             if LenseNum == 0 then OneLense = false end
             local offset = self.RenderOffset[self.LightType] or Vector(0, 0, 0)
-            self.LongOffset = self.LongOffset or Vector(0, 0, 0)
+            self.LongOffset = vector_zero
+            if self.TrafficLightModels[self.LightType].first_lenses_group_offset then
+                if self.LensesTBL[1] == "M" then
+                    self.LongOffset = self.LongOffset + (self.TrafficLightModels[self.LightType].first_lenses_group_offset['M'] or vector_zero)
+                else
+                    self.LongOffset = self.LongOffset + (self.TrafficLightModels[self.LightType].first_lenses_group_offset[#self.LensesTBL[1]] or vector_zero)
+                end
+            end
             if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
             if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*Vector(-1,1,1),Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
 
@@ -359,7 +368,7 @@ function ENT:Think()
                 end
 
                 self.NamesOffset = self.NamesOffset + vec
-                local offsetAndLongOffset = offset + self.LongOffset
+                local offsetAndLongOffset = offset + self.LongOffset + (v == "M" and self.TrafficLightModels[self.LightType].MOffset or vector_zero) + (v ~= "M" and self.TrafficLightModels[self.LightType].LOffset or vector_zero)
                 if not self.Left or self.Double then    self:SpawnHeads(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M") end
                 if self.Left or self.Double then self:SpawnHeads((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,v~="M",true) end
                 if v ~= "M" then
@@ -404,6 +413,7 @@ function ENT:Think()
             for i = double and 2 or 0,#self.Name-1 do
                 local id = (double and i-1 or i) - min
                 if double and i == 2 then offset = offset + TLM.DoubleOffset end
+				if self.TrafficLightModels[self.LightType].every_letter_offset then offset = offset + self.TrafficLightModels[self.LightType].every_letter_offset end
                 if self.Name[i+1] == " " then continue end
                 if self.Name[i+1] == "/" then min = min + 1; continue end
                 --if not IsValid(self.Models[2][i]) then

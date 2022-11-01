@@ -165,6 +165,8 @@ function MSignalSayHook(ply, comm, fromULX)
 			comm = comm:sub(8,-1):upper()
 			comm = string.Explode(":",comm)
 			if comm[1] == sig.Name then
+				--если нет пригласительной линзы, то и включаться пригласительный не будет
+				-- if sig.LensesStr and sig.LensesStr:find("P") then sig.InvationSignal = true end
 				sig.InvationSignal = true
 			end
 		elseif comm:sub(1,7) == "!sclps " then
@@ -304,20 +306,7 @@ function ENT:PostInitalize()
 		if not v.Lights then continue end
 		v.LightsExploded = string.Explode("-",v.Lights)
 	end
-	if not self.RouteNumberSetup or not self.RouteNumberSetup:find("W") then
-		self.GoodInvationSignal = 0
-		local index = 1
-		for k,v in ipairs(self.Lenses) do
-			if v ~= "M" then
-				for i = 1,#v do
-					if v[i] == "W" then self.GoodInvationSignal = index end
-					index = index + 1
-				end
-			end
-		end
-	else
-		self.GoodInvationSignal = -1
-	end
+
 	if self.Left then
 		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBoxMittor.model)
 	else
@@ -592,9 +581,9 @@ function ENT:Think()
 				self.RouteNumberOverrite = self.RouteNumber
 			end
 		end
-		if self.InvationSignal and self.GoodInvationSignal == -1 then
-			number = number.."W"
-		end
+		
+		if self.InvationSignal then number = number.."W" end
+
 		if self.KGU then number = number.."K" end
 		if number then self:SetNW2String("Number",number) end
 
@@ -625,7 +614,6 @@ function ENT:Think()
 		local index = 1
 		local offset = self.RenderOffset[self.SignalType] or Vector(0,0,0)
 		self.Sig = ""
-		self.Colors = ""
 		for k,v in ipairs(self.Lenses) do
 			if self.Routes[self.Route or 1].Repeater and IsValid(self.NextSignalLink) and (not self.Routes[self.Route or 1].Lights or self.Routes[self.Route or 1].Lights == "") then
 				break
@@ -637,12 +625,11 @@ function ENT:Think()
 				for i = 1,#v do
 					--Get the LightID and check, is this light must light up
 					local LightID = IsValid(self.NextSignalLink) and math.min(#Route.LightsExploded,self.FreeBS+1) or 1
-					local AverageState = Route.LightsExploded[LightID]:find(tostring(index)) or ((v[i] == "W" and self.InvationSignal and self.GoodInvationSignal == index) and 1 or 0)
-					local MustBlink = (v[i] == "W" and self.InvationSignal and self.GoodInvationSignal == index) or (AverageState > 0 and Route.LightsExploded[LightID][AverageState+1] == "b") --Blinking, when next is "b" (or it's invasion signal')
+					local AverageState = Route.LightsExploded[LightID]:find(tostring(index)) or ((v[i] == "P" and self.InvationSignal) and 1 or 0)
+					local MustBlink = (v[i] == "P" and self.InvationSignal) or (AverageState > 0 and Route.LightsExploded[LightID][AverageState+1] == "b") --Blinking, when next is "b" (or it's invasion signal')
 					self.Sig = self.Sig..(AverageState > 0 and (MustBlink and 2 or 1) or 0)
 
 					if AverageState > 0 then
-						if self.GoodInvationSignal ~= index then self.Colors = self.Colors..(MustBlink and v[i]:lower() or v[i]:upper()) end
 						if v[i] == "R" then
 							self.AutoEnabled = not self.NonAutoStop
 							self.Red = true
@@ -688,24 +675,11 @@ function ENT:Think()
 				self.RouteNumberOverrite = self.RouteNumber
 			end
 		end]]
-		if self.InvationSignal and self.GoodInvationSignal == -1 then
-			number = number.."W"
-		end
+		
+		if self.InvationSignal then number = number.."W" end
+		
 		if self.KGU then number = number.."K" end
 		if number then self:SetNW2String("Number",number) end
-		local index = 1
-		self.Colors = ""
-		for k,v in ipairs(self.Lenses) do
-			if v ~= "M" then
-				--get the some models data
-				local data = #v ~= 1 and self.TrafficLightModels[self.SignalType][#v-1] or self.TrafficLightModels[self.SignalType][self.Signal_IS]
-				if not data then continue end
-				for i = 1,#v do
-					if (self.Sig[index] == "1" or self.Sig[index] == "2") then self.Colors = self.Colors..v[i]:lower() end
-					index = index + 1
-				end
-			end
-		end
 	end
 
 	if self.Controllers then
