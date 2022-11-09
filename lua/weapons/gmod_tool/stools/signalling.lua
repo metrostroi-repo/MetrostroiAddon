@@ -61,16 +61,14 @@ local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street",
 --SHARED
 --пишу эту функцию именно сюда, потому что нужен доступ к таблице TypesOfSign.
 --Как альтернативный вариант - засунуть ее в глобальную таблицу Metrostroi и тогда функцию можно будет поместить куда угодно
-function Metrostroi.ReloadCustomSigs()
-    Metrostroi.CustomSigsAdded = true
+hook.Add("InitPostEntity","MetrostroiCustomSigs",function()
     local SIGENT = scripted_ents.GetStored("gmod_track_signs").t
     for _,params in pairs(Metrostroi.CustomSigs)do
         local idx = table.insert(TypesOfSign,params.name)
         SIGENT.SignModels[idx-1] = params
         print(params)
     end
-end
-hook.Add("InitPostEntity","MetrostroiCustomSigs",Metrostroi.ReloadCustomSigs)
+end)
     
 local RouteTypes = {"Auto", "Manual","Repeater","Emerg"}
 
