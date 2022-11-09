@@ -1,3 +1,5 @@
+--пример (поэтому скрипт выключен строкой do return end)
+--файл должен лежать именно в папке metrostroi и его имя должно начинаться на sh_
 do return end
 Metrostroi.AddCustomSigs({
     name = "test1",
