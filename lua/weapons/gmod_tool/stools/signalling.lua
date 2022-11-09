@@ -66,7 +66,7 @@ hook.Add("InitPostEntity","MetrostroiCustomSigs",function()
     for _,params in pairs(Metrostroi.CustomSigs)do
         local idx = table.insert(TypesOfSign,params.name)
         SIGENT.SignModels[idx-1] = params
-        print(params)
+        print("Metrostroi: Added custom sign "..params.name)
     end
 end)
     
