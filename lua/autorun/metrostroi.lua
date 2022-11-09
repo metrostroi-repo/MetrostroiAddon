@@ -333,6 +333,13 @@ function Metrostroi.AddLastStationTex(id,stIndex,texture)
     end
     tbl[stIndex] = table.insert(tbl,texture)
 end
+
+--function for custom sigs in signalling tool
+Metrostroi.CustomSigs = {}
+function Metrostroi.AddCustomSigs(params)
+    table.insert(Metrostroi.CustomSigs,params)
+end
+
 --------------------------------------------------------------------------------
 -- Load core files and skins
 --------------------------------------------------------------------------------
