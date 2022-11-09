@@ -72,9 +72,9 @@ function ENT:Think()
 	    --  --if ent.Spawned then hook.Remove("MetrostroiBigLag",ent) end
 	    --  --ent.Spawned = true
 	    --end)
-        if self:GetNWString("CustomModel",nil)then
-            self.Model = ClientsideModel(self:GetNWString("CustomModel",nil), RENDERGROUP_OTHER)
-        else
+        if self:GetNWString("CustomModel","") ~= "" then
+            self.Model = ClientsideModel(self:GetNWString("CustomModel"), RENDERGROUP_OTHER)
+        elseif self.ModelProp.model then
             if self.Left and not self.ModelProp.noleft then
                 if self.ModelProp.model:find("_r.mdl") then
                     self.Model = ClientsideModel(self.ModelProp.model:Replace("_r.mdl","_l.mdl"), RENDERGROUP_OTHER)

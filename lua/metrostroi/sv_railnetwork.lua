@@ -1407,7 +1407,8 @@ function Metrostroi.Save(name)
     local signs_ents = ents.FindByClass("gmod_track_signs")
     for k,v in pairs(signs_ents) do
         local CustomModel
-        if IsValid(v) then CustomModel = v:GetNWString("CustomModel",nil)end
+        if IsValid(v) then CustomModel = v:GetNWString("CustomModel","")end
+        if CustomModel == "" then CustomModel = nil end
         table.insert(signs,{
             Class = "gmod_track_signs",
             Pos = v:GetPos(),

@@ -925,6 +925,8 @@ function TOOL:BuildCPanelCustom()
                 tool.Sign.CustomModel = val
                 tool:SendSettings()
             end
+        else
+            tool.Sign.CustomModel = nil
         end
         local VYOffT = CPanel:NumSlider("Y Offset:",nil,-500,500,0)
             VYOffT:SetValue(tool.Sign.YOffset or 0)
