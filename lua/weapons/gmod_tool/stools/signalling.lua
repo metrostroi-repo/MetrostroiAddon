@@ -916,11 +916,13 @@ function TOOL:BuildCPanelCustom()
         CPanel:AddItem(VSType)
         if tool.Sign.Type == #TypesOfSign then
             local VNameT = CPanel:TextEntry("ModelPath")
-            VNameT:SetTooltip("example: models/metrostroi/re_sign/t_och_r.mdl")
+            VNameT:SetTooltip("example: models/metrostroi/re_sign/t_och_r.mdl\nMax length 199")
             VNameT:SetValue(tool.Sign.CustomModel or "")
             VNameT:SetEnterAllowed(false)
             function VNameT:OnLoseFocus()
-                tool.Sign.CustomModel = self:GetValue()
+                local val = self:GetValue():gsub("\\","/")
+                self:SetText(val)
+                tool.Sign.CustomModel = val
                 tool:SendSettings()
             end
         end
