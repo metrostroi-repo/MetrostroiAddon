@@ -72,18 +72,24 @@ function ENT:Think()
 	    --  --if ent.Spawned then hook.Remove("MetrostroiBigLag",ent) end
 	    --  --ent.Spawned = true
 	    --end)
-		if self.Left and not self.ModelProp.noleft then
-			if self.ModelProp.model:find("_r.mdl") then
-				self.Model = ClientsideModel(self.ModelProp.model:Replace("_r.mdl","_l.mdl"), RENDERGROUP_OTHER)
-				--self.Model:SetModel(self.ModelProp.model:Replace("_r.mdl","_l.mdl"))
-			else
-				self.Model = ClientsideModel(self.ModelProp.model:Replace("_l.mdl","_r.mdl"), RENDERGROUP_OTHER)
-				--self.Model:SetModel(self.ModelProp.model:Replace("_l.mdl","_r.mdl"))
-			end
-		else
-			self.Model = ClientsideModel(self.ModelProp.model, RENDERGROUP_OTHER)
-			--self.Model:SetModel(self.ModelProp.model)
-		end
+        if self:GetNWString("CustomModel","") ~= "" then
+            self.Model = ClientsideModel(self:GetNWString("CustomModel"), RENDERGROUP_OTHER)
+        elseif self.ModelProp.model then
+            if self.Left and not self.ModelProp.noleft then
+                if self.ModelProp.model:find("_r.mdl") then
+                    self.Model = ClientsideModel(self.ModelProp.model:Replace("_r.mdl","_l.mdl"), RENDERGROUP_OTHER)
+                    --self.Model:SetModel(self.ModelProp.model:Replace("_r.mdl","_l.mdl"))
+                else
+                    self.Model = ClientsideModel(self.ModelProp.model:Replace("_l.mdl","_r.mdl"), RENDERGROUP_OTHER)
+                    --self.Model:SetModel(self.ModelProp.model:Replace("_l.mdl","_r.mdl"))
+                end
+            else
+                self.Model = ClientsideModel(self.ModelProp.model, RENDERGROUP_OTHER)
+                --self.Model:SetModel(self.ModelProp.model)
+            end
+        else
+            return true
+        end
 		local RAND = math.random(-10,10)
 		local pos = self.ModelProp.pos + self.Offset
 		local ang = self.ModelProp.angles

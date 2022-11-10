@@ -509,3 +509,7 @@ ENT.SignModels[84] = {
 	angles = Angle(0,-90,0),
 	noauto = true,
 }
+ENT.SignModels[85] = {
+	pos = Vector(0,0,0),
+	angles = Angle(0,0,0)
+}
