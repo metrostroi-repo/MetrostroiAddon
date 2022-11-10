@@ -87,6 +87,8 @@ function ENT:Think()
                 self.Model = ClientsideModel(self.ModelProp.model, RENDERGROUP_OTHER)
                 --self.Model:SetModel(self.ModelProp.model)
             end
+        else
+            return true
         end
 		local RAND = math.random(-10,10)
 		local pos = self.ModelProp.pos + self.Offset
