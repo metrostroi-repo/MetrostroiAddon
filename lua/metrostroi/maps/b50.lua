@@ -19,8 +19,8 @@ Metrostroi.AddPassSchemeTex("720","Line 2",{
     "metrostroi_skins/81-720_schemes/b50_2r",
 })
 Metrostroi.AddPassSchemeTex("722","Line 1",{
-    "metrostroi_skins/81-722_schemes/b50_1",
     "metrostroi_skins/81-722_schemes/b50_1r",
+    "metrostroi_skins/81-722_schemes/b50_1",
 })
 Metrostroi.AddPassSchemeTex("722","Line 2",{
     "metrostroi_skins/81-722_schemes/b50_2",
@@ -1144,7 +1144,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO",{
     odz2 = {"subway_announcers/sarmat_upo/rhino/metrostroi/odz2.mp3", 2.192400 + 0.3}
 }, {
     {
-        LED = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2},
+        LED = {2,2,2,2,2,2,2,2,2,2,2,2,4,2,2},
         Name = "Автозавдоская - Междустройская",
         Loop = false,
         {
@@ -1263,7 +1263,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO",{
         }
     },
     {
-        LED = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 1, 1},
+        LED = {2,2,2,2,2,2,2,2,2,2,2,2,4,2,1,1},
         Name = "Автозавдоская - Автостанция Южная",
         Loop = false,
         {
