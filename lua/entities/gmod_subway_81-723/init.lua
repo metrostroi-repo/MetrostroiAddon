@@ -90,9 +90,6 @@ function ENT:Initialize()
     
     self.FrontDoor = false
     self.RearDoor = false
-
-    self:SetNW2Float("UPONoiseVolume",math.Rand(0,0.3))
-    self:SetNW2Float("UPOVolume",math.Rand(0.8,1))
 end
 
 --------------------------------------------------------------------------------
@@ -129,17 +126,7 @@ function ENT:Think()
     self:SetPackedBool("BortLSD",self.Panel.DoorsW>0)
     self:SetPackedBool("BortBV",self.Panel.GRP>0)
 
-    self:SetPackedBool("DoorAlarmL",self.BUKV.CloseRing)
-    self:SetPackedBool("DoorAlarmR",self.BUKV.CloseRing)
-
-    self:SetNW2Int("PassSchemesLED",self.BNT.PassSchemeCurr)
-    self:SetNW2Int("PassSchemesLEDN",self.BNT.PassSchemeNext)
-    self:SetPackedBool("PassSchemesLEDO",self.BNT.PassSchemePath)
-    self:SetPackedBool("SarmatLeft",self.Panel.PassSchemePowerL)
-    self:SetPackedBool("SarmatRight",self.Panel.PassSchemePowerR)
-
     self:SetPackedBool("AnnPlay",self.Panel.AnnouncerPlaying > 0)
-    self:SetPackedBool("AnnPlayUPO",self.Announcer.AnnTable=="AnnouncementsUPO")
 
     self.AsyncInverter:TriggerInput("Speed",self.Speed)
     if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
