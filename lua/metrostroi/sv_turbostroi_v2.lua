@@ -201,6 +201,17 @@ end
 -- Turbostroi scripts
 --------------------------------------------------------------------------------
 -- NEW API
+local OSes = {
+    Windows = "win32",
+    Windows64 = "win64",
+    Linux = "linux",
+    Linux64 = "linux64",
+    BSD = "linux",
+    POSIX = "linux",
+    OSX = "osx",
+}
+local dllPath = "./garrysmod/lua/bin/gmsv_turbostroi_"..(OSes[jit.os] or "").."%s.dll"
+
 local ffi = require("ffi")
 ffi.cdef[[
 bool ThreadSendMessage(void *p, int message, const char* system_name, const char* name, double index, double value);
@@ -215,22 +226,7 @@ typedef struct {
 thread_msg ThreadRecvMessage(void* p);
 ]]
 
-local OSName = "gmsv_turbostroi_"
-
-if jit.os == "Windows" then
-	OSName = OSName.."win"
-elseif jit.os == "Linux" then
-	OSName = OSName.."linux"
-end
-
-if jit.arch == "x86" then
-	OSName = OSName.."32"
-else
-	OSName = OSName.."64"
-end
-
-
-local TS = ffi.load(OSName)
+local TS = ffi.load(dllPath)
 
 Metrostroi = {}
 local dataCache = {wires = {},wiresW = {},wiresL = {}}
