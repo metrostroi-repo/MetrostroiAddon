@@ -39,11 +39,11 @@ ENT.MirrorCams = {
 }
 
 ENT.AnnouncerPositions = {
-    {Vector(408,18.5,16),50,0.4}
+    {Vector(406,18.7,16),50,0.4,0x43} --[C]abin speaker
 }
 for i=1,4 do
-    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230+37.5,47 ,44),100,0.3})
-    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230,-47,44),100,0.3})
+    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230+37.5,47,44),100,1,0x4C}) --[L]eft side speakers
+    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230,-47,44),100,1,0x52}) --[R]ight side speakers
 end
 
 ENT.Cameras = {
@@ -204,9 +204,6 @@ function ENT:InitializeSounds()
     self.SoundNames["door_cab_open"] = "subway_trains/common/door/cab/door_open.mp3"
     self.SoundNames["door_cab_close"] = "subway_trains/common/door/cab/door_close.mp3"
 
-    self.SoundNames["door_alarm"] = "subway_trains/722/door_alarm.mp3"
-    self.SoundPositions["door_alarm"] = {485,1e9,Vector(0,0,0),0.2}
-
     self.SoundNames["doors"] = "subway_trains/722/door_start.mp3"
     self.SoundNames["doorl"] = {loop=true,"subway_trains/722/door_loop.wav"}
     self.SoundPositions["doors"] = {300,1e9,Vector(0,0,0),0.2}
@@ -217,8 +214,8 @@ function ENT:InitializeSounds()
             self.SoundPositions["door"..i.."x"..k.."c"] = {485,1e9,GetDoorPosition(i,k),0.2}
         end
     end
-    self.SoundNames["door_alarm"] = {"subway_trains/722/door_alarm.mp3"}
-    self.SoundPositions["door_alarm"] = {485,1e9,Vector(0,0,0),0.25}
+    self.SoundNames["door_alarm"] = {loop=1.1,"subway_trains/722/door_alarm_start.mp3","subway_trains/722/door_alarm_loop.wav","subway_trains/722/door_alarm_end.mp3"}
+    self.SoundPositions["door_alarm"] = {485,1e9,Vector(0,0,0),0.35}
 
 
     self.SoundNames["epk_brake"] = {loop=true,"subway_trains/common/pneumatic/epv_loop.wav"}
@@ -248,13 +245,15 @@ function ENT:InitializeSounds()
     end
     for k,v in ipairs(self.AnnouncerPositions) do
         self.SoundNames["announcer_noise1_"..k] = {loop=true,"subway_announcers/upo/noiseS1.wav"}
-        self.SoundPositions["announcer_noise1_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noise1_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noise2_"..k] = {loop=true,"subway_announcers/upo/noiseS2.wav"}
-        self.SoundPositions["announcer_noise2_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noise2_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noise3_"..k] = {loop=true,"subway_announcers/upo/noiseS3.wav"}
-        self.SoundPositions["announcer_noise3_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noise3_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noiseW"..k] = {loop=true,"subway_announcers/upo/noiseW.wav"}
-        self.SoundPositions["announcer_noiseW"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noiseW"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
+        self.SoundNames["announcer_sarmat_start"..k] = {"subway_announcers/sarmat_upo/sarmat_start.mp3"}
+        self.SoundPositions["announcer_sarmat_start"..k] = {v[2] or 300,1e9,v[1],v[3]}
     end
 end
 function ENT:InitializeSystems()
@@ -378,6 +377,10 @@ ENT.Spawner = {
                 ent.CabinDoorRight = val==4 and first
                 ent.PassengerDoor = val==4
                 ent.RearDoor = val==4
+
+                ent.BMCIK.Announcer.Line = 1
+                ent.BMCIK.Announcer.Path = not first 
+                ent.BMCIK.Announcer.PathSel = not first 
             else
                 ent.FrontDoor = val==4
                 ent.RearDoor = val==4
