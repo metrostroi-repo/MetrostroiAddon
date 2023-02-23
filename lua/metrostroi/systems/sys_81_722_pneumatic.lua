@@ -526,9 +526,19 @@ function TRAIN_SYSTEM:Think(dT)
         self.DoorLeft = false
         self.DoorRight = false
     end--]]
-    local commandLeft =  (Train:ReadTrainWire(34) > 0 or Train.BUKV.OpenLeft) and (Train:ReadTrainWire(38) > 0 or Train:ReadTrainWire(39) > 0) and Train.SF41.Value > 0
-    local commandRight =  (Train.BUKV.OpenRightBack or (Train:ReadTrainWire(34) > 0 or Train.BUKV.OpenRight) and (Train:ReadTrainWire(37) > 0 or Train:ReadTrainWire(39) > 0)) and Train.SF42.Value > 0
-    local commandClose =  Train.BUKV.CloseDoors and Train.SF43.Value > 0
+    local commandLeft,commandRight,commandClose
+    if Train:ReadTrainWire(34) > 0 then
+        commandLeft = Train:ReadTrainWire(38) > 0
+        commandRight = Train:ReadTrainWire(37) > 0
+        commandClose = Train:ReadTrainWire(39) < 1
+    else
+        commandLeft = Train.BUKV.OpenLeft
+        commandRight = Train.BUKV.OpenRight or Train.BUKV.OpenRightBack
+        commandClose = Train.BUKV.CloseDoors
+    end
+    commandLeft  = commandLeft  and Train.SF41.Value > 0
+    commandRight = commandRight and Train.SF42.Value > 0
+    commandClose = commandClose and Train.SF43.Value > 0
     if commandClose or commandLeft and commandRight then
         self.DoorLeft = false
         self.DoorRight = false
