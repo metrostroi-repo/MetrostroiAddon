@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- 81-722 route number
+-- 81-722 TNM-01 system
 --------------------------------------------------------------------------------
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
@@ -156,26 +156,7 @@ if SERVER then
         
         Train:SetNW2Int("TNM:State",self.State)
     end
-else
-    local function createFont(name,font,size)
-        surface.CreateFont("Metrostroi_"..name, {
-            font = font,
-            size = size,
-            weight = 800,
-            blursize = 0,
-            antialias = false,
-            underline = false,
-            italic = false,
-            strikeout = false,
-            symbol = false,
-            rotary = false,
-            shadow = false,
-            additive = false,
-            outline = false,
-            extended = true,
-        })
-    end
-    
+else    
     local TNMPixels = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/tnm")
 
     function TRAIN_SYSTEM:ClientInitialize()
