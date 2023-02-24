@@ -4,17 +4,28 @@ local function OpenGUI()
     Frame:SetSize(600,300)
     Frame:Center()
     Frame:SetTitle(Metrostroi.GetPhrase("StationList.Title"))
+    Frame:SetDeleteOnClose(true)
     Frame:MakePopup()
-    Frame.OnClose = Frame.Remove
+
+    -- Check ULX
+    if not ulx.tps then
+        local ErrorLabel = vgui.Create("DLabel",Frame)
+        ErrorLabel:SetTextColor(Color(255,50,50))
+        ErrorLabel:SetFont("CloseCaption_Bold")
+        ErrorLabel:SetText(Metrostroi.GetPhrase("StationList.NoULX"))
+        ErrorLabel:SizeToContents()
+        ErrorLabel:Center()
+        return
+    end
     
     -- Check stations table
     if not Metrostroi.StationConfigurations then
         local ErrorLabel = vgui.Create("DLabel",Frame)
-        ErrorLabel:Dock(FILL)
         ErrorLabel:SetTextColor(Color(255,50,50))
-        ErrorLabel:DockMargin(7,0,0,7)
         ErrorLabel:SetFont("CloseCaption_Bold")
         ErrorLabel:SetText(Metrostroi.GetPhrase("StationList.NoConfig"))
+        ErrorLabel:SizeToContents()
+        ErrorLabel:Center()
         return
     end
     
@@ -50,6 +61,10 @@ local function OpenGUI()
         end
     end
     StList:SortByColumn(1)
+    function StList:DoDoubleClick(lineID, line)
+        RunConsoleCommand("ulx","station",tostring(SelectedID)..":"..tostring(SelectedPosID))
+        Frame:Close()
+    end
     
     -- Create teleport button
     local TpBtn = vgui.Create("DButton",Frame)
@@ -63,6 +78,7 @@ local function OpenGUI()
     end
     function TpBtn:DoClick()
         RunConsoleCommand("ulx","station",tostring(SelectedID)..":"..tostring(SelectedPosID))
+        Frame:Close()
     end
 end
 concommand.Add("metrostroi_stations",OpenGUI,nil,"GUI for station list")
