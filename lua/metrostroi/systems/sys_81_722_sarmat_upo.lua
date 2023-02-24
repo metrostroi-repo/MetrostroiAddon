@@ -1266,7 +1266,7 @@ function TRAIN_SYSTEM:CANUpdate()
             end
 
             bitText = bitText..Format("%%yСледующая станция\n%%y%s",sTblNext[2])
-            if sTblNext.right_doors then
+            if sTblNext and sTblNext.right_doors then
                 bitText = bitText..",\n%%yвыход\n%%yна правую сторону.\n"
                 bitLoop = bitLoop + 2
             else
@@ -1291,7 +1291,7 @@ function TRAIN_SYSTEM:CANUpdate()
             bitText = bitText..".\n"
         end
         
-        if sTblPrev.messagedep then
+        if sTblPrev and sTblPrev.messagedep then
             bitLoop = bitLoop + #string.Explode("\n",sTblPrev.messagedep)
             bitText = bitText..(sTblPrev.messagedep).."\n"
         end
