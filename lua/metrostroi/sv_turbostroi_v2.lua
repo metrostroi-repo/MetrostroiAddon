@@ -210,7 +210,7 @@ local OSes = {
     POSIX = "linux",
     OSX = "osx",
 }
-local dllPath = "./garrysmod/lua/bin/gmsv_turbostroi_"..(OSes[jit.os] or "").."%s.dll"
+local dllPath = "./garrysmod/lua/bin/gmsv_turbostroi_"..(OSes[jit.os] or "win32")..".dll"
 
 local ffi = require("ffi")
 ffi.cdef[[
