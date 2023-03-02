@@ -1163,8 +1163,8 @@ ENT.ButtonMap["BMCIK"] = {
     scale = 0.0089,
     sensor = true,
     system = "BMCIK",
-    hideseat=0.2,
-    hide=true,
+    hideseat = 0.2,
+    hide = true
 }
 
 for i=1,3 do
@@ -1196,24 +1196,47 @@ ENT.ButtonMap["TNM"] = {
     height = 115,
     scale = 0.06,
 
-    hide=2,
+    hide=2
 }
 ENT.ButtonMap["BMTS"] = {
-    pos = Vector(473.8,-12.8,44.7),
+    pos = Vector(473.8,-11.85,45.2-0.5),
     ang = Angle(0,90,90),
     width = 512,
     height = 80,
-    scale = 0.1012,
-
-    hide=2,
+    scale = 0.0975,
+    hide = 2
 }
-ENT.ButtonMap["BIT"] = {
-    pos = Vector(-455.4,-10.85,52.62),
+ENT.ButtonMap["BIT1"] = {
+    pos = Vector(-455.37,-10.92504,52.35969),
     ang = Angle(0,90,90),
     width = 1024,
     height = 192,
-    scale = 0.0268,
-    hideseat = 1.5,
+    scale = 0.026947,
+    hideseat = 1.5
+}
+ENT.ButtonMap["BIT2"] = {
+    pos = Vector(1.55365,-10.92493,51.99417),
+    ang = Angle(0,90,97),
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
+}
+ENT.ButtonMap["BIT3"] = {
+    pos = Vector(-4.83291,10.92509,51.99417),
+    ang = Angle(0,-90,97),
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
+}
+ENT.ButtonMap["BIT4"] = {
+    pos = Vector(377.70719,16.66898,52.35969),
+    ang = Angle(0,-90,90),
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
 }
 ENT.ButtonMap["SarmatButtons"] = {
     pos = Vector(476.2,30.2,-6.4),
@@ -1762,12 +1785,14 @@ function ENT:DrawPost()
         surface.DrawTexturedRectRotated(256,64,512,128,0)
     end)
     self.RTMaterial:SetTexture("$basetexture", self.BITScr)
-    self:DrawOnPanel("BIT",function(...)
-        surface.SetMaterial(self.RTMaterial)
-        surface.SetDrawColor(255,255,255,200)
-        surface.DrawTexturedRectRotated(512,128,1024,256,0)
-    end)
+    surface.SetDrawColor(255,255,255,200)
+    for i=1,4 do
+        self:DrawOnPanel("BIT"..i,function(...)
+            surface.DrawTexturedRectRotated(512,128,1024,256,0)
+        end)
+    end
     self.RTMaterial:SetTexture("$basetexture", self.TNMScr)
+    surface.SetDrawColor(255,255,255)
     self:DrawOnPanel("TNM",function(...)
         surface.SetMaterial(self.RTMaterial)
         surface.SetDrawColor(255,255,255)
