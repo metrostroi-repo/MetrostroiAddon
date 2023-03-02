@@ -194,7 +194,7 @@ else
     function TRAIN_SYSTEM:ClientInitialize()
     end
     function TRAIN_SYSTEM:ClientThink()
-        if not self.Train:ShouldDrawPanel("BIT") then return end
+        if not self.Train:ShouldDrawPanel("BIT1") then return end
         render.PushRenderTarget(self.Train.BITScr,0,0,1024, 256)
         render.Clear(0, 0, 0, 0)
         cam.Start2D()
@@ -215,7 +215,7 @@ else
     function TRAIN_SYSTEM:BIT(Train)
         local state = Train:GetNW2Int("BIT:State",0)
         if state == 0 then return end
-        surface.SetDrawColor(20,10,20,255)
+        surface.SetDrawColor(20,10,20)
         surface.DrawRect(0,0,1024,192)
 
         if state > 0 then

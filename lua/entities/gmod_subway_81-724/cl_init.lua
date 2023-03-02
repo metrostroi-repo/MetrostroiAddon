@@ -437,36 +437,36 @@ ENT.Lights = {
     [19] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0.4,-0), Angle(0,0,0), Color(254,210,18), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
 }
 ENT.ButtonMap["BIT1"] = {
-    pos = Vector(-455.4,-10.85,52.62),
+    pos = Vector(-455.75,-10.92504,52.35969),
     ang = Angle(0,90,90),
     width = 1024,
     height = 192,
-    scale = 0.0268,
-    hideseat=1.5,
+    scale = 0.026947,
+    hideseat = 1.5
 }
 ENT.ButtonMap["BIT2"] = {
-    pos = Vector(1.8,-11,52.35),
-    ang = Angle(0,90,90+9),
+    pos = Vector(1.55365,-10.92493,51.99417),
+    ang = Angle(0,90,97),
     width = 1024,
     height = 192,
-    scale = 0.02684+0.0003,
-    hideseat=1.5,
+    scale = 0.026947,
+    hideseat = 1.5
 }
 ENT.ButtonMap["BIT3"] = {
-    pos = Vector(-5,11,52.35),
-    ang = Angle(0,-90,90+9),
+    pos = Vector(-4.83291,10.92509,51.99417),
+    ang = Angle(0,-90,97),
     width = 1024,
     height = 192,
-    scale = 0.02684+0.0003,
-    hideseat=1.5,
+    scale = 0.026947,
+    hideseat = 1.5
 }
 ENT.ButtonMap["BIT4"] = {
-    pos = Vector(449.3,10.85,52.62),
+    pos = Vector(449.44,10.92504,52.35969),
     ang = Angle(0,-90,90),
     width = 1024,
     height = 192,
-    scale = 0.0268,
-    hideseat=1.5,
+    scale = 0.026947,
+    hideseat = 1.5
 }
 function ENT:Initialize()
     self.BaseClass.Initialize(self)
@@ -754,7 +754,7 @@ end
 function ENT:DrawPost()
     self.RTMaterial:SetTexture("$basetexture", self.BITScr)
     surface.SetMaterial(self.RTMaterial)
-    surface.SetDrawColor(255,255,255)
+    surface.SetDrawColor(255,255,255,200)
     for i=1,4 do
         self:DrawOnPanel("BIT"..i,function(...)
             surface.DrawTexturedRectRotated(512,128,1024,256,0)
