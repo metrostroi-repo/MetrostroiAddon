@@ -40,6 +40,7 @@ Panel.DisableHUD        = Disable HUD in the driver seat
 Panel.DisableCamAccel   = Disable camera acceleration
 Panel.DisableHoverText  = Disable tooltips
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW #FIXME
+Panel.DisableSeatShadows= Disable seat shadows #NEW #FIXME
 Panel.ScreenshotMode    = Screenshot mode (LOW FPS)
 Panel.ShadowsHeadlight  = Enable headlight shadows
 Panel.RedLights         = Enable dynamic light\nof red lights
@@ -51,6 +52,7 @@ Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = FOV
 Panel.Z                 = Camera height #NEW
 Panel.RenderDistance    = Render distance
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Reload client side
 
 Panel.ClientAdvanced    = Client (advanced)

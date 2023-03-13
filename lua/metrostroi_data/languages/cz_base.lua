@@ -32,6 +32,7 @@ Panel.DisableHUD        = Vypnout HUD v pozici strojvedoucího
 Panel.DisableCamAccel   = Vypnout akceleraci pohledu
 Panel.DisableHoverText  = Vypnout vysvětlivky
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = Mód snímku obrazovky (NÍZKÉ FPS)
 Panel.RedLights         = Zapnout dynamická červená světla
 Panel.ShadowsHeadlight  = Zapnout odrazy reflektorů
@@ -42,6 +43,7 @@ Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = FOV
 Panel.Z                 = Výška kamery
 Panel.RenderDistance    = Vykreslovací\nvzdálenost
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Znovu načíst klienta
 
 Panel.ClientAdvanced    = Klient (pokročilý)

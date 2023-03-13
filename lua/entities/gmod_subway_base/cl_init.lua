@@ -310,6 +310,7 @@ local C_Shadows3            = GetConVar("metrostroi_shadows3")
 local C_Shadows4            = GetConVar("metrostroi_shadows4")
 local C_AA                  = GetConVar("mat_antialias")
 local C_Sprites             = GetConVar("metrostroi_sprites")
+local C_DisableSeatShadows  = GetConVar("metrostroi_disableseatshadows")
 local whitelist = {
     ["CHudChat"] = true,
     ["CHudDeathNotice"] = true,
@@ -615,17 +616,20 @@ local function colAlpha(col,a)
 end
 hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,isDD)
     if isDD then return end
+    local inSeat = LocalPlayer().InMetrostroiTrain
     for ent in pairs(Metrostroi.SpawnedTrains) do
         if ent:IsDormant() then continue end
         if MetrostroiStarted and MetrostroiStarted~=true or ent.RenderBlock then
-            local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
-            cam.Start3D2D(ent:LocalToWorld(Vector(0,-200,100)),ent:LocalToWorldAngles(Angle(0,90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
-            cam.End3D2D()
-            cam.Start3D2D(ent:LocalToWorld(Vector(0,200,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),2)
-                draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
-            cam.End3D2D()
-            return
+            if not inSeat then
+                local timeleft = (math.max(0,(MetrostroiStarted and MetrostroiStarted~=true) and 3-(RealTime()-MetrostroiStarted) or 3-(RealTime()-ent.RenderBlock)))+0.99
+                cam.Start3D2D(ent:LocalToWorld(Vector(0,-150,100)),ent:LocalToWorldAngles(Angle(0,90,90)),1.5)
+                    draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                cam.End3D2D()
+                cam.Start3D2D(ent:LocalToWorld(Vector(0,150,100)),ent:LocalToWorldAngles(Angle(0,-90,90)),1.5)
+                    draw.SimpleText("Wait, train will be available across "..string.NiceTime(timeleft))
+                cam.End3D2D()
+            end
+            continue
         end
         cam.IgnoreZ(true)
         for i,vHandle in pairs(ent.Sprites) do
@@ -665,7 +669,7 @@ local function enableDebug()
                 if ent.ButtonMap ~= nil then
                     draw.NoTexture()
                     for kp,panel in pairs(ent.ButtonMap) do
-                        if kp ~= "BaseClass" and LocalPlayer():GetPos():Distance(ent:LocalToWorld(panel.pos)) < 512 then
+                        if kp ~= "BaseClass" and LocalPlayer():GetPos():DistToSqr(ent:LocalToWorld(panel.pos)) < 262144 then
                             ent:DrawOnPanel(kp,function()
                                 surface.SetDrawColor(0,0,255)
                                 if not ent:ShouldDrawPanel(kp) then surface.SetDrawColor(255,0,0) end
@@ -1046,6 +1050,18 @@ function ENT:Think()
             end
         end
     end
+    
+    local disableSeatShadows = C_DisableSeatShadows:GetBool()
+    if self.DisableSeatShadows ~= disableSeatShadows then
+        for i=1,self:GetNW2Int("seats",0) do
+            local seat = self:GetNW2Entity("seat_"..i)
+            if IsValid(seat) then
+                seat:SetRenderMode(disableSeatShadows and RENDERMODE_NONE or RENDERMODE_TRANSALPHA)
+                if disableSeatShadows then seat:AddEffects(EF_NODRAW) else seat:RemoveEffects(EF_NODRAW) end
+            end
+        end
+        self.DisableSeatShadows = disableSeatShadows
+    end    
 
     if (GetConVar("metrostroi_disablecamaccel"):GetInt() == 0) then
         self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Float("Accel",0)+1)/2),0,1, 4, 1)*30-15)
@@ -2321,8 +2337,8 @@ end
 local function sendPanelTouch(panel,x,y,outside,state)
     net.Start("metrostroi-panel-touch")
     net.WriteString(panel or "")
-    net.WriteInt(x,11)
-    net.WriteInt(y,11)
+    net.WriteUInt(x,11)
+    net.WriteUInt(y,11)
     net.WriteBool(outside)
     net.WriteBool(state)
     net.SendToServer()

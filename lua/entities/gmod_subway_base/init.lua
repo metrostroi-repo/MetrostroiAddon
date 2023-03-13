@@ -1126,7 +1126,7 @@ function ENT:CreateCouple(pos,ang,forward,typ)
     table.insert(self.JointPositions,index,x)
     -- Constraint bogey to the train
     if self.NoPhysics then
-        bogey:SetParent(coupler)
+        coupler:SetParent(self)
     else
         constraint.AdvBallsocket(
             self,
@@ -1192,7 +1192,9 @@ function ENT:CreateSeatEntity(seat_info)
     end
 
     -- Set some shared information about the seat
-    self:SetNW2Entity("seat_"..seat_info.type,seat)
+    local seats = self:GetNW2Int("seats",0)+1
+    self:SetNW2Entity("seat_"..seats, seat)
+    self:SetNW2Int("seats", seats)
     seat:SetNW2String("SeatType", seat_info.type)
     seat:SetNW2Entity("TrainEntity", self)
     seat_info.entity = seat
@@ -2219,8 +2221,8 @@ end)
 -- Receiver for panel touchs, Checks if people are the legit driver and calls buttonevent on the train
 net.Receive("metrostroi-panel-touch", function(len, ply)
     local panel = net.ReadString()
-    local x = net.ReadInt(11)
-    local y = net.ReadInt(11)
+    local x = net.ReadUInt(11)
+    local y = net.ReadUInt(11)
     local outside = net.ReadBool()
     local state = net.ReadBool()
     local seat = ply:GetVehicle()

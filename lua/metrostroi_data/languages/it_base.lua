@@ -30,6 +30,8 @@ Panel.DrawCams          = Render telecamera
 Panel.DisableHUD        = Disabilita l'HUD nella sedia del macchinista
 Panel.DisableCamAccel   = Disabilita accellerazione della visuale
 Panel.DisableHoverText  = Disable hover text
+Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = Modalità screenshot (FPS Bassi)
 Panel.ShadowsHeadlight  = Abilita ombre faro
 Panel.RedLights         = Abilita le luci dinamiche\ndelle luci rosse
@@ -38,6 +40,7 @@ Panel.MinimizedShow     = Non scaricare nessun elemento\nwhen minimizzato
 Panel.FOV               = FOV
 Panel.Z                 = Altezza della videocamera
 Panel.RenderDistance    = Distanza di rendering
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Ricarica lato utente
 
 Panel.ClientAdvanced    = Utente (Avanzato)

@@ -268,7 +268,7 @@ function ENT:Think()
     local BoardTime = 8+7*self.HorliftStation
     for k,v in pairs(ents.FindByClass("gmod_subway_*")) do
         if v.Base ~= "gmod_subway_base" and v:GetClass() ~= "gmod_subway_base" then continue end
-        if not IsValid(v) or v:GetPos():Distance(self:GetPos()) > self.PlatformStart:Distance(self.PlatformEnd) then continue end
+        if not IsValid(v) or v:GetPos():DistToSqr(self:GetPos()) > self.PlatformStart:DistToSqr(self.PlatformEnd) then continue end
 
         local platform_distance = ((self.PlatformStart-v:GetPos()) - ((self.PlatformStart-v:GetPos()):Dot(self.PlatformNorm))*self.PlatformNorm):Length()
         local vertical_distance = math.abs(v:GetPos().z - self.PlatformStart.z)
@@ -553,16 +553,16 @@ function ENT:Think()
 
         if target <= 0 then
             self.WindowEnd = self.WindowStart
-        else
+        elseif self.WindowEnd < self:PoolSize() then
             local growthDelta = math.max(0,(target-self:PopulationCount())*0.005)
-            if growthDelta < 1.0 then -- Accumulate fractional rate
+            if growthDelta > 0.0 and growthDelta < 1.0 then -- Accumulate fractional rate
                 self.GrowthAccumulation = (self.GrowthAccumulation or 0) + growthDelta
                 if self.GrowthAccumulation > 1.0 then
                     growthDelta = 1
                     self.GrowthAccumulation = self.GrowthAccumulation - 1.0
                 end
             end
-            self.WindowEnd = (self.WindowEnd + math.floor(growthDelta+0.5)) % self:PoolSize()
+            self.WindowEnd = math.min(self:PoolSize(), self.WindowEnd + math.floor(growthDelta+0.5))
         end
     end
 

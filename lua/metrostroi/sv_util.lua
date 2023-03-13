@@ -488,6 +488,14 @@ Metrostroi.Current = 0
 Metrostroi.PeopleOnRails = 0
 Metrostroi.VoltageRestoreTimer = 0
 
+local function consumeFromFeeder(inCurrent, inFeeder)
+    if inFeeder then
+        Metrostroi.Currents[inFeeder] = Metrostroi.Currents[inFeeder] + inCurrent*0.4
+    else
+        Metrostroi.Current = Metrostroi.Current + inCurrent*0.4
+    end
+end
+
 local prevTime
 hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     -- Change in time
@@ -511,28 +519,33 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
         local trains = ents.FindByClass(class)
         for _,train in pairs(trains) do
             if train.Electric then
-                Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0,(train.Electric.EnergyChange or 0))
-                local current = math.max(0,(train.Electric.Itotal or 0)) -  math.max(0,(train.Electric.Iexit or 0))
-                local feeder = false
-                local fB = train.FrontBogey
-                local rB = train.RearBogey
-                if IsValid(fB) then
-                    if fB.Feeder then
-                        Metrostroi.Currents[fB.Feeder] = Metrostroi.Currents[fB.Feeder] + fB.DropByPeople+current*0.4
-                        feeder = true
+                if train.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, train.Electric.EnergyChange) end
+                local current = math.max(0, train.Electric.Itotal or 0) -  math.max(0, train.Electric.Iexit or 0)
+
+                local fB = IsValid(train.FrontBogey) and train.FrontBogey
+                local rB = IsValid(train.RearBogey) and train.RearBogey
+                if fB and (not fB.ContactStates or (not fB.ContactStates[1] and not fB.ContactStates[2])) then fB = nil end -- Don't have contact with TR
+                if rB and (not rB.ContactStates or (not rB.ContactStates[1] and not rB.ContactStates[2])) then rB = nil end -- Don't have contact with TR
+
+                local fBfeeder = fB and fB.Feeder
+                local rBfeeder = rB and rB.Feeder
+
+                if fBfeeder then
+                    if not rBfeeder or fBfeeder == rBfeeder then
+                        consumeFromFeeder(current, fBfeeder) -- Feeders are same
                     else
-                        Metrostroi.Current = Metrostroi.Current + fB.DropByPeople
+                        consumeFromFeeder(current * 0.5, fBfeeder) -- Feeders are different
                     end
                 end
-                if IsValid(rB) then
-                    if rB.Feeder then
-                        Metrostroi.Currents[rB.Feeder] = Metrostroi.Currents[rB.Feeder] + rB.DropByPeople+current*0.4
-                        feeder = true
-                    else
-                        Metrostroi.Current = Metrostroi.Current + rB.DropByPeople
+
+                if rBfeeder then
+                    if not fBfeeder then
+                        consumeFromFeeder(current, rBfeeder) -- Feeders are same
+                    elseif fBfeeder ~= rBfeeder  then
+                        consumeFromFeeder(current * 0.5, rBfeeder) -- Feeders are different
                     end
                 end
-                if not feeder then Metrostroi.Current = Metrostroi.Current + current*0.4 end
+                if not rBfeeder and not fBfeeder then consumeFromFeeder(current) end
             end
         end
     end

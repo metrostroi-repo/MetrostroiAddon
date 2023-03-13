@@ -5,7 +5,7 @@ local function enableDebug()
     if debug:GetBool() then
         hook.Add("PostDrawTranslucentRenderables","MetrostroiSignDebug",function(bDrawingDepth,bDrawingSkybox)
             for _,ent in pairs(ents.FindByClass("gmod_track_signs")) do
-                if bDrawingDepth and LocalPlayer():GetPos():Distance(sig:GetPos()) < 512 then
+                if bDrawingDepth and LocalPlayer():GetPos():DistToSqr(sig:GetPos()) < 262144 then
                     local pos = sig:LocalToWorld(Vector(0,0,0))
                     local ang = sig:LocalToWorldAngles(Angle(0,90,90))
                     cam.Start3D2D(pos, ang, 0.25)

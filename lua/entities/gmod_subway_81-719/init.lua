@@ -320,8 +320,8 @@ function ENT:Think()
     self:SetPackedRatio("TLPressure", self.Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure", math.min(3.2,self.Pneumatic.BrakeCylinderPressure)/6.0)
 
-    self:SetPackedRatio("BatteryVoltage",self.Panel["V1"]*self.Battery.Voltage/150.0)
-    self:SetPackedRatio("BatteryCurrent",self.Panel["V1"]*math.Clamp((self.Battery.Voltage-75)*0.01,-0.01,1))
+    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)
+    self:SetPackedRatio("BatteryCurrent",Panel["V1"]*math.Clamp((self.Battery.Voltage-75)*0.01,-0.01,1))
 
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)

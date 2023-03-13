@@ -442,7 +442,7 @@ end)
 
 net.Receive("metrostroi_bogey_contact",function()
     local ent = net.ReadEntity()
-    if not IsValid(ent) then return end
+    if not IsValid(ent) or not ent.PlayTime then return end
     local PantNum = net.ReadUInt(1)+1
     local PantPos = net.ReadVector()
     local Spark = net.ReadUInt(1) > 0

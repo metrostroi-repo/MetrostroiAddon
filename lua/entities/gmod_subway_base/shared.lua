@@ -589,12 +589,12 @@ end
 ---------------------------------------------------------------------------------------
 function ENT:SetPackedRatio(idx,value)
 	--local idx = type(idx) == "number" and 999-idx or idx
-	if self._NetData[2][idx] ~= nil and self._NetData[2][idx] == math.floor(value*500) then return end
-	self:SetNW2Int(idx,math.floor(value*500))
+	if self._NetData[2][idx] ~= nil and self._NetData[2][idx] == math.floor(value*1000+0.5) then return end
+	self:SetNW2Int(idx,math.floor(value*1000+0.5))
 end
 
 function ENT:GetPackedRatio(idx)
-	return self:GetNW2Int(idx)/500
+	return self:GetNW2Int(idx)*0.001
 end
 
 --------------------------------------------------------------------------------

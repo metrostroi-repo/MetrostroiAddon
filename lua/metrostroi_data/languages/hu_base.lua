@@ -31,6 +31,8 @@ Panel.DrawCams          = Kamerák renderelése
 Panel.DisableHUD        = HUD kikapcsolása a vezető ülésben
 Panel.DisableCamAccel   = Kamera gyorsítás kikapcsolása
 Panel.DisableHoverText  = Felvillanó szövegek kikapcsolása
+Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = Képernyőmentés mód (ALACSONY FPS)
 Panel.ShadowsHeadlight  = Fényszóró árnyékok bekapcsolása
 Panel.RedLights         = \nZárjelző lámpák dinamikus fényének bekapcsolása
@@ -39,6 +41,7 @@ Panel.MinimizedShow     = Ne töltse be az elemeket, \nha a program tálcán van
 Panel.FOV               = FOV
 Panel.Z                 = Kamera magassága
 Panel.RenderDistance    = Renderelési távolság
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Kliens oldal újraindítása
 
 Panel.ClientAdvanced    = Kliens (haladó)

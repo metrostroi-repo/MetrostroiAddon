@@ -256,7 +256,7 @@ function ENT:Think()
                     local target = Vector(0,0,0)
                     for j=1,count do
                         local vec = self:GetNW2Vector("TrainDoor"..j,Vector(0,0,0))
-                        local d = vec:Distance(self.ClientModels[i]:GetPos())
+                        local d = vec:DistToSqr(self.ClientModels[i]:GetPos())
                         if d < distance then
                             target = vec
                             distance = d
@@ -352,8 +352,8 @@ function ENT:Think()
         end
 
         -- Move pedestrian
-        local speed = 256
-        if distance > 1048576--[[1024]] then speed = 512 end
+        local speed = 150
+        if distance > 1048576--[[1024]] then speed = 256 end
         v.ent:SetPos(v.ent:GetPos() + targetDir*math.min(threshold,speed*self.DeltaTime))
         -- Rotate pedestrian
         v.ent:SetAngles(targetDir:Angle() + Angle(0,180,0))

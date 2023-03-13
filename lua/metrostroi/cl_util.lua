@@ -767,8 +767,8 @@ hook.Add("Think","metrostroi_camera_move",function()
         local camera = Metrostroi.RenderCam
         Metrostroi.RenderCam = nil
         if IsValid(camera[1]) then
-            local distance = camera[1]:LocalToWorld(camera[2]):Distance(LocalPlayer():GetPos())
-            if distance > 256 then return end
+            local distance = camera[1]:LocalToWorld(camera[2]):DistToSqr(LocalPlayer():GetPos())
+            if distance > 65536 then return end
             local x,y = camera[9],camera[10]
             local scale = camera[11] or 1
             local xmin,ymin = camera[12] or 0,camera[13] or 0

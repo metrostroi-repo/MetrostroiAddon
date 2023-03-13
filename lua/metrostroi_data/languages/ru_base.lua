@@ -40,6 +40,7 @@ Panel.DisableHUD        = Откл. HUD в кресле машиниста
 Panel.DisableCamAccel   = Откл. симуляцию качания головы
 Panel.DisableHoverText  = Откл. всплывающий текст
 Panel.DisableHoverTextP = Откл. дополнительную информацию\nв всплывающем тексте
+Panel.DisableSeatShadows= Откл. тени от кресел
 Panel.ScreenshotMode    = Режим съёмки (НИЗКИЙ ФПС)
 Panel.ShadowsHeadlight  = Вкл. тени от фар
 Panel.RedLights         = Вкл. динамический свет от\nкрасных фар
@@ -51,6 +52,7 @@ Panel.RouteNumber       = Номер маршрута
 Panel.FOV               = Поле зрения
 Panel.Z                 = Высота камеры
 Panel.RenderDistance    = Дальность прорисовки
+Panel.RenderSignals     = Прорисовка светофоров
 Panel.ReloadClient      = Перезагрузить клиентскую часть
 
 Panel.ClientAdvanced    = Клиент (дополнительно)

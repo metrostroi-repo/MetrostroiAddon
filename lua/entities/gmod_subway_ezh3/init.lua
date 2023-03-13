@@ -6,17 +6,13 @@ ENT.BogeyDistance = 650 -- Needed for gm trainspawner
 
 --"DURASelectMain","DURASelectAlternate","DURAToggleChannel","DURAPowerToggle",
 ENT.SyncTable = {
-    "VB","DoorSelect","V4","V5","KU9","KU15","V1","VU14","V2","V3","V6","KU12","KU7","V10","KU8","OtklAVU","KU10","KU11","KRR","R_UNch","R_ZS","R_G","R_Radio","R_Program1","R_Program2","Ring","PB","RC1","VAH","VAD","ARS","ALS","KVT","KB","VU1","VU2","VU3","AV","VU","PLights","GLights","RST","RUM","KRR",
+    "VB","DoorSelect","V4","V5","KU9","KU15","V1","VU14","V2","V3","V6","KU12","KU7","V10","KU8","OtklAVU","KU10","KU11","KRR","R_UNch","R_ZS","R_G","R_Radio","R_Program1","R_Program2","Ring","PB","RC1","VAH","VAD","ARS","ALS","KVT","KB","KAH","VU1","VU2","VU3","AV","VU","PLights","GLights","RST","RUM","KRR",
     "R_Program1H","R_Program2H",
     "SAMMSchemeOff","SAMMStart","SAMMReset","SAMMOn","SAMMBlok","SAMMX2","SAMMAhead","SAMMAccept","SAMMUnit",
     "RRIEnable","RRIAmplifier",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","EPK","EmergencyBrakeValve","UAVA","UAVAC",
     "GV",
     "R_ASNPOn","R_ASNPDown","R_ASNPUp","R_ASNPPath","R_ASNPMenu","IGLA1","IGLA2",
-    "PR1","PR2","PR5","PR11","PR4","PR9","PR6","PR8","PR12",--9
-    "PR1Cap","PR2Cap","PR5Cap","PR11Cap","PR4Cap","PR9Cap","PR6Cap","PR8Cap","PR12Cap",
-    "PRL13","PRL31","PRL17","PRL25","PRL18","PRL24","PRL19","PRL6A","PRL4A","PRL16","PRL28","PRL2A","PRL34",
-    "PRL23","PRL15","PRL22","PRL20","PRL21","PRL32","PRL30","PRL1A","PRL14","PRL26","PRL12","PRL3A","PRL33",
 }
 
 function ENT:Initialize()
@@ -104,6 +100,7 @@ function ENT:Initialize()
         [KEY_PAD_4] = "PneumaticBrakeSet4",
         [KEY_PAD_5] = "PneumaticBrakeSet5",
         [KEY_PAD_DIVIDE] = "KU10Set",
+        [KEY_PAD_MULTIPLY] = "KAHSet",
 
         [KEY_SPACE] = {
             def="PBSet",
@@ -216,7 +213,6 @@ function ENT:Initialize()
     self.FrontDoor = false
     self.CabinDoor = false
     self.PassengerDoor = false
-	self.FuseboxCover = false
 
 --  self.A5:TriggerInput("Set",0)
     self:TrainSpawnerUpdate()
@@ -258,16 +254,14 @@ function ENT:Think()
     local Pneumatic = self.Pneumatic
     self:SetPackedBool("PanelLights",Panel.PanelLights> 0.5)
     self:SetPackedBool("GaugeLights",Panel.GaugeLights > 0.5)
-    self:SetPackedBool("RedLights1",Panel.RedLight1 > 0)
-    self:SetPackedBool("RedLights2",Panel.RedLight2 > 0)
+    self:SetPackedBool("RedLight",Panel.RedLights>0)
     self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
     self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
 
     local power = Panel.V1 > 0.5
     self:SetPackedBool("V1p",power)
-    local lightsActive2 = math.min(1,self.Panel.MainLights2)^2
-    local lightsActive1 = math.min(1,self.Panel.MainLights1)^2
-    local LightPower = math.min(1,self.Panel.LightPower)^2
+    local lightsActive2 = math.min(1,Panel.MainLights2)
+    local lightsActive1 = math.min(1,Panel.MainLights1)^2
     local emerActive1 = Panel.EmergencyLights1
     local emerActive2 = Panel.EmergencyLights2
 
@@ -275,7 +269,7 @@ function ENT:Think()
     self:SetPackedBool("Lamps_emer2",emerActive2 > 0)
     self:SetPackedBool("Lamps_half1",lightsActive1 > 0)
     self:SetPackedBool("Lamps_half2",lightsActive2 > 0)
-    self:SetPackedRatio("LampsStrength",LightPower)
+    self:SetPackedRatio("LampsStrength",lightsActive1)
 
     -- Signal if doors are open or no to platform simulation
     self.LeftDoorsOpen =
@@ -339,8 +333,8 @@ function ENT:Think()
     self:SetPackedRatio("BLPressure", Pneumatic.ReservoirPressure/16.0)
     self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure",  math.min(2.7,Pneumatic.BrakeCylinderPressure)/6.0)
-    self:SetPackedRatio("EnginesVoltage",self.Electric.Aux750V/1000.0)
-    self:SetPackedRatio("BatteryVoltage",self.Panel["V1"]*self.Battery.Voltage/100)
+    self:SetPackedRatio("EnginesVoltage", self.Electric.Main750V/1000.0)
+    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
     self:SetPackedBool("RT300",self.Electric.ThyristorControllerPower*self.Electric.ThyristorControllerWork>0)
@@ -353,7 +347,6 @@ function ENT:Think()
     self:SetPackedBool("AR80",Panel.AR80 > 0)
     self:SetPackedBool("KT",Panel.KT)
     self:SetPackedBool("KVD",Panel.KVD > 0)
-    self:SetPackedBool("LPU",Panel.LPU > 0)
 
     self:SetPackedRatio("Speed", self.Speed/100)
     -- Exchange some parameters between engines, pneumatic system, and real world
@@ -389,28 +382,6 @@ function ENT:Think()
     end
 
     self:GenerateJerks()
-    --Fuses
-    self:SetPackedBool("PR1FState",self.PR1.Value)
-    self:SetPackedBool("PR2FState",self.PR2.Value)
-    self:SetPackedBool("PR5FState",self.PR5.Value)
-    self:SetPackedBool("PR11FState",self.PR11.Value)
-    self:SetPackedBool("PR4FState",self.PR4.Value)
-    self:SetPackedBool("PR9FState",self.PR9.Value)
-    self:SetPackedBool("PR6FState",self.PR6.Value)
-    self:SetPackedBool("PR8FState",self.PR8.Value)
-    self:SetPackedBool("PR12FState",self.PR12.Value)
-     
-    self:SetPackedBool("PR1Cover", self.PR1Cap.Value)
-    self:SetPackedBool("PR2Cover", self.PR2Cap.Value)
-    self:SetPackedBool("PR5Cover", self.PR5Cap.Value)
-    self:SetPackedBool("PR11Cover", self.PR11Cap.Value)
-    self:SetPackedBool("PR4Cover", self.PR4Cap.Value)
-    self:SetPackedBool("PR9Cover", self.PR9Cap.Value)
-    self:SetPackedBool("PR6Cover", self.PR6Cap.Value)
-    self:SetPackedBool("PR8Cover", self.PR8Cap.Value)
-    self:SetPackedBool("PR12Cover", self.PR12Cap.Value)
-    
-    self:SetPackedBool("FuseboxCover", self.FuseboxCover)
 
     return RetVal
 end
@@ -429,7 +400,6 @@ function ENT:OnButtonPress(button,ply)
         return
     end
     if button == "FrontDoor" then self.FrontDoor = not self.FrontDoor end
-	if button == "FBoxCover" then self.FuseboxCover = not self.FuseboxCover end
     if button == "RearDoor" then self.RearDoor = not self.RearDoor end
     if button == "PassengerDoor" then self.PassengerDoor = not self.PassengerDoor end
     if button == "CabinDoor" then self.CabinDoor = not self.CabinDoor end

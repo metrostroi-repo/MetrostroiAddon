@@ -101,7 +101,9 @@ CreateClientConVar("metrostroi_debugger_data_timeout",2,true,false)
 
 CreateClientConVar("metrostroi_disablehud",0,true)
 CreateClientConVar("metrostroi_renderdistance",1024,true)
+CreateClientConVar("metrostroi_signal_distance",8192,true)
 CreateClientConVar("metrostroi_screenshotmode",0,true)
+CreateClientConVar("metrostroi_disableseatshadows",0,true)
 CreateClientConVar("metrostroi_softdrawmultipier",100,true)
 
 CreateClientConVar("metrostroi_route_number",61,true,true)

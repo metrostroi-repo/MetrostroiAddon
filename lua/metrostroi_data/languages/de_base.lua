@@ -32,6 +32,7 @@ Panel.DisableHUD        = HUD im Zug deaktivieren
 Panel.DisableCamAccel   = Deaktivieren der Kamerabewegung
 Panel.DisableHoverText  = Hilfetext ausblenden
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
+Panel.DisableSeatShadows= Disable seat shadows #NEW
 Panel.ScreenshotMode    = Screenshot modus (NIEDRIGE FPS)
 Panel.ShadowsHeadlight  = Schatten der Scheinwerfer aktivieren
 Panel.RedLights         = Enable dynamic light\nof red lights
@@ -42,6 +43,7 @@ Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = Sichtfeld
 Panel.Z                 = Camera height #NEW
 Panel.RenderDistance    = Render distanz
+Panel.RenderSignals     = Traced signals #NEW #FIXME
 Panel.ReloadClient      = Clientseitig neuladen
 
 Panel.ClientAdvanced    = Client (Fortgeschritten)

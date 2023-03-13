@@ -190,11 +190,8 @@ if CLIENT then
             local ltbl = stbl[Line]
             if ltbl.Loop then
                 local Path = Train:GetNW2Bool("ASNP:Path")
-                self:PrintText(0,0,"Путь")
+                self:PrintText(0,0,"Выбор пути")
                 self:PrintText(0,1,Path and "II" or "I")
-                self:PrintText(2,1,Path and "(второй)" or "(первый)")
-                if RealTime()%0.8 > 0.4 then self:PrintText(18,0,Train:GetNW2Bool("ASNP:Path") and "II" or "I") end
-                self:PrintText(20,0,"-")
             else
                 local St = ltbl[Train:GetNW2Int("ASNP:Station",1)]
                 self:PrintText(0,0,"Текущая станция   -")
@@ -208,14 +205,12 @@ if CLIENT then
             if ltbl.Loop then
                 local station = Train:GetNW2Int("ASNP:LastStation",1)
                 local En = ltbl[station]
-                self:PrintText(0,0,"Конечная станция ")
+                self:PrintText(0,0,"Выбор ст. оборота -")
                 if station == 0 then
-                    self:PrintText(0,1," ():".."Кольцевой")
+                    self:PrintText(0,1,"Кольцевой")
                 else
-                    self:PrintText(0,1,En[1]..":"..En[2])
+                    self:PrintText(0,1,En[2])
                 end
-                local Path = Train:GetNW2Bool("ASNP:Path") and "II" or "I"
-                self:PrintText(18,0,Path)
                 -- self:PrintText(20,0,"-")
                 -- if RealTime()%0.8 > 0.4 then
                 --     if En then
@@ -504,9 +499,8 @@ function TRAIN_SYSTEM:Trigger(name,value)
         self.TriggerButton = value and false or name
         self.TriggerButtonTime = value and false or CurTime()
     end
-    if (not self.Train.R_Radio or self.Train.R_Radio.Value>0) and (name == "R_Program2" or name == "R_Program2H") and value then
+    if (not self.Train.R_Radio or self.Train.R_Radio.Value>0) and (name == "R_Program2" or name == "R_Program2H") and value and self.LineOut==0 then
         if self.State ~= 7 and tbl[self.Line] and tbl[self.Line].spec_last then
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
             self:AnnQueue{"click1","buzz_start"}
             self:AnnQueue(-1)
             self:AnnQueue(tbl[self.Line].spec_last)
@@ -557,8 +551,9 @@ function TRAIN_SYSTEM:Trigger(name,value)
         self.State = 2
         -- self.Selected = 0
     elseif self.State == 2 and value then
+        local stbl = Metrostroi.ASNPSetup[self.Train:GetNW2Int("Announcer",1)]
         if name == "R_ASNPMenu" then
-            self.State = 3
+            self.State = #stbl>1 and 3 or 4
         end
         if (name == "R_ASNPUp" or name == "R_ASNPDown") then
             local num = Format("%02d",self.RouteNumber)
@@ -623,6 +618,10 @@ function TRAIN_SYSTEM:Trigger(name,value)
         if name == "R_ASNPMenu" then
             self.Path = self.Station > self.LastStation
             -- self.Station = self.FirstStation
+
+            -- if (self.Path and self.Station==#stbl) or (not self.Path and self.Station==1) then
+                self.AnnounceLast = self.Path and (self.LastStation~=#stbl) or self.LastStation~=1
+            -- end
             if self.Path then
                 local first = self.LastStation
                 self.LastStation = self.FirstStation
@@ -658,6 +657,7 @@ function TRAIN_SYSTEM:Trigger(name,value)
             end
         end
         if name == "R_ASNPMenu" then
+            self.AnnounceLast = self.LastStation>0
             self.State = 6
             self.Station = 1
             self.Arrived = true
@@ -686,16 +686,35 @@ function TRAIN_SYSTEM:Trigger(name,value)
         -- if name == "R_ASNPMenu" and not value and self.ReturnTimer and self.ReturnTimer - CurTime() < 0.0 then
         --     self.ReturnTimer = nil
         -- end
-        if name == "R_ASNPMenu" and value then
+        if name == "R_ASNPMenu" and value and self.LineOut==0 then
             self.State = 2
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
+            self.PlayNextArmed = false
+            self.AnnounceLast = false
         end
         -- if name == "R_ASNPDown" and value then self:Next() end
         -- if name == "R_ASNPUp" and value then self:Prev() end
-        if (name == "R_Program1" or name == "R_Program1H") and value and (not self.Train.R_Radio or self.Train.R_Radio.Value>0) then
-            if self.LineOut>0 then self:AnnQueue{-2,"buzz_end","click2"} end
+        if (name == "R_Program1" or name == "R_Program1H") and value and (not self.Train.R_Radio or self.Train.R_Radio.Value>0) and self.LineOut==0 then
             if self.Arrived and self.Station == (self.Path and self.FirstStation or self.LastStation) then
-                self:Zero()
+                -- self:Zero()
+                return
+            end
+            self.StopMessage = false
+            if self.AnnounceLast then
+                self.AnnounceLast = false
+                local last = stbl.Loop and self.LastStation or self.Path and self.FirstStation or self.LastStation
+                local ltbl = stbl[last]
+                local ltbl_station = stbl[self.Station]
+                if ltbl_station.not_last_c and ltbl_station.not_last_c[self.Path and 2 or 1] then
+                    self:AnnQueue{"click1","buzz_start"}
+                    self:AnnQueue(ltbl[ltbl_station.not_last_c[self.Path and 2 or 1]] or ltbl.not_last)
+                    self:AnnQueue{"buzz_end","click2"}
+                    return
+                elseif ltbl.not_last then
+                    self:AnnQueue{"click1","buzz_start"}
+                    self:AnnQueue(ltbl.not_last)
+                    self:AnnQueue{"buzz_end","click2"}
+                    return
+                end
             end
             self:Play(self.Arrived)
             self.StopMessage = false
@@ -736,6 +755,7 @@ function TRAIN_SYSTEM:Think()
     if Power and self.State > -1  then
         for k,v in pairs(self.TriggerNames) do
             if Train[v] and (Train[v].Value > 0.5) ~= self.Triggers[v] then
+                self.StateTime = false
                 self:Trigger(v,Train[v].Value > 0.5)
                 self.Triggers[v] = Train[v].Value > 0.5
             end
@@ -792,11 +812,7 @@ function TRAIN_SYSTEM:Think()
     Train:SetNW2Bool("ASNP:Playing",self.LineOut>0)
     if Train.VBD and self.State>0 then
         Train:SetNW2Bool("ASNP:CanLocked",true)
-        if self.State<6 then
-            self.K1 = 1
-            self.K2 = 1
-            self.StopTimer = nil
-        elseif Train.ALSCoil.Speed>1 then
+        if Train.ALSCoil.Speed>1 then
             self.K1 = 0
             self.K2 = 0
             self.StopTimer = nil
@@ -807,10 +823,10 @@ function TRAIN_SYSTEM:Think()
             end
             local tbl = Metrostroi.ASNPSetup[self.Train:GetNW2Int("Announcer",1)]
             local stbl = tbl[self.Line] and tbl[self.Line][self.Station]
-            if not stbl or not tbl[self.Line].BlockDoors or self.Arrived and self.Station == (self.Path and self.FirstStation or self.LastStation) then
+            if not stbl or not tbl[self.Line].BlockDoors or self.Arrived or (not self.Arrived and self.PlayNextArmed) and self.Station == (self.Path and self.FirstStation or self.LastStation) then
                 self.K1 = 1
                 self.K2 = 1
-            elseif self.Arrived then
+            elseif self.Arrived or (not self.Arrived and self.PlayNextArmed) then
                 self.K1 = (stbl.both_doors or not stbl.right_doors) and 1 or 0
                 self.K2 = (stbl.both_doors or     stbl.right_doors) and 1 or 0
             elseif self.StopTimer~=false then
