@@ -6,7 +6,7 @@ ENT.BogeyDistance = 650 -- Needed for gm trainspawner
 
 --"DURASelectMain","DURASelectAlternate","DURAToggleChannel","DURAPowerToggle",
 ENT.SyncTable = {
-    "VB","DoorSelect","V4","V5","KU9","KU15","V1","VU14","V2","V3","V6","KU12","KU7","V10","KU8","OtklAVU","KU10","KU11","KRR","R_UNch","R_ZS","R_G","R_Radio","R_Program1","R_Program2","Ring","PB","RC1","VAH","VAD","ARS","ALS","KVT","KB","KAH","VU1","VU2","VU3","AV","VU","PLights","GLights","RST","RUM","KRR",
+    "VB","DoorSelect","V4","V5","KU9","KU15","V1","VU14","V2","V3","V6","KU12","KU7","V10","KU8","OtklAVU","KU10","KU11","KRR","R_UNch","R_ZS","R_G","R_Radio","R_Program1","R_Program2","Ring","PB","RC1","VAH","VAD","ARS","ALS","KVT","KB","VU1","VU2","VU3","AV","VU","PLights","GLights","RST","RUM","KRR",
     "R_Program1H","R_Program2H",
     "SAMMSchemeOff","SAMMStart","SAMMReset","SAMMOn","SAMMBlok","SAMMX2","SAMMAhead","SAMMAccept","SAMMUnit",
     "RRIEnable","RRIAmplifier",
@@ -14,10 +14,9 @@ ENT.SyncTable = {
     "GV",
     "R_ASNPOn","R_ASNPDown","R_ASNPUp","R_ASNPPath","R_ASNPMenu","IGLA1","IGLA2",
     "PR1","PR2","PR5","PR11","PR4","PR9","PR6","PR8","PR12",--9
-     "PR1Cap","PR2Cap","PR5Cap","PR11Cap","PR4Cap","PR9Cap","PR6Cap","PR8Cap","PR12Cap",
+    "PR1Cap","PR2Cap","PR5Cap","PR11Cap","PR4Cap","PR9Cap","PR6Cap","PR8Cap","PR12Cap",
     "PRL13","PRL31","PRL17","PRL25","PRL18","PRL24","PRL19","PRL6A","PRL4A","PRL16","PRL28","PRL2A","PRL34",
-    "PRL23","PRL15","PRL22","PRL20","PRL21","PRL32","PRL30","PRL1A","PRL14","PRL26","PRL12","PRL29","PRL33",
-     "FBoxCover"
+    "PRL23","PRL15","PRL22","PRL20","PRL21","PRL32","PRL30","PRL1A","PRL14","PRL26","PRL12","PRL3A","PRL33",
 }
 
 function ENT:Initialize()
@@ -105,7 +104,6 @@ function ENT:Initialize()
         [KEY_PAD_4] = "PneumaticBrakeSet4",
         [KEY_PAD_5] = "PneumaticBrakeSet5",
         [KEY_PAD_DIVIDE] = "KU10Set",
-        [KEY_PAD_MULTIPLY] = "KAHSet",
 
         [KEY_SPACE] = {
             def="PBSet",
@@ -218,6 +216,7 @@ function ENT:Initialize()
     self.FrontDoor = false
     self.CabinDoor = false
     self.PassengerDoor = false
+	self.FuseboxCover = false
 
 --  self.A5:TriggerInput("Set",0)
     self:TrainSpawnerUpdate()
@@ -340,7 +339,7 @@ function ENT:Think()
     self:SetPackedRatio("BLPressure", Pneumatic.ReservoirPressure/16.0)
     self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure",  math.min(2.7,Pneumatic.BrakeCylinderPressure)/6.0)
-    self:SetPackedRatio("EnginesVoltage", self.Electric.Main750V/1000.0)
+    self:SetPackedRatio("EnginesVoltage", self.Electric.Aux750V/1000.0)
     self:SetPackedRatio("BatteryVoltage",self.Panel["V1"]*self.Battery.Voltage/100)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
@@ -354,6 +353,7 @@ function ENT:Think()
     self:SetPackedBool("AR80",Panel.AR80 > 0)
     self:SetPackedBool("KT",Panel.KT)
     self:SetPackedBool("KVD",Panel.KVD > 0)
+    self:SetPackedBool("LPU",Panel.LPU > 0)
 
     self:SetPackedRatio("Speed", self.Speed/100)
     -- Exchange some parameters between engines, pneumatic system, and real world
@@ -409,35 +409,8 @@ function ENT:Think()
     self:SetPackedBool("PR6Cover", self.PR6Cap.Value)
     self:SetPackedBool("PR8Cover", self.PR8Cap.Value)
     self:SetPackedBool("PR12Cover", self.PR12Cap.Value)
-    self:SetPackedBool("FuseboxCover", self.FBoxCover.Value)
     
-    self:SetPackedBool("PRL13State",self.PRL13.Value)
-    self:SetPackedBool("PRL31State",self.PRL31.Value)
-    self:SetPackedBool("PRL17State",self.PRL17.Value)
-    self:SetPackedBool("PRL25State",self.PRL25.Value)
-    self:SetPackedBool("PRL18State",self.PRL18.Value)
-    self:SetPackedBool("PRL24State",self.PRL24.Value)
-    self:SetPackedBool("PRL19State",self.PRL19.Value)
-    self:SetPackedBool("PRL6AState",self.PRL6A.Value)
-    self:SetPackedBool("PRL4AState",self.PRL4A.Value)
-    self:SetPackedBool("PRL16State",self.PRL16.Value)
-    self:SetPackedBool("PRL28State",self.PRL28.Value)
-    self:SetPackedBool("PRL2AState",self.PRL2A.Value)
-    self:SetPackedBool("PRL34State",self.PRL34.Value)
-    
-    self:SetPackedBool("PRL23State",self.PRL23.Value)
-    self:SetPackedBool("PRL15State",self.PRL15.Value)
-    self:SetPackedBool("PRL22State",self.PRL22.Value)
-    self:SetPackedBool("PRL20State",self.PRL20.Value)
-    self:SetPackedBool("PRL21State",self.PRL21.Value)
-    self:SetPackedBool("PRL32State",self.PRL32.Value)
-    self:SetPackedBool("PRL30State",self.PRL30.Value) 
-    self:SetPackedBool("PRL1AState",self.PRL1A.Value) -- номер под вопросом ???
-    self:SetPackedBool("PRL14State",self.PRL14.Value)
-    self:SetPackedBool("PRL26State",self.PRL26.Value)
-    self:SetPackedBool("PRL12State",self.PRL12.Value)
-    self:SetPackedBool("PRL29State",self.PRL29.Value)
-    self:SetPackedBool("PRL33State",self.PRL33.Value)
+    self:SetPackedBool("FuseboxCover", self.FuseboxCover)
 
     return RetVal
 end
@@ -456,6 +429,7 @@ function ENT:OnButtonPress(button,ply)
         return
     end
     if button == "FrontDoor" then self.FrontDoor = not self.FrontDoor end
+	if button == "FBoxCover" then self.FuseboxCover = not self.FuseboxCover end
     if button == "RearDoor" then self.RearDoor = not self.RearDoor end
     if button == "PassengerDoor" then self.PassengerDoor = not self.PassengerDoor end
     if button == "CabinDoor" then self.CabinDoor = not self.CabinDoor end

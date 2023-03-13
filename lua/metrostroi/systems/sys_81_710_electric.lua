@@ -59,7 +59,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["10AK"] = BO*Train.PRL24.Value*Train.VU.Value 
     --10AK->AV --FIXME SAMM
     S["U2"] = S["10AK"]*KV["U2-10AK"]
-    S["F7"] = BO*Train.PRL15.Value*(KV["F-F7"]+KRU["11/3-FR1"])
+    S["F7"] = BO*(KV["F-F7"]+(KRU["11/3-FR1"]*Train.PRL6A.Value))
     Train:WriteTrainWire(1,S["10AK"]*KV["10AK-1"]*Train.R1_5.Value+(KRU["1/3-ZM31"]*Train.PRL6A.Value)*-10) --FIXME KRU
     Train:WriteTrainWire(2,S["U2"]*KV["U2-2"]+(KRU["2/3-ZM31"]*Train.PRL6A.Value)*-10+ARS["2"]*RUM) --FIXME ARS SAMM KRU
     Train:WriteTrainWire(3,S["U2"]*KV["U2-3"]+(KRU["3/3-ZM31"]*Train.PRL6A.Value)*-10) --FIXME SAMM KRU
@@ -70,7 +70,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train:WriteTrainWire(9,ARS["48"]*RUM)
     Train:WriteTrainWire(14,BO*KV["10-14A"]*KV["14A-14B"]*(ARS["33D"]*RUM+(1-RUM)))--FIXME ARS SAMM
     Train:WriteTrainWire(17,S["10AK"]*KV["10AK-17"]*Train.KU9.Value)--FIXME SAMM
-    Train:WriteTrainWire(20,S["U2"]*KV["U2-20"]+KRU["20/3-ZM31"]*-10+ARS["20"]*RUM) --FIXME ARS SAMM KRU
+    Train:WriteTrainWire(20,S["U2"]*KV["U2-20"]+(KRU["20/3-ZM31"]*Train.PRL3A.Value)*-10+ARS["20"]*RUM) --FIXME ARS SAMM KRU
     Train:WriteTrainWire(29,(BO*(KRU["14/1-B3"]*Train.PRL6A.Value)+T[5]*Train.KRR.Value)*Train.KU10.Value)
     Train:WriteTrainWire(24,S["U2"]*Train.KU8.Value)
     Train:WriteTrainWire(25,S["U2"]*KV["U2-6"]*KV["6-25"]*Train.K25.Value) --FIXME ARS SAMM KRU
@@ -226,16 +226,17 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train:WriteTrainWire(27,BO*Train.PRL21.Value*Train.V4.Value)
     Train:WriteTrainWire(28,BO*Train.PRL21.Value*Train.V5.Value)
     Panel.GRP = BO*Train.PRL21.Value*Train.RPvozvrat.Value
-    Panel.Headlights1 = S["F7"]
-    Panel.Headlights2 = S["F7"]*Train.VU14.Value
+    Panel.Headlights1 = S["F7"]*Train.PRL15.Value
+    Panel.Headlights2 = S["F7"]*Train.PRL15.Value*Train.VU14.Value
     Panel.RedLight1 = BO*Train.PRL26.Value*KV["B2-F1"]
     Panel.RedLight2 = BO*Train.PRL12.Value*KV["B2-F1"]
-    S["D1"] = BO*Train.PRL22.Value*(KV["D-D1"]+KRU["11/3-D1/1"])
+    S["D1"] = BO*Train.PRL22.Value*(KV["D-D1"]+(KRU["11/3-D1/1"]*Train.PRL6A.Value))
     Train:WriteTrainWire(31,S["D1"]*(Train.V6.Value+Train.KU12.Value))
     Train:WriteTrainWire(32,S["D1"]*Train.KU7.Value)
     Train:WriteTrainWire(12,S["D1"]*Train.V10.Value)
     Train:WriteTrainWire(16,S["D1"]*Train.V2.Value*Train.V3.Value)
     Train.RPU:TriggerInput("Set",T[27])
+    Panel.LPU = Train.RPU.Value*T[1]
 
     Panel.PanelLights = BO*Train.PLights.Value
     Panel.GaugeLights = BO*Train.GLights.Value
@@ -566,9 +567,9 @@ function TRAIN_SYSTEM:Think(dT,iter)
     -- Voltages from the third rail
     ----------------------------------------------------------------------------
     self.Main750V = Train.TR.Main750V
-    self.Aux750V  = Train.TR.Main750V*Train.AV.Value
+    self.Aux750V  = Train.TR.Main750V*Train.AV.Value*Train.PR5.Value
     self.Power750V = self.Main750V * Train.GV.Value
-    self.NR750V    = self.Aux750V*Train.PR5.Value
+    self.NR750V    = self.Aux750V
 
 
     ----------------------------------------------------------------------------

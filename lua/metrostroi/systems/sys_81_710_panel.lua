@@ -49,7 +49,6 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("ALS","Relay","Switch", {bass = true })
     self.Train:LoadSystem("KVT","Relay","Switch", {bass = true})
     self.Train:LoadSystem("KB","Relay","Switch", {bass = true})
-    self.Train:LoadSystem("KAH","Relay","Switch", {bass = true})
 
     --САММ
     self.Train:LoadSystem("SAMMSchemeOff","Relay","Switch", {bass = true})
@@ -92,7 +91,6 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("PR8Cap","Relay","Switch", {normally_closed = false,bass = true})
     self.Train:LoadSystem("PR12Cap","Relay","Switch", {normally_closed = false,bass = true})
     --Предохранители низковольтные
-    self.Train:LoadSystem("FBoxCover","Relay","Switch", {normally_closed = false,bass = true}) 
     self.Train:LoadSystem("PRL13","Relay","Switch", {normally_closed = true,bass = true}) 
     self.Train:LoadSystem("PRL31","Relay","Switch", {normally_closed = true,bass = true}) 
     self.Train:LoadSystem("PRL17","Relay","Switch", {normally_closed = true,bass = true}) 
@@ -118,7 +116,7 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("PRL14","Relay","Switch", {normally_closed = true,bass = true})
     self.Train:LoadSystem("PRL26","Relay","Switch", {normally_closed = true,bass = true})
     self.Train:LoadSystem("PRL12","Relay","Switch", {normally_closed = true,bass = true})
-    self.Train:LoadSystem("PRL29","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL3A","Relay","Switch", {normally_closed = true,bass = true})
     self.Train:LoadSystem("PRL33","Relay","Switch", {normally_closed = true,bass = true})
 
     self.Train:LoadSystem("RST","Relay","Switch", {bass = true, normally_closed = true})
@@ -154,6 +152,7 @@ function TRAIN_SYSTEM:Initialize()
     self.AR80 = 0
     self.KT = 0
     self.KVD = 0
+    self.LPU = 0
 
     self.AnnouncerPlaying = 0
 
@@ -162,5 +161,5 @@ function TRAIN_SYSTEM:Initialize()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "V1","GRP","RRP","TW18","SD","LKVT","Headlights1","Headlights2","RedLight1","RedLight2","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","Ring","KT","AnnouncerPlaying","AVU","PanelLights","GaugeLights","VPR","AR04","AR0","AR40","AR60","AR70","AR80","KT","KVD","CBKIPower","PCBKPower","LightPower"}
+    return { "V1","GRP","RRP","TW18","SD","LKVT","Headlights1","Headlights2","RedLight1","RedLight2","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","Ring","KT","AnnouncerPlaying","AVU","PanelLights","GaugeLights","VPR","AR04","AR0","AR40","AR60","AR70","AR80","KT","KVD","CBKIPower","PCBKPower","LightPower","LPU"}
 end

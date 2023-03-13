@@ -753,189 +753,6 @@ ENT.ClientProps["fusebox_cover"] = {
     ang = Angle(0,-90,0),
     hideseat = 1.0,
 }
-ENT.ClientProps["PRL13_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-43.75,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL31_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-42,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL17_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-40.35,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL25_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-38.65,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.2,
-}
-ENT.ClientProps["PRL18_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-36.95,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL24_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-35.25,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.2,
-}
-ENT.ClientProps["PRL19_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-33.55,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL6A_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-31.87,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.2,
-}
-ENT.ClientProps["PRL4A_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-30.2,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL16_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-28.45,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL28_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-26.80,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL2A_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-25.1,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL34_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-23.40,13.2), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
------------
-ENT.ClientProps["PRL23_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-43.75,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL15_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-42,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL22_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-40.35,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL20_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-38.65,8.1), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL21_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-36.95,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL32_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-35.25,8.1), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL30_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-33.55,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1,
-}
-ENT.ClientProps["PRL1A_fuse"] = { --ХЗ какой
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-31.87,8.1), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL14_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-30.2,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL26_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-28.45,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL12_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-26.80,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL29_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-25.1,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
-ENT.ClientProps["PRL33_fuse"] = {
-    model = "models/metrostroi_train/81-717/BP15_sg_small.mdl",
-    pos = Vector(404,-23.40,8.6), 
-    ang = Angle(0,-90,0),
-    hideseat = 0.2,
-    scale = 1.0,
-}
 ENT.ButtonMap["FuseboxCoverC"] = {
     pos = Vector(405,-45.55,-4),
     ang = Angle(-90,180,0),
@@ -944,8 +761,8 @@ ENT.ButtonMap["FuseboxCoverC"] = {
     scale = 0.0625,
     hide=0.8,
     buttons = {
-        {ID = "FBoxCoverToggle",x=0,y=0,w=150,h=380, tooltip ="", model = {
-        var="FBoxCover", sndid="fusebox_cover", 
+        {ID = "FBoxCover",x=0,y=0,w=150,h=380, tooltip ="", model = {
+        var="fusebox_cover", sndid="fusebox_cover", 
         sndvol = 1.2, snd = function(val) return val and "fusebox_open" or "fusebox_close"  end,
         sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
         noTooltip = true,
@@ -960,11 +777,12 @@ ENT.ButtonMap["FuseboxCoverO"] = {
     scale = 0.0625,
     hide=0.8,
     buttons = {
-        {ID = "FBoxCoverToggle",x=0,y=0,w=150,h=380, tooltip ="", model = {
-        noTooltip = true,
+        {ID = "FBoxCover",x=0,y=0,w=150,h=380, tooltip ="", model = {
+            noTooltip = true,
         }},
     }
 }
+ 
 ENT.ButtonMap["Fusebox"] = {
     pos = Vector(404,-45.55,-3),
     ang = Angle(-90,180,0),
@@ -973,44 +791,207 @@ ENT.ButtonMap["Fusebox"] = {
     scale = 0.0625,
     hide=0.8,
     buttons = {
-        --Верхний ряд
-        {ID = "PRL13Toggle", x=128+56*2,y=21+27*0,w=40,h=15,tooltip=""},
-        {ID = "PRL31Toggle", x=128+56*2,y=21+27*1,w=40,h=15,tooltip=""},
-        {ID = "PRL17Toggle", x=128+56*2,y=21+27*2,w=40,h=15,tooltip=""},
-        {ID = "PRL25Toggle",x=128+56*2,y=21+27*3,w=40,h=15,tooltip=""},
-        {ID = "PRL18Toggle", x=128+56*2,y=21+27*4,w=40,h=15,tooltip=""},
-        {ID = "PRL24Toggle", x=128+56*2,y=21+27*5,w=40,h=15,tooltip=""},
-        {ID = "PRL19Toggle", x=128+56*2,y=21+27*6,w=40,h=15,tooltip=""},
-        --{ID = "PRL6AToggle", x=128+56*2,y=21+27*7,w=40,h=15,tooltip=""},
-        {ID = "PRL4AToggle",x=128+56*2,y=21+27*8,w=40,h=15,tooltip=""},
-        {ID = "PRL16Toggle", x=128+56*2,y=21+27*9,w=40,h=15,tooltip=""},
-        {ID = "PRL28Toggle", x=128+56*2,y=21+27*10,w=40,h=15,tooltip=""},
-        {ID = "PRL2AToggle", x=128+56*2,y=21+27*11,w=40,h=15,tooltip=""},
-        {ID = "PRL34Toggle",x=128+56*2,y=21+27*12,w=40,h=15,tooltip=""},
+        {ID = "PRL13Toggle", x=128+56*2,y=21+27*0,w=40,h=15,tooltip="", model = {
+            var="PRL13", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            noTooltip = true,
+            lamp = {
+                 model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", ang = Angle(0,90,0), var = "PRL13", anim = true
+            }}
+        },
+        {ID = "PRL31Toggle", x=128+56*2,y=21+27*1,w=40,h=15,tooltip="", model = {
+            var="PRL31", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1, ang = Angle(0,90,0), var = "PRL31", anim = true
+            }}
+        },
+        {ID = "PRL17Toggle", x=128+56*2,y=21+27*2,w=40,h=15,tooltip="", model = {
+            var="PRL17", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1, ang = Angle(0,90,0), var = "PRL17", anim = true
+            }}
+        },
+        {ID = "PRL25Toggle",x=128+56*2,y=21+27*3,w=40,h=15,tooltip="", model = {
+            var="PRL25", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1, ang = Angle(0,90,0), scale = 1.2, var = "PRL25", anim = true
+            }}
+        },
+        {ID = "PRL18Toggle", x=128+56*2,y=21+27*4,w=40,h=15,tooltip="", model = {
+            var="PRL18", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1, ang = Angle(0,90,0), var = "PRL18", anim = true
+            }}
+        },
+        {ID = "PRL24Toggle", x=128+56*2,y=21+27*5,w=40,h=15,tooltip="", model = {
+            var="PRL24", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1, ang = Angle(0,90,0), scale = 1.2, var = "PRL24", anim = true
+            }}
+        },
+        {ID = "PRL19Toggle", x=128+56*2,y=21+27*6,w=40,h=15,tooltip="", model = {
+            var="PRL19", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL19", anim = true
+            }}
+        },
+        {ID = "PRL4AToggle",x=128+56*2,y=21+27*8,w=40,h=15,tooltip="", model = {
+            var="PRL4A", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL4A", anim = true
+            }}
+        },
+        {ID = "PRL16Toggle", x=128+56*2,y=21+27*9,w=40,h=15,tooltip="", model = {
+            var="PRL16", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL16", anim = true
+            }}
+        },
+        {ID = "PRL28Toggle", x=128+56*2,y=21+27*10,w=40,h=15,tooltip="", model = {
+            var="PRL28", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.7, ang = Angle(0,90,0), var = "PRL28", anim = true
+            }}
+        },
+        {ID = "PRL2AToggle", x=128+56*2,y=21+27*11,w=40,h=15,tooltip="", model = {
+            var="PRL2A", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL2A", anim = true
+            }}
+        },
+        {ID = "PRL34Toggle",x=128+56*2,y=21+27*12,w=40,h=15,tooltip="", model = {
+            var="PRL34", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL34", anim = true
+            }}
+        },
         --Нижний ряд
-        {ID = "PRL23Toggle", x=110+56*1,y=21+27*0,w=40,h=15,tooltip=""},
-        {ID = "PRL15Toggle", x=110+56*1,y=21+27*1,w=40,h=15,tooltip=""},
-        {ID = "PRL22Toggle", x=110+56*1,y=21+27*2,w=40,h=15,tooltip=""},
-        {ID = "PRL20Toggle", x=110+56*1,y=21+27*3,w=40,h=15,tooltip=""},
-        {ID = "PRL21Toggle",x=110+56*1,y=21+27*4,w=40,h=15,tooltip=""},
-        --{ID = "PRL32Toggle", x=110+56*1,y=21+27*5,w=40,h=15,tooltip=""},
-        --{ID = "PRL30Toggle",x=110+56*1,y=21+27*6,w=40,h=15,tooltip=""},
-        --{ID = "PRL1AToggle", x=110+56*1,y=21+27*7,w=40,h=15,tooltip=""},
-        {ID = "PRL14Toggle",x=110+56*1,y=21+27*8,w=40,h=15,tooltip=""}, 
-        {ID = "PRL26Toggle", x=110+56*1,y=21+27*9,w=40,h=15,tooltip=""},
-        {ID = "PRL12Toggle",x=110+56*1,y=21+27*10,w=40,h=15,tooltip=""},
-        {ID = "PRL29Toggle", x=110+56*1,y=21+27*11,w=40,h=15,tooltip=""},
-        {ID = "PRL33Toggle",x=110+56*1,y=21+27*12,w=40,h=15,tooltip=""},
+        {ID = "PRL23Toggle", x=110+56*1,y=21+27*0,w=40,h=15,tooltip="", model = {
+            var="PRL23", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 0.7, ang = Angle(0,90,0), var = "PRL23", anim = true
+            }}
+        },
+        {ID = "PRL15Toggle", x=110+56*1,y=21+27*1,w=40,h=15,tooltip="", model = {
+            var="PRL15", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 0.7, ang = Angle(0,90,0), var = "PRL15", anim = true
+            }}
+        },
+        {ID = "PRL22Toggle", x=110+56*1,y=21+27*2,w=40,h=15,tooltip="", model = {
+            var="PRL22", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL22", anim = true
+            }}
+        },
+        {ID = "PRL20Toggle", x=110+56*1,y=21+27*3,w=40,h=15,tooltip="", model = {
+            var="PRL20", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, x = -9, ang = Angle(0,90,0), var = "PRL20", anim = true
+            }}
+        },
+        {ID = "PRL21Toggle",x=110+56*1,y=21+27*4,w=40,h=15,tooltip="", model = {
+            var="PRL21", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL21", anim = true
+            }}
+        },
+        {ID = "PRL14Toggle",x=110+56*1,y=21+27*8,w=40,h=15,tooltip="", model = {
+            var="PRL14", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL14", anim = true
+            }}
+        }, 
+        {ID = "PRL26Toggle", x=110+56*1,y=21+27*9,w=40,h=15,tooltip="", model = {
+            var="PRL26", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL26", anim = true
+            }}
+        },
+        {ID = "PRL12Toggle",x=110+56*1,y=21+27*10,w=40,h=15,tooltip="", model = {
+            var="PRL12", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL12", anim = true
+            }}
+        },
+        {ID = "PRL29Toggle", x=110+56*1,y=21+27*11,w=40,h=15,tooltip="", model = {
+            var="PRL29", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL29", anim = true
+            }}
+        },
+        {ID = "PRL33Toggle",x=110+56*1,y=21+27*12,w=40,h=15,tooltip="", model = {
+            var="PRL33", speed=3, sndid="fusebox_cover", 
+            sndvol = 0.1, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
+            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
+            --noTooltip = true,
+            lamp = {
+                model = "models/metrostroi_train/81-717/BP15_sg_small.mdl", y = 1.2, ang = Angle(0,90,0), var = "PRL33", anim = true
+            }}
+        },
     }
 }
-for i,button in pairs(ENT.ButtonMap.Fusebox.buttons) do
-    button.model = {
-        var=button.ID:Replace("Toggle",""), speed=3, sndid=button.ID:Replace("Toggle","_fuse"), 
-        sndvol = 0.3, snd = function(val) return val and "fuseh_in" or "fuseh_out" end,
-        sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
-        noTooltip = true
-    }
-end
 
 --------------------------------------------------------------------------------
 ENT.ClientPropsInitialized = false
@@ -1409,8 +1390,8 @@ function ENT:Think()
     end
      
     --Fuses animate
-    self:HidePanel("FuseboxCoverC", not self:GetPackedBool("FuseboxCover")) 
-    self:HidePanel("FuseboxCoverO", self:GetPackedBool("FuseboxCover"))
+    local fusepanelC = self:HidePanel("FuseboxCoverC", not self:GetPackedBool("FuseboxCover")) 
+    local fusepanelC = self:HidePanel("FuseboxCoverO", self:GetPackedBool("FuseboxCover"))
      for i=1,12 do 
           self:ShowHide("PR"..i.."Toggle", self:GetPackedBool("PR"..i.."Cover"))
           if (self:Animate("PR"..i.."Cap", self:GetPackedBool("PR"..i.."Cover") and 0.99 or 0,0,1,4,false) >= 0.01) then
@@ -1419,17 +1400,13 @@ function ENT:Think()
                self:ShowHide("PR"..i.."Fuse",1)
           end
      end
-     for i=1,36 do 
-        self:ShowHide("PRL"..i.."Toggle", self:GetPackedBool("FuseboxCover")) 
-        self:ShowHide("PRL"..i.."AToggle", self:GetPackedBool("FuseboxCover")) 
-          if (self:Animate("fusebox_cover", self:GetPackedBool("FuseboxCover") and 1 or 0,0,1,0.05,false) >= 0.01) then
-               self:ShowHideSmooth("PRL"..i.."_fuse", ((self:GetPackedBool("PRL"..i.."State") and 1 or 0) - (self:Animate("PRL"..i.."_fuse",self:GetPackedBool("PRL"..i.."State") and 0 or 1,0,1,5,false))))
-               self:ShowHideSmooth("PRL"..i.."A_fuse", ((self:GetPackedBool("PRL"..i.."AState") and 1 or 0) - (self:Animate("PRL"..i.."A_fuse",self:GetPackedBool("PRL"..i.."AState") and 0 or 1,0,1,5,false))))
-          else
-               self:ShowHide("PRL"..i.."_fuse",1)
-               self:ShowHide("PRL"..i.."A_fuse",1)
-          end
+	 
+    local fusebox_cover = self:Animate("fusebox_cover", self:GetPackedBool("FuseboxCover") and 1 or 0,0,1,8,1)
+    if self.FboxCover ~= (fusebox_cover > 0) then
+        self.FboxCover = fusebox_cover > 0
+        self:PlayOnce("fusebox_cover","bass",self.FboxCover and 1 or 0)
     end
+	self:HidePanel("Fusebox", fusebox_cover == 0)
     ---
     local HL1 = self:Animate("whitelights",self:GetPackedBool("HeadLights1") and 1 or 0,0,1,5,false)
     local HL2 = self:Animate("distantlights",self:GetPackedBool("HeadLights2") and 1 or 0,0,1,5,false)

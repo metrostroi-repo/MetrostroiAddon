@@ -17,9 +17,9 @@ ENT.SyncTable = {
     "GV",
     "Ring",
     "PR1","PR2","PR5","PR11","PR4","PR9","PR6","PR8","PR12",--9
-    "PRL13","PRL31","PRL17","PRL25","PRL18","PRL24","PRL19","PRL6A","PRL4A","PRL16","PRL28","PRL2A","PRL34",--13+13==26 --PRL2 ?
+    "PRL13","PRL31","PRL17","PRL25","PRL18","PRL24","PRL19","PRL6A","PRL4A","PRL16","PRL28","PRL2A","PRL34",
     "PRL23","PRL15","PRL22","PRL20","PRL21","PRL32","PRL30","PRL1A","PRL14","PRL26","PRL12","PRL29","PRL33",
-     "FBoxCover"
+    "FBoxCover"
 }
 
 function ENT:Initialize()
@@ -197,8 +197,7 @@ function ENT:Initialize()
     self.RearDoor = false
     self.FrontDoor = false
     self.CabinDoor = false
-    self.PassengerDoor = false
-    
+    self.PassengerDoor = false    
     self.FuseboxCover = false
     
     self:TrainSpawnerUpdate()
@@ -330,7 +329,7 @@ function ENT:Think()
     self:SetPackedBool("PR8FState",self.PR8.Value)
     self:SetPackedBool("PR12FState",self.PR12.Value)
      
-     self:SetPackedBool("PR1Cover", self.PR1Cap.Value)
+    self:SetPackedBool("PR1Cover", self.PR1Cap.Value)
     self:SetPackedBool("PR2Cover", self.PR2Cap.Value)
     self:SetPackedBool("PR5Cover", self.PR5Cap.Value)
     self:SetPackedBool("PR11Cover", self.PR11Cap.Value)
@@ -339,35 +338,8 @@ function ENT:Think()
     self:SetPackedBool("PR6Cover", self.PR6Cap.Value)
     self:SetPackedBool("PR8Cover", self.PR8Cap.Value)
     self:SetPackedBool("PR12Cover", self.PR12Cap.Value)
-    self:SetPackedBool("FuseboxCover", self.FBoxCover.Value)
-    
-    self:SetPackedBool("PRL13State",self.PRL13.Value)
-    self:SetPackedBool("PRL31State",self.PRL31.Value)
-    self:SetPackedBool("PRL17State",self.PRL17.Value)
-    self:SetPackedBool("PRL25State",self.PRL25.Value)
-    self:SetPackedBool("PRL18State",self.PRL18.Value)
-    self:SetPackedBool("PRL24State",self.PRL24.Value)
-    self:SetPackedBool("PRL19State",self.PRL19.Value)
-    --self:SetPackedBool("PRL6AState",self.PRL6A.Value)
-    self:SetPackedBool("PRL4AState",self.PRL4A.Value)
-    self:SetPackedBool("PRL16State",self.PRL16.Value)
-    self:SetPackedBool("PRL28State",self.PRL28.Value)
-    self:SetPackedBool("PRL2AState",self.PRL2A.Value)
-    self:SetPackedBool("PRL34State",self.PRL34.Value)
-    
-    self:SetPackedBool("PRL23State",self.PRL23.Value)
-    self:SetPackedBool("PRL15State",self.PRL15.Value)
-    self:SetPackedBool("PRL22State",self.PRL22.Value)
-    self:SetPackedBool("PRL20State",self.PRL20.Value)
-    self:SetPackedBool("PRL21State",self.PRL21.Value)
-    --self:SetPackedBool("PRL32State",self.PRL32.Value)
-    --self:SetPackedBool("PRL30State",self.PRL30.Value) 
-    --self:SetPackedBool("PRL1AState",self.PRL1A.Value)
-    self:SetPackedBool("PRL14State",self.PRL14.Value)
-    self:SetPackedBool("PRL26State",self.PRL26.Value)
-    self:SetPackedBool("PRL12State",self.PRL12.Value)
-    self:SetPackedBool("PRL29State",self.PRL29.Value)
-    self:SetPackedBool("PRL33State",self.PRL33.Value)
+	
+    self:SetPackedBool("FuseboxCover", self.FuseboxCover)
 
     return RetVal
 end
@@ -385,6 +357,7 @@ function ENT:OnButtonPress(button,ply)
         self.Pneumatic:TriggerInput("BrakeSet",tonumber(button:sub(-1,-1)))
         return
     end
+	if button == "FBoxCover" then self.FuseboxCover = not self.FuseboxCover end
     if button == "FrontDoor" then self.FrontDoor = not self.FrontDoor end
     if button == "RearDoor" then self.RearDoor = not self.RearDoor end
     if button == "PassengerDoor" then self.PassengerDoor = not self.PassengerDoor end
