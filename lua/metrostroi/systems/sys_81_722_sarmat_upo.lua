@@ -1192,7 +1192,7 @@ function TRAIN_SYSTEM:CANUpdate()
     local Announcer = self.Announcer
     local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
     local lTblCount = #lTbl
-    local ledTbl = lTbl.LED
+    local ledTbl = lTbl.LED or {}
     local currLed, nextLed = 0,0
     local station = Announcer.Station
     if Announcer.AVTDepart then
@@ -1206,10 +1206,10 @@ function TRAIN_SYSTEM:CANUpdate()
     end
 
     for i=(Announcer.Path and #ledTbl or 1),station,(Announcer.Path and -1 or 1) do
-        currLed = currLed + ledTbl[i]
+        currLed = currLed + (ledTbl[i] or 0)
     end
     if Announcer.AVTDepart or not Announcer.OnStation then
-        nextLed = ledTbl[station]
+        nextLed = ledTbl[station] or 0
         currLed = currLed - nextLed
     end
 
