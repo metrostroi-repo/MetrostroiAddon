@@ -215,8 +215,33 @@ function Metrostroi.AddANSPAnnouncer(name,soundtable,datatable)
     print("Metrostroi: Added \""..name.."\" ASNP announcer.")
 end
 
-Metrostroi.AnnouncementsSarmatUPO = {}
-Metrostroi.SarmatUPOSetup = {}
+Metrostroi.AnnouncementsSarmatUPO = {
+    [0] = {
+        name = "Default",
+        tone = {"subway_announcers/sarmat_upo/tone.mp3",1}
+    }
+}
+Metrostroi.SarmatUPOSetup = {[0] = {
+    name = "Default",
+    {
+        LED = {16,16},
+        Name = "Обкатка",
+        {100,"Обкатка","Obkatka"},
+        {101,"Обкатка","Obkatka"}
+    },
+    {
+        LED = {16,16},
+        Name = "Перегонка",
+        {200,"Перегонка","Peregonka"},
+        {201,"Перегонка","Peregonka"}
+    },
+    {
+        LED = {16,16},
+        Name = "В депо",
+        {300,"В депо","В депо"},
+        {301,"В депо","В депо"}
+    },
+}}
 function Metrostroi.AddSarmatUPOAnnouncer(name,soundtable,datatable)
     if not soundtable or not datatable then return end
     for k,v in pairs(Metrostroi.AnnouncementsSarmatUPO) do

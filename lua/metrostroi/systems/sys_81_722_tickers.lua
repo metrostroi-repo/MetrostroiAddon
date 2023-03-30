@@ -1,13 +1,27 @@
 --------------------------------------------------------------------------------
--- 81-722 tickers
+-- 81-722 BIT-20 system
 --------------------------------------------------------------------------------
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_722_Tickers")
+Metrostroi.DefineSystem("81_722_BIT")
 TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize()
+    self.State = 0
+    self.Data = {
+        Left = "< ",
+        Right = " >",
+        TextStr = "---",
+        Text = {"---"},
+        Loop = 1
+    }
+    self.TextTimer = 0
+    -- self.DopText = "---"
+    self.ShowTime = false
+    if not TURBOSTROI then
+        self.IP = self.Train:GetWagonNumber()%255
+    end
 end
 
 function TRAIN_SYSTEM:Outputs()
@@ -18,41 +32,118 @@ function TRAIN_SYSTEM:Inputs()
     return {}
 end
 if TURBOSTROI then return end
-function TRAIN_SYSTEM:TriggerInput(name,value)
+
+local function setBitValue(targetVar, value, offset, bitCount)
+    value = bit.band(value,bit.lshift(1,bitCount)-1)
+    return bit.bor(targetVar,bit.lshift(value,offset))
 end
+
+local function getBitValue(value, offset, bitCount)
+    local mask = bit.lshift(bit.lshift(1,bitCount)-1,offset)
+    return bit.rshift(bit.band(value,mask),offset)
+end
+
+TRAIN_SYSTEM.CAN_ACTIVATE  = 0x01
+TRAIN_SYSTEM.CAN_CIKSTATE  = 0x02
+
+TRAIN_SYSTEM.CAN_BMTS_TEXT = 0x10
+
+TRAIN_SYSTEM.CAN_CURR      = 0x21
+TRAIN_SYSTEM.CAN_NEXT      = 0x22
+TRAIN_SYSTEM.CAN_PATH      = 0x23
+TRAIN_SYSTEM.CAN_CLOSERING = 0x24
+TRAIN_SYSTEM.CAN_VOLUMES   = 0x25
+TRAIN_SYSTEM.CAN_SPEED     = 0x26
+
+TRAIN_SYSTEM.CAN_BITTEXT   = 0x30
+TRAIN_SYSTEM.CAN_BITDOPMSG = 0x31
+TRAIN_SYSTEM.CAN_BITTIME   = 0x32
+
 if SERVER then
     function TRAIN_SYSTEM:CANReceive(source,sourceid,target,targetid,textdata,numdata)
-        if textdata=="Arrived" then
-            if self.Arrived ~= numdata then
-                self.TimerRand = math.Rand(-10,10)
-                self.Arrived = numdata
-            end
-        else
-            self[textdata]=numdata
+        if self.State < 1 then return end
+        if textdata == self.CAN_ACTIVATE then
+            self.State = 1
+            self.CurrentShowIndex = 1
+        end
+        if textdata == self.CAN_BITTEXT then
+            self.TextTimer = CurTime()-1
+            self.Data.Text = numdata.Text
+            self.Data.Left  = numdata.Left  or "< "
+            self.Data.Right = numdata.Right or " >"
+            self.Data.Loop = numdata.Loop or 1
+            self.CurrentShowIndex = 0
+        end
+        if textdata == self.CAN_BITTIME then
+           self.ShowTime = numdata
         end
     end
     function TRAIN_SYSTEM:Think(dT)
         local Train = self.Train
-        local Power = Train.Panel.PassSchemePowerL>0 and Train.Panel.PassSchemePowerR>0
+        local Power = Train.Panel.PassSchemePowerL>0 or Train.Panel.PassSchemePowerR>0
         if Power then
-            if not self.TimerRand then self.TimerRand = math.Rand(-10,10) end
-            Train:SetNW2Int("TickersRandom",self.TimerRand*10)
-            Train:SetNW2String("TickersPrev",self.Prev or "")
-            Train:SetNW2String("TickersPrevEn",self.PrevEn or "")
-            Train:SetNW2String("TickersNext",self.Next or "")
-            Train:SetNW2Bool("TickersNextRight",self.NextRight)
-            Train:SetNW2String("TickersNextEn",self.NextEn or "")
-            Train:SetNW2String("TickersCurr",self.Curr or "")
-            Train:SetNW2String("TickersCurrEn",self.CurrEn or "")
-            Train:SetNW2Bool("TickersCurrRight",self.CurrRight)
-            Train:SetNW2Bool("TickersArrived",self.Arrived or "")
-            Train:SetNW2Bool("TickersLast",self.Last)
-            Train:SetNW2Bool("TickersClosing",self.Closing)
-            Train:SetNW2String("TickersSpecial",self.Special or "")
-        elseif self.TimerRand then
-            self.TimerRand = nil
+            if self.State > 0 then
+                if self.State == 1 then
+                    if CurTime() > self.TextTimer then
+                        self.TextTimer = CurTime()+math.Rand(2,2.2)
+                        self.CurrentShowIndex = self.CurrentShowIndex + 1
+                        if self.CurrentShowIndex > #self.Data.Text then
+                            self.CurrentShowIndex = self.Data.Loop
+                        end
+
+                        Train:SetNW2String("BIT:Text",self.Data.Text[self.CurrentShowIndex])
+                        Train:SetNW2String("BIT:TextLeft",self.Data.Left)
+                        Train:SetNW2String("BIT:TextRight",self.Data.Right)
+                    end
+                    
+                elseif self.State == 2 then
+                    if CurTime() > self.TextTimer then
+                        self.TextTimer = CurTime()+2.1
+                        self.ShowIP = not self.ShowIP
+                    end
+
+                    local ip = 0
+                    ip = setBitValue(ip,self.ShowIP and 1 or 0,0,1)
+                    ip = setBitValue(ip,self.IP,1,8)
+                    Train:SetNW2Int("BIT:IP",ip)
+                end
+                Train:SetNW2Bool("BIT:Time",self.ShowTime)
+            elseif self.State < 0 then
+                if self.LoadingTimer and CurTime() > self.LoadingTimer then
+                    if self.State == -3 then
+                        self.State = -2
+                        self.LoadingTimer = CurTime()+math.Rand(3,4)
+                    elseif self.State == -2 then
+                        self.State = -1
+                        self.LoadingTimer = CurTime()+math.Rand(9,11)
+                    elseif self.State == -1 then
+                        self.State = 2
+                        self.TextTimer = CurTime()+2
+                        self.ShowIP = true
+                        self.LoadingTimer = nil
+                    end
+                end
+            else
+                self.State = -3
+                self.LoadingTimer = CurTime()+math.Rand(1,3)
+            end
+        else
+            if self.State ~= 0 then
+                self.State = 0
+                self.Data = {
+                    Left = "< ",
+                    Right = " >",
+                    TextStr = "---",
+                    Text = {"---"},
+                    Loop = 1
+                }
+                self.CurrentShowIndex = 1
+                self.TextTimer = 0
+                -- self.DopText = "---"
+            end
         end
-        Train:SetNW2Bool("TickersPower",Power)
+        
+        Train:SetNW2Int("BIT:State",self.State)
     end
 else
     local function createFont(name,font,size,weight)
@@ -73,104 +164,119 @@ else
             extended = true,
         })
     end
-    --createFont("BUKPSpeed","Eurostar Metrostroi",80)
-    --createFont("Arial15","Arial",15,800)
-    --createFont("Arial20","Arial",20,800)
-    --createFont("Arial22","Arial",22,400)
-    --createFont("Arial40","Arial",30,400)
-    createFont("TNR30","Times new roman",30,400)
-    createFont("TNR60","Times new roman",60,400)
+
+    local function drawText(text,x,y,xalign,yalign)
+        if (xalign or yalign) then
+            local w,h = surface.GetTextSize( text )
+            if (xalign == TEXT_ALIGN_CENTER) then
+                x = x - w / 2
+            elseif (xalign == TEXT_ALIGN_RIGHT) then
+                x = x - w
+            end
+    
+            if (yalign == TEXT_ALIGN_CENTER) then
+                y = y - h / 2
+            elseif (yalign == TEXT_ALIGN_BOTTOM) then
+                y = y - h
+            end
+        end
+        surface.SetTextPos(x,y)
+        surface.DrawText(text)
+    end
+
+    createFont("BIT1","Ubuntu Condensed",54)
+    createFont("BIT2","Liberation Serif",103)
+    createFont("BIT3","Liberation Serif",30)
+
+    local tDay = {"пн","вт","ср","чт","пт","сб","вс"}
+	local tMonth = {"янв","фев","мар","апр","мая","июня","июля","авг","сен","окт","ноя","дек"}
 
     function TRAIN_SYSTEM:ClientInitialize()
-        self.TimerCorrection = 0
     end
     function TRAIN_SYSTEM:ClientThink()
-        if not self.Train:ShouldDrawPanel("Tickers") then return end
-        local train = self.Train
-        render.PushRenderTarget(self.Train.Tickers,0,0,1024, 128)
+        if not self.Train:ShouldDrawPanel("BIT1") then return end
+        render.PushRenderTarget(self.Train.BITScr,0,0,1024, 256)
         render.Clear(0, 0, 0, 0)
         cam.Start2D()
-            surface.SetDrawColor(0,0,0)
-            surface.DrawRect(0,0,600,128)
-            self:Tickers(self.Train)
+            self:BIT(self.Train)
         cam.End2D()
         render.PopRenderTarget()
     end
 
-    --SarmatCam2T
-    function TRAIN_SYSTEM:Tickers(Train)
-        surface.SetDrawColor(0,0,0,80)
-        surface.DrawRect(0,0,600,128)
-        local state = Train:GetNW2Bool("TickersPower",false)
-        if state then
-            local arr = Train:GetNW2Bool("TickersArrived")
-            local last = Train:GetNW2Bool("TickersLast")
-            local closing = Train:GetNW2Bool("TickersClosing")
-            local nxt,nxtEn,nxtR = Train:GetNW2String("TickersNext",""),Train:GetNW2String("TickersNextEn",""),Train:GetNW2Bool("TickersNextRight")
-            local prev = Train:GetNW2String("TickersPrev",""),Train:GetNW2String("TickersPrevEn","")
-            local curr,currEn,currR = Train:GetNW2String("TickersCurr",""),Train:GetNW2String("TickersCurrEn",""),Train:GetNW2Bool("TickersCurrRight")
-            local special = Train:GetNW2String("TickersSpecial","")
-            local str = ""
-            if (arr or closing) and last then
-                str = Format("Поезд прибыл\nна конечную станцию\n%s",curr or "...")
-                if currR then str = str..",\nвыход на правую сторону" end
-                if currEn~="" then
-                    str=str..Format("\nTrain arrived\nto last station\n%s",currEn)
-                    if currR then str = str..",\nexit to the right side" end
-                end
-            elseif arr then
-                str = curr or "..."
-                if currR then str = str..",\nвыход на правую сторону" end
-                if currEn~="" then
-                    str = str.."\n%y"..currEn.." station"
-                    if currR then str = str..",\nexit to the right side" end
-                end
+    local white = Color(255,255,255)
+    local yellow = Color(255,235,100)
+    local green = Color(50,120,50)
+    local red = Color(255,65,85)
+    local blue = Color(40,60,255)
 
-                str = str..Format("\nСледующая станция\n%s",nxt)
-                if nxtR then str = str..",\nвыход на правую сторону" end
-                if special~="" then
-                    if special:sub(1,2) == "%c" then str = str.."," end
-                    str = str.."\n"..special
-                end
-                if nxtEn~="" then
-                    str = str..Format("\n%%yNext station is\n%s",nxtEn)
-                    if nxtR then str = str..",\nexit to the right side" end
-                end
-            elseif not arr and (self.Closing or closing) then
-                str = Format("%%rДвери закрываются\n%%yСледующая станция\n%s",nxt)
-                if nxtR then str = str..",\nвыход на правую сторону" end
-                if nxtEn~="" then
-                    str = str..Format("\nNext station is\n%s",nxtEn)
-                    if nxtR then str = str..",\nexit to the right side" end
-                end
-                if special~="" then
-                    str = str.."\n"..special
-                end
-            else
-                str = "."
-            end
-            local tbl = string.Explode("\n",str)
+    local fontTop = "Metrostroi_BIT1"
+    local fontMain = "Metrostroi_BIT2"
+    local fontBottom = "Metrostroi_BIT3"
+    function TRAIN_SYSTEM:BIT(Train)
+        local state = Train:GetNW2Int("BIT:State",0)
+        if state == 0 then return end
+        surface.SetDrawColor(20,10,20)
+        surface.DrawRect(0,0,1024,192)
 
-            local otime = CurTime()+Train:GetNW2Int("TickersRandom",0)/10
-            if self.OldArr ~= arr then
-                self.OldArr = arr
-                self.TimerCorrection = -otime
+        if state > 0 then
+            local showTime = Train:GetNW2Bool("BIT:Time")
+            local leftHeaderText = Train:GetNW2String("BIT:TextLeft","< ")
+            local rightHeaderText = Train:GetNW2String("BIT:TextRight"," >")
+            
+            if state == 1 then
+                local bitText = Train:GetNW2String("BIT:Text","---")
+                local yellowText = bitText:find("%%y")
+                local greenText = bitText:find("%%g")
+                local redText = bitText:find("%%r")
+                local blueText = bitText:find("%%b")
+                surface.SetFont(fontMain)
+                if yellowText then
+                    surface.SetTextColor(yellow:Unpack())
+                    bitText = bitText:sub(yellowText+2)
+                elseif greenText then
+                    surface.SetTextColor(green:Unpack())
+                    bitText = bitText:sub(greenText+2)
+                elseif redText then
+                    surface.SetTextColor(red:Unpack())
+                    bitText = bitText:sub(redText+2)
+                elseif blueText then
+                    surface.SetTextColor(blue:Unpack())
+                    bitText = bitText:sub(blueText+2)
+                else
+                    surface.SetTextColor(white:Unpack())
+                end
+                
+                drawText(bitText,512,48,TEXT_ALIGN_CENTER)
+                
+                -- TODO: Задел на предупредительные сообщения
+                draw.SimpleText("---",fontBottom,512,168, white,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+            elseif state == 2 then
+                local ipNW2 = Train:GetNW2Int("BIT:IP",0)
+                local showIP = getBitValue(ipNW2,0,1) > 0
+                local IP = getBitValue(ipNW2,1,8)
+
+                draw.SimpleText(showIP and "ip = 192.168.5."..IP or "ООО “НПП “Сармат”",fontMain,512,100,yellow,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+
+                draw.SimpleText("Продукция ООО “НПП “Сармат”",fontBottom,501,168, Color(50,120,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
+                draw.SimpleText("* (с) 2014-2022, г. Ростов-на-Дону",fontBottom,508,168,white,TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
             end
-            local ctime = otime+self.TimerCorrection
-            local time = math.floor(ctime%(#tbl*3)/3)+1
-            if not self.Closing and closing and time>1 then self.Closing = true end
-            if time==1 and not closing and self.Closing then
-                self.Closing = false
+
+            local leftHeaderBorder = draw.SimpleText(leftHeaderText,fontTop,0,26,white,TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+            local rightHeaderBorder = 1024-draw.SimpleText(rightHeaderText,fontTop,1024,26,white,TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
+            
+            if showTime then
+                local d = os.date("!*t",Metrostroi.GetSyncTime())
+                local time = Format("%d %s, %s, %02d:%02d",d.day,tMonth[d.month],tDay[d.wday],d.hour,d.min)
+                local timeW = surface.GetTextSize(time)
+                local timeX = math.max(math.min(512-timeW/2,rightHeaderBorder-timeW-8),leftHeaderBorder+8)
+                surface.SetTextColor(yellow:Unpack())
+                drawText(time,timeX,-1)
             end
-            local message = tbl[time]
-            if message:find("%%y") or time==1 then self.Color = nil end
-            if message:find("%%r") then self.Color = Color(220,65,85) end
-            if message:find("%%g") then self.Color = Color(50,120,80) end
-            draw.SimpleText(message:gsub("%%[rgyc]",""),"Metrostroi_TNR60",300,64, self.Color or Color(245,235,170),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-            --local prevStation = stbl[line][path and st+1 or st-1]
-            if arr and prev~="" then draw.SimpleText("< "..prev,"Metrostroi_TNR30",10,16, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER) end
-            --local nextStation = stbl[line][path and st-1 or st+1]
-            if nxt~="" then draw.SimpleText(nxt.." >","Metrostroi_TNR30",586,16, Color(200,200,200),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER) end
+        elseif state == -2 then
+            surface.SetDrawColor(255,255,255)
+            surface.DrawRect(0,0,1024,192)
+        
         end
+        
     end
 end

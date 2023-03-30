@@ -265,11 +265,6 @@ function TRAIN_SYSTEM:Think()
     else
         self.Strength = 0
     end
-    local clRing = self:Get("CloseRing")
-    if self.CloseRing ~= clRing then
-        self.CloseRing = clRing
-        if clRing then Train:PlayOnce("door_alarm",1,1) end
-    end
     self.DisableLights = self:Get("PVU2") and 1 or 0
     self.EnableLights = self:Get("PassLight") and 1 or 0
     self.DisablePSN = self:Get("PVU3") and 1 or 0

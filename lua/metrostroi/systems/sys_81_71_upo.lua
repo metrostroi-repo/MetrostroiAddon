@@ -44,11 +44,11 @@ end
 function TRAIN_SYSTEM:Play(dep)
     local tbl = Metrostroi.UPOSetup
     if not tbl then return end
-    self.Train.Announcer:TriggerInput("Reset","AnnouncementsUPO")
     local stbl = tbl[self.Station]
-    local path = self.Path and 2 or 1
     if not stbl or dep and not stbl.dep or not dep and not stbl.arr and not stbl.arrlast then return end
+    local path = self.Path and 2 or 1
     if dep and stbl.dep and stbl.dep[path] and (not self.Train.OnUPOArrived or self.Train:OnUPOArrived()) then
+        self.Train.Announcer:TriggerInput("Reset","AnnouncementsUPO")
         self:AnnQueue(-2)
         self:AnnQueue{"noise_end","buzz_end_upo"}
         if self.Buzz then self:AnnQueue{"buzz_start_upo",self.Buzz} else self:AnnQueue("buzz_end_upo") end
@@ -68,6 +68,7 @@ function TRAIN_SYSTEM:Play(dep)
             lastst = true
         end
         if msg and (not self.Train.OnUPOArrived or self.Train:OnUPOArrived()) then
+            self.Train.Announcer:TriggerInput("Reset","AnnouncementsUPO")
             self:AnnQueue(-2)
             self:AnnQueue{"noise_end","buzz_end_upo"}
             if self.Buzz then self:AnnQueue{"buzz_start_upo",self.Buzz} else self:AnnQueue("buzz_end_upo") end

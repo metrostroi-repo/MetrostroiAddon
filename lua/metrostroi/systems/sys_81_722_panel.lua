@@ -17,7 +17,7 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("SF7","Relay","Switch",{normally_closed = true,bass=true})
     self.Train:LoadSystem("SF8","Relay","Switch",{normally_closed = true,bass=true})
     self.Train:LoadSystem("SF9","Relay","Switch",{normally_closed = true,bass=true})
-    self.Train:LoadSystem("R_UPO","Relay","Switch",{normally_closed = true,bass=true})
+    self.Train:LoadSystem("SF00","Relay","Switch",{bass=true})
     self.Train:LoadSystem("SF01","Relay","Switch",{bass=true})
     self.Train:LoadSystem("SF10","Relay","Switch",{bass=true})
     self.Train:LoadSystem("SF11","Relay","Switch",{bass=true})
@@ -135,9 +135,13 @@ function TRAIN_SYSTEM:Initialize()
     self.EmergencyDriveL = 0
     self.EmergencyBrakeTPlusL = 0
 
-    self.DoorLeftL = 0
-    self.DoorRightL = 0
-    self.MFDUPowerL = 0
+    self.DoorLeft1 = 0
+    self.DoorLeft2 = 0
+    self.DoorRight = 0
+    self.DoorClose = 0
+    self.DoorCloseAVT = 0
+    self.DoorSelect = 0
+    self.DoorBack = 0
 
     self.CabLights = 0
     self.PanelLights = 0
@@ -177,7 +181,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "Controller","BattOn","BattOff","SOSDL","RS","AVS","LRU","EmergencyDriveL","EmergencyBrakeTPlusL","DoorLeftL","DoorRightL","MFDUPowerL","CabLights","PanelLights","Headlights1","Headlights2","RedLights","EmergencyLights","MainLights", "V4","SOSD","UPOPower","AnnouncerPlaying", "PassSchemePowerL", "PassSchemePowerR","DoorsW","BrW","GRP","RC","VPR1","VPR2","BARSPower","ARSPower","ALSPower"}
+    return { "Controller","BattOn","BattOff","SOSDL","RS","AVS","LRU","EmergencyDriveL","EmergencyBrakeTPlusL","DoorLeft1","DoorLeft2","DoorRight","DoorClose","DoorCloseAVT","DoorSelect","DoorBack","CabLights","PanelLights","Headlights1","Headlights2","RedLights","EmergencyLights","MainLights", "V4","SOSD","UPOPower","AnnouncerPlaying", "PassSchemePowerL", "PassSchemePowerR","DoorsW","BrW","GRP","RC","VPR1","VPR2","BARSPower","ARSPower","ALSPower"}
 end
 --if not TURBOSTROI then return end
 function TRAIN_SYSTEM:TriggerInput(name,value)

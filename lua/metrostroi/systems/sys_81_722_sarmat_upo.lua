@@ -1,58 +1,95 @@
 --------------------------------------------------------------------------------
--- 81-722 "Sarmat-UPO" announcer system
+-- 81-722 BMCIK-01 system
 --------------------------------------------------------------------------------
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_722_sarmat")
+Metrostroi.DefineSystem("81_722_BMCIK")
 TRAIN_SYSTEM.DontAccelerateSimulation = true
+TRAIN_SYSTEM.TriggerNames = {
+    "SarmatUp",
+    "SarmatDown",
+    "SarmatEnter",
+    "SarmatEsc",
+    "SarmatF1",
+    "SarmatF2",
+    "SarmatF3",
+    "SarmatF4",
+    "SarmatPath",
+    "SarmatLine",
+    "SarmatZero",
+    "SarmatStart",
+}
 
 function TRAIN_SYSTEM:Initialize()
-    self.Train:LoadSystem("SarmatUp","Relay","Switch")
-    self.Train:LoadSystem("SarmatDown","Relay","Switch")
-    self.Train:LoadSystem("SarmatEnter","Relay","Switch")
-    self.Train:LoadSystem("SarmatEsc","Relay","Switch")
-    self.Train:LoadSystem("SarmatF1","Relay","Switch")
-    self.Train:LoadSystem("SarmatF2","Relay","Switch")
-    self.Train:LoadSystem("SarmatF3","Relay","Switch")
-    self.Train:LoadSystem("SarmatF4","Relay","Switch")
-    self.Train:LoadSystem("SarmatPath","Relay","Switch")
-    self.Train:LoadSystem("SarmatLine","Relay","Switch")
-    self.Train:LoadSystem("SarmatZero","Relay","Switch")
-    self.Train:LoadSystem("SarmatStart","Relay","Switch")
-    self.TriggerNames = {
-        "SarmatUp",
-        "SarmatDown",
-        "SarmatEnter",
-        "SarmatEsc",
-        "SarmatF1",
-        "SarmatF2",
-        "SarmatF3",
-        "SarmatF4",
-        "SarmatPath",
-        "SarmatLine",
-        "SarmatZero",
-        "SarmatStart",
-    }
     self.Triggers = {}
     for k,v in pairs(self.TriggerNames) do
-        if self.Train[v] then self.Triggers[v] = self.Train[v].Value > 0.5 end
+        self.Train:LoadSystem(v,"Relay","Switch")
+        self.Triggers[v] = false
     end
-    self.SarmatState = 0
-    self.SarmatAnnState = 1
-    self.SarmatCamState = 1
-
-    self.Line = 1
-    self.Path = false
-    self.Station = 1
-    self.Arrived = true
-
-    self.Selected = 0
-
-    self.LineEnabled = false
-
-    self.UPOActive = 0
     self.LineOut = 0
+    self.UPOActive = 0
+    if TURBOSTROI then return end
+
+    self.State = 0
+    self.Brightness = 1
+    
+    self.NIIP = {
+        DOORS_closed = 0,
+        RUCHKA = 0,
+        SPEED = 0,
+        UPO_STATE = 0,
+        Evacuation = 0,
+        Vzlom_kabiny = 0,
+        CabActive = 0
+    }
+
+    self.BMTS = {
+        State = 0,
+        Text = "",
+        Update = false
+    }
+
+    self.Announcer = {
+        State = 0,
+        CIKState = 0,
+        Active = false,
+        Line = 0,
+        LimitStation = false,
+        Path = false,
+        PathSel = false,
+        Station = 0,
+        OnStation = false,
+        Mode = 3,
+        TrainTrain = false,
+        BITTime = false,
+        LineEnabled = false,
+        Volumes = {
+            Cabin = 5,
+            Salon = 5,
+            UPOCabin = 5,
+            UPOSalon = 5,
+            EmerCab = 5,
+            V5 = 0
+        }
+    }
+
+    self.List = {
+        Count = 0,
+        Selected = 1,
+        Offset = 0,
+        States = {}
+    }
+
+    self.Cam = {
+        {Link = nil,Ent = NULL},
+        {Link = nil,Ent = NULL},
+        {Link = nil,Ent = NULL},
+        {Link = nil,Ent = NULL},
+        Page = 0,
+        Wagon = 0,
+        Fullscreen = 0
+    }
 end
 
 function TRAIN_SYSTEM:Outputs()
@@ -60,1033 +97,2439 @@ function TRAIN_SYSTEM:Outputs()
 end
 
 function TRAIN_SYSTEM:Inputs()
-    return {"CheckUPO"}
+    return {}
 end
 if TURBOSTROI then return end
-function TRAIN_SYSTEM:TriggerInput(name,value)
-    if name == "CheckUPO" then
-        local UPOActive = (math.random()>0.05 and not self.Arrived or self.Arrived and not self.Depeating) and self.LineOut==0
-        if UPOActive then
-            if self.Arrived and not self.Depeating then
-                --self.Train.BUKP.CloseRing = self.Train.BUKP.CloseRing or CurTime()+3
-                self.Depeating = true
-            elseif not self.Arrived then
-                self.Arrived = true
 
-                local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-                local stbll = stbl[self.Line]
-                local last = (self.Path and not stbll.Loop) and self.StartStation or self.EndStation
-                self.Last = self.Station == last
+-- CAN messages
+TRAIN_SYSTEM.CAN_ACTIVATE  = 0x01
+TRAIN_SYSTEM.CAN_CIKSTATE  = 0x02
+
+TRAIN_SYSTEM.CAN_BMTS_TEXT = 0x10
+
+TRAIN_SYSTEM.CAN_CURR      = 0x21
+TRAIN_SYSTEM.CAN_NEXT      = 0x22
+TRAIN_SYSTEM.CAN_PATH      = 0x23
+TRAIN_SYSTEM.CAN_CLOSERING = 0x24
+TRAIN_SYSTEM.CAN_VOLUMES   = 0x25
+TRAIN_SYSTEM.CAN_SPEED     = 0x26
+
+TRAIN_SYSTEM.CAN_BITTEXT   = 0x30
+TRAIN_SYSTEM.CAN_BITDOPMSG = 0x31
+TRAIN_SYSTEM.CAN_BITTIME   = 0x32
+
+-- Buttons
+TRAIN_SYSTEM.Buttons = {
+    {
+        name = "Esc",
+        id = 41,
+        x = 10,y = 742,
+        w = 218,h = 48,
+        touch = function(self)
+            if self.Cam.Page == 0 then return end
+            if self.Cam.Fullscreen > 0 then
+                self.Cam.Fullscreen = 0
+            else
+                self.Cam.Page = 0
+                for i=1,4 do
+                    self.Cam[i].Link = nil
+                    self.Cam[i].Ent = NULL
+                end
             end
-            self:UpdateSarmat()
+        end,
+        show = function(page)
+            return true
         end
-        self.UPOActive = UPOActive and 1 or 0
-        self.UPOLock = UPOActive and CurTime()
-        return UPOActive
+    },
+    {
+        name = "<-",
+        id = 42,
+        x = 234,y = 742,
+        w = 217,h = 48,
+        touch = function(self)
+            if self.Cam.Page == 0 then return end
+            if self.Cam.Fullscreen > 0 then return end
+            self.Cam.Page = self.Cam.Page - 1
+            if self.Cam.Page == 0 then
+                self.Cam.Wagon = self.Cam.Wagon - 1
+                if self.Cam.Wagon == 0 then
+                    self.Cam.Wagon = self.Cam.WagNum
+                end
+                self.Cam.Page = self.Cam.Cameras[self.Cam.Wagon].Count
+            end
+            return true
+        end,
+        show = function(page)
+            return true
+        end
+    },
+    {
+        name = "->",
+        id = 43,
+        x = 457,y = 742,
+        w = 218,h = 48,
+        touch = function(self)
+            if self.Cam.Page == 0 then return end
+            if self.Cam.Fullscreen > 0 then return end
+            self.Cam.Page = self.Cam.Page + 1
+            if self.Cam.Page > self.Cam.Cameras[self.Cam.Wagon].Count then
+                self.Cam.Wagon = self.Cam.Wagon + 1
+                if self.Cam.Wagon > self.Cam.WagNum then
+                    self.Cam.Wagon = 1
+                end
+                self.Cam.Page = 1
+            end
+            return true
+        end,
+        show = function(page)
+            return true
+        end
+    },
+    {
+        name = "☼",
+        id = 44,
+        x = 911,y = 9,
+        w = 119,h = 32,
+        touch = function(self)
+            self.Brightness = self.Brightness + 0.25
+            if self.Brightness > 1 then self.Brightness = 0.25 end
+            self.Train:SetNW2Float("BMCIK:Brightness",self.Brightness)
+        end,
+        show = function(page)
+            return true
+        end
+    },  
+
+    -- Наружные камеры
+    {
+        name = "Левые",
+        id = 1,
+        x = 95,y = 183,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = 1
+            self.Cam.Page = 2
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+    {
+        name = "Передние",
+        id = 2,
+        x = 241,y = 183,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = 1
+            self.Cam.Page = 1
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+    {
+        name = "Вокруг",
+        id = 3,
+        x = 387,y = 183,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = 1
+            self.Cam.Page = 4
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+    {
+        name = "Задние",
+        id = 4,
+        x = 533,y = 183,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = self.Cam.WagNum
+            self.Cam.Page = 1
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+    {
+        name = "Правые",
+        id = 5,
+        x = 679,y = 183,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = 1
+            self.Cam.Page = 3
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+
+    -- Камеры на постах машиниста
+    {
+        name = "Вагон 1",
+        id = 21,
+        x = 215,y = 463,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = 1
+            self.Cam.Page = 6
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+    {
+        name = "Вагон %d",
+        id = 22,
+        x = 559,y = 463,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = self.Cam.WagNum
+            self.Cam.Page = 3
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+
+    -- Путевые камеры
+    {
+        name = "Вагон 1",
+        id = 31,
+        x = 215,y = 603,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = 1
+            self.Cam.Page = 5
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+    {
+        name = "Вагон %d",
+        id = 32,
+        x = 559,y = 603,
+        w = 140,h = 60,
+        touch = function(self)
+            if self.Cam.Page > 0 then return end
+            self.Cam.Wagon = self.Cam.WagNum
+            self.Cam.Page = 2
+            return true
+        end,
+        show = function(page)
+            return page == 0
+        end
+    },
+}
+TRAIN_SYSTEM.Buttons.Count = #TRAIN_SYSTEM.Buttons
+TRAIN_SYSTEM.CamConfig = {
+    -- Dummy
+    [0] = {
+        Count = 0,
+        {
+            PageName = "",
+            Count = 4,
+            {"",Vector(0,0,0),Angle(0,0,0)},
+            {"",Vector(0,0,0),Angle(0,0,0)},
+            {"",Vector(0,0,0),Angle(0,0,0)},
+            {"",Vector(0,0,0),Angle(0,0,0)}
+        },
+    },
+    -- 722 Head
+    {
+        Count = 8,
+        {
+            PageName = "Передние зеркала",
+            Count = 2,
+            {
+                "[1] Левый борт, переднее зеркало",
+                Vector(425, 65,40),Angle(10, 170,0)
+            },
+            {
+                "[2] Правый борт, переднее зеркало",
+                Vector(425,-65,40),Angle(10,-170,0)
+            }
+        },
+        {
+            Count = 2,
+            PageName = "Левые зеркала",
+            
+            {
+                "[1] Левый борт, переднее зеркало",
+                Vector(425, 65,40),Angle(10, 170,0)
+            },
+            {
+                "[2] Левый борт, заднее зеркало",
+                Vector(425,-65,40),Angle(10,-170,0),
+                lastWag = true
+            }
+        },
+        {
+            PageName = "Правые зеркала",
+            Count = 2,
+            {
+                "[1] Правый борт, переднее зеркало",
+                Vector(425,-65,40),
+                Angle(10,-170,0)
+            },
+            {
+                "[2] Правый борт, заднее зеркало",
+                Vector(425,65,40),Angle(10,170,0),
+                lastWag = true
+            }
+        },
+        {
+            PageName = "Бортовые зеркала",
+            Count = 4,
+            {
+                "[1] Левый борт, переднее зеркало",
+                Vector(425,65,40),Angle(10,170,0)
+            },
+            {
+                "[2] Правый борт, переднее зеркало",
+                Vector(425,-65,40),Angle(10,-170,0)
+            },
+            {
+                "[3] Левый борт, заднее зеркало",
+                Vector(425,-65,40),Angle(10,-170,0),
+                lastWag = true
+            },
+            {
+                "[4] Правый борт, заднее зеркало",
+                Vector(425,65,40),Angle(10,170,0),
+                lastWag = true
+            }
+        },
+        {
+            PageName = "Путевые камеры",
+            Count = 1,
+            {
+                "[1] Передняя путевая камера",
+                Vector(490,10,-8),Angle(5,0,0)
+            }
+        },
+        {
+            PageName = "Кабина машиниста",
+            Count = 1,
+            {
+                "[1] Передняя кабина",
+                Vector(410,35,36.5),Angle(33,-15,0)
+            }
+        },
+        {
+            PageName = "Салонные камеры",
+            Count = 4,
+            {
+                "[1] Камера в БИТ",
+                Vector(375,-14,45),
+                Angle(20,180,0)
+            },
+            {
+                "[2] Камера в БИТ",
+                Vector(5,-14,49),
+                Angle(24,0,0)
+            },
+            {
+                "[3] Камера в БИТ",
+                Vector(-450,14,49),
+                Angle(20,0,0)
+            },
+            {
+                "[4] Камера в БИТ",
+                Vector(-8,14,49),
+                Angle(24,180,0)
+            }
+        },
+        {
+            PageName = "Салонные камеры",
+            Count = 2,
+            {
+                "[1] Камера в БЭС",
+                Vector(150,-50,20),
+                Angle(5,95,0),
+                wide = true
+            },
+            {
+                "[2] Камера в БЭС",
+                Vector(-156, 50,20),
+                Angle(5,-85,0),
+                wide = true
+            }
+        }
+    },
+    -- 722 Back
+    {
+        Count = 6,
+
+        {
+            PageName = "Задние зеркала",
+            Count = 2,
+            {
+                "[1] Левый борт, заднее зеркало",
+                Vector(425,-65,40),
+                Angle(10,-170,0)
+            },
+            {
+                "[2] Правый борт, заднее зеркало",
+                Vector(425,65,40),
+                Angle(10,170,0)
+            }
+        },
+        {
+            PageName = "Путевые камеры",
+            Count = 1,
+            {
+                "[1] Задняя путевая камера",
+                Vector(490,10,-8),
+                Angle(5,0,0)
+            }
+        },
+        {
+            PageName = "Кабина машиниста",
+            Count = 1,
+            {
+                "[1] Задняя кабина",
+                Vector(410,35,36.5),
+                Angle(33,-15,0)
+            }
+        },
+        {
+            PageName = "Салонные камеры",
+            Count = 4,
+            {
+                "[1] Левое зеркало",
+                Vector(425,-65,40),
+                Angle(10,-170,0)
+            },
+            {
+                "[2] Правое зеркало",
+                Vector(425, 65,40),
+                Angle(10, 170,0)
+            },
+            {
+                "[3] Путевая камера",
+                Vector(490,10,-8),
+                Angle(5,0,0)
+            },
+            {
+                "[4] Камера в кабине машиниста",
+                Vector(410,35,36.5),
+                Angle(33,-15,0)
+            }
+        },
+        {
+            PageName = "Салонные камеры",
+            Count = 4,
+            {
+                "[1] Камера в БИТ",
+                Vector(-450,14,49),
+                Angle(20,0,0)
+            },
+            {
+                "[2] Камера в БИТ",
+                Vector(-8,14,49),
+                Angle(24,180,0)
+            },
+            {
+                "[3] Камера в БИТ",
+                Vector(375,-14,45),
+                Angle(20,180,0)
+            },
+            {
+                "[4] Камера в БИТ",
+                Vector(5,-14,49),
+                Angle(24,0,0)
+            }
+        },
+        {
+            PageName = "Салонные камеры",
+            Count = 2,
+            {
+                "[1] Камера в БЭС",
+                Vector(150,-50,20),
+                Angle(5,95,0),
+                wide = true
+            },
+            {
+                "[2] Камера в БЭС",
+                Vector(-156, 50,20),
+                Angle(5,-85,0),
+                wide = true
+            }
+        }
+    },
+    -- 723/724 Intermediate
+    {
+        Count = 2,
+        {
+            PageName = "Салонные камеры",
+            Count = 4,
+            {
+                "[1] Камера в БИТ",
+                Vector(450,-14,49),
+                Angle(20,180,0)
+            },
+            {
+                "[2] Камера в БИТ",
+                Vector(5,-14,49),
+                Angle(24,0,0)
+            },
+            {
+                "[3] Камера в БИТ",
+                Vector(-450,14,49),
+                Angle(20,0,0)
+            },
+            {
+                "[4] Камера в БИТ",
+                Vector(-8,14,49),
+                Angle(24,180,0)
+            }
+        },
+        {
+            PageName = "Салонные камеры",
+            Count = 2,
+            {
+                "[1] Камера в БЭС",
+                Vector(150,-50,20),
+                Angle(5,95,0),
+                wide = true
+            },
+            {
+                "[2] Камера в БЭС",
+                Vector(-156, 50,20),
+                Angle(5,-85,0),
+                wide = true
+            }
+        }
+    }
+}
+TRAIN_SYSTEM.SettingsList = {
+    {"Ввод номера маршрута",nil},
+    {"Режимы работы информатора","AnnModeList"},
+    {"Режимы работы СОСТАВ-СОСТАВ",nil},
+    {"Настройка громкости","AnnVolumeList"},
+    {"Информация","InfoList"},
+    {"Диагностика","DiagList"},
+    {"Язык","LangList"},
+    {"Время на БИТ","BITClockList"}
+}
+TRAIN_SYSTEM.AnnModeList = {
+    "Режим 'Информатор'",
+    "Режим 'УПО+Информатор'",
+    "Режим 'УПО+Информатор+Пуск'",
+    "Режим 'УПО'"
+}
+TRAIN_SYSTEM.AnnVolumeList = {
+    {"Громкость инф. в кабине","Cabin",0,10},
+    {"Громкость инф. в салоне","Salon",1,10},
+    {"Громкость УПО в кабине","UPOCabin",0,10},
+    {"Громкость УПО в салоне","UPOSalon",1,10},
+    {"Громкость ЭКСТР./МЕЖКАБ.","EmerCab",0,10},
+    {"Увеличение при V>5 на","V5",0,10}
+}
+TRAIN_SYSTEM.InfoList = {
+    {"MIES firmware version 20181203",nil},
+    {"NIIP DOORS_closed= ","BMCIK:AddInfoNIIPDoors"},
+    {"NIIP RUCHKA= ",nil},
+    {"NIIP SPEED= ","BMCIK:AddInfoNIIPSpeed"},
+    {"NIIP UPO_STATE= ","BMCIK:AddInfoUPO"},
+    {"NIIP Evacuation= ",nil},
+    {"NIIP Vzlom_kabiny= ",nil},
+    {"Video sended= ","BMCIK:AddInfoVideo"},
+    {"AVT.State.State_byte= ",nil},
+    {"AVT.Now_S.code= ",nil},
+    {"AVT.Next_S.code= ",nil},
+    {"AVT.Final_S.code= ",nil},
+    {"AVT.Met= ",nil}
+}
+TRAIN_SYSTEM.DiagList = {
+    "Advanced LAN diagnostics",
+    "Advanced CAN diagnostics",
+    "BMCIK 0/0",
+    "MIES 0/0",
+    "MDU 0/0",
+    "MAR 0/0",
+    "BES LAN 0/0",
+    "BES CAN 0/0",
+    "BNT(BUM) 0/0",
+    "BIT 0/0",
+    "BVK 0/0",
+    "BMTS 0/0"
+}
+TRAIN_SYSTEM.LangList = {
+    "Russian",
+    -- "English",
+    -- "Hungarian"
+}
+TRAIN_SYSTEM.BITClockList = {
+    "Время выключено",
+    "Время включено"
+}
+
+TRAIN_SYSTEM.CIKStatesNames = {
+    [0] = "Готов",
+    [1] = "Воспроизведение...",
+    [2] = "Межкабинная связь активна",
+    [3] = "Громкая связь",
+    -- [4] = "Нет связи",
+    -- [5] = "Связь восстановлена",
+    -- [6] = "Линия свободна"
+}
+
+TRAIN_SYSTEM.HeaderNames = {
+    [0] = "---",
+    [1] = "---",
+    [11] = "Предупредительные\nсообщения",
+    [12] = "Ограничение маршрута",
+    [13] = "Дополнительные сообщения",
+    [14] = "Экстренные сообщения",
+    [15] = "Выбор линии",
+    [2] = "Меню настройки блока\nСБУЦИК",
+    [21] = "Меню настройки блока\nСБУЦИК",
+    [22] = "Режимы работы\nинформатора",
+    [23] = "Режимы работы блока\nСБУЦИК",
+    [24] = "Настройка громкости",
+    [25] = "Additional information",
+    [26] = "Диагностика (0%)",
+    [27] = "Язык",
+    [28] = "Отображение времени на\nБИТ"
+}
+
+local function setBitValue(targetVar, value, offset, bitCount)
+    value = bit.band(value,bit.lshift(1,bitCount)-1)
+    return bit.bor(targetVar,bit.lshift(value,offset))
+end
+
+local function getBitValue(value, offset, bitCount)
+    local mask = bit.lshift(bit.lshift(1,bitCount)-1,offset)
+    return bit.rshift(bit.band(value,mask),offset)
+end
+
+-- Announcer functions
+function TRAIN_SYSTEM:Announcer_Reset(resetAnn)
+    local Announcer = self.Announcer
+    self:Announcer_Stop()
+    self:Announcer_CabStop()
+    Announcer.State = 0
+    Announcer.CIKState = 0
+    Announcer.Active = false
+    if resetAnn then
+        Announcer.Line = 0
+        Announcer.Volumes.Cabin = 5
+        Announcer.Volumes.Salon = 5
+        Announcer.Volumes.UPOCabin = 5
+        Announcer.Volumes.UPOSalon = 5
+        Announcer.Volumes.EmerCab = 5
+        Announcer.Volumes.V5 = 0
+
+        Announcer.BITTime = false
+    end
+    
+    Announcer.LimitStation = false
+    Announcer.Path = false
+    Announcer.PathSel = false
+    Announcer.Station = 0
+    Announcer.OnStation = false
+    Announcer.Mode = 3
+    Announcer.TrainTrain = false
+    Announcer.LineEnabled = false
+
+    self.Train:SetNW2Int("BMCIK:Announcer",0)
+    self.Train:SetNW2Bool("BMCIK:LineEnabled",false)
+end
+
+function TRAIN_SYSTEM:Announcer_Activate(forceActive)
+    local Announcer = self.Announcer
+    if (not forceActive and Announcer.Active) or Announcer.Line == 0 then return end
+
+    -- TODO: Try to implement better logic of UPO noise sync
+    local Train = self.Train
+    local noiseVolume = Train.UPONoiseVolume
+    local upoVolume = Train.UPOVolume
+    local wagList = Train.WagonList
+    for i=1,#wagList do
+        wagList[i]:SetNW2Float("UPONoiseVolume",noiseVolume)
+        wagList[i]:SetNW2Float("UPOVolume",upoVolume)
+    end
+
+    self:Announcer_FindLimitStations()
+    Announcer.LimitStation = false
+    self:Announcer_Zero()
+    self:Announcer_SetState(1,#Metrostroi.SarmatUPOSetup[Train:GetNW2Int("Announcer")][Announcer.Line]*2)
+end
+
+function TRAIN_SYSTEM:Announcer_SetState(state,count)
+    local Announcer = self.Announcer
+    self:List_Save(Announcer.State)
+    Announcer.PrevState = Announcer.State
+    Announcer.State = state
+    self:List_Reset(count)
+end
+
+function TRAIN_SYSTEM:Announcer_FindLimitStations()
+    local Announcer = self.Announcer
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
+    Announcer.LastStations = {}
+    if lTbl.Loop then
+        for i=1,#lTbl do
+            if lTbl[i].arrlast then table.insert(Announcer.LastStations,i) end
+        end
+    else
+        for i=2,#lTbl-1 do
+            if lTbl[i].arrlast then table.insert(Announcer.LastStations,i) end
+        end
     end
 end
-TRAIN_SYSTEM.Specials = {[-4]="Еду на море",[-3]="На порезку",[-2]="Обкатка",[-1]="Перегонка",[0]="В депо"}
-if SERVER then
-    local function InRange(x,y,px,py,pw,ph)
-        local hpw,hph = pw/2,ph/2
-        return (px-hpw < x and x < px+hpw) and (py-hph < y and y < py+hph)
-    end
-    function TRAIN_SYSTEM:Touch(value,x,y)
-        local Train = self.Train
-        if self.SarmatCamState == 1 and value then
-            local WagNum = #Train.WagonList
-            if InRange(x,y,124,140,113,40,"Левые") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam2,self.Cam2E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 2,2,1
-            end
-            if InRange(x,y,242,140,113,40,"Передние") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam2,self.Cam2E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 2,2,2
-            end
-            if InRange(x,y,360,140,113,40,"Вокруг") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam2,self.Cam2E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam3,self.Cam3E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam4,self.Cam4E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 4,4,3
-            end
-            if InRange(x,y,478,140,113,40,"Задние") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam2,self.Cam2E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 3,2,4
-            end
-            if InRange(x,y,596,140,113,40,"Правые") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam2,self.Cam2E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 3,2,5
-            end
 
-            for i=1+self.Selected,math.min(WagNum,6+self.Selected) do
-                if InRange(x,y,65+(i-1-self.Selected)*118+118*math.max(0,6-WagNum)/2    ,235,113,40,"Вагон "..i) then
-                    self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train.WagonList[i]
-                    self.Cam2,self.Cam2E = CurTime()+math.Rand(0.4,4),Train.WagonList[i]
-                    self.Cam3,self.Cam3E = CurTime()+math.Rand(0.4,4),Train.WagonList[i]
-                    self.Cam4,self.Cam4E = CurTime()+math.Rand(0.4,4),Train.WagonList[i]
-                    self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 5,4,6
-                end
-            end
+function TRAIN_SYSTEM:Announcer_Zero()
+    local Announcer = self.Announcer
+    local Train = self.Train
+    local lTbl = Metrostroi.SarmatUPOSetup[Train:GetNW2Int("Announcer")][Announcer.Line]
+    if Announcer.Line < 1 then return end
 
-            if InRange(x,y,220,350,113,40,"Вагон 1") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam2,self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 6,1,7
-            end
-            if InRange(x,y,500,350,113,40,"Вагон "..WagNum) then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam2,self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 6,1,8
-            end
+    self:Announcer_Stop()
+    Announcer.Active = true
+    Announcer.Path = Announcer.PathSel
+    Announcer.Station = Announcer.Path and #lTbl or 1
+    Announcer.OnStation = false
+    Announcer.AVTDepart = false
 
-            if InRange(x,y,220,465,113,40,"Вагон 1") then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train
-                self.Cam2,self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 7,1,9
-            end
-            if InRange(x,y,500,465,113,40,"Вагон "..WagNum) then
-                self.Cam1,self.Cam1E = CurTime()+math.Rand(0.4,4),Train.WagonList[WagNum]
-                self.Cam2,self.Cam3,self.Cam4 = false,false
-                self.SarmatCamState,self.SarmatCamCount,self.SarmatCamType = 7,1,10
-            end
-            --surface.DrawTexturedRectRotated(110,590,200,40,0)
-            --draw.SimpleText("Esc","Metrostroi_Arial20",110,590, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+    Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_CLOSERING,false)
+    Train:CANWrite("BMCIK",Train:GetWagonNumber(),"BMCIK",nil,self.CAN_ACTIVATE)
+    Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_ACTIVATE)
+    Train:CANWrite("BMCIK",nil,"BIT",nil,self.CAN_ACTIVATE)
+    Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_VOLUMES,{Announcer.Volumes.Salon,Announcer.Volumes.UPOSalon,Announcer.Volumes.V5})
 
+    self:BMTS_Update()
+    self:CANUpdate()
+end
 
-            if InRange(x,y,320,590,200,40,"<-") then
-                self.Selected = math.max(self.Selected - 1,0)
+function TRAIN_SYSTEM:Announcer_Prev()
+    local Announcer = self.Announcer
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
+    if Announcer.OnStation then
+        Announcer.OnStation = false
+    else
+        if Announcer.Path then
+            if #lTbl > Announcer.Station then
+                Announcer.Station = Announcer.Station+1
+                Announcer.OnStation = true
             end
-            if InRange(x,y,530,590,200,40,"->") then
-                self.Selected = math.Clamp(self.Selected + 1,0,#Train.WagonList-6)
+        else
+            if Announcer.Station > 1 then
+                Announcer.Station = Announcer.Station-1
+                Announcer.OnStation = true
             end
         end
-        if self.SarmatCamState > 1 and value then
-            if InRange(x,y,110,590,200,40,"Esc") then
-                self.SarmatCamState = 1
-                self.Cam1 = false
-                self.Cam2 = false
-                self.Cam3 = false
-                self.Cam4 = false
-                self.Selected = 0
+    end
+end
+
+function TRAIN_SYSTEM:Announcer_Next(returnToStart)
+    local Announcer = self.Announcer
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
+    local maxStation = Announcer.LimitStation or (Announcer.Path and 1 or #lTbl)
+    if Announcer.OnStation then
+        if Announcer.Path then
+            if Announcer.Station > maxStation then
+                Announcer.Station = Announcer.Station-1
+                Announcer.OnStation = false
+            elseif returnToStart and maxStation == Announcer.Station then
+                Announcer.Station = #lTbl
+                Announcer.OnStation = false
+                return true
+            end
+        else
+            if maxStation > Announcer.Station then
+                Announcer.Station = Announcer.Station+1
+                Announcer.OnStation = false
+            elseif returnToStart and maxStation == Announcer.Station then
+                Announcer.Station = 1
+                Announcer.OnStation = false
+                return true
             end
         end
-        Train:SetNW2Int("SarmatCamSelected",self.Selected)
+    else
+        Announcer.OnStation = true
+        local last = not lTbl.Loop and Announcer.Station == (Announcer.Path and 1 or #lTbl)
+        if Announcer.LimitStation then
+            last = Announcer.LimitStation == Announcer.Station
+        end
+        Announcer.CurrentLast = last
+    end
+end
+
+function TRAIN_SYSTEM:Announcer_Queue(msg)
+    local AnnouncerSys = self.Train.Announcer
+    if msg and type(msg) ~= "table" then
+        AnnouncerSys:Queue{msg}
+    else
+        AnnouncerSys:Queue(msg)
+    end
+end
+
+function TRAIN_SYSTEM:Announcer_CabPlay()
+    if self.LineOut > 0 then return end
+    local Announcer = self.Announcer
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
+    if not lTbl then return end
+    local sTbl = lTbl[Announcer.Station]
+
+    Announcer.CabPlay = true
+    self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_VOLUMES,{0,0,0})
+
+    self.Train.Announcer.AnnounceTimer = CurTime()+0.2 -- Silent sound fix at begin playing
+    self:Announcer_Queue("tone")
+    local message
+    local last = not lTbl.Loop and Announcer.Station == (Announcer.Path and 1 or #lTbl)
+    if Announcer.LimitStation then
+        last = Announcer.LimitStation == Announcer.Station
+    end
+    if Announcer.OnStation then
+        if sTbl.odz then self:Announcer_Queue(sTbl.odz) end
+        message = sTbl.dep and sTbl.dep[Announcer.Path and 2 or 1]
+    else
+        if last then
+            message = sTbl.arrlast and sTbl.arrlast[Announcer.Path and 2 or 1]
+        else
+            message = sTbl.arr and sTbl.arr[Announcer.Path and 2 or 1]
+        end
     end
 
-    function TRAIN_SYSTEM:Zero()
-        local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-        local stbll = stbl[self.Line]
-        if not stbll then
-            self:UpdateSarmat()
+    if not message then return end
+    self:Announcer_Queue(message)
+end
+
+function TRAIN_SYSTEM:Announcer_CabStop()
+    local Announcer = self.Announcer
+    if not Announcer.CabPlay then return end
+    Announcer.CabPlay = false
+    self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_VOLUMES,{Announcer.Volumes.Salon,Announcer.Volumes.UPOSalon,Announcer.Volumes.V5})
+end
+
+function TRAIN_SYSTEM:Announcer_Play()
+    local Announcer = self.Announcer
+    if Announcer.UPOLock then return end
+    if Announcer.Mode > 3 then return end
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
+    if not lTbl then return end
+    local sTbl = lTbl[Announcer.Station]
+    self:Announcer_Stop()
+    self:Announcer_Queue("tone")
+    local message
+    local last = not lTbl.Loop and Announcer.Station == (Announcer.Path and 1 or #lTbl)
+    if Announcer.LimitStation then
+        last = Announcer.LimitStation == Announcer.Station
+    end
+    if Announcer.OnStation then
+        if sTbl.odz then self:Announcer_Queue(sTbl.odz) end
+        message = sTbl.dep and sTbl.dep[Announcer.Path and 2 or 1]
+    else
+        if last then
+            message = sTbl.arrlast and sTbl.arrlast[Announcer.Path and 2 or 1]
+            self:Announcer_Queue(-1)
+        else
+            message = sTbl.arr and sTbl.arr[Announcer.Path and 2 or 1]
+        end
+    end
+    Announcer.CurrentLast = last
+    if not message then return end
+    self:Announcer_Queue(message)
+end
+
+function TRAIN_SYSTEM:Announcer_Stop()
+    self:Announcer_CabStop()
+    self.LineOut = 0
+    self.UPOActive = 0
+    self.Announcer.UPOLock = false
+    self.Train.Announcer.AnnounceTimer = CurTime()+0.2 -- Silent sound fix at begin playing
+    self.Train.Announcer:TriggerInput("Reset","AnnouncementsSarmatUPO")
+end
+
+-- Cameras control functions
+function TRAIN_SYSTEM:Cam_Scan()
+    local Cam = self.Cam
+    local Train = self.Train
+    local wagList = Train.WagonList
+    Cam.WagNum = #wagList
+    Cam.Cameras = {}
+
+    local lastWag = wagList[Cam.WagNum]
+    for w=1,Cam.WagNum do
+        local iWag = wagList[w]
+        local iWagType = w==1 and 1 or (iWag.SubwayTrain.WagType==1 and w==Cam.WagNum) and 2 or 3
+        local wagCamTbl = self.CamConfig[iWagType]
+        Cam.Cameras[w] = {
+            wagEnt = iWag,
+            wagNum = iWag:GetWagonNumber(),
+            wagType = iWagType,
+            Count = wagCamTbl.Count
+        }
+        for page=1,wagCamTbl.Count do
+            Cam.Cameras[w][page] = {}
+            for iCam=1,wagCamTbl[page].Count do
+                Cam.Cameras[w][page][iCam] = wagCamTbl[page][iCam].lastWag and lastWag or iWag
+            end
+        end
+    end
+    Cam.TrainLen = Cam.WagNum*20
+    Cam.LoadingTimer = nil
+    Train:SetNW2Int("BMCIK:WagNum",Cam.WagNum)
+end
+
+function TRAIN_SYSTEM:Cam_Open(wagon,page)
+    local Cam = self.Cam
+    if Cam.Page > 0 then return end
+
+    Cam.AutoOpen = true
+    Cam.Distance = 0
+    Cam.Wagon = wagon
+    Cam.Page = page
+
+    for i=1,4 do
+        Cam[i].Link = CurTime()+math.Rand(0.2,1)
+        Cam[i].Ent = Cam.Cameras[Cam.Wagon][Cam.Page][i]
+        if i > #Cam.Cameras[Cam.Wagon][Cam.Page] then
+            Cam[i].Link = nil
+            Cam[i].Ent = NULL
+        end
+    end
+
+    local Train = self.Train
+    Train:SetNW2Int("BMCIK:CamWagIndex",Cam.Wagon)
+    Train:SetNW2Int("BMCIK:CamType",Cam.Cameras[Cam.Wagon].wagType)
+    Train:SetNW2Int("BMCIK:CamWagNumber",Cam.Cameras[Cam.Wagon].wagNum)
+end
+
+function TRAIN_SYSTEM:Cam_Close()
+    local Cam = self.Cam
+    Cam.Page = 0
+    for i=1,4 do
+        Cam[i].Link = nil
+        Cam[i].Ent = NULL
+    end
+
+    local Train = self.Train
+    Train:SetNW2Int("BMCIK:CamWagIndex",0)
+    Train:SetNW2Int("BMCIK:CamType",0)
+    Train:SetNW2Int("BMCIK:CamWagNumber",0)
+end
+
+function TRAIN_SYSTEM:Cam_Reset()
+    local Cam = self.Cam
+    Cam.Page = 0
+    Cam.Wagon = 0
+    Cam.Fullscreen = 0
+    Cam.AutoOpen = false
+    Cam[1] = {Link = nil,Ent = NULL}
+    Cam[2] = {Link = nil,Ent = NULL}
+    Cam[3] = {Link = nil,Ent = NULL}
+    Cam[4] = {Link = nil,Ent = NULL}
+end
+
+-- List functions
+function TRAIN_SYSTEM:List_Save(state)
+    local List = self.List
+    List.States[state] = {Count = List.Count,Selected = List.Selected,Offset = List.Offset}
+end
+
+function TRAIN_SYSTEM:List_Load(state)
+    local List = self.List
+    if not List.States[state] then return end
+    local saveState = List.States[state]
+    saveState.Selected = math.min(saveState.Selected,saveState.Count)
+    local dOffset = saveState.Count - saveState.Offset - 21
+    if dOffset < 0 then
+        saveState.Offset = math.max(0,saveState.Offset + dOffset)
+    end
+    List.Count = saveState.Count
+    List.Selected = saveState.Selected
+    List.Offset = saveState.Offset
+    List.States[state] = nil
+end
+
+function TRAIN_SYSTEM:List_Set(state, sel)
+    local List = self.List
+    if state and self.Announcer.State ~= state and List.States[state] then List = List.States[state] end
+    if sel == List.Selected or sel > List.Count then return end 
+    List.Selected = sel
+
+    local cursorPos = List.Selected - List.Offset
+    local dOffset
+    if cursorPos < 1 then
+        dOffset = cursorPos - 1
+    elseif cursorPos > 21 then
+        dOffset = cursorPos - 21
+    end
+    if dOffset then
+        List.Offset =  math.Clamp(List.Offset + dOffset,0,List.Count-21)
+    end
+end
+
+function TRAIN_SYSTEM:List_GetSelectedItem()
+    return self.List.Selected
+end
+
+function TRAIN_SYSTEM:List_Prev(state)
+    local List = self.List
+    if state and self.Announcer.State ~= state and List.States[state] then List = List.States[state] end
+    if List.Count < 2 then return end
+    local lastSel = List.Selected
+    List.Selected = math.max(1,List.Selected - 1)
+    if List.Selected-List.Offset == 0 and List.Selected ~= lastSel then
+        List.Offset = List.Offset-1
+    end
+end
+
+function TRAIN_SYSTEM:List_Next(state)
+    local List = self.List
+    if state and self.Announcer.State ~= state and List.States[state] then List = List.States[state] end
+    if List.Count < 2 then return end
+    local lastSel = List.Selected
+    List.Selected = math.min(List.Count,List.Selected + 1)
+    if List.Selected-List.Offset > 21 and List.Selected ~= lastSel then
+        List.Offset = List.Offset+1
+    end
+end
+
+function TRAIN_SYSTEM:List_Reset(count)
+    local List = self.List
+    List.Selected = 1
+    List.Offset = 0
+    List.ListTimer = nil
+    List.ListTimerDir = nil
+    List.Count = count or 0
+end
+
+function TRAIN_SYSTEM:CANReceive(source,sourceid,target,targetid,textdata,numdata)
+    if textdata == self.CAN_BMTS_TEXT then
+        self.BMTS.Text = numdata
+        self.BMTS.Update = true
+        return
+    end
+    if sourceid == self.Train:GetWagonNumber() then return end
+    if textdata == self.CAN_ACTIVATE then
+        if self.Announcer.Active then
+            self.Announcer.Active = false
+            self.Announcer.AVTDepart = false
+            self:Cam_Close()
+        end
+    end
+    if textdata == self.CAN_CIKSTATE then
+        self.Announcer.CIKStateIntercab = numdata
+    end
+end
+
+function TRAIN_SYSTEM:TriggerInput(name,value)
+    if not self.Announcer.Active then return end
+    if name == "OpenDoors" then
+        if value == 0x4C then
+            self:Cam_Open(1,2)
+        elseif value == 0x52 then
+            self:Cam_Open(1,3)
+        end
+    end
+    local Announcer = self.Announcer
+    if name == "CheckUPO" then
+        if self.UPOActive == 0 or self.LineOut>0 or math.random()>0.95 then
+            return false
+        end
+        if not Announcer.OnStation then
+            self:Announcer_Next()
+            self:List_Next(1)
+            self:CANUpdate()
+        end
+        return true
+    end
+    
+    if name == "ClosedDoors" then
+        self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_CLOSERING,false)
+    end
+    if name == "OpenDoors" then
+        self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_CLOSERING,false)
+        if Announcer.AVTDepart then
+            Announcer.AVTDepart = false
+            self:CANUpdate()
             return
         end
-        if stbll.Loop then
-            self.Station = self.Path and #stbll or 1
-        else
-            self.Station = self.Path and self.EndStation or self.StartStation
+        if not Announcer.OnStation then
+            self:Announcer_Play()
+            self:Announcer_Next()
+            self:List_Next(1)
+            self:CANUpdate()
         end
-        self.Arrived = true
-        self.Depeating = false
-        self:UpdateSarmat()
+    end
+    if name == "CloseDoorsAVT" then
+        Announcer.AVTDepart = Announcer.OnStation
+        if Announcer.AVTDepart then
+            self:Announcer_Play()
+            self:CANUpdate()
+        end
+        self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_CLOSERING,true)
+    end
+end
+
+function TRAIN_SYSTEM:CANUpdate()
+    local Announcer = self.Announcer
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][Announcer.Line]
+    local lTblCount = #lTbl
+    local ledTbl = lTbl.LED or {}
+    local currLed, nextLed = 0,0
+    local station = Announcer.Station
+    if Announcer.AVTDepart then
+        if Announcer.Path then
+            station = station - 1
+            if station < 1 then station = #ledTbl end
+        else
+            station = station + 1
+            if station > #ledTbl then station = 1 end
+        end
     end
 
-    function TRAIN_SYSTEM:Next()
-        local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-        local stbll = stbl[self.Line]
-        if not stbll then return end
-        local last = (self.Path and not stbll.Loop) and self.StartStation or self.EndStation
-        if stbll.Loop then
-            if self.Arrived then
-                if self.Path then
-                    self.Station = math.max(0,self.Station - 1)
-                    if self.Station <= 0 then self.Station = #stbll end
-                else
-                    local max = #stbll
-                    if self.Station >= max then self.Station = 0 end
-                    self.Station = math.min(max,self.Station + 1)
-                end
-                self.Arrived = false
+    for i=(Announcer.Path and #ledTbl or 1),station,(Announcer.Path and -1 or 1) do
+        currLed = currLed + (ledTbl[i] or 0)
+    end
+    if Announcer.AVTDepart or not Announcer.OnStation then
+        nextLed = ledTbl[station] or 0
+        currLed = currLed - nextLed
+    end
+
+    local sTbl = lTbl[station]
+    local first,sTblPrev,sTblNext
+    if lTbl.Loop and not Announcer.Limit then
+        first = 0
+        if Announcer.Path then
+            sTblNext = ((station-1) < 1) and lTbl[lTblCount] or lTbl[station-1]
+            sTblPrev = ((station+1) > lTblCount) and lTbl[1] or lTbl[station+1]
+        else
+            sTblPrev = ((station-1) < 1) and lTbl[lTblCount] or lTbl[station-1]
+            sTblNext = ((station+1) > lTblCount) and lTbl[1] or lTbl[station+1]
+        end
+    else
+        if Announcer.Path then
+            first = lTblCount
+            sTblPrev = station < lTblCount and lTbl[station+1]
+            sTblNext = station > 1 and lTbl[station-1]
+        else
+            first = 1
+            sTblPrev = station > 1 and lTbl[station-1]
+            sTblNext = station < lTblCount and lTbl[station+1]
+        end
+    end
+    
+    local bitText  = "---"
+    local bitLeft,bitRight
+    local bitLoop = 1
+
+    if not Announcer.AVTDepart and Announcer.OnStation then
+        if Announcer.CurrentLast then
+            bitLeft = ""
+            bitRight = Format("%s >",sTbl[2])
+            bitLoop = 4
+
+            bitText = Format("%%rПоезд прибыл\n%%rна конечную станцию\n%%r%s",sTbl[2])
+            if sTbl.right_doors then
+                bitText = bitText..",\n%%rвыход\n%%rна правую сторону.\n"
+                bitLoop = bitLoop + 2
             else
-                if self.Station ~= (self.EndStation > 0 and self.EndStation or -1) then
-                    self.Arrived = true
-                end
+                bitText = bitText..".\n"
             end
         else
-            if self.Last then
-                self.Station = self.Path and self.EndStation or self.StartStation
-                self.Arrived = true
-            elseif self.Arrived then
-                if self.Path then
-                    self.Station = math.max(self.StartStation,self.Station - 1)
-                else
-                    self.Station = math.min(self.EndStation,self.Station + 1)
-                end
-                self.Arrived = false
+            bitLeft = sTblPrev and sTblPrev[2] or ""
+            bitRight = sTblNext and Format("%s >",sTblNext[2])
+            bitLoop = 5
+            bitText = Format("%%yСтанция\n%%y%s",sTbl[2])
+            if sTbl.right_doors then
+                bitText = bitText..",\n%%yвыход\n%%yна правую сторону.\n"
+                bitLoop = bitLoop + 2
             else
-                if self.Station ~= (self.Path and self.StartStation or self.EndStation) then
-                    self.Arrived = true
-                end
+                bitText = bitText..".\n"
             end
-        end
-        self.Last = self.Station == last
-        self.Depeating = false
-        self:UpdateSarmat()
-    end
-    function TRAIN_SYSTEM:Prev()
-        local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-        local stbll = stbl[self.Line]
-        if not stbll then return end
-        if stbll.Loop then
-            if not self.Arrived then
-                if self.Path then
-                    if self.Station >= #stbll then self.Station = 0 end
-                    self.Station = math.min(#stbll,self.Station + 1)
-                else
-                    self.Station = math.max(0,self.Station - 1)
-                    if self.Station <= 0 then self.Station = #stbll end
-                    if self.Station == self.EndStation then
-                        self:Prev()
-                    end
-                end
-                self.Arrived = true
+
+            bitText = bitText..Format("%%yСледующая станция\n%%y%s",sTblNext[2])
+            if sTblNext and sTblNext.right_doors then
+                bitText = bitText..",\n%%yвыход\n%%yна правую сторону.\n"
+                bitLoop = bitLoop + 2
             else
-                self.Arrived = false
+                bitText = bitText..".\n"
             end
+        end
+
+        if sTbl.messagearr then
+            bitLoop = bitLoop + #string.Explode("\n",sTbl.messagearr)
+            bitText = bitText..(sTbl.messagearr).."\n"
+        end
+        bitText = bitText.."\n."
+    elseif Announcer.AVTDepart or station ~= first then
+        bitLeft = sTblPrev and sTblPrev[2]
+        bitRight = Format("%s >",sTbl[2])
+        bitLoop = 5
+        bitText = Format("%%rОсторожно,\n%%rдвери закрываются!\n%%yСледующая станция\n%%y%s",sTbl[2])
+        if sTbl.right_doors then
+            bitText = bitText..",\n%%yвыход\n%%yна правую сторону.\n"
+            bitLoop = bitLoop + 2
         else
-            if not self.Arrived then
-                if self.Path then
-                    self.Station = math.min(self.EndStation,self.Station + 1)
+            bitText = bitText..".\n"
+        end
+        
+        if sTblPrev and sTblPrev.messagedep then
+            bitLoop = bitLoop + #string.Explode("\n",sTblPrev.messagedep)
+            bitText = bitText..(sTblPrev.messagedep).."\n"
+        end
+        bitText = bitText.."\n."
+    end
+    
+    self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_CURR,currLed)
+    self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_NEXT,nextLed)
+    self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_PATH,Announcer.Path)
+    self.Train:CANWrite("BMCIK",nil,"BIT",nil,self.CAN_BITTEXT,{Text = string.Explode("\n",bitText), Left = bitLeft, Right = bitRight, Loop = bitLoop})
+end
+
+function TRAIN_SYSTEM:BMTS_Update()
+    local lTbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer")][self.Announcer.Line]
+    local bmtsText = lTbl[self.Announcer.LimitStation or (self.Announcer.Path and 1 or #lTbl)][2]
+    if lTbl.Loop and not self.Announcer.LimitStation then bmtsText = "КОЛЬЦЕВОЙ" end
+    self.Train:CANWrite("BMCIK",nil,"BMCIK",nil,self.CAN_BMTS_TEXT,bmtsText)
+end
+
+local function InRange(px,py,x,y,w,h)
+    return (px >= x and px <= (x+w) and py >= y and py <= (y+h))
+end
+function TRAIN_SYSTEM:Touch(value,x,y)
+    if self.State < 1 then return end
+    local btnID = 0
+    local newPage = false
+
+    if self.Cam.Page > 0 then
+        if not value and self.Cam.Fullscreen == 0 then
+            local camCountPage = #self.Cam.Cameras[self.Cam.Wagon][self.Cam.Page]
+            if camCountPage == 4 then
+                if InRange(x,y,24,58,430,328,"[1]") then
+                    self.Cam.Fullscreen = 1
+                elseif InRange(x,y,460,58,430,328,"[2]") then
+                    self.Cam.Fullscreen = 2
+                elseif InRange(x,y,24,392,430,328,"[3]") then
+                    self.Cam.Fullscreen = 3
+                elseif InRange(x,y,460,392,430,328,"[4]") then
+                    self.Cam.Fullscreen = 4
+                end
+            elseif camCountPage == 2 then
+                if InRange(x,y,24,58,430,662,"[1]") then
+                    self.Cam.Fullscreen = 1
+                elseif InRange(x,y,460,58,430,662,"[2]") then
+                    self.Cam.Fullscreen = 2
+                end
+            end
+        end
+    else
+        local wagNum = self.Cam.WagNum
+        for i=1,wagNum do
+            if (wagNum == 8 and InRange(x,y,350+(i-wagNum/2)*110,323,104,60))
+            or (wagNum == 7 and InRange(x,y,334+(i-wagNum/2)*126,323,120,60))
+            or (wagNum <= 6 and InRange(x,y,313+(i-wagNum/2)*147,323,141,60)) then
+                btnID = 10 + i
+                if not value then
+                    self.Cam.Wagon = i
+                    self.Cam.Page = self.Cam.Cameras[i].wagType == 1 and 7 or self.Cam.Cameras[i].wagType == 2 and 5 or 1
+                    newPage = true
+                end
+            end
+        end
+    end
+
+    for i=1,#self.Buttons do
+        local btn = self.Buttons[i]
+        if btn.show(self.Cam.Page) and InRange(x,y,btn.x,btn.y,btn.w,btn.h) then
+            if not value and btn.touch then newPage = btn.touch(self) end
+            btnID = btn.id
+        end
+    end
+
+    if newPage then
+        self.Cam.AutoOpen = false
+        for i=1,4 do
+            self.Cam[i].Link = CurTime()+math.Rand(0.2,1)
+            self.Cam[i].Ent = self.Cam.Cameras[self.Cam.Wagon][self.Cam.Page][i]
+            if i > #self.Cam.Cameras[self.Cam.Wagon][self.Cam.Page] then
+                self.Cam[i].Link = nil
+                self.Cam[i].Ent = NULL
+            end
+        end
+        self.Train:SetNW2Int("BMCIK:CamWagIndex",self.Cam.Wagon)
+        self.Train:SetNW2Int("BMCIK:CamType",self.Cam.Cameras[self.Cam.Wagon].wagType)
+        self.Train:SetNW2Int("BMCIK:CamWagNumber",self.Cam.Cameras[self.Cam.Wagon].wagNum)
+    end
+
+    self.Train:SetNW2Int("BMCIK:IDTouched",btnID or 0)
+end
+
+function TRAIN_SYSTEM:Trigger(name,value)
+    name = name:gsub("Sarmat","")
+    if name ~= "Up" and name ~= "Down" and not value then return end
+    local Train = self.Train
+    local annTbl = Metrostroi.SarmatUPOSetup[Train:GetNW2Int("Announcer")]
+    local Announcer = self.Announcer
+    local annState = Announcer.State
+    local selected = self:List_GetSelectedItem()
+
+    if annState == 1 then
+        if name == "Up" or name == "Down" or name == "Enter" or name == "Start" then
+            Announcer.AVTDepart = false
+        end
+    end
+
+    if annState == 12 and name == "Esc" then
+        if Announcer.PrevLimitStation ~= Announcer.LimitStation then
+            if Announcer.LimitStation then
+                self.List.States[1].Count = (Announcer.Path and (#annTbl[Announcer.Line] - Announcer.LimitStation + 1) or Announcer.LimitStation)*2
+                local lastStation = Announcer.Station
+                if Announcer.Path then
+                    Announcer.Station = math.max(Announcer.Station,Announcer.LimitStation)
                 else
-                    self.Station = math.max(self.StartStation,self.Station - 1)
+                    Announcer.Station = math.min(Announcer.Station,Announcer.LimitStation)
                 end
-                self.Arrived = true
+                if lastStation ~= Announcer.Station then
+                    Announcer.OnStation = true
+                end
             else
-                if self.Station ~= (self.Path and self.EndStation or self.StartStation) then
-                    self.Arrived = false
-                end
+                self.List.States[1].Count = #annTbl[Announcer.Line]*2
             end
-        end
-        self.Last = self.Station == last
-        self.Depeating = false
-        self:UpdateSarmat()
-    end
-
-    function TRAIN_SYSTEM:AnnQueue(msg)
-        local Announcer = self.Train.Announcer
-        if msg and type(msg) ~= "table" then
-            Announcer:Queue{msg}
-        else
-            Announcer:Queue(msg)
+            self:BMTS_Update()
+            Announcer.PrevLimitStation = nil
         end
     end
 
-    function TRAIN_SYSTEM:Play(dep)
-        local ltbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)][self.Line]
-        if not ltbl then return end
-        local stbl = ltbl[self.Station]
-        local last = (self.Path and not ltbl.Loop) and self.StartStation or self.EndStation
-        local lastst = self.Station == last
-        if dep then
-            local message = stbl.dep[self.Path and 2 or 1]
-            if message and not lastst then
-                self.Train.Announcer:TriggerInput("Reset","AnnouncementsSarmatUPO")
-                self:AnnQueue("tone")
-                if stbl.odz then self:AnnQueue(stbl.odz) end
-                self:AnnQueue(message)
-            end
-        else
-            local message
-            if lastst then
-                message = stbl.arrlast[self.Path and 2 or 1]
-            else
-                message = stbl.arr[self.Path and 2 or 1]
-            end
-            if message then
-                self.Train.Announcer:TriggerInput("Reset","AnnouncementsSarmatUPO")
-                self:AnnQueue("tone")
-                if lastst and not stbl.ignorelast then self:AnnQueue(-1) end
-                self:AnnQueue(message)
-            end
-        end
-        self.Last = lastst
-        self:UpdateSarmat()
+    if annState == 23 and Announcer.TrainTrain and (name == "Esc" or name == "Zero") then
+        Announcer.TrainTrain = false
+        return
     end
-
-    function TRAIN_SYSTEM:UpdateSarmat()
-        if not self.Active then return end
-        local tbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)][self.Line]
-        if not tbl then
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Current",0)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Arrival",32)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Path",self.Path)
-
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Prev",self.Specials[self.Line])
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"PrevEn",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Next",self.Specials[self.Line])
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextEn",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextRight",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Curr",self.Specials[self.Line])
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrEn",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrRight",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Arrived",true)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Last",false)
-            self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Closing",false)
-            if self.Specials[self.Line] then
-                self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Special","%g"..self.Specials[self.Line].."\n%r"..self.Specials[self.Line])
+    
+    ---- ▲
+    if name == "Up" then
+        if value then
+            self:List_Prev()
+            if annState == 1 then self:Announcer_Prev() end
+            if self.ListTimerDir == nil then
+                self.ListTimer = CurTime()+0.4
+                self.ListTimerDir = false
             end
-            return
-        end
-        local stbl = tbl.LED
-        local last = self.Path and self.FirstStation or self.LastStation
-
-        local curr=0
-        if self.Path then
-            for i=#stbl,self.Station+(self.Depeating and 0 or 1),-1 do curr = curr + stbl[i] end
         else
-            for i=1,self.Station-(self.Depeating and 0 or 1) do curr = curr + stbl[i] end
+            self.ListTimer = nil
+            self.ListTimerDir = nil
         end
-        local nxt = 0
-        if self.Arrived and not self.Depeating then
-            curr = curr + stbl[self.Station]
+    ---- ▼
+    elseif name == "Down" then
+        if value then
+            self:List_Next()
+            if annState == 1 then self:Announcer_Next() end
+            if self.ListTimerDir == nil then
+                self.ListTimer = CurTime()+0.4
+                self.ListTimerDir = true
+            end
         else
-            nxt = stbl[self.Station]
+            self.ListTimer = nil
+            self.ListTimerDir = nil
         end
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Current",curr)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Arrival",nxt)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"PassSchemes",nil,"Path",self.Path)
-
-        local curr,prev,nxt = tbl[self.Station],tbl[self.Station-(self.Path and -1 or 1)],tbl[self.Station-(self.Path and 1 or -1)]
-        if not self.Arrived then prev = curr nxt = curr end
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Prev",prev and prev[2])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"PrevEn",prev and prev[3])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Next",nxt and nxt[2])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextEn",nxt and nxt[3])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"NextRight",nxt and nxt.right_doors)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Curr",curr and curr[2])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrEn",curr and curr[3])
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"CurrRight",curr and curr.right_doors)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Arrived",self.Arrived and not self.Depeating)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Last",self.Last)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Closing",self.Depeating)
-        self.Train:CANWrite("Sarmat",self.Train:GetWagonNumber(),"Tickers",nil,"Special",not self.Last and (self.Arrived and (self.Depeating and curr.messagedep or not self.Depeating and curr.messagearr) or not self.Arrived and prev.messagedep))
-    end
-
-    function TRAIN_SYSTEM:Trigger(name,value)
-        local Train = self.Train
-        if self.SarmatAnnState == 1 then
-            if name == "SarmatZero" and value then
-                self:Zero()
-                if self.ZeroTimer then
-                    if CurTime()-self.ZeroTimer < 0.3 then self.SarmatAnnState = 2 end
-                    self.ZeroTimer = nil
-                end
-                if not self.ZeroTimer then self.ZeroTimer = CurTime() end
+    ---- Enter
+    elseif name == "Enter" then
+        if annState == 0 then return end
+        if annState == 1 then
+            self:Announcer_CabPlay()
+        elseif annState == 2 then
+            Announcer.PrevState2 = Announcer.PrevState
+            local sTbl = self[self.SettingsList[selected][2]]
+            self:Announcer_SetState(20+selected,sTbl and #sTbl or 1)
+            if selected == 5 then
+                local Cam = self.Cam
+                local videoSended = (Cam[1].Link==true or Cam[2].Link==true or Cam[3].Link==true or Cam[4].Link==true) and 1 or 0
+                Train:SetNW2Int("BMCIK:AddInfoNIIPDoors",self.NIIP.DOORS_closed)
+                Train:SetNW2Int("BMCIK:AddInfoNIIPSpeed",self.NIIP.SPEED)
+                Train:SetNW2Int("BMCIK:AddInfoUPO",self.UPOActive)
+                Train:SetNW2Int("BMCIK:AddInfoVideo",videoSended)
             end
-            if name == "SarmatLine" and value then
-                self.LineEnabled = not self.LineEnabled
-            end
-            if name == "SarmatStart" and value and self.LineOut==0 then
-                if not self.Arrived then
-                    self:Play(false)
-                elseif self.Arrived then
-                    self:Play(true)
-                end
-            end
-            local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-            if name == "SarmatPath" and value then
-                self.Path = not self.Path
-                if not stbl[self.Line] then
-                    self.LastStationName = self.Specials[self.Line]
-                elseif self.EndStation == 0 then
-                    self.LastStationName = "Кольцевой"
+        elseif annState > 10 and annState < 20 then
+            if annState == 12 then
+                local selLast = Announcer.LastStations[selected]
+                if Announcer.LimitStation == selLast then
+                    Announcer.LimitStation = false
                 else
-                    self.LastStationName = stbl[self.Line][self.Path and not stbl[self.Line].Loop and self.StartStation or self.EndStation][2]
+                    Announcer.LimitStation = selLast
                 end
-                self:Zero()
-            end
-            if name == "SarmatF1" and value and stbl[self.Line] then
-                self.SarmatAnnState = 3
-                self.Select = 1
-            end
-            if name == "SarmatF2" and value and stbl[self.Line] then
-                self.SarmatAnnState = 4
-                self.Select = 1
-            end
-            if name == "SarmatF3" and value and stbl[self.Line] then
-                self.SarmatAnnState = 5
-                self.Select = 1
-            end
-            if name == "SarmatF4" and value then
-                self.SarmatAnnState = 6
-                self.Select = 1
-            end
-            if name == "SarmatDown" and value then
-                self:Next()
-            end
-            if name == "SarmatUp" and value then
-                self:Prev()
-            end
-        end
-        if self.SarmatAnnState == 2 then
-            local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-            if name == "SarmatDown" and value then
-                self.Line = math.min(#stbl,self.Line + 1)
-            end
-            if name == "SarmatUp" and value then
-                self.Line = math.max(-4,self.Line - 1)
-            end
-            if name == "SarmatEnter" and value then
-                self.SarmatAnnState = 1
-                self.StartStation = 1
-                if stbl[self.Line] then
-                    if stbl[self.Line].Loop then
-                        self.EndStation = 0
-                    else
-                        self.EndStation = #stbl[self.Line]
-                    end
-                    if self.EndStation == 0 then
-                        self.LastStationName = "Кольцевой"
-                    else
-                        self.LastStationName = stbl[self.Line][self.Path and not stbl[self.Line].Loop and self.StartStation or self.EndStation][2]
-                    end
-                else
-                    self.EndStation = 0
-                    self.LastStationName = self.Specials[self.Line]
+            elseif annState == 15 then
+                if Announcer.Active and selected == Announcer.Line then
+                    self:List_Load(1)
+                    Announcer.State = 1
+                    return
                 end
-                self:Zero()
+                Announcer.Line = selected 
+                self:Announcer_Activate(true)
             end
-        end
-        if self.SarmatAnnState == 3 then
-            local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-            local stbll = stbl[self.Line]
-            if name == "SarmatDown" and value then
-                for i=self.Select+1,#stbll do
-                    if i==1 or i==#stbll or stbll[i].arrlast then
-                        self.Select = i
-                        break
-                    end
-                end
-            end
-            if name == "SarmatUp" and value then
-                local selected = false
-                for i=self.Select-1,1,-1 do
-                    if i==1 or i==#stbll or stbll[i].arrlast then
-                        self.Select = i
-                        selected = true
-                        break
-                    end
-                end
-                if stbll.Loop and not selected then
-                    self.Select = 0
-                end
-            end
-            if name == "SarmatF1" and value and not stbll.Loop then
-                if self.Select < self.EndStation then
-                    self.StartStation = self.Select
-                    self.LastStationName = stbl[self.Line][self.Path and not stbl[self.Line].Loop and self.StartStation or self.EndStation][2]
-                    self:Zero()
-                end
-            end
-            if name == "SarmatF2" and value then
-                if self.Select > self.StartStation or stbll.Loop then
-                    self.EndStation = self.Select
-                    if self.EndStation == 0 then
-                        self.LastStationName = "Кольцевой"
-                    else
-                        self.LastStationName = stbl[self.Line][self.Path and not stbl[self.Line].Loop and self.StartStation or self.EndStation][2]
-                    end
-                    self:Zero()
-                end
-            end
-            if (name == "SarmatEnter" or name == "SarmatEsc") and value then
-                self.SarmatAnnState = 1
-                self:Zero()
-            end
-        end
-        if self.SarmatAnnState == 4 then
-            if (name == "SarmatEnter" or name == "SarmatEsc") and value then
-                self.SarmatAnnState = 1
-            end
-        end
-        if self.SarmatAnnState == 5 then
-            if (name == "SarmatEnter" or name == "SarmatEsc") and value then
-                self.SarmatAnnState = 1
-            end
-        end
-        if self.SarmatAnnState == 6 then
-            if (name == "SarmatEnter" or name == "SarmatEsc") and value then
-                self.SarmatAnnState = 1
-            end
-        end
-        Train:SetNW2Int("SarmatSelect",self.Select)
-    end
-    function TRAIN_SYSTEM:Think(dT)
-        local Train = self.Train
-        local Power = Train.Electric.Power > 0 and Train.SF17.Value > 0
+        elseif annState > 20 then
+            if annState == 22 then
+                Announcer.Mode = selected
+            elseif annState == 23 then
+                if not Announcer.TrainTrain then Announcer.TrainTrain = true end
+            elseif annState == 24 then
+                local selItem = self.AnnVolumeList[selected]
+                local volumes = self.Announcer.Volumes
 
-        if not Power and self.SarmatState ~= 0 then
-            self.SarmatState = 0
-            self.SarmatTimer = nil
-            if self.LineOut>0 then self:AnnQueue(-2) end
+                volumes[selItem[2]] = volumes[selItem[2]] + 1
+                if volumes[selItem[2]] > selItem[4] then volumes[selItem[2]] = selItem[3] end
+
+                -- -- from 0 to N with a resolution of 10. The value of N can be calculated using the formula N = 100 - P,
+                -- -- where P - is the value of the volume level set in the line «Громкость инф. в салоне».
+                -- -- TODO: See how it works in 81-765 and do it by analogy
+                self.Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_VOLUMES,{volumes.Salon,volumes.UPOSalon,volumes.V5})
+            elseif annState == 28 then
+                Announcer.BITTime = selected == 2
+                self.Train:CANWrite("BMCIK",nil,"BIT",nil,self.CAN_BITTIME,Announcer.BITTime)
+            end
         end
-        if Power and self.SarmatState == 0 then
-            self.SarmatState = -1
-            self.SarmatTimer = CurTime()-math.Rand(-0.5,1)
-            self.SarmatAnnState = 1
-            self.SarmatCamState = 1
-            self.Cam1,self.Cam1E = false,NULL
-            self.Cam2,self.Cam2E = false,NULL
-            self.Cam3,self.Cam3E = false,NULL
-            self.Cam4,self.Cam4E = false,NULL
-            self.Selected = 0
-            Train:SetNW2Int("SarmatCamSelected",self.Selected)
-        end
-        if self.SarmatState == -1 and self.SarmatTimer and CurTime()-self.SarmatTimer > 2 then
-            self.SarmatState = -2
-            self.SarmatTimer = CurTime()-math.Rand(-0.5,1.5)
-        end
-        if self.SarmatState == -2 and self.SarmatTimer and CurTime()-self.SarmatTimer > 14 then
-            self.SarmatState = -3
-            self.SarmatTimer = CurTime()-math.Rand(-0.3,0.5)
-        end
-        if self.SarmatState == -3 and self.SarmatTimer and CurTime()-self.SarmatTimer > 1 then
-            if Metrostroi.SarmatUPOSetup and Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)] then
-                self.SarmatState = 1
-            else
-                self.SarmatState = -4
+    ---- Esc
+    elseif name == "Esc" then
+        if annState == 1 then
+            -- Single click delay
+            if not self.EscBtnTimer then
+                self.EscBtnTimer = CurTime() + 0.3
                 return
             end
 
-            local stbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)]
-            self.StartStation = self.StartStation or 1
-            if stbl[self.Line].Loop then
-                self.EndStation = self.EndStation or 0
-            else
-                self.EndStation = self.EndStation or #stbl[self.Line]
-            end
-            if self.EndStation == 0 then
-                self.LastStationName = "Кольцевой"
-            else
-                self.LastStationName = stbl[self.Line][self.Path and not stbl[self.Line].Loop and self.StartStation or self.EndStation][2]
-            end
-            self:Zero()
+            -- Double click
+            self.EscBtnTimer = nil    
+            self:Announcer_SetState(14,1)
+            return
         end
-        if self.SarmatState > 0 and Train.BUKP.Active > 0 then
-            if self.SarmatCamState > 1 then
-                Train:SetNW2Int("SarmatCamType",self.SarmatCamType)
-                local cam1,cam2,cam3,cam4 = false,false,false,false
-                for i=1,#Train.WagonList do
-                    local train = Train.WagonList[i]
-                    if self.Cam1 and self.Cam1E == train then cam1 = true end
-                    if self.Cam2 and self.Cam2E == train then cam2 = true end
-                    if self.Cam3 and self.Cam3E == train then cam3 = true end
-                    if self.Cam4 and self.Cam4E == train then cam4 = true end
-                end
-                if self.Cam1 == true and (not IsValid(self.Cam1E) or not cam1) then self.Cam1 = false end
-                if self.Cam2 == true and (not IsValid(self.Cam2E) or not cam2) then self.Cam2 = false end
-                if self.Cam3 == true and (not IsValid(self.Cam3E) or not cam3) then self.Cam3 = false end
-                if self.Cam4 == true and (not IsValid(self.Cam4E) or not cam4) then self.Cam4 = false end
-                if self.Cam1 == true then
-                    Train:SetNW2Bool("SarmatCam1C",true)
-                    Train:SetNW2Entity("SarmatCam1E",self.Cam1E)
-                else
-                    if self.Cam1 and self.Cam1 ~= true and CurTime()-self.Cam1 > 0 then self.Cam1 = true end
-                    Train:SetNW2Bool("SarmatCam1C",false)
-                end
-                if IsValid(self.Cam1E) then Train:SetNW2Int("SarmatCam1EN",self.Cam1E:GetWagonNumber()) end
-                if self.Cam2 == true then
-                    Train:SetNW2Bool("SarmatCam2C",true)
-                    Train:SetNW2Entity("SarmatCam2E",self.Cam2E)
-                else
-                if self.Cam2 and self.Cam2 ~= true and CurTime()-self.Cam2 > 0 then self.Cam2 = true end
-                    Train:SetNW2Bool("SarmatCam2C",false)
-                end
-                if IsValid(self.Cam2E) then Train:SetNW2Int("SarmatCam2EN",self.Cam2E:GetWagonNumber()) end
-                if self.Cam3 == true then
-                    Train:SetNW2Bool("SarmatCam3C",true)
-                    Train:SetNW2Entity("SarmatCam3E",self.Cam3E)
-                else
-                if self.Cam3 and self.Cam3 ~= true and CurTime()-self.Cam3 > 0 then self.Cam3 = true end
-                    Train:SetNW2Bool("SarmatCam3C",false)
-                end
-                if IsValid(self.Cam3E) then Train:SetNW2Int("SarmatCam3EN",self.Cam3E:GetWagonNumber()) end
-                if self.Cam4 == true then
-                    Train:SetNW2Bool("SarmatCam4C",true)
-                    Train:SetNW2Entity("SarmatCam4E",self.Cam4E)
-                else
-                if self.Cam4 and self.Cam4 ~= true and CurTime()-self.Cam4 > 0 then self.Cam4 = true end
-                    Train:SetNW2Bool("SarmatCam4C",false)
-                end
-                if IsValid(self.Cam4E) then Train:SetNW2Int("SarmatCam4EN",self.Cam4E:GetWagonNumber()) end
-                Train:SetNW2Int("SarmatCamC",self.SarmatCamCount)
-            end
-
-
-            Train:SetNW2Int("SarmatCamState",self.SarmatCamState)
-        else
-            Train:SetNW2Int("SarmatCamState",0)
-            Train:SetNW2Bool("SarmatCam1C",false)
-            Train:SetNW2Bool("SarmatCam2C",false)
-            Train:SetNW2Bool("SarmatCam3C",false)
-            Train:SetNW2Bool("SarmatCam4C",false)
+        if not Announcer.PrevState then return end
+        self:List_Load(Announcer.PrevState)
+        Announcer.State = Announcer.PrevState
+        Announcer.PrevState = Announcer.PrevState2
+        Announcer.PrevState2 = nil
+    ---- F1
+    elseif name == "F1" then
+        if annState ~= 1 then return end
+        self:Announcer_SetState(11,1)
+    ---- F2
+    elseif name == "F2" then
+        if annState ~= 1 then return end
+        Announcer.PrevLimitStation = Announcer.LimitStation
+        self:Announcer_SetState(12,#Announcer.LastStations)
+    ---- F3
+    elseif name == "F3" then
+        if annState ~= 1 then return end
+        self:Announcer_SetState(13,1)
+    ---- F4
+    elseif name == "F4" then
+        if annState > 1 then return end
+        self:Announcer_SetState(2,#self.SettingsList)
+    ---- ПУТЬ
+    elseif name == "Path" then
+        if Announcer.Line == 0 then return end
+        Announcer.PathSel = not Announcer.PathSel
+    --- >0<
+    elseif name == "Zero" then
+        if annState > 1 then return end
+        -- Single click delay
+        if not self.ZeroBtnTimer then 
+            self.ZeroBtnTimer = CurTime() + 0.3
+            return
         end
-        if self.SarmatState > 0 and Train.BUKP.Active > 0 then
-            if not self.Active then self.Active = true self:UpdateSarmat()  end
+
+        -- Double click
+        self.ZeroBtnTimer = nil
+        local prevClear = annState == 0
+        if annTbl then self:Announcer_SetState(15,#annTbl) end
+        if prevClear then Announcer.PrevState = nil end
+    ---- ЛИНИЯ
+    elseif name == "Line" then
+        Announcer.LineEnabled = not Announcer.LineEnabled
+    ---- ПУСК
+    elseif name == "Start" then
+        if annState == 1 and Announcer.Mode == 3 then
+            self:Announcer_Play()
+            self:Announcer_Next()
+            self:List_Next()
+            -- if self:Announcer_Next(true) then
+            --     self:List_Set(1,1)
+            -- else
+            --     self:List_Next(1)
+            -- end
+            self:CANUpdate()
+        end
+    end
+end
+
+function TRAIN_SYSTEM:Think(dT)
+    local Train = self.Train
+
+    -- BMCIK-01 logic
+    local Power = Train.Electric.Power > 0 and (Train.SF16.Value + Train.SF17.Value) > 0
+    if Power then
+        local Cam = self.Cam
+        local Announcer = self.Announcer
+        if self.State > 0 then
+            ---- Buttons --------------------
+            local valBtn = false
             for k,v in pairs(self.TriggerNames) do
-                if Train[v] and (Train[v].Value > 0.5) ~= self.Triggers[v] then
-                    self:Trigger(v,Train[v].Value > 0.5)
-                    --print(v,self.Train[v].Value > 0.5)
-                    self.Triggers[v] = Train[v].Value > 0.5
+                valBtn = Train[v].Value > 0.5
+                if Train[v] and (valBtn) ~= self.Triggers[v] then
+                    self:Trigger(v,valBtn)
+                    self.Triggers[v] = valBtn
                 end
             end
-            local OpenDoors = Train.BUKP.OpenLeft or Train.BUKP.OpenRight
-            local CloseDoors = not not Train.BUKP.CloseRing
-            local UPOPlaying = self.UPOActive>0 and Train.UPO.LineOut>0
-            if not self.Depeating and (OpenDoors or UPOPlaying) and not self.Arrived then
-                self.Arrived = true
-                if self.UPOActive==0 then self:Play(false) end
-            end
-            if OpenDoors and self.Depeating then
-                self.Depeating = false
-                self:UpdateSarmat()
-            end
-            if self.Arrived and (CloseDoors~=self.CloseDoors and CloseDoors or UPOPlaying) then
-                --local ltbl = Metrostroi.SarmatUPOSetup[self.Train:GetNW2Int("Announcer",1)][self.Line]
-                if self.UPOActive==0 and not self.Depeating then
-                    self.Depeating = true
-                    self:Play(true)
+
+            if self.ZeroBtnTimer and CurTime() > self.ZeroBtnTimer then
+                self.ZeroBtnTimer = nil
+                if Announcer.State == 0 then
+                    self:Announcer_Activate()
+                elseif Announcer.State == 1 then
+                    self:Announcer_Zero()
+                    local lTbl = Metrostroi.SarmatUPOSetup[Train:GetNW2Int("Announcer")][Announcer.Line]
+                    local countSt = Announcer.LimitStation and (Announcer.Path and #lTbl - Announcer.LimitStation + 1 or Announcer.LimitStation) or #lTbl
+                    self:List_Reset(countSt*2)
                 end
-                --self:UpdateSarmat()
             end
-            self.CloseDoors = CloseDoors
-            if self.UPOActive>0 and not UPOPlaying and (not self.UPOLock or CurTime()-self.UPOLock)>0.5 then
+
+            if self.EscBtnTimer and CurTime() > self.EscBtnTimer then
+                self.EscBtnTimer = nil
+            end
+
+            ---- BUKP CAN -------------------
+            if CurTime() > self.CAN_SU then
+                self.CAN_SU = CurTime()+0.1
+
+                local BUKP = Train.BUKP
+                local niipSpeed = math.floor(BUKP.Speed)
+                if self.NIIP.SPEED ~= niipSpeed then
+                    Train:CANWrite("BMCIK",nil,"BNT",nil,self.CAN_SPEED,niipSpeed)
+                    self.NIIP.SPEED = niipSpeed
+                end
+                self.NIIP.DOORS_closed = BUKP.LSD and 1 or 0
+                
+                local cabAcitve = Train.Electric.CabActive
+                if self.NIIP.CabActive ~= cabAcitve then
+                    if cabAcitve > 0 then -- ПГК
+                        self:Announcer_Activate()
+                    end
+                    self.NIIP.CabActive = cabAcitve
+                end
+            end
+
+            ---- Cameras --------------------
+            if Cam.Page > 0 then
+                local wags = {false,false,false,false}
+                local wagList = Train.WagonList
+                for i=1,Cam.WagNum do
+                    local iWag = wagList[i]
+                    if Cam[1].Link and Cam[1].Ent == iWag then wags[1] = true end
+                    if Cam[2].Link and Cam[2].Ent == iWag then wags[2] = true end
+                    if Cam[3].Link and Cam[3].Ent == iWag then wags[3] = true end
+                    if Cam[4].Link and Cam[4].Ent == iWag then wags[4] = true end
+                end
+
+                local camC = 0
+                for i=1,4 do
+                    local iCam = Cam[i]
+                    if iCam.Link == true then
+                        Train:SetNW2Entity("BMCIK:CamE"..i,iCam.Ent)
+                        if not wags[i] or iCam.Ent.Electric.Power < 1 then
+                            iCam.Link = false
+                        end
+                    else
+                        if iCam.Link and CurTime() > iCam.Link then
+                            iCam.Link = wags[i]
+                        end
+                    end
+                    camC = setBitValue(camC,iCam.Link==true and 1 or 0,i-1,1)
+                end
+                camC = setBitValue(camC,Cam.Fullscreen,4,3)
+                Train:SetNW2Int("BMCIK:Cam",camC)
+
+                if Cam.AutoOpen then
+                    Cam.Distance = Cam.Distance + self.NIIP.SPEED*dT/3.6
+                    if Cam.Distance > Cam.TrainLen then
+                        self:Cam_Close()
+                        Cam.AutoOpen = nil
+                        Cam.Distance = nil
+                    end
+                end
+            end
+            Train:SetNW2Int("BMCIK:CamPage",Cam.Page)
+
+            ---- Announcer ------------------
+            local annPlaying = Train:GetNW2Bool("AnnouncerPlaying")
+            if Announcer.State > 0 then
+                if Announcer.Active then
+                    if Announcer.AVTDepart then
+                        if self.NIIP.SPEED > 3 then
+                            if self:Announcer_Next(true) then
+                                self:List_Set(1,1)
+                            else
+                                self:List_Next(1)
+                            end
+                            
+                            Announcer.AVTDepart = false
+                        end
+                    end
+
+                    if Announcer.CabPlay and not annPlaying and #Train.Announcer.Schedule == 0 then
+                        self:Announcer_CabStop()
+                    end
+
+                    self.LineOut = (Train.Announcer.AnnTable=="AnnouncementsSarmatUPO" and annPlaying) and 1 or 0
+                    self.UPOActive = Announcer.Mode > 1 and 1 or 0
+                    if self.UPOActive > 0 then
+                        Announcer.UPOLock = Train.UPO.LineOut > 0
+                    end
+
+                    Train:SetNW2Int("BMCIK:VolCab",Announcer.UPOLock and Announcer.Volumes.UPOCabin or Announcer.Volumes.Cabin)
+                else
+                    if Announcer.State == 1 or (Announcer.State > 10 and Announcer.State < 20 and Announcer.State ~= 15) then
+                        self:Announcer_Stop()
+                        Train:SetNW2Int("BMCIK:VolCab",0)
+                        Announcer.State = 0
+                    end
+                end
+
+                if self.ListTimer and CurTime() > self.ListTimer then
+                    if self.ListTimerDir then
+                        self:List_Next()
+                        if Announcer.State == 1 then self:Announcer_Next() end
+                    else
+                        self:List_Prev()
+                        if Announcer.State == 1 then self:Announcer_Prev() end
+                    end
+                    self.ListTimer = CurTime()+0.2
+                end
+
+                if Announcer.State > 20 then
+                    if Announcer.State == 22 then
+                        Train:SetNW2Int("BMCIK:AnnMode",Announcer.Mode)
+                    elseif Announcer.State == 23 then
+                        Train:SetNW2Bool("BMCIK:TrainTrain",Announcer.TrainTrain)
+                    elseif Announcer.State == 24 then
+                        local volumes = 0
+                        local annVolumes = Announcer.Volumes
+                        volumes = setBitValue(volumes,annVolumes.Cabin,0,4)
+                        volumes = setBitValue(volumes,annVolumes.Salon,4,4)
+                        volumes = setBitValue(volumes,annVolumes.UPOCabin,8,4)
+                        volumes = setBitValue(volumes,annVolumes.UPOSalon,12,4)
+                        volumes = setBitValue(volumes,annVolumes.EmerCab,16,4)
+                        volumes = setBitValue(volumes,annVolumes.V5,20,4)
+                        Train:SetNW2Int("BMCIK:VolumesPage",volumes)
+                    elseif Announcer.State == 28 then
+                        Train:SetNW2Bool("BMCIK:BITTime",Announcer.BITTime)
+                    end
+                end
+
+                Train:SetNW2Int("BMCIK:ListSelect",self.List.Selected)
+                Train:SetNW2Int("BMCIK:ListOffset",self.List.Offset)
+            else
+                Announcer.Active = false
+                self.LineOut = annPlaying and 1 or 0
                 self.UPOActive = 0
-                self.UPOLock = false
             end
-            if self.Depeating and Train.BUKP.Speed>3 then
-                self:Next()
+
+            local cikState = 0
+            if Train.Microphone.Value > 0 then
+                if Announcer.LineEnabled then
+                    cikState = 3 -- Громкая связь
+                else
+                    cikState = 2 -- Межкабинная связь активна
+                end
+            elseif self.LineOut + Train.UPO.LineOut > 0 then
+                cikState = 1 -- Воспроизведение...
+            else
+                cikState = 0 -- Готов
             end
+            if Announcer.CIKStateIntercab then
+                cikState = Announcer.CIKStateIntercab
+            end
+            
+            if Announcer.CIKState ~= cikState then
+                if not Announcer.CIKStateIntercab then
+                    Train:CANWrite("BMCIK",Train:GetWagonNumber(),"BMCIK",nil,self.CAN_CIKSTATE,cikState > 1 and cikState or nil)
+                end
+
+                if Announcer.Active and cikState == 3 and self.LineOut then self:Announcer_Stop() end
+                Announcer.CIKState = cikState
+            end
+
+            local ann = 0
+            ann = setBitValue(ann,Announcer.State,0,6)
+            ann = setBitValue(ann,Announcer.CIKState,6,4)
+            ann = setBitValue(ann,Announcer.Line,10,8)
+            ann = setBitValue(ann,Announcer.LimitStation or 0,18,12)
+            ann = setBitValue(ann,Announcer.Path and 1 or 0,30,1)
+            ann = setBitValue(ann,Announcer.PathSel and 1 or 0,31,1)
+            Train:SetNW2Int("BMCIK:Announcer",ann)
+            Train:SetNW2Bool("BMCIK:LineEnabled",Announcer.LineEnabled)
+        elseif self.State < 0 then
+            if CurTime() > self.LoadingTimer then
+                if self.State == -6 then
+                    self.State = -5
+                    self.LoadingTimer = CurTime()+math.Rand(0.9,1.5)
+                elseif self.State == -5 then
+                    self.State = -4
+                    self.LoadingTimer = CurTime()+2
+                elseif self.State == -4 then
+                    self.State = -3
+                    self.LoadingTimer = CurTime()+math.Rand(9,12)
+                elseif self.State == -3 then
+                    self.State = -2
+                    self.LoadingTimer = CurTime()+math.Rand(1,3)
+                elseif self.State == -2 then
+                    self.State = -1
+                    self.LoadingTimer = CurTime()+math.Rand(2,3)
+                elseif self.State == -1 then
+                    self.State = 1
+                    self.CAN_SU = CurTime()
+                    self:Cam_Scan()
+                end
+            end
+            if self.State == -4 then Train:SetNW2Int("BMCIK:GRUBTimeout",self.LoadingTimer - CurTime() + 1) end
         else
-            if self.Depeating then
-                self:Next()
-            end
-            self.UPOActive = 0
-            self.UPOLock = false
-            self.CloseDoors = false
-            self.Active = false
-            --self.CloseTimer = CurTime()
+            self.State = -6
+            self.LoadingTimer = CurTime()+math.Rand(5,7)
+            -- self.State = -2
+            -- self.LoadingTimer = CurTime()+3
         end
-        Train:SetNW2Bool("SarmatMonitor",Train.Electric.Power>0 and Train.SF16.Value > 0)
-        Train:SetNW2Int("SarmatState",self.SarmatState)
-        Train:SetNW2Int("WagNum",#Train.WagonList)
-
-        Train:SetNW2Int("SarmatAnnState",self.SarmatAnnState)
-
-        Train:SetNW2Int("SarmatLine",self.Line)
-        Train:SetNW2Bool("SarmatPath",self.Path)
-        Train:SetNW2Int("SarmatStation",self.Station)
-        Train:SetNW2Bool("SarmatStationArr",self.Arrived)
-
-        Train:SetNW2Bool("SarmatLineEnabled",self.LineEnabled)
-
-        Train:SetNW2Int("SarmatStartStation",self.StartStation)
-        Train:SetNW2Int("SarmatEndStation",self.EndStation)
-
-        local Ann = Train.Announcer
-        self.LineOut = (Ann.AnnTable=="AnnouncementsSarmatUPO" and Ann.AnnounceTimer) and 1 or 0
+    else
+        if self.State ~= 0 then
+            self:MemReset()
+            self.State = 0
+        end
     end
-else
-    local function createFont(name,font,size,weight)
-        surface.CreateFont("Metrostroi_"..name, {
-            font = font,
-            size = size,
-            weight = weight or 400,
-            blursize = 0,
-            antialias = true,
-            underline = false,
-            italic = false,
-            strikeout = false,
-            symbol = false,
-            rotary = false,
-            shadow = false,
-            additive = false,
-            outline = false,
-            extended = true,
-        })
-    end
-    --createFont("BUKPSpeed","Eurostar Metrostroi",80)
-    createFont("Arial15","Arial",15,800)
-    createFont("Arial20","Arial",20,800)
-    createFont("Arial22","Arial",22,400)
-    createFont("Arial25","Arial",25,400)
-    createFont("Arial30","Arial",30,400)
-    local ubuntu_load = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/ubuntu_load")
-    local button = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/button")
 
-
-
-    function TRAIN_SYSTEM:ClientInitialize()
-        self.Cam1 = self.Train:CreateRT("720SarmatC1",256,256,true)
-        self.Cam2 = self.Train:CreateRT("720SarmatC2",256,256,true)
-        self.Cam3 = self.Train:CreateRT("720SarmatC3",256,256,true)
-        self.Cam4 = self.Train:CreateRT("720SarmatC4",256,256,true)
-    end
-    local CamRT = surface.GetTextureID( "pp/rt" )
-    local CamRTM = Material( "pp/rt" )
-    local SarPos = Vector(470,41,-6)
-    function TRAIN_SYSTEM:ClientThink()
-        if not self.Train:ShouldDrawPanel("Sarmat") then return end
-        local train = self.Train
-        local state = train:GetNW2Int("SarmatState",0)
-        local camstate = train:GetNW2Int("SarmatCamState",1)
-        local Cam1,Cam1E = train:GetNW2Bool("SarmatCam1C"),train:GetNW2Entity("SarmatCam1E")
-        local Cam2,Cam2E = train:GetNW2Bool("SarmatCam2C"),train:GetNW2Entity("SarmatCam2E")
-        local Cam3,Cam3E = train:GetNW2Bool("SarmatCam3C"),train:GetNW2Entity("SarmatCam3E")
-        local Cam4,Cam4E = train:GetNW2Bool("SarmatCam4C"),train:GetNW2Entity("SarmatCam4E")
-        if state > 0 then
-            if camstate == 2 then
-                if Cam1 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam1",math.Rand(0.2,0.5),self.Cam1,Cam1E,Vector(425,65,40),Angle(5,180-5,0),256,256,2,64,64) end
-                if Cam2 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam2",math.Rand(0.2,0.5),self.Cam2,Cam2E,Vector(425,-65,40),Angle(5,180+5,0),256,256,2,64,64) end
-            end
-            if camstate == 3 then
-                if Cam1 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam1",math.Rand(0.2,0.5),self.Cam1,Cam1E,Vector(425,-65,40),Angle(5,180+5,0),256,256,2,64,64) end
-                if Cam2 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam2",math.Rand(0.2,0.5),self.Cam2,Cam2E,Vector(425,65,40),Angle(5,180-5,0),256,256,2,64,64) end
-            end
-            if camstate == 4 then
-                if Cam1 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam1",math.Rand(0.2,0.5),self.Cam1,Cam1E,Vector(425,65,40),Angle(5,180-5,0),256,256,2,64,64) end
-                if Cam2 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam2",math.Rand(0.2,0.5),self.Cam2,Cam2E,Vector(425,-65,40),Angle(5,180+5,0),256,256,2,64,64) end
-                if Cam3 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam3",math.Rand(0.2,0.5),self.Cam3,Cam3E,Vector(425,-65,40),Angle(5,180+5,0),256,256,2,64,64) end
-                if Cam4 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam4",math.Rand(0.2,0.5),self.Cam4,Cam4E,Vector(425,65,40),Angle(5,180-5,0),256,256,2,64,64) end
-            end
-            if camstate == 5 then
-                if Cam1 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam1",math.Rand(0.2,0.5),self.Cam1,Cam1E,Vector(360,-45,30),Angle(15,180-15,0),256,256,1) end
-                if Cam2 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam2",math.Rand(0.2,0.5),self.Cam2,Cam2E,Vector(360,45,30),Angle(15,180+15,0),256,256,1) end
-                if Cam3 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam3",math.Rand(0.2,0.5),self.Cam3,Cam3E,Vector(-360,-45,30),Angle(15,15,0),256,256) end
-                if Cam4 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam4",math.Rand(0.2,0.5),self.Cam4,Cam4E,Vector(-360,45,30),Angle(15,-15,0),256,256) end
-            end
-            if camstate == 6 then
-                if Cam1 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam1",math.Rand(0.2,0.5),self.Cam1,Cam1E,Vector(408,35,37),Angle(25,-15,0),256,256,1) end
-            end
-            if camstate == 7 then
-                if Cam1 then Metrostroi.RenderCamOnRT(train,SarPos,"Cam1",math.Rand(0.2,0.5),self.Cam1,Cam1E,Vector(490,6,-7),Angle(0,0,0),256,256,1) end
+    -- BMTS-07 logic
+    local BMTSPower = Train.Electric.Power > 0 and Train.SF18.Value > 0
+    local BMTS = self.BMTS
+    if BMTSPower and Train.SF18.Value > 0 then
+        if BMTS.State == 0 then
+            BMTS.State = -1
+            BMTS.Loading = CurTime()+5
+            BMTS.Update = true
+        elseif self.BMTS.State == -1 then
+            if CurTime() > BMTS.Loading then
+                BMTS.State = 1
+                BMTS.Text = ""
+                BMTS.Loading = nil
+                BMTS.Update = true
             end
         end
-        --debugoverlay.Sphere(self.Train:LocalToWorld(Vector(425,-65,46)),2,1,Color( 255, 255, 255 ),true)
-        render.PushRenderTarget(self.Train.Sarmat,0,0,1024, 1024)
+    else 
+        if BMTS.State ~= 0 then
+            BMTS.State = 0
+            BMTS.Text = ""
+            BMTS.Update = true
+        end
+    end
+
+    Train:SetNW2Int("BMCIK:State",self.State)
+    if BMTS.Update then
+        BMTS.Update = false
+        Train:SetNW2Int("BMTS:State",BMTS.State)
+        Train:SetNW2String("BMTS:Text",BMTS.Text)
+    end
+end
+
+function TRAIN_SYSTEM:MemReset(resetAnn)
+    self.ZeroBtnTimer = nil
+    self.EscBtnTimer = nil
+    self.Brightness = 1
+
+    self.NIIP.CabActive = false
+
+    self:Cam_Reset()
+    self:Announcer_Reset(resetAnn)
+    self:List_Reset()
+
+    self.Train:SetNW2Int("BMCIK:IDTouched",0)
+    self.Train:SetNW2Float("BMCIK:Brightness",1)
+    self.Train:SetNW2Int("BMCIK:VolCab",0)
+end
+
+if SERVER then return end
+
+local font20 = "Metrostroi_Dejavu20"
+local font21 = "Metrostroi_Dejavu21"
+local font28 = "Metrostroi_Dejavu28"
+
+-- Create fonts
+local function createFont(name,font,size,weight,noAA)
+    surface.CreateFont("Metrostroi_"..name, {
+        font = font,
+        size = size,
+        weight = weight or 400,
+        blursize = 0,
+        antialias = not noAA,
+        underline = false,
+        italic = false,
+        strikeout = false,
+        symbol = false,
+        rotary = false,
+        shadow = false,
+        additive = false,
+        outline = false,
+        extended = true,
+    })
+end
+createFont("Dejavu20","Dejavu Sans",20)
+createFont("Dejavu21","Dejavu Sans",21)
+createFont("Dejavu22","Dejavu Sans",22)
+createFont("Dejavu26","Dejavu Sans",26)
+createFont("Dejavu28","Dejavu Sans",28)
+createFont("BMTS1","Arial",14,800,true)
+createFont("BMTS2","Arial",17,800,true)
+createFont("BMTS3","Arial",22,800,true)
+createFont("BMTS4","Arial",30,800,true)
+
+local function drawText(text,x,y,xalign,yalign)
+    if (xalign or yalign) then
+        local w,h = surface.GetTextSize( text )
+        if (xalign == TEXT_ALIGN_CENTER) then
+            x = x - w / 2
+        elseif (xalign == TEXT_ALIGN_RIGHT) then
+            x = x - w
+        end
+
+        if (yalign == TEXT_ALIGN_CENTER) then
+            y = y - h / 2
+        elseif (yalign == TEXT_ALIGN_BOTTOM) then
+            y = y - h
+        end
+    end
+    surface.SetTextPos(x,y)
+    surface.DrawText(text)
+end
+
+local scx,scy = 1,1 -- Multipliers for fix RT draw on screen
+function TRAIN_SYSTEM:ClientInitialize()
+    scx,scy = math.max(ScrW()/2048,1),math.max(ScrH()/1024,1)
+    self.Cams = {
+        {self.Train:CreateRT("722BVK1",512,512),0},
+        {self.Train:CreateRT("722BVK2",512,512),0},
+        {self.Train:CreateRT("722BVK3",512,512),0},
+        {self.Train:CreateRT("722BVK4",512,512),0}
+    }
+
+    self.HeaderNames = table.Copy(self.HeaderNames)
+    self.List = {
+        Selected = 0,
+        Offset = 0
+    }
+    self.BMTS = {
+        State = 0,
+        Text = "",
+        Update = true
+    }
+end
+
+local BMTSPixels = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/bmts")
+function TRAIN_SYSTEM:ClientThink(dT)
+    -- БМЦИК-01 ЦИКВ.465122.049
+    if self.Train:ShouldDrawPanel("BMCIK") then
+        render.PushRenderTarget(self.Train.BMCIKScr,0,0,2048, 1024)
         render.Clear(0, 0, 0, 0)
         cam.Start2D()
+            render.SetScissorRect(0,0,1280,800,true)
             surface.SetDrawColor(0,0,0)
-            surface.DrawRect(0,0,1024,640)
-            self:SarmatMonitor(self.Train)
+            surface.DrawRect(0,0,1280,800)
+            local state = self.Train:GetNW2Int("BMCIK:State",0)
+            self:BMCIK01(self.Train,state)
+            if state ~= 0 then
+                surface.SetDrawColor(20,20,90,8)
+                surface.DrawRect(0,0,1280,800)
+            end
+            render.SetScissorRect(0,0,0,0,false)
         cam.End2D()
         render.PopRenderTarget()
     end
 
-    local function drawButton(x,y,w,h,text)
-        surface.DrawTexturedRectRotated(x,y,w,h,0)
-        draw.SimpleText(text,"Metrostroi_Arial20",x,y, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+    -- БМТС-07 ЦИКВ.402261.031
+    if self.Train:ShouldDrawPanel("BMTS") then
+        local BMTSText = self.Train:GetNW2String("BMTS:Text","")
+        local BMTSState = self.Train:GetNW2Int("BMTS:State",0)
+        if self.BMTS.State ~= BMTSState then
+            self.BMTS.State = BMTSState
+            self.BMTS.Update = true
+        end
+        if self.BMTS.State > 0 and self.BMTS.Text ~= BMTSText then
+            self.BMTS.Text = BMTSText
+            self.BMTS.Update = true
+        end
+
+        if self.BMTS.Update then
+            render.PushRenderTarget(self.Train.BMTSScr,0,0,512,128)
+            render.Clear(0, 0, 0, 0)
+            cam.Start2D()
+                self:BMTS07(self.Train)
+                render.OverrideBlend(true,BLEND_ZERO,BLEND_ONE,BLENDFUNC_ADD,BLEND_ZERO,BLEND_ZERO,BLENDFUNC_MIN)
+                    surface.SetDrawColor(255,255,255,200)
+                    surface.SetTexture(BMTSPixels)
+                    surface.DrawTexturedRectRotated(256,64,512,128,0)
+                render.OverrideBlend(false)
+            cam.End2D()                   
+            render.PopRenderTarget()
+            self.BMTS.Update = false
+        end
     end
-    local names = {
-        "Левые камеры",
-        "Передние камеры",
-        "Все левые/правые камеры",
-        "Задние камеры",
-        "Правые камеры",
-        "Салонные камеры",
-        "Камера на посте машиниста",
-        "Камера на посте машиниста",
-        "Путевая камера",
-        "Путевая камера",
-    }
-    local types = {
-        {"Левая камера 1 вагона","Левая камера %d вагона"},
-        {"Левая камера 1 вагона","Правая камера 1 вагона"},
-        {"Левая камера 1 вагона","Правая камера 1 вагона","Левая камера %d вагона","Правая камера %d вагона"},
-        {"Левая камера %d вагона","Правая камера %d вагона"},
-        {"Правая камера 1 вагона","Правая камера %d вагона"},
-        {"Передняя правая камера салона","Передняя левая камера салона","Задняя правая камера салона","Задняя левая камера салона"},
-        {"Камера кабины 1 вагона"},
-        {"Камера кабины %d вагона"},
-        {"Путевая камера 1 вагона"},
-        {"Путевая камера %d вагона"},
-    }
-    local inverts = {
-        {true,false},
-        {true,true},
-        {true,true,false,false},
-        {false,false},
-        {true,false},
-        {true,true,false,false},
-        {false},
-        {false},
-        {false},
-        {false},
-    }
-    --SarmatCam2T
-    function TRAIN_SYSTEM:SarmatMonitor(Train)
-        local state = Train:GetNW2Int("SarmatState",0)
-        local annstate = Train:GetNW2Int("SarmatAnnState",1)
-        local camstate = Train:GetNW2Int("SarmatCamState",1)
-        local WagNum = Train:GetNW2Int("WagNum",0)
-        if not Train:GetNW2Bool("SarmatMonitor") then return end
-        if state == -2 then
-            surface.SetDrawColor(255,255,255)
-            surface.DrawRect(0,0,1024,640)
-            surface.SetDrawColor(220,83,13)
-            surface.DrawRect(450+math.ceil(CurTime()%4-1)*32,341,6,6)
-            surface.SetTexture(ubuntu_load)
-            surface.SetDrawColor(255,255,255)
-            surface.DrawTexturedRectRotated(512,512,1024,1024,0)
-        elseif state == 1 then
-            surface.SetDrawColor(15,15,15)
-            surface.DrawRect(0,0,1024,640)
+end
 
-            local line = Train:GetNW2Int("SarmatLine")
-            local path = Train:GetNW2Bool("SarmatPath")
-            local station = Train:GetNW2Int("SarmatStation",1)
-            local stationarr = Train:GetNW2Bool("SarmatStationArr")
-
-            local st = Train:GetNW2Int("SarmatStartStation")
-            local en = Train:GetNW2Int("SarmatEndStation")
-
-            local lineenabled = Train:GetNW2Bool("SarmatLineEnabled")
-            local sel = Train:GetNW2Int("SarmatSelect",1)
-            local stbl = Metrostroi.SarmatUPOSetup[Train:GetNW2Int("Announcer",1)]
-            Metrostroi.DrawRectOutline(820,5,96,26,lineenabled and Color(0,200,0) or Color(50,50,50),3)
-            draw.SimpleText("ЛИНИЯ","Metrostroi_Arial15",868,17, lineenabled and Color(0,200,0) or Color(50,50,50),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-            Metrostroi.DrawRectOutline(916,5,96,26,Color(200,200,200),3)
-            draw.SimpleText("ПУТЬ "..(path and 2 or 1),"Metrostroi_Arial15",964,17, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-
-            if annstate == 1 then
-                local ann = stbl[line]
-
-
-                --render.DrawTextureToScreenRect(self.Cam3,0,260,260,260)
-                --render.DrawTextureToScreenRect(self.Cam4,260,260,260,260)
-                if not ann then
-                    draw.SimpleText(Format("Линия: -%s-",self.Specials[line]),"Metrostroi_Arial20",870,60, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                else
-                    draw.SimpleText(Format("Линия: %s-%s%s",ann[1][2],ann[#ann][2],ann.Loop and "[кол]" or ""),"Metrostroi_Arial20",870,60, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                    local count = stationarr and 0.5 or 1
-                    local last
-                    if ann.Loop then
-                        last =  path and station-16 or 16+station
-                    else
-                        last = (path and st or en)
-                    end
-                    for i=station,last,path and -1 or 1 do
-                        i = (i-1)%(#ann)+1
-                        local stat = ann[i]
-                        if ann.Loop and en > 0 and count > 1 and i == en+(path and -1 or 1) then
-                            break
-                        end
-                        if ann.Loop or (path and i < station or i > station) or not stationarr then
-                            if count > 9 and stationarr then
-                                draw.SimpleText("...","Metrostroi_Arial22",760,30+count*54, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                                break
-                            elseif count >= 1 then
-                                draw.SimpleText(stat[2],"Metrostroi_Arial22",760,30+count*54, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                            end
-                        end
-                        if count > 8 and not stationarr then
-                            draw.SimpleText("...","Metrostroi_Arial22",760,57+count*54, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                            break
-                        end
-                        if (path and not ann.Loop and i~=st or (not path or ann.Loop and en > 0) and i~=en or ann.Loop and en == 0) then
-                            draw.SimpleText(stat[2].." отпр.","Metrostroi_Arial22",760,57+count*54, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                        else
-                            draw.SimpleText(stat[2].." кон.","Metrostroi_Arial22",760,57+count*54, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                        end
-                        count = count + 1
-                    end
-                end
-            end
-            if annstate == 2 then
-                draw.SimpleText("Выбор линии:","Metrostroi_Arial20",870,60, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-
-                for cline=-4,#stbl do
-                    if cline>0 then
-                        local ann = stbl[cline]
-                        draw.SimpleText(Format("%s-%s%s",ann[1][2],ann[#ann][2],ann.Loop and "[кол]" or ""),"Metrostroi_Arial22",760,60+(cline+5)*30, cline == line and Color(80,120,150) or Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    else
-                        draw.SimpleText(Format("-%s-",self.Specials[cline]),"Metrostroi_Arial22",760,60+(cline+5)*30, cline == line and Color(80,120,150) or Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    end
-                end
-            end
-            if annstate == 3 then
-                draw.SimpleText("Выбор начальной и конечной:","Metrostroi_Arial20",870,60, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                local count = stbl[line].Loop and 2 or 1
-                if stbl[line].Loop then
-                    draw.SimpleText("Кольцевой","Metrostroi_Arial22",760,60+30, 0 == sel and Color(80,120,150) or Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    if en == 0 then
-                        draw.SimpleText("К","Metrostroi_Arial22",750,60+30, Color(200,0,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                    end
-                end
-                for i=1,#stbl[line] do
-                    local ann = stbl[line][i]
-                    if i==1 or i==#stbl[line] or ann.arrlast then
-                        draw.SimpleText(ann[2],"Metrostroi_Arial22",760,60+count*30, i == sel and Color(80,120,150) or Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                        if not stbl[line].Loop and st==i then
-                            draw.SimpleText("Н","Metrostroi_Arial22",750,60+count*30, Color(0,200,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        elseif en == i then
-                            draw.SimpleText("К","Metrostroi_Arial22",750,60+count*30, Color(200,0,0),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        end
-                        count = count + 1
-                    end
-                end
-            end
-
-            surface.SetDrawColor(127,127,127)
-            surface.SetTexture(button)
-            if camstate == 0 then
-                draw.SimpleText("Система видеонаблюдения","Metrostroi_Arial25",360  ,25, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                draw.SimpleText("Не активна","Metrostroi_Arial20",360,85, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-            end
-            if camstate == 1 then
-                local selected = Train:GetNW2Int("SarmatCamSelected",0)
-                draw.SimpleText("Система видеонаблюдения","Metrostroi_Arial25",360  ,25, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                draw.SimpleText("Наружные камеры","Metrostroi_Arial20",360,85, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-
-                drawButton(124,140,113,40,"Левые")
-                draw.SimpleText("Вагон 1","Metrostroi_Arial20",235,106, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                drawButton(242,140,113,40,"Передние")
-                draw.SimpleText("Все вагоны","Metrostroi_Arial20",360,106, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                drawButton(360,140,113,40,"Вокруг")
-                draw.SimpleText("Вагон "..WagNum,"Metrostroi_Arial20",485,106, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                drawButton(478,140,113,40,"Задние")
-                drawButton(596,140,113,40,"Правые")
-
-                draw.SimpleText("Камеры в салоне","Metrostroi_Arial20",360,200, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                for i=1+selected,math.min(WagNum,6+selected) do
-                    drawButton(65+(i-1-selected)*118+118*math.max(0,6-WagNum)/2 ,235,113,40,"Вагон "..i)
-                end
-
-                draw.SimpleText("Камеры на постах машиниста","Metrostroi_Arial20",360,315, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                drawButton(220,350,113,40,"Вагон 1")
-                drawButton(500,350,113,40,"Вагон "..WagNum)
-
-                draw.SimpleText("Путевые камеры","Metrostroi_Arial20",360,430, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                drawButton(220,465,113,40,"Вагон 1")
-                drawButton(500,465,113,40,"Вагон "..WagNum)
-                --surface.DrawTexturedRectRotated(110,590,200,40,0)
-                --draw.SimpleText("Esc","Metrostroi_Arial20",110,590, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-
-                if selected ~= 0 then drawButton(320,590,200,40,"<-") end
-                if 6+selected < WagNum then drawButton(530,590,200,40,"->") end
-                --render.DrawTextureToScreenRect(self.Cam1,15,50,690,510)
-            end
-            if camstate > 1 then
-                local camtype = Train:GetNW2Int("SarmatCamType")
-                draw.SimpleText(names[camtype] or "Система видеонаблюдения","Metrostroi_Arial25",15 ,25, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                local CamCount = Train:GetNW2Int("SarmatCamC")
-                local Cam1 = Train:GetNW2Bool("SarmatCam1C")
-                local Cam2 = Train:GetNW2Bool("SarmatCam2C")
-                local Cam3 = Train:GetNW2Bool("SarmatCam3C")
-                local Cam4 = Train:GetNW2Bool("SarmatCam4C")
-                if CamCount > 0 then
-                    local invert = inverts[camtype][1]
-                    local w,h = 340,250
-                    if CamCount < 2 then w = 690 end
-                    if CamCount < 3 then h = 510 end
-                    if Cam1 then
-                        surface.SetDrawColor(255,255,255,255)
-                        if invert then render.DrawTextureToScreenRect(self.Cam1,15+w,50,-w,h) else render.DrawTextureToScreenRect(self.Cam1,15,50,w,h) end
-                        draw.SimpleText("связь","Metrostroi_Arial20",15+w-5,50+h-10, Color(50,200,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    else
-                        surface.SetDrawColor(0,0,0,255)
-                        surface.DrawRect(15,50,w,h)
-                        draw.SimpleText("Подключение к камере...","Metrostroi_Arial30",15+w/2,50+h/2, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        draw.SimpleText("нет связи","Metrostroi_Arial20",15+w-5,50+h-10, Color(200,50,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    end
-                    draw.SimpleText("[1]"..Format(types[camtype][1],WagNum),"Metrostroi_Arial20",15+5,50+10, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(Format("Вагон №%d",Train:GetNW2Int("SarmatCam1EN")),"Metrostroi_Arial20",15+5,50+30, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    Metrostroi.DrawRectOutline(15,50,w,h,Color(40,40,40),2)
-                end
-                if CamCount > 1 then
-                    local h = 250
-                    if CamCount < 3 then h = 510 end
-                    if Cam2 then
-                        local invert = inverts[camtype][2]
-                        surface.SetDrawColor(255,255,255,255)
-                        if invert then render.DrawTextureToScreenRect(self.Cam2,340+15+10+340,50,-340,h) else render.DrawTextureToScreenRect(self.Cam2,340+15+10,50,340,h) end
-                        draw.SimpleText("связь","Metrostroi_Arial20",365+340-5,50+h-10, Color(50,200,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    else
-                        surface.SetDrawColor(0,0,0,255)
-                        surface.DrawRect(340+15+10,50,340,h)
-                        draw.SimpleText("Подключение к камере...","Metrostroi_Arial30",365+340/2,50+h/2, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        draw.SimpleText("нет связи","Metrostroi_Arial20",365+340-5,50+h-10, Color(200,50,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    end
-                    draw.SimpleText("[2]"..Format(types[camtype][2],WagNum),"Metrostroi_Arial20",365+5,50+10, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(Format("Вагон №%d",Train:GetNW2Int("SarmatCam2EN")),"Metrostroi_Arial20",365+5,50+30, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    Metrostroi.DrawRectOutline(340+15+10,50,340,h,Color(40,40,40),2)
-                end
-                if CamCount > 2 then
-                    if Cam3 then
-                        local invert = inverts[camtype][3]
-                        surface.SetDrawColor(255,255,255,255)
-                        if invert then render.DrawTextureToScreenRect(self.Cam3,15+340,50+250+10,-340,250) else render.DrawTextureToScreenRect(self.Cam3,15,50+250+10,340,250) end
-                        draw.SimpleText("связь","Metrostroi_Arial20",15+340-5,300+250, Color(50,200,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    else
-                        surface.SetDrawColor(0,0,0,255)
-                        surface.DrawRect(15,50+250+10,340,250)
-                        draw.SimpleText("Подключение к камере...","Metrostroi_Arial30",15+340/2,310+250/2, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        draw.SimpleText("нет связи","Metrostroi_Arial20",15+340-5,300+250, Color(200,50,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    end
-                    draw.SimpleText("[3]"..Format(types[camtype][3],WagNum),"Metrostroi_Arial20",15+5,310+10, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(Format("Вагон №%d",Train:GetNW2Int("SarmatCam3EN")),"Metrostroi_Arial20",15+5,310+30, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    Metrostroi.DrawRectOutline(15,50+250+10,340,250,Color(40,40,40),2)
-                end
-                if CamCount > 3 then
-                    local invert = inverts[camtype][4]
-                    if Cam4 then
-                        surface.SetDrawColor(255,255,255,255)
-                        if invert then render.DrawTextureToScreenRect(self.Cam4,340+15+10+340,50+250+10,-340,250) else render.DrawTextureToScreenRect(self.Cam4,340+15+10,50+250+10,340,250) end
-                        draw.SimpleText("связь","Metrostroi_Arial20",365+340-5,300+250, Color(50,200,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    else
-                        surface.SetDrawColor(0,0,0,255)
-                        surface.DrawRect(340+15+10,50+250+10,340,250)
-                        draw.SimpleText("Подключение к камере...","Metrostroi_Arial30",365+340/2,310+250/2, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                        draw.SimpleText("нет связи","Metrostroi_Arial20",365+340-5,300+250, Color(200,50,50),TEXT_ALIGN_RIGHT,TEXT_ALIGN_CENTER)
-                    end
-                    draw.SimpleText("[4]"..Format(types[camtype][4],WagNum),"Metrostroi_Arial20",365+5,310+10, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(Format("Вагон №%d",Train:GetNW2Int("SarmatCam4EN")),"Metrostroi_Arial20",365+5,310+30, Color(200,150,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    Metrostroi.DrawRectOutline(340+15+10,50+250+10,340,250,Color(40,40,40),2)
-                end
-                surface.SetDrawColor(127,127,127)
-                surface.SetTexture(button)
-                drawButton(110,590,200,40,"Esc")
-                --drawButton(320,590,200,40,"<-")
-                --drawButton(530,590,200,40,"->")
-            end
-            --surface.SetTexture( self.Cam1 )
-            --surface.SetDrawColor( 255, 0, 0, 255 )
-            --[[
-
-
-
-            --]
-            --[[
-            render.DrawTextureToScreenRect(self.Cam1,15,50,340,510)
-            render.DrawTextureToScreenRect(self.Cam2,340+15+10,50,340,510)--]]
-            --[[
-            for i=1,#Metrostroi.WorkingStations[line] do
-                local st = Metrostroi.WorkingStations[line][i]
-                draw.SimpleText(Metrostroi.AnnouncerTranslate[st],"Metrostroi_Arial25",760,80+i*30, Color(200,200,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-            end]]
-            --draw.SimpleText("Блок неактивен","Metrostroi_Arial25",870,100, Color(200,200,200),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+local sarmatLogo = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/sarmat_logo")
+local grubMenu = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/grub")
+function TRAIN_SYSTEM:BMCIK01(Train,state)
+    if state == 0 then return end
+    if state == -4 then
+        local grubTimeout = Train:GetNW2Int("BMCIK:GRUBTimeout",0)
+        surface.SetTexture(grubMenu)
+        surface.SetDrawColor(255,255,255)
+        
+        local mat = Matrix()
+        mat:SetScale(Vector(2,1.667))
+        cam.PushModelMatrix(mat)
+            surface.DrawTexturedRect(0,0,1024,512)
+            surface.DrawTexturedRectUV(482,398,8,12,0.625+grubTimeout*0.0078125,0,0.6328125+grubTimeout*0.0078125,0.0234375)
+        cam.PopModelMatrix()
+    elseif state == -3 then
+        if (CurTime()%0.5 > 0.25) then
+            surface.SetTextColor(255,255,255)
+            surface.SetFont(font28)
+            drawText("_",2,2)
         end
-        if state ~= 0 then
-            surface.SetDrawColor(0,0,20,100)
-            surface.DrawRect(0,0,1024,640)
+    elseif state == -2 then
+        draw.SimpleText("_",font28,2,16, Color(255,255,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+        surface.SetTexture(sarmatLogo)
+        surface.SetDrawColor(250,190,0)
+        surface.DrawTexturedRectRotated(955,685,640,320,0)
+    elseif state == 1 then
+        self:BMCIK01State1(Train)
+
+        surface.SetAlphaMultiplier(1-self.Train:GetNW2Float("BMCIK:Brightness",1)^1.2)
+        surface.SetDrawColor(Color(8,8,8))
+        surface.DrawRect(0,0,1280,800,0)
+        surface.SetAlphaMultiplier(1)
+    end
+end
+
+function TRAIN_SYSTEM:BMCIK01State1(Train)
+    self.WagNum = Train:GetNW2Int("BMCIK:WagNum",0)
+
+    self:BMCIK01GUICameras(Train)
+    self:BMCIK01GUIAnnouncer(Train)
+
+    surface.SetFont(font28)
+    surface.SetTextColor(255,255,255)
+    drawText(os.date("!%d.%m.%y %H:%M:%S",Metrostroi.GetSyncTime()),681,742)
+    drawText("Ver. 6",681,768)
+end
+
+local function drawButton(x,y,w,h,text,touched)
+    draw.RoundedBox(8,x,y,w,h,Color(255,255,255))
+    draw.RoundedBox(6,x+2,y+2,w-4,h-4,touched and Color(83,83,83) or Color(35,35,35))
+
+    drawText(text,x+w/2,y+h/2,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+end
+
+local BMCIKPos = Vector(472,37.4,-9)
+local camFrame = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/cam_frame")
+function TRAIN_SYSTEM:BMCIK01GUICameras(Train)
+    local wagNum = self.WagNum
+    local camPage = Train:GetNW2Int("BMCIK:CamPage",0)
+    local touchId = Train:GetNW2Int("BMCIK:IDTouched",0)
+
+    surface.SetFont(font28)
+    surface.SetTextColor(255,255,255)
+    for i=1,self.Buttons.Count do
+        local btn = self.Buttons[i]
+        if btn.show(camPage) then
+            drawButton(btn.x,btn.y,btn.w,btn.h,Format(btn.name,wagNum),touchId == btn.id)
         end
+    end
+    if camPage == 0 then
+        drawText("Система видеонаблюдения",457,32,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+
+        for i=1,self.Buttons.Count do
+            local btn = self.Buttons[i]
+            drawButton(btn.x,btn.y,btn.w,btn.h,Format(btn.name,wagNum),touchId == btn.id)
+        end
+
+        drawText("Наружные камеры",457,129,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+        drawText("1",74,185)
+        drawText(wagNum,74,213)
+        drawText("Вагон 1",311,163,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+        drawText("Все вагоны",457,163,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+        drawText("Вагон "..wagNum,603,163,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+        drawText("1",825,185)
+        drawText(wagNum,825,213)
+
+        drawText("Камеры в салонах",457,303,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+        for i=1,wagNum do
+            if wagNum == 8 then
+                drawButton(350+(i-wagNum/2)*110,323,104,60,"Вагон "..i,touchId == 10+i)
+            elseif wagNum == 7 then
+                drawButton(334+(i-wagNum/2)*126,323,120,60,"Вагон "..i,touchId == 10+i)
+            else
+                drawButton(313+(i-wagNum/2)*147,323,141,60,"Вагон "..i,touchId == 10+i)
+            end
+        end
+        
+        drawText("Камеры на постах машиниста",457,443,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+        drawText("Путевые камеры",457,583,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+    else
+        -- Номер вагона, тип вагона, бортовой номер
+        local camWagIndex = Train:GetNW2Int("BMCIK:CamWagIndex",0)
+        local camWagType = Train:GetNW2Int("BMCIK:CamType",0)
+        local camWagNum = Train:GetNW2Int("BMCIK:CamWagNumber",0)
+        local camCurrConf = self.CamConfig[camWagType][camPage] or self.CamConfig[0][1]
+
+        surface.SetFont("Metrostroi_Dejavu26")
+        local headerCurr = Format("Вагон %d [%d] - %s - страница %d/%d",camWagIndex,camWagNum,camCurrConf.PageName,camPage,self.CamConfig[camWagType].Count)
+        local headerCurrW = surface.GetTextSize(headerCurr)
+
+        surface.SetDrawColor(255,255,255)
+        surface.SetTexture(camFrame)
+        surface.DrawTexturedRectRotated(530,542,1024,1024,0)
+
+        surface.SetDrawColor(0,0,0)
+        surface.DrawRect(457 - ((headerCurrW+10)/2-0.5),30,headerCurrW+10,1)
+        drawText(headerCurr,457 - headerCurrW/2,20)
+
+        local CamNW2 = Train:GetNW2Int("BMCIK:Cam",0)
+        local Cam1 = getBitValue(CamNW2,0,1) > 0
+        local Cam2 = camCurrConf.Count > 1 and getBitValue(CamNW2,1,1) > 0
+        local Cam3 = camCurrConf.Count > 2 and getBitValue(CamNW2,2,1) > 0
+        local Cam4 = camCurrConf.Count > 3 and getBitValue(CamNW2,3,1) > 0
+
+        local camTbl
+        if Cam1 then
+            camTbl = camCurrConf[1]
+            Metrostroi.RenderCamOnRT(Train,BMCIKPos,"Cam1",0.1+0.15*math.random(),self.Cams[1][1],Train:GetNW2Entity("BMCIK:CamE1"),camTbl[2],camTbl[3],512,512,not camTbl.wide and 1.4,not camTbl.wide and 74,not camTbl.wide and 74)
+            self.Cams[1][2] = Metrostroi.CamQueue[1] and (Metrostroi.CamQueue[1][3]:EndsWith("1") and math.floor(1/Metrostroi.CamQueue[1][4])) or self.Cams[1][2]
+        end
+        if Cam2 then
+            camTbl = camCurrConf[2]
+            Metrostroi.RenderCamOnRT(Train,BMCIKPos,"Cam2",0.1+0.15*math.random(),self.Cams[2][1],Train:GetNW2Entity("BMCIK:CamE2"),camTbl[2],camTbl[3],512,512,not camTbl.wide and 1.4,not camTbl.wide and 74,not camTbl.wide and 74)
+            self.Cams[2][2] = Metrostroi.CamQueue[1] and (Metrostroi.CamQueue[1][3]:EndsWith("2") and math.floor(1/Metrostroi.CamQueue[1][4])) or self.Cams[2][2]
+        end
+        if Cam3 then
+            camTbl = camCurrConf[3]
+            Metrostroi.RenderCamOnRT(Train,BMCIKPos,"Cam3",0.1+0.15*math.random(),self.Cams[3][1],Train:GetNW2Entity("BMCIK:CamE3"),camTbl[2],camTbl[3],512,512,not camTbl.wide and 1.4,not camTbl.wide and 74,not camTbl.wide and 74)
+            self.Cams[3][2] = Metrostroi.CamQueue[1] and (Metrostroi.CamQueue[1][3]:EndsWith("3") and math.floor(1/Metrostroi.CamQueue[1][4])) or self.Cams[3][2]
+        end
+        if Cam4 then
+            camTbl = camCurrConf[4]
+            Metrostroi.RenderCamOnRT(Train,BMCIKPos,"Cam4",0.1+0.15*math.random(),self.Cams[4][1],Train:GetNW2Entity("BMCIK:CamE4"),camTbl[2],camTbl[3],512,512,not camTbl.wide and 1.4,not camTbl.wide and 74,not camTbl.wide and 74)
+            self.Cams[4][2] = Metrostroi.CamQueue[1] and (Metrostroi.CamQueue[1][3]:EndsWith("4") and math.floor(1/Metrostroi.CamQueue[1][4])) or self.Cams[4][2]
+        end
+        
+        local camFullScreen = getBitValue(CamNW2,4,3)
+        surface.SetFont(font20)
+        if camFullScreen > 0 then
+            local tCam = getBitValue(CamNW2,camFullScreen-1,1) > 0
+            if tCam then
+                render.DrawTextureToScreenRect(self.Cams[camFullScreen][1],scx*24,scy*58,scx*866,scy*662)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[camFullScreen][2]),26,78)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",888,698,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",888,698,TEXT_ALIGN_RIGHT)
+            end
+            Metrostroi.DrawRectOutline(24,58,867,663,Color(176,176,176))
+            surface.SetTextColor(250,200,0)
+            drawText(camCurrConf[camFullScreen][1],26,58)
+        elseif camCurrConf.Count == 4 then
+            -- Top left
+            if Cam1 then
+                render.DrawTextureToScreenRect(self.Cams[1][1],scx*24,scy*58,scx*430,scy*328)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[1][2]),26,78)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",451,364,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",451,364,TEXT_ALIGN_RIGHT)
+            end
+
+            -- Top right
+            if Cam2 then
+                render.DrawTextureToScreenRect(self.Cams[2][1],scx*460,scy*58,scx*430,scy*328)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[2][2]),462,78)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",888,364,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",888,364,TEXT_ALIGN_RIGHT)
+            end
+
+            -- Bottom left
+            if Cam3 then
+                render.DrawTextureToScreenRect(self.Cams[3][1],scx*24,scy*392,scx*430,scy*328)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[3][2]),26,414)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",451,698,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",451,698,TEXT_ALIGN_RIGHT)
+            end
+            
+            -- Bottom right
+            if Cam4 then
+                render.DrawTextureToScreenRect(self.Cams[4][1],scx*460,scy*392,scx*430,scy*328)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[4][2]),462,414)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",888,698,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",888,698,TEXT_ALIGN_RIGHT)
+            end
+
+
+            Metrostroi.DrawRectOutline(24,58,431,329,Color(176,176,176))
+            Metrostroi.DrawRectOutline(460,58,431,329,Color(176,176,176))
+            Metrostroi.DrawRectOutline(24,392,431,329,Color(176,176,176))
+            Metrostroi.DrawRectOutline(460,392,431,329,Color(176,176,176))
+
+            surface.SetTextColor(250,200,0)
+            drawText(camCurrConf[1][1],26,58)
+            drawText(camCurrConf[2][1],462,58)
+            drawText(camCurrConf[3][1],26,394)
+            drawText(camCurrConf[4][1],462,394)
+        elseif camCurrConf.Count == 2 then
+            -- Left
+            if Cam1 then
+                render.DrawTextureToScreenRect(self.Cams[1][1],scx*24,scy*58,scx*430,scy*662)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[1][2]),26,78)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",451,698,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",451,698,TEXT_ALIGN_RIGHT)
+            end
+
+            -- Right
+            if Cam2 then
+                render.DrawTextureToScreenRect(self.Cams[2][1],scx*460,scy*58,scx*430,scy*662)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[2][2]),462,78)
+
+                surface.SetTextColor(0,200,0)
+                drawText("link",888,698,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",888,698,TEXT_ALIGN_RIGHT)
+            end
+
+
+            Metrostroi.DrawRectOutline(24,58,431,663,Color(176,176,176))
+            Metrostroi.DrawRectOutline(460,58,431,663,Color(176,176,176))
+
+            surface.SetTextColor(250,200,0)
+            drawText(camCurrConf[1][1],26,58)
+            drawText(camCurrConf[2][1],462,58)
+        else
+            if Cam1 then
+                render.DrawTextureToScreenRect(self.Cams[1][1],scx*24,scy*58,scx*866,scy*662)
+                surface.SetTextColor(200,0,0)
+                drawText("fps = "..(self.Cams[1][2]),26,78)
+                
+                surface.SetTextColor(0,200,0)
+                drawText("link",888,698,TEXT_ALIGN_RIGHT)
+            else
+                surface.SetTextColor(200,0,0)
+                drawText("no link",888,698,TEXT_ALIGN_RIGHT)
+            end
+            Metrostroi.DrawRectOutline(24,58,867,663,Color(176,176,176))
+            surface.SetTextColor(250,200,0)
+            drawText(camCurrConf[1][1],26,58)
+        end
+    end
+end
+
+local listCursor = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/list_cursor")
+function TRAIN_SYSTEM:DrawListLine(text,pos,selected)
+    pos = pos - self.List.Offset
+    if selected then
+        surface.SetTexture(listCursor)
+        surface.SetDrawColor(176,176,176)
+        surface.DrawTexturedRectRotated(1174,132+(pos-1)*24,512,32,0)
+
+        surface.SetTextColor(0,0,0)
+    else
+        surface.SetTextColor(255,255,255)
+    end
+    
+    drawText(tostring(text),selected and 924 or 920,94+pos*24)
+end
+
+local annFrame = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/ann_frame")
+local lineFrame = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/line_frame")
+local trainTrainMsg = surface.GetTextureID("models/metrostroi_train/81-722/screens/sarmat_upo/traintrain_msg")
+function TRAIN_SYSTEM:BMCIK01GUIAnnouncer(Train)
+    local listSelected = Train:GetNW2Int("BMCIK:ListSelect"); self.List.Selected = listSelected;
+    local listOffset = Train:GetNW2Int("BMCIK:ListOffset"); self.List.Offset = listOffset;
+
+    local annNW2 = Train:GetNW2Int("BMCIK:Announcer")
+    local annState = getBitValue(annNW2,0,6)
+    local annLine = getBitValue(annNW2,10,8)
+    local annLimit = getBitValue(annNW2,18,12); annLimit = annLimit > 0 and annLimit
+    local annPath = getBitValue(annNW2,30,1) > 0
+    local annPathSel = getBitValue(annNW2,31,1) > 0
+
+    local annTbl = Metrostroi.SarmatUPOSetup[Train:GetNW2Int("Announcer")]
+    local lTbl = annTbl and annTbl[annLine]
+    local lTblCount = lTbl and #lTbl or 0
+
+    surface.SetFont(font28)
+    surface.SetTextColor(255,255,255)
+    drawText("линия",1054,11)
+    drawText(lTbl and "ПУТЬ "..(annPathSel and 2 or 1) or "---",1213,25,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+
+    surface.SetTexture(lineFrame)
+    if Train:GetNW2Bool("BMCIK:LineEnabled") then
+        surface.SetDrawColor(0,255,0)
+        surface.SetTextColor(0,255,0)
+    else
+        surface.SetDrawColor(59,59,59)
+        surface.SetTextColor(59,59,59)
+    end
+    surface.DrawTexturedRectRotated(1096,25,128,32,0)
+    drawText("линия",1053,10)
+
+    -- Header
+    surface.SetTextColor(255,255,255)
+    if annState < 2 then
+        local lNameHeader = "---"
+        if lTbl then
+            if lTbl.Name then
+                lNameHeader = "Линия: "..lTbl.Name
+            else
+                local fSt = annPath and 1 or lTblCount
+                local lSt = annLimit or (annPath and 1 or lTblCount)
+                lNameHeader = Format("Линия: %s-%s",lTbl[fSt][2],lTbl[lSt][2]) -- "Линия: " = 92px
+            end
+            if surface.GetTextSize(lNameHeader) > 355 then
+                lNameHeader = lNameHeader:gsub("-","-\n",1)
+            end
+        end
+        self.HeaderNames[0] = lNameHeader
+        self.HeaderNames[1] = self.HeaderNames[0]
+    end
+    local textHeader = string.Explode("\n",self.HeaderNames[annState])
+    for i=1,#textHeader do
+        drawText(textHeader[i],1091,78-(#textHeader-1)*14+(i-1)*28,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+    end
+
+    -- White frame
+    if annState > 0 and annState ~= 21 then
+        surface.SetDrawColor(255,255,255)
+        surface.SetTexture(annFrame)
+        surface.DrawTexturedRectRotated(1169,623,512,1024,0)
+    end
+
+    -- Lists
+    render.SetScissorRect(918,116,1264,637,true)
+    surface.SetFont(font21)
+    if annState == 0 then
+        surface.SetFont(font28)
+        drawText("Блок неактивен",992,112)
+    elseif annState == 1 then
+        if annPath then
+            for i=lTblCount,1,-1 do
+                if annLimit and i < annLimit then break end
+                local iPos=(lTblCount-i+1)*2
+                
+                self:DrawListLine(lTbl[i][2],iPos-1,listSelected==(iPos-1))
+                self:DrawListLine(lTbl[i][2].." отп",iPos,listSelected==iPos)
+            end
+        else
+            for i=1,lTblCount do
+                if annLimit and i > annLimit then break end
+                local iPos=i*2
+                
+                self:DrawListLine(lTbl[i][2],i*2-1,listSelected==(i*2-1))
+                self:DrawListLine(lTbl[i][2].." отп",i*2,listSelected==(i*2))
+            end
+        end
+    elseif annState > 10 and annState < 20 then
+        if annState == 11 then -- Предупредительные сообщения
+            self:DrawListLine("Нет сообщений",1,true)
+        elseif annState == 12 then -- Ограничения маршрута
+            local iLast = 1
+            if lTbl.Loop then
+                for i=1,lTblCount do
+                    if lTbl[i].arrlast then
+                        self:DrawListLine((annLimit == i and "☑ " or "☐ ")..lTbl[i][2],iLast,listSelected==iLast)
+                        iLast = iLast + 1
+                    end
+                end
+            else
+                for i=2,lTblCount-1 do
+                    if lTbl[i].arrlast then
+                        self:DrawListLine((annLimit == i and "☑ " or "☐ ")..lTbl[i][2],iLast,listSelected==iLast)
+                        iLast = iLast + 1
+                    end
+                end
+            end
+        elseif annState == 13 then -- Дополнительные сообщения
+            self:DrawListLine("Нет сообщений",1,true)
+        elseif annState == 14 then -- Экстренные сообщение
+            self:DrawListLine("Нет сообщений",1,true)
+        elseif annState == 15 then -- Выбор линии
+            for i=1,#annTbl do
+                local lName = annTbl[i].Name or Format("%s-%s",annTbl[i][1][2],annTbl[i][#annTbl[i]][2])
+                self:DrawListLine(lName,i,listSelected==i)
+            end
+        end
+    elseif annState == 2 then -- Меню настройки блока СБУЦИК
+        for i=1,#self.SettingsList do
+            self:DrawListLine(self.SettingsList[i][1],i,listSelected==i)
+        end
+    elseif annState > 20 then
+        if annState == 21 then -- Ввод номера маршрута
+            surface.SetFont(font28)
+            drawText("Ввод номера маршрута",945,112)
+        elseif annState == 22 then -- Режимы работы информатора
+            local mode = Train:GetNW2Int("BMCIK:AnnMode",0)
+            for i=1,#self.AnnModeList do
+                self:DrawListLine((mode == i and "☑ " or "☐ ")..self.AnnModeList[i],i,listSelected==i)
+            end
+        elseif annState == 23 then -- Режимы работы СОСТАВ-СОСТАВ
+            local mode = Train:GetNW2Bool("BMCIK:TrainTrain")
+            self:DrawListLine((mode and "☑ " or "☐ ").."Режим 'Состав-Состав'",1,true)
+            if mode then
+                render.SetScissorRect(0,0,0,0,false)
+                surface.SetDrawColor(255,255,255)
+                surface.DrawRect(900,400,378,250)
+                surface.SetTexture(trainTrainMsg)
+                surface.DrawTexturedRectRotated(1156,528,512,256,0)
+            end
+        elseif annState == 24 then -- Настройка громкости
+            local volumes = Train:GetNW2Int("BMCIK:VolumesPage")
+            local volumeList = self.AnnVolumeList
+            for i=1,#volumeList do
+                self:DrawListLine(volumeList[i][1],i,listSelected==i)
+                drawText(getBitValue(volumes,(i-1)*4,4)*10,1230,118+(i-1)*24,TEXT_ALIGN_CENTER)
+            end
+        elseif annState == 25 then -- Информация
+            local info = self.InfoList
+            local infoNW2 = Train:GetNW2Int("BMCIK:AddInfo",0)
+            for i=1,#info do
+                local v = info[i][2] and Train:GetNW2Int(info[i][2]) or 0
+                self:DrawListLine(info[i][1]..v,i,listSelected==i)
+            end
+        elseif annState == 26 then -- Диагностика
+            for i=1,#self.DiagList do
+                self:DrawListLine(self.DiagList[i],i,listSelected==i)
+            end
+        elseif annState == 27 then -- Язык
+            -- TODO: Add translations support
+            local mode = 1
+            for i=1,#self.LangList do
+                self:DrawListLine((mode==i and "☑ " or "☐ ")..self.LangList[i],i,listSelected==i)
+            end
+        elseif annState == 28 then -- Отображение времени на БИТ
+            local mode = Train:GetNW2Bool("BMCIK:BITTime") and 2 or 1
+            for i=1,#self.BITClockList do
+                self:DrawListLine((mode==i and "☑ " or "☐ ")..self.BITClockList[i],i,listSelected==i)
+            end
+        end
+    end
+    render.SetScissorRect(0,0,0,0,false)
+
+    surface.SetTextColor(255,255,255)
+    surface.SetFont("Metrostroi_Dejavu22")
+    drawText("Состав:",924,647)
+
+    surface.SetFont(font28)
+    local wagNum = self.WagNum
+    for i=0,wagNum-1 do
+        drawButton(1091+(i-wagNum/2)*41,673,40,48,i+1)
+    end
+
+    local cikState = getBitValue(annNW2,6,4)
+    drawText(self.CIKStatesNames[cikState],913,756)
+end
+
+local function stringUpperCyrillic(str)
+    if #str == 0 then return "" end
+    local strtbl = {utf8.codepoint(str,1,-1)}
+    local strUp = ""
+    for i=1,#strtbl do
+        local chartbl = strtbl[i]
+        if chartbl > 0x042F and chartbl < 0x0450 then chartbl = chartbl - 0x20 -- [а,я] --> [A,Я]
+        elseif chartbl == 0x0456 then chartbl = 0x0406 -- і -> І
+        elseif chartbl == 0x0451 then chartbl = 0x0401 -- ё -> Ё
+        elseif chartbl == 0x0457 then chartbl = 0x0407 -- ї -> Ї
+        elseif chartbl == 0x0454 then chartbl = 0x0404 -- є -> Є
+        elseif chartbl == 0x045E then chartbl = 0x040E -- ў -> Ў
+        elseif chartbl == 0x0491 then chartbl = 0x0490 -- ґ -> Ґ
+        end
+        
+        strUp = strUp..(utf8.char(chartbl))
+    end
+    return string.upper(strUp)
+end
+
+function TRAIN_SYSTEM:BMTS07(Train)
+    local state = self.BMTS.State
+    if state == 0 then return end
+    if state == 1 then
+        surface.SetFont("Metrostroi_BMTS4")
+        surface.SetTextColor(255,120,0)
+        local lastStation = stringUpperCyrillic(self.BMTS.Text)
+        local lsW,lsY = surface.GetTextSize(lastStation),-5
+        if lsW >= 230 then
+            surface.SetFont("Metrostroi_BMTS1")
+            lsW = surface.GetTextSize(lastStation)
+            lsY = 3
+        elseif lsW >= 168 then
+            surface.SetFont("Metrostroi_BMTS2")
+            lsW = surface.GetTextSize(lastStation)
+            lsY = 2
+        elseif lsW >= 126 then
+            surface.SetFont("Metrostroi_BMTS3")
+            lsW = surface.GetTextSize(lastStation)
+            lsY = -1
+        end
+        local mat = Matrix()
+        mat:Scale(Vector(4,4))
+        cam.PushModelMatrix(mat)
+            surface.SetTextPos(64-lsW/2, lsY)
+            surface.DrawText(lastStation)
+        cam.PopModelMatrix()
+    elseif state == -1 then
+        surface.SetDrawColor(255,120,0)
+        surface.DrawRect(0,0,512,80)
     end
 end
