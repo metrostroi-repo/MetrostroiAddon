@@ -5,6 +5,7 @@
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
 Metrostroi.DefineSystem("BPSN")
+TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize()
     self.X2 = {
@@ -18,6 +19,11 @@ function TRAIN_SYSTEM:Initialize()
     self.X2_2 = 0
     self.X6_2 = 0
     self.X2_1 = 0
+
+    self.OutputVoltage = math.random(78,82) -- volts
+    self.IResistance = 0.05--1.33 --Ohm
+    self.car_control_load= 0 --Amp
+    self.VoltageOut = 0
 
     self.Active = 0
     self.Train:LoadSystem("ConverterProtection","Relay","Switch", {bass = true})
@@ -54,4 +60,6 @@ function TRAIN_SYSTEM:Think()
     self.Active = XT3_1>0 and 1 or 0
     self.X2_2 = Train.Electric.Aux750V*self.Active
     self.X6_2 = self.Active
+    
+    self.VoltageOut = self.X2_1*((self.OutputVoltage - self.car_control_load*self.IResistance) + (Train.Electric.Aux750V - 600)*2/375)
 end
