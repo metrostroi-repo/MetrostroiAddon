@@ -58,8 +58,9 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local P     = Train.PositionSwitch
     local RheostatController = Train.RheostatController
     local RK    = RheostatController.SelectedPosition
-    local B     = (Train.Battery.Voltage > 55) and 1 or 0
-    local BO    = B*Train.VB.Value
+    local B     = (Train.Battery.Voltage >= 60) and 1 or (Train.Battery.Voltage >= Train.Battery.CutoffVoltage) and 0.5 or 0
+    local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
+    local BO2   = B*Train.VB.Value*(1-Train.PA2.Value)
     local T     = Train.SolverTemporaryVariables
 
     local isMVM = self.Type == 1
@@ -80,7 +81,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     end
     --Вагонная часть
     S["10A"] = BO*Train.A30.Value
-    S["ZR"] = (1-Train.RRP.Value)+(B*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
+    S["ZR"] = (1-Train.RRP.Value)+(B*(1-Train.PA2.Value)*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
 
     S["1A"] = T[1]*Train.A1.Value*Train.IGLA_PCBK.KVC
     S["6A"] = T[6]*Train.A6.Value
@@ -229,7 +230,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train:WriteTrainWire(22,T[10]*Train.A10.Value*Train.AK.Value)
     S["UO"] = T[10]*Train.A27.Value
     Train:WriteTrainWire(27,S["UO"]*Train.L_1.Value)
-    S["36N"] = BO*Train.A45.Value
+    S["36N"] = BO2*Train.A45.Value
     Train:WriteTrainWire(36,S["36N"]*Train.BPSNon.Value)
     Train:WriteTrainWire(37,S["36N"]*Train.ConverterProtection.Value)
 
@@ -252,7 +253,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     S["B9a"] = S["B9"]*Train.VB.Value
     Train.KVC:TriggerInput("Set",S["B9a"])
     --Train.KUP:TriggerInput("Set",S["B9a"]*Train.A75.Value)
-    S["D4"] = BO*Train.A13.Value
+    S["D4"] = BO2*Train.A13.Value
     Panel.RZP = T[36]*T[61]
     --[[S["14b"] = S["14a"]*Train.A17.Value
     S["D1"] = ["10"]*Train.A21.Value*KV["D-D1"]+S["14b"]*KRU["11/3-D1/1"]
@@ -340,13 +341,13 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     local P     = Train.PositionSwitch
     local RheostatController = Train.RheostatController
     local RK    = RheostatController.SelectedPosition
-    local B     = (Train.Battery.Voltage > 55) and 1 or 0
-    local BO    = B*Train.VB.Value
+    local B     = (Train.Battery.Voltage >= 60) and 1 or (Train.Battery.Voltage >= Train.Battery.CutoffVoltage) and 0.5 or 0
+    local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
     local T     = Train.SolverTemporaryVariables
 
     --Вагонная часть
     S["10A"] = BO*Train.A30.Value
-    S["ZR"] = (1-Train.RRP.Value)+(B*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
+    S["ZR"] = (1-Train.RRP.Value)+(B*(1-Train.PA2.Value)*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
 
 
     S["1N"] = C(11<=RK and RK<=18)*(1-Train.LK4.Value)

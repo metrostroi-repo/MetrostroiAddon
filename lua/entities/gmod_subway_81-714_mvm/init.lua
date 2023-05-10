@@ -131,6 +131,8 @@ function ENT:Initialize()
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
     }
+    self.BattCurrent = 0
+    self.eds_eq = 0
 
     -- Cross connections in train wires
     self.TrainWireInverts = {
@@ -228,6 +230,9 @@ end
 
 function ENT:TrainSpawnerUpdate()
     self:SetNW2Bool("Custom",self.CustomSettings)
+    self.Battery:TriggerInput("CarType",1)
+    self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
+    self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
     local num = self.WagonNumber
     math.randomseed(num+817171)
     if self.CustomSettings then
@@ -357,23 +362,9 @@ function ENT:Think()
     self:SetPackedRatio("BCPressure", Pneumatic.BrakeCylinderPressure/6.0)
 
 ----------------------------------*****************************--------------------------------
-    --10th wire voltage readout imitation depending on the BPSNs and EKK state, not on the wagon battery switch state
-    local hvcounter = 0
-    local hvcar = nil
-    local vdrop = 1.125*(#self.WagonList)
-    for k,v in ipairs(self.WagonList) do
-	if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
-            hvcounter = hvcounter + 1
-            hvcar = hvcar or v
-            vdrop = vdrop - 1.125
-        else
-            vdrop = vdrop - ((v.A56.Value == 0 and 0.4 or (v.VB.Value == 0 and 0.4 or 0)) + (v.LK4.Value == 0 and 0.725 or 0))
-        end
-    end
-    local PCV_o = hvcounter > 0 and math.Clamp(76+(hvcar.Electric.Aux750V - 600)*8/375, 76, 84) - vdrop or self.WagonList[1].Battery.Voltage
     --imitating converter overload protection only when control circuits are energized and at least one PC on the train is off; pretty useless btw (but fun)
-    local pcloadratio = #self.WagonList/(hvcounter > 0 and hvcounter or 0.5)
-    local _A = 25*(6 - 6/(5.01))                                          --assuming one PC on 6 cars can work for 25 secs while the cars' CCs are energized
+    local pcloadratio = #self.WagonList/(self.Battery.hvcounter > 0 and self.Battery.hvcounter or 0.5)
+    local _A = 90*(6 - 6/(5.01))                                          --assuming one PC on 6 cars can work for 90 secs while the cars' CCs are energized
     if pcloadratio > 1 and pcloadratio <= #self.WagonList and self.LK4.Value > 0 and self.PowerSupply.X2_2 > 0 and not self.pcrlxtimer then
         self.pcprotimer = self.pcprotimer or CurTime()
         --hyperbolic function of PC operating time depending on load coeff
@@ -394,8 +385,8 @@ function ENT:Think()
     self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0) 	        --BPSN overheat protection in case of RZP button is being pressed constantly
 ----------------------------------*****************************--------------------------------
     
-    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*PCV_o/150.0)
-    self:SetPackedRatio("BatteryCurrent",Panel["V1"]*math.Clamp((self.Battery.Voltage-75)*0.01,-0.01,1))
+    self:SetPackedRatio("BatteryVoltage",(self.eds_eq)/150.0)
+    self:SetPackedRatio("BatteryCurrent",self.BattCurrent/1000)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)

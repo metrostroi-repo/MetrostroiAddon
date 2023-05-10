@@ -227,6 +227,7 @@ Common.Spawner.Old                      = Old
 Common.Spawner.New                      = New
 Common.Spawner.Type                     = Type
 Common.Spawner.SchemeInvert             = Invert line schemes
+Common.Spawner.Chargeable               = Train battery can lose it's charge
 
 #Coupler common
 Common.Couple.Title         = Coupler menu

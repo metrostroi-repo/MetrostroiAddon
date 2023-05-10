@@ -75,7 +75,7 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
     -- Should relay be spring-returned to initial position
     parameters.returns          = parameters.returns or (not parameters.latched)
     -- Trigger level for the relay
-    parameters.trigger_level    = parameters.trigger_level or 0.5
+    parameters.trigger_level    = parameters.trigger_level or 0.2*math.random() + 0.4
     for k,v in pairs(parameters) do
         self[k] = v
     end
