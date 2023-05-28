@@ -293,12 +293,15 @@ function Metrostroi.RerailTrain(train)
 	train.RearBogey:SetAngles(train:LocalToWorldAngles(train.RearBogey.SpawnAng))--reardata.forward:Angle())
 
 
-	if IsValid(train.FrontCouple) then
+	if IsValid(train.FrontCouple) and not train.OptOutRerail then
 		train.FrontCouple:SetPos(train:LocalToWorld(train.FrontCouple.SpawnPos))
 		train.RearCouple:SetPos(train:LocalToWorld(train.RearCouple.SpawnPos))
 		train.FrontCouple:SetAngles(train:LocalToWorldAngles(train.FrontCouple.SpawnAng))
 		train.RearCouple:SetAngles(train:LocalToWorldAngles(train.RearCouple.SpawnAng))
 
+		train.FrontCouple:GetPhysicsObject():EnableMotion(false)
+		train.RearCouple:GetPhysicsObject():EnableMotion(false)
+	elseif IsValid(train.FrontCouple) and train.OptOutRerail == true then
 		train.FrontCouple:GetPhysicsObject():EnableMotion(false)
 		train.RearCouple:GetPhysicsObject():EnableMotion(false)
 	end
