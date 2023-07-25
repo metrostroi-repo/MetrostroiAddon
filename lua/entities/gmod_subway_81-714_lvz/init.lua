@@ -362,7 +362,7 @@ function ENT:Think()
     else
         self:SetPackedRatio("BLPressure", Pneumatic.BrakeLinePressure/16.0)
     end
-    self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
+    self:SetPackedRatio("TLPressure", Pneumatic.AuxiliaryLinePressure/16.0)
     self:SetPackedRatio("BCPressure", Pneumatic.BrakeCylinderPressure/6.0)
 
     self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)

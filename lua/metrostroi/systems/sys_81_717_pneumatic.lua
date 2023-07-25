@@ -36,6 +36,8 @@ function TRAIN_SYSTEM:Initialize(parameters)
     -- Pressure in trains brake line
     self.BrakeLinePressure = 0.0 -- atm
     self.EPKPressure = 0.0 -- atm
+    -- Pressure in train's auxiliary line
+	self.AuxiliaryLinePressure = 8.0 -- atm
     -- Pressure in brake cylinder
     self.BrakeCylinderPressure = 0.0 -- atm
     -- Pressure in the door line
@@ -155,7 +157,7 @@ end
 
 function TRAIN_SYSTEM:Outputs()
     return { "BrakeLinePressure", "BrakeCylinderPressure", "DriverValvePosition",
-             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "WorkingChamberPressure" }
+             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "WorkingChamberPressure", "AuxiliaryLinePressure" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
@@ -324,6 +326,7 @@ function TRAIN_SYSTEM:Think(dT)
     self.BrakeCylinderPressure_dPdT = 0.0
     self.ParkingBrakePressure_dPdT = 0.0
     self.WorkingChamberPressure_dPdT = 0.0
+	self.AuxiliaryLinePressure_dPdT = 0.0
 
     local rnd = math.random(1,10)
     local offs = 0.1
@@ -622,6 +625,11 @@ function TRAIN_SYSTEM:Think(dT)
     Train.SQ3:TriggerInput("Set",  Train.PassengerDoor and 0 or 1)
 
     ----------------------------------------------------------------------------
+	-- Simulate air pressure drop while the horn is engaged
+    local horny = self.Train:GetNW2Bool("HornState",false)
+	self:equalizePressure(dT,"AuxiliaryLinePressure", horny and math.max(0,self.TrainLinePressure - 0.3) or self.TrainLinePressure, 22)	--was 12		
+	self.TrainLinePressure = self.TrainLinePressure - (horny and 0.012 or 0)
+
     -- Simulate doors opening, closing
     if self.DoorLinePressure > 3.5 then
         if (Train.VDOL.Value == 1.0) and (Train.VDOP.Value == 0.0) and not self.DoorLeft then
