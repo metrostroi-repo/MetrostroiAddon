@@ -1089,6 +1089,10 @@ function ENT:Think()
             for i,stbl in ipairs(v) do
                 local snd = stbl.sound
                 if not IsValid(snd) then continue end
+                if k == "horn" and v[1].state and IsValid(v[3].sound) and v[3].sound:GetState() == GMOD_CHANNEL_PLAYING then
+                    v[3].sound:Pause()
+                    v[3].sound:SetTime(0)
+                end
                 if snd:GetState() == GMOD_CHANNEL_PLAYING then
                     self:SetPitchVolume(snd,v.pitch or 1,stbl.volume,tbl)
                     if stbl.volume == 0 and not stbl.time then
@@ -1096,7 +1100,7 @@ function ENT:Think()
                         snd:SetTime(0)
                     end
                 end
-                if snd:GetState() ~= GMOD_CHANNEL_PLAYING and stbl.volume ~= 0 then
+                if snd:GetState() ~= GMOD_CHANNEL_PLAYING and stbl.volume ~= 0 and not stbl.state then
                     stbl.volume = 0
                 end
                 if stbl.time then
@@ -1104,7 +1108,7 @@ function ENT:Think()
                     if stbl.time == true then
                         stbl.volume = targetvol
                     else
-                        stbl.volume = math.Clamp((stbl.volume or 0) + FrameTime()/(stbl.time/v.pitch)*(stbl.state and 1 or -1)*v.volume,0,v.volume)
+                        stbl.volume = math.Clamp((stbl.volume or 0) + FrameTime()/(stbl.time/(v.pitch))*(stbl.state and 1 or -1)*v.volume,0,v.volume)
                     end
                     if stbl.volume == targetvol then
                         stbl.time = nil
@@ -1113,11 +1117,15 @@ function ENT:Think()
 
                 if i==1 then
                     local no1 = ntbl.loop and ntbl.loop==0
-                    local endt = (ntbl.loop and snd:GetTime() > ntbl.loop or snd:GetTime()/snd:GetLength() >= 0.8) or no1
-                    if stbl.state and stbl.volume < v.volume and not no1 then
+                    local endt
+                    if k ~= "horn" then
+                        endt = (ntbl.loop and snd:GetTime() > ntbl.loop or snd:GetTime()/snd:GetLength() >= 0.8) or no1
+                    end
+                    if stbl.state and stbl.volume ~= v.volume and not no1 then
                         if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
                             snd:Play()
                             self:SetBASSPos(snd,tbl)
+                            if k == "horn" then self._HornLoopTime = CurTime() end
                         end
                         stbl.volume = v.volume
                         self:SetPitchVolume(snd,v.pitch,stbl.volume,tbl)
@@ -1134,8 +1142,12 @@ function ENT:Think()
                         end
                         stbl.time = nil
                     end
+                    if k == "horn" and self._HornLoopTime then
+                        endt = ntbl.loop and (CurTime() - self._HornLoopTime > ntbl.loop) or (CurTime() - self._HornLoopTime > snd:GetLength()*0.8)--0.3
+                    end
                     if stbl.state and endt then
                         stbl.state = false
+                        if k == "horn" then self._HornLoopTime = false end
                         if no1 then
                             stbl.time = true
                             v[2].state = not v[3].state
@@ -1143,7 +1155,8 @@ function ENT:Think()
                     end
 
                     if not stbl.state and stbl.volume == v.volume and not stbl.time then
-                        stbl.time = not ntbl.loop or 0.1/v.pitch--endt and (snd:GetLength()-snd:GetTime())*0.8 or 0.05
+                        --stbl.time = not ntbl.loop or 0.1/v.pitch--endt and (snd:GetLength()-snd:GetTime())*0.8 or 0.05
+                        stbl.time = not ntbl.loop or 0.07/v.pitch
                         v[2].state = not v[3].state
                     end
                 end
@@ -1157,7 +1170,7 @@ function ENT:Think()
                         if v[1].time == true then
                             stbl.volume = v.volume
                         elseif v[1].time then
-                            stbl.time = v[1].time
+                            stbl.time = v[1].time*0.1
                             stbl.volume = 0
                         end
                         self:SetPitchVolume(snd,v.pitch,stbl.volume,tbl)
@@ -1168,15 +1181,19 @@ function ENT:Think()
                 end
                 if i==3 then
                     local time = v[2].time or v[1].time
+                    local hlt = self._HornLoopTime3 or CurTime()
+                    local timelim = (k == "horn") and ((CurTime()-hlt) > snd:GetLength()*0.9) or (snd:GetTime()/snd:GetLength()>=0.9)
+                    --вот тут сомнительное место: time вполне может стать false раньше, чем это нужно
                     if stbl.state and time and not stbl.time then
                         if snd:GetState() ~= GMOD_CHANNEL_PLAYING then
                             snd:Play()
                             self:SetBASSPos(snd,tbl)
+                            if k == "horn" then self._HornLoopTime3 = CurTime() end
                         end
-                        stbl.volume = 0
                         self:SetPitchVolume(snd,v.pitch,stbl.volume,tbl)
 
-                        stbl.time = 0.1/v.pitch
+                        --stbl.time = 0.1/v.pitch
+                        stbl.time = 0.07/v.pitch
                         for i=1,2 do
                             if v[i].volume > 0 then
                                 v[i].time=0.07/v.pitch
@@ -1187,10 +1204,10 @@ function ENT:Think()
                                 self:SetPitchVolume(v[i].sound,v.pitch,v[i].volume,tbl)
                             end
                         end
-                    elseif (not stbl.state or (snd:GetTime()/snd:GetLength() >= 0.9)) and stbl.time then
+                    elseif (not stbl.state or timelim) and stbl.time then
                         stbl.time = nil
-                        stbl.volume = 0
                         stbl.state = false
+                        if k == "horn" then self._HornLoopTime3 = false end
                     end
                 end
             end
