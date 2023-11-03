@@ -1,6 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "models/metrostroi_train/81-717/pam_panel_buttons"
-	"$model" "1"
-	$additive 1
-}

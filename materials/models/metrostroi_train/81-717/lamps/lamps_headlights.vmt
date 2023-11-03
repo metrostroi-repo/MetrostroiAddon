@@ -1,8 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "models/metrostroi_train/81-717/lamps_headlights"
-	$additive 1
-    $model 1
-    $color2 "[1 1 1]"
-    hdr { "$color2" "[0.55 0.55 0.55]" }
-}
