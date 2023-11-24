@@ -571,7 +571,7 @@ Metrostroi.StationConfigurations = {
         }
     },
     pto = {
-        pto = {"пто","ПТО"},
+        names = {"пто","ПТО"},
         positions = {
             {Vector(-4539,5624,-4597),Angle(0,0,0)},
         }
