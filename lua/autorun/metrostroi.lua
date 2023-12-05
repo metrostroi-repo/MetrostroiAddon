@@ -354,7 +354,7 @@ if SERVER then
             if not pcall(require,"turbostroi") then
                 if system.IsWindows() then
                     ErrorNoHalt("======================================================\nMetrostroi: Turbostroi library can't be loaded because of missing libraries!\nCheck, that you have Microsoft visual c++ 2010 and 2017 redistributable(x86) installed\nYou can download it from:\n")
-                    MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=5555\nhttps://aka.ms/vs/15/release/vc_redist.x86.exe\n")
+                    MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=26999 (2010 x86)\nhttps://aka.ms/vs/15/release/vc_redist.x86.exe (2017 x86)\n")
                     ErrorNoHalt("======================================================\n")
                 else
                     ErrorNoHalt("Metrostroi: Turbostroi library can't be loaded!\n")
@@ -366,7 +366,7 @@ if SERVER then
 			if not pcall(require,"turbostroi") then
                 if system.IsWindows() then
                     ErrorNoHalt("======================================================\nMetrostroi: Turbostroi library can't be loaded because of missing libraries!\nCheck, that you have Microsoft visual c++ 2010 and 2017 redistributable(x64) installed\nYou can download it from:\n")
-                    MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=5555\nhttps://aka.ms/vs/15/release/vc_redist.x64.exe\n")
+                    MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=26999 (2010 x64)\nhttps://aka.ms/vs/15/release/vc_redist.x64.exe (2017 x64)\n")
                     ErrorNoHalt("======================================================\n")
                 else
                     ErrorNoHalt("Metrostroi: Turbostroi library can't be loaded!\n")
@@ -378,7 +378,7 @@ if SERVER then
             ErrorNoHalt("======================================================\nMetrostroi: Turbostroi DLL not found.\nYou can found turbostroi for Windows at \n")
             MsgC(Color(255,0,0),"https://metrostroi.net/turbostroi\n")
             ErrorNoHalt("Just place this .dll to garrysmod/lua/bin folder.\nIf bin folder doesn't exists - create it.\nDon't forget to install Microsoft visual c++ 2010 and 2017 redistributable(x86)\nYou can download it from:\n")
-            MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=5555\nhttps://aka.ms/vs/15/release/vc_redist.x86.exe\n")
+            MsgC(Color(255,0,0),"https://www.microsoft.com/en-us/download/details.aspx?id=26999 (2010 x86)\nhttps://aka.ms/vs/15/release/vc_redist.x86.exe (2017 x86)\n")
             ErrorNoHalt("======================================================\n")
         else
             ErrorNoHalt("Metrostroi: Turbostroi DLL not found.\n")
