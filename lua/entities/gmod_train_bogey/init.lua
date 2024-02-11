@@ -395,17 +395,12 @@ function ENT:CheckContact(pos,dir,id,cpos)
                 sound.Play("udochka_connect.wav",traceEnt:GetPos())
                 self.Connectors[id] = traceEnt
                 DropEntityIfHeld(traceEnt)
-                --[[timer.Simple(0,function()
-                    if not IsValid(traceEnt) or not traceEnt:IsPlayerHolding()  then return end
-                    traceEnt:ForcePlayerDrop()
-                    if traceEnt.LastPickup and traceEnt.LastPickup:IsPlayer()  then
-                        traceEnt.LastPickup:DropObject()
-                    end
-                end)]]
             end
-            if (traceEnt.CoupledWith == nil) then
-                self.Connectors[id] = nil
-            end
+        end
+        return false
+    elseif self.Connectors[id] == traceEnt then
+        if traceEnt.Coupled == nil then
+            self.Connectors[id] = nil
         end
         return false
     elseif traceEnt:GetClass() == "player" and self.Voltage > 40 then
