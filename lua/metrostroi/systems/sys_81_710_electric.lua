@@ -89,7 +89,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
         --RRI_VV.CabinSpeakerPower = T[13]
     else
         local ASNP_VV = Train.ASNP_VV
-        ASNP_VV.Power = BO*Train.R_ASNPOn.Value*Train.R_Radio.Value*Train.PRL4A.Value
+        ASNP_VV.Power = BO*Train.R_ASNPOn.Value*Train.RST.Value*Train.PRL4A.Value
         ASNP_VV.AmplifierPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_UNch.Value
         ASNP_VV.CabinSpeakerPower = ASNP_VV.Power*Train.ASNP.LineOut*Train.R_G.Value
         Train:WriteTrainWire(13,ASNP_VV.AmplifierPower)
