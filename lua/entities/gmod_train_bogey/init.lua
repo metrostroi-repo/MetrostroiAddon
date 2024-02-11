@@ -403,6 +403,9 @@ function ENT:CheckContact(pos,dir,id,cpos)
                     end
                 end)]]
             end
+            if (traceEnt.CoupledWith == nil) then
+                self.Connectors[id] = nil
+            end
         end
         return false
     elseif traceEnt:GetClass() == "player" and self.Voltage > 40 then
