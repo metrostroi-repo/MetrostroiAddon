@@ -9,7 +9,7 @@ Metrostroi.DefineSystem("KF_47A")
 function TRAIN_SYSTEM:Initialize()
     self.Resistors = {
         ["L12-L13"] = 1.730,
-
+        ["P1-P3"]   = 0.715,
         ["P3-P4"]   = 0.144,
         ["P4-P5"]   = 0.223,
         ["P5-P6"]   = 0.190,
@@ -20,7 +20,7 @@ function TRAIN_SYSTEM:Initialize()
         ["P10-P11"] = 0.144,
         ["P11-P12"] = 1.070,
         ["P12-P13"] = 0.485,
-        ["P1-P3"]   = 0.715,
+        
         ["P3-P14"]  = 1.622,
         ["P13-P42"] = 0.285,
 
@@ -38,8 +38,8 @@ function TRAIN_SYSTEM:Initialize()
         ["P76-P27"] = 1.710,
 
         ["L2-L4"]   = 1.140,
-        ["L24-L39"] = 1.000,
-        ["L40-L63"] = 1.000,
+        ["L24-L39"] = 0.970,
+        ["L40-L63"] = 0.970,
     }
     self.ResistorTemperatures = {
         ["P3-P4"]   = 1,
