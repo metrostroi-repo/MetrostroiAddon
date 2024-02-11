@@ -194,7 +194,7 @@ function TRAIN_SYSTEM:Think(dT)
     
     -- New RNT with confirmation only from KVT
     Train.BSM_RNT:TriggerInput("Set",self.ALS*(Train.KVT.Value+Train.BSM_RNT.Value*(Train.BSM_BR1.Value+Train.BSM_BR2.Value+Train.BSM_KSR1.Value*Train.BSM_KSR2.Value+Train.BSM_KRT.Value)))
-
+    print()
     self.Ring = self.GE*(1-Train.BSM_RNT.Value)*(1-Train.BSM_RVV.Value)
 
     S["LUDS"] = S["SRPower"]*Train.BSM_SR1.Value*Train.BSM_SR2.Value
@@ -280,4 +280,5 @@ function TRAIN_SYSTEM:Think(dT)
     Panel.KVD = self.GE*(1-Train.BUM_RUVD.Value)
     --Train:WriteTrainWire(90,self.EPK*(1-Train.ARS.Value))
     Train.EPKC:TriggerInput("Set",self.EPK)
+    --print(Train.BSM_KSR1.Value.." KSR")
 end

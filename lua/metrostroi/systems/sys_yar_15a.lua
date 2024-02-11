@@ -70,20 +70,29 @@ function TRAIN_SYSTEM:Initialize()
 end
 
 function TRAIN_SYSTEM:Inputs()
-    return {  }
+    return {"WithFuse"}
 end
 function TRAIN_SYSTEM:Outputs()
     return {  }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
+    if name == "WithFuse" then
+	    self.Fuse = value > 0
+	end
 end
 
 function TRAIN_SYSTEM:Think()
     local Train = self.Train
-    -- Zero relay operation
-    Train.NR:TriggerInput("Close",Train.Electric.Aux750V > 360) -- 360 - 380 V
-    Train.NR:TriggerInput("Open", Train.Electric.Aux750V < 150) -- 120 - 190 V
+    -- Zero relay operation + fix for Ezh3 fuses
+    if self.Fuse then
+        Train.NR:TriggerInput("Close",Train.Electric.NR750V > 360) -- 360 - 380 V + Fuse
+        Train.NR:TriggerInput("Open",Train.Electric.NR750V < 150) -- 120 - 190 V + Fuse
+	else
+        Train.NR:TriggerInput("Close",Train.Electric.Aux750V > 360) -- 360 - 380 V
+        Train.NR:TriggerInput("Open", Train.Electric.Aux750V < 150) -- 120 - 190 V
+	end
+
     -- Overload relays operation
     Train.RP1_3:TriggerInput("Set",math.abs(Train.Electric.I13))
     Train.RP2_4:TriggerInput("Set",math.abs(Train.Electric.I24))

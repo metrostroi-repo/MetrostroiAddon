@@ -130,7 +130,7 @@ function TRAIN_SYSTEM:Initialize(parameters)
 end
 
 function TRAIN_SYSTEM:Inputs()
-    return { "BrakeUp", "BrakeDown", "BrakeSet", "ValveType", "Autostop" }
+    return { "BrakeUp", "BrakeDown", "BrakeSet", "ValveType", "Autostop" , "PowerWithFuse"}
 end
 
 function TRAIN_SYSTEM:Outputs()
@@ -155,7 +155,9 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
             self.Train.UAVAC:TriggerInput("Set",0)
             if value > 0 then RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName()) end
         end
-    end
+    elseif name == "PowerWithFuse" then
+	    self.Fuse = 1
+	end
 end
 
 
@@ -488,8 +490,11 @@ function TRAIN_SYSTEM:Think(dT)
 
     ----------------------------------------------------------------------------
     -- Simulate compressor operation and train line depletion
-    self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
-
+	if self.Fuse then
+        self.Compressor = Train.PR2.Value * Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
+    else
+	    self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
+	end
     self.TrainLinePressure = self.TrainLinePressure - 0.07*trainLineConsumption_dPdT*dT -- 0.190 --0.170
     if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, 0.02) end
     self:equalizePressure(dT,"TrainLinePressure", 0,0.001)
