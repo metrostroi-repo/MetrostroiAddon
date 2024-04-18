@@ -69,9 +69,9 @@ function TRAIN_SYSTEM:Initialize(parameters)
     -- Блокировка дверей
     self.Train:LoadSystem("BD","Relay","")
     -- Вентили дверного воздухораспределителя (ВДОЛ, ВДОП, ВДЗ)
-    self.Train:LoadSystem("VDOL","Relay","", {bass = true})
-    self.Train:LoadSystem("VDOP","Relay","", {bass = true})
-    self.Train:LoadSystem("VDZ","Relay","", {bass = true})
+    self.Train:LoadSystem("VDOL","Relay","", {bass = true, coil_res = 175})
+    self.Train:LoadSystem("VDOP","Relay","", {bass = true, coil_res = 175})
+    self.Train:LoadSystem("VDZ","Relay","", {bass = true, coil_res = 175})
 
     -- Разобщение клапана машиниста
     self.Train:LoadSystem("DriverValveDisconnect","Relay","Switch", {bass = true})

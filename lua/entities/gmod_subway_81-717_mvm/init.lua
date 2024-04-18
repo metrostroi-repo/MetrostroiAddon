@@ -559,6 +559,7 @@ function ENT:TrainSpawnerUpdate()
     end
     self.Pneumatic.VDLoud = math.random()<0.06 and 0.9+math.random()*0.2
     if self.Pneumatic.VDLoud then self.Pneumatic.VDLoudID = math.random(1,5) end
+    print("KD.trigger_level = "..tostring(self.KD.trigger_level))
     self:SetNW2Bool("SecondKV",math.random()>0.7)
     math.randomseed(os.time())
 end
