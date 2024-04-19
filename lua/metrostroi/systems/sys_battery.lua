@@ -36,6 +36,9 @@ function TRAIN_SYSTEM:Initialize()
     self.ComputerCar = false
 end
 
+-- self.Consumers is a table of relays with the next structure:
+--      [<relay>] = {<relay.Value>, <relay.coil_res>, <relay.current>}
+
 function TRAIN_SYSTEM:Inputs()
     return { "Charge", "Dischargeable", "InitialVoltage", "CarType" }
 end

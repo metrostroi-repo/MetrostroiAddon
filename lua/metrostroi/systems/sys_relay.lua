@@ -75,8 +75,9 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
     -- Should relay be spring-returned to initial position
     parameters.returns          = parameters.returns or (not parameters.latched)
     -- Trigger level for the relay
-    --parameters.trigger_level    = parameters.trigger_level or 0.15*math.random() + 0.2
-    parameters.trigger_level    = parameters.trigger_level or 0.002*math.random() + 0.001   -- 100–300 mA in percentage of 80 A (coil hold current)
+    parameters.trigger_level    = parameters.trigger_level or 0.5
+    -- Relay pickup current
+    parameters.pickup_current   = parameters.pickup_current or 0.002*math.random() + 0.001   -- 100–300 mA in percentage of 80 A (coil hold current)
     -- relay coil resistance, Ohm
     parameters.coil_res         = parameters.coil_res or math.random(100,300)
     for k,v in pairs(parameters) do
@@ -293,7 +294,10 @@ function TRAIN_SYSTEM:Think(dT)
     -- Register new relay as current consumer
     if self.Train.Battery and self.Train.Battery.Consumers and not self.Train.Battery.Consumers[self] then
         --print("Registering relay",self, "Train: ", self.Train)
-        self.Train.Battery.Consumers[self] = {0,self.coil_res}
+        self.Train.Battery.Consumers[self] = {0,self.coil_res,0}
+    end
+    if self.ChangeTime and self.TargetValue == 1.0 then
+        self.Train.Battery.Consumers[self][3] = self.Train.Battery.eds_eq/self.coil_res
     end
     -- Switch relay
     if self.ChangeTime and (self.Time > self.ChangeTime) and not self.SpuriousTripTimer then

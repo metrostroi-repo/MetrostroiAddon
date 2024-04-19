@@ -60,7 +60,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     --local B     = (Train.Battery.Voltage >= 60) and 1 or (Train.Battery.Voltage >= Train.Battery.CutoffVoltage) and 0.5 or 0
     --local B     = math.min(1,linearity*(Train.Battery.Voltage - Train.Battery.CutoffVoltage)/(Train.Battery.StartVoltage - Train.Battery.CutoffVoltage))
     -- TODO: вычисление B пересмотреть. Полностью пересмотреть принцип включения (триггера) реле
-    --local B     = math.min(1,(Train.Battery.CCcurrent_sigma - Train.PowerSupply.car_control_load + Train.Battery.Ibatt_sigma)*-1/80)
+    local B     = Train.Battery.Voltage > Train.Battery.CutoffVoltage and 1 or 0
     local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
     local BO2   = B*Train.VB.Value*(1-Train.PA2.Value)
     local T     = Train.SolverTemporaryVariables
