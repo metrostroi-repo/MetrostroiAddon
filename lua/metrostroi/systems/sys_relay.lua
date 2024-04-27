@@ -214,8 +214,6 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
     if (name == "Block") then
         self.Blocked = value
     elseif (name == "Close") and (value > self.trigger_level) and (self.Value ~= 1.0 or self.TargetValue ~= 1.0) then --(self.TargetValue ~= 1.0 and self.rpb))
-        if self.Name:find("PA") then  print "Сгорел предохранитель!" end
-        --if self.Name:find("RD") then  print "Попытка включить РД!" end
         if self.pneumatic and self.Train.Pneumatic.TrainLinePressure < 3 then return end
         if (not self.ChangeTime) or (self.TargetValue ~= 1.0) then
             self.ChangeTime = self.Time + FailSim.Value(self,"CloseTime")
@@ -299,10 +297,6 @@ function TRAIN_SYSTEM:Think(dT)
         self.Value = self.TargetValue
         self.SpuriousTripTimer = nil
     end
-
-    -- Should move this chunk outside of turbostroi
-    ---------********************************************----------
-    ---------********************************************----------
 
     --print("РД = ",self.Train.Battery.Consumers[self.Train.RD])
     if self.hasCoil then
