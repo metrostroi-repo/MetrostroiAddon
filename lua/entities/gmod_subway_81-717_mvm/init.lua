@@ -27,6 +27,7 @@ ENT.SyncFunctions = {
     ""
 }
 function ENT:Initialize()
+    self.consLogged = 0
     self.Plombs = {
         VAH = true,
         VP = true,
@@ -391,7 +392,9 @@ function ENT:TrainSpawnerUpdate()
     for k,v in ipairs(self.WagonList) do
         if v.AR63 and v.ComputerCar then ccc = ccc + 1; break end
     end
-    if ccc == 0 then self.ComputerCar = true end
+    if ccc == 0 then
+        self.ComputerCar = true
+    end
     math.randomseed(num+817171)
     if self.CustomSettings then
     --{"Type","Spawner.717.Type","List",{"Spawner.717.Type.717","Spawner.717.Type.7175"}},
@@ -559,7 +562,6 @@ function ENT:TrainSpawnerUpdate()
     end
     self.Pneumatic.VDLoud = math.random()<0.06 and 0.9+math.random()*0.2
     if self.Pneumatic.VDLoud then self.Pneumatic.VDLoudID = math.random(1,5) end
-    print("KD.trigger_level = "..tostring(self.KD.trigger_level))
     self:SetNW2Bool("SecondKV",math.random()>0.7)
     math.randomseed(os.time())
 end
@@ -567,7 +569,10 @@ end
 --------------------------------------------------------------------------------
 function ENT:Think()
     self.RetVal = self.BaseClass.Think(self)
-
+    --[[if self.Battery.Consumers[self.RD] then
+        print("RD.pickup_current = "..tostring(self.RD.pickup_current),"RD current = "..self.Battery.Consumers[self.RD][3])
+    end]]
+    --print("Entity RD = ",self.RD.Value)
     local Panel = self.Panel
     local Pneumatic = self.Pneumatic
     local power = Panel.V1 > -1.5

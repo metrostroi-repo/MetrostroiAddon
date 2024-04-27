@@ -29,21 +29,21 @@ function TRAIN_SYSTEM:Initialize()
     self.Train:LoadSystem("BSM","ALS_ARS_BSM")
     self.Train:LoadSystem("BUM","ALS_ARS_BUM")
 
-    self.Train:LoadSystem("ROT1","Relay","",{bass=true, trigger_level = 0.1*math.random() + 0.4})
-    self.Train:LoadSystem("ROT2","Relay","",{bass=true, trigger_level = 0.1*math.random() + 0.4})
+    self.Train:LoadSystem("ROT1","Relay","",{bass=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true})
+    self.Train:LoadSystem("ROT2","Relay","",{bass=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true})
 
     self.Train:LoadSystem("EPKC","Relay")
 
-    self.Train:LoadSystem("KPK1","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Коммутация ПК
-    self.Train:LoadSystem("KPK2","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Коммутация ПК
-    self.Train:LoadSystem("FMM1","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Фиксация местонахождения машиниста
-    self.Train:LoadSystem("FMM2","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Фиксация местонахождения машиниста
-    self.Train:LoadSystem("PD1","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Переключение дешифратора
-    self.Train:LoadSystem("PD2","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Переключение дешифратора
-    self.Train:LoadSystem("ARS_VP","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Режим ВП
-    self.Train:LoadSystem("ARS_RT","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4}) --Реле торможения от АРС-Р
-    self.Train:LoadSystem("NG","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4})
-    self.Train:LoadSystem("NH","Relay","",{bass=true,bass_separate=true, trigger_level = 0.1*math.random() + 0.4})
+    self.Train:LoadSystem("KPK1","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Коммутация ПК
+    self.Train:LoadSystem("KPK2","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Коммутация ПК
+    self.Train:LoadSystem("FMM1","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Фиксация местонахождения машиниста
+    self.Train:LoadSystem("FMM2","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Фиксация местонахождения машиниста
+    self.Train:LoadSystem("PD1","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Переключение дешифратора
+    self.Train:LoadSystem("PD2","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Переключение дешифратора
+    self.Train:LoadSystem("ARS_VP","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Режим ВП
+    self.Train:LoadSystem("ARS_RT","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true}) --Реле торможения от АРС-Р
+    self.Train:LoadSystem("NG","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true})
+    self.Train:LoadSystem("NH","Relay","",{bass=true,bass_separate=true, pickup_current = 0.1*math.random() + 0.4, hasCoil = true})
 
     -- ARS wires
     self["33D"] = 0

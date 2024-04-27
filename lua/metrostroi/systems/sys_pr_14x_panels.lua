@@ -11,15 +11,15 @@ function TRAIN_SYSTEM:Initialize()
     -- ПР-143
     ----------------------------------------------------------------------------
     -- Контактор включения провода 1 (Р1-Р5)
-    self.Train:LoadSystem("R1_5","Relay","KPD-110E",{ bass = true })
+    self.Train:LoadSystem("R1_5","Relay","KPD-110E",{ bass = true, hasCoil = true })
     -- Контактор 6-ого провода (К6)
-    self.Train:LoadSystem("K6","Relay","KPD-110E",{ bass = true, close_time = 0.12})
+    self.Train:LoadSystem("K6","Relay","KPD-110E",{ bass = true, close_time = 0.12, hasCoil = true })
     -- Реле времени торможения (РВТ)
-    self.Train:LoadSystem("RVT","Relay","REV-811T", { bass   = true, open_time = 0.5, close_time = 0.12})--(self.Train.Electric.TrainSolver:find("81-") and 0.3 or 0.7)
+    self.Train:LoadSystem("RVT","Relay","REV-811T", { bass   = true, open_time = 0.5, close_time = 0.12, hasCoil = true })--(self.Train.Electric.TrainSolver:find("81-") and 0.3 or 0.7)
     -- Реле педали бдительности (РПБ)
-    self.Train:LoadSystem("RPB","Relay","REV-813T", { bass = true, open_time = 2.5,})
+    self.Train:LoadSystem("RPB","Relay","REV-813T", { bass = true, open_time = 2.5, hasCoil = true })
     -- РВ-2
-    self.Train:LoadSystem("RV_2","Relay","REV-813T",{ open_time = 0.2, close_time = 0.6 })
+    self.Train:LoadSystem("RV_2","Relay","REV-813T",{ open_time = 0.2, close_time = 0.6, hasCoil = true })
 
 
 
@@ -27,13 +27,13 @@ function TRAIN_SYSTEM:Initialize()
     -- ПР-144
     ----------------------------------------------------------------------------
     -- Контактор 25ого провода (К25)
-    self.Train:LoadSystem("K25","Relay","PR-143",{bass = true})
+    self.Train:LoadSystem("K25","Relay","PR-143",{bass = true, hasCoil = true })
     -- Реле-повторитель провода 8 (РП8)
-    self.Train:LoadSystem("Rp8","Relay","REV-811T",{open_time = 0.2,bass = true })
+    self.Train:LoadSystem("Rp8","Relay","REV-811T",{open_time = 0.2,bass = true, hasCoil = true })
     -- Контактор дверей (КД)
-    self.Train:LoadSystem("KD","Relay","REV-811T",{ bass = true, trigger_level = 0.04*math.random() + 0.46 })
+    self.Train:LoadSystem("KD","Relay","REV-811T",{ bass = true, pickup_current = 0.04*math.random() + 0.46, hasCoil = true })
     -- Реле остановки (РО)
-    self.Train:LoadSystem("RO","Relay","KPD-110E",{ bass = true, close_time = 0--[[ , close_time = 0.1--]] })
+    self.Train:LoadSystem("RO","Relay","KPD-110E",{ bass = true, close_time = 0, hasCoil = true--[[ , close_time = 0.1--]] })
 end
 
 function TRAIN_SYSTEM:Think()

@@ -34,16 +34,27 @@ function TRAIN_SYSTEM:Initialize()
     self.CCcurrent_sigma                = 0
     self.Dischar = false
     self.ComputerCar = false
+
+    for k,v in pairs(self.Train.Systems) do
+        if v.hasCoil and not self.Consumers[v] then
+            print("Registering relay",v.Name, "Train: ", self.Train)
+            self.Consumers[v] = {0,v.coil_res,0}
+        end
+    end
+    print "------------------\n"
 end
+
+-- TODO:  - разобраться, почему при сборе схемы на ход пропадает контроль дверей
+--        - расставить параметры для всех оставшихся реле
 
 -- self.Consumers is a table of relays with the next structure:
 --      [<relay>] = {<relay.Value>, <relay.coil_res>, <relay.current>}
 
 function TRAIN_SYSTEM:Inputs()
-    return { "Charge", "Dischargeable", "InitialVoltage", "CarType" }
+    return { "Charge", "Dischargeable", "InitialVoltage", "CarType", "Computer" }
 end
 function TRAIN_SYSTEM:Outputs()
-    return { "Capacity", "Charge", "Voltage" }
+    return { "Capacity", "Charge", "Voltage", "eds_eq" }
 end
 function TRAIN_SYSTEM:TriggerInput(name,value)
     if name == "Charge" then self.Charging = value end
@@ -71,6 +82,11 @@ function TRAIN_SYSTEM:Think(dT)
             self.IResistance = math.min(0.32, 0.018 + 1.56^(12-1.48*self.SoC))       -- just made it up by myself >_>
         end
         self.IResistance = self.IResistance * self.ElementCount
+
+        for k,v in pairs(self.Consumers) do
+            v[1] = k.Value
+            v[3] = k.Current
+        end
 
         if self.Train.ComputerCar then
             local nodecurr_sum, branchcond_sum = 0, 0
@@ -121,7 +137,9 @@ function TRAIN_SYSTEM:Think(dT)
                 v.Battery.Ibatt_sigma = self.Ibatt_sigma
                 v.Battery.CCcurrent_sigma = self.CCcurrent_sigma
             end
+            --print("БД = ", self.Train.BD.Value)
         end
+        --print("Battery RD = ",self.Train.RD.Value)
         -- Calculate discharge
         if self.Dischar then
             self.Train.BattCurrent = self.Ibatt*self.Train.A24.Value

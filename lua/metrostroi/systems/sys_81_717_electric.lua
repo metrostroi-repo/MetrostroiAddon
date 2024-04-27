@@ -59,7 +59,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local RK    = RheostatController.SelectedPosition
     --local B     = (Train.Battery.Voltage >= 60) and 1 or (Train.Battery.Voltage >= Train.Battery.CutoffVoltage) and 0.5 or 0
     --local B     = math.min(1,linearity*(Train.Battery.Voltage - Train.Battery.CutoffVoltage)/(Train.Battery.StartVoltage - Train.Battery.CutoffVoltage))
-    -- TODO: вычисление B пересмотреть. Полностью пересмотреть принцип включения (триггера) реле
     local B     = Train.Battery.Voltage > Train.Battery.CutoffVoltage and 1 or 0
     local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
     local BO2   = B*Train.VB.Value*(1-Train.PA2.Value)
@@ -82,7 +81,6 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     S["10AK"] = T[10]*Train.A54.Value*Train.A84.Value
     S["U2"] = S["10AK"]*KV["U2-10AK"] --10AK-KV-U2
-    --print(Train.Battery.CutoffVoltage)
 
     --Reverser
     S["7D"] = T[10]*Train.A48.Value
@@ -887,9 +885,7 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     local P     = Train.PositionSwitch
     local RheostatController = Train.RheostatController
     local RK    = RheostatController.SelectedPosition
-    --local B     = (Train.Battery.Voltage >= 60) and 1 or (Train.Battery.Voltage >= Train.Battery.CutoffVoltage) and 0.5 or 0
-    --local B     = math.min(1,linearity*(Train.Battery.Voltage - Train.Battery.CutoffVoltage)/(Train.Battery.StartVoltage - Train.Battery.CutoffVoltage))
-    local B     = math.min(1,(Train.Battery.CCcurrent_sigma - Train.PowerSupply.car_control_load + Train.Battery.Ibatt_sigma)*-1/80)
+    local B     = Train.Battery.Voltage > Train.Battery.CutoffVoltage and 1 or 0
     local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
     local T     = Train.SolverTemporaryVariables
 
@@ -1145,7 +1141,6 @@ function TRAIN_SYSTEM:SolveThyristorController(Train, dT)
         end
         --print(self.ThyristorState)
 
-        --print(self.ThyristorState)
         -- Generate resistance
         local keypoints = {0.10, 0.008, 0.20, 0.018, 0.30, 0.030, 0.40, 0.047, 0.50, 0.070, 0.60, 0.105, 0.70, 0.165, 0.80, 0.280, 0.90, 0.650, 1.00, 15.00}
         local TargetField = 0.48 + 0.52 * self.ThyristorState

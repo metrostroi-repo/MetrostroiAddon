@@ -8,7 +8,7 @@ Metrostroi.DefineSystem("YAR_13B")
 
 function TRAIN_SYSTEM:Initialize()
     -- Реле перегрузки (РПЛ)
-    self.Train:LoadSystem("RPL","Relay","RM3001", {coil_res = 73, trigger_level = 0.012})--, { trigger_level = 1300 })
+    self.Train:LoadSystem("RPL","Relay","RM3001", {coil_res = 73, pickup_current = 0.012, hasCoil = true})--, { trigger_level = 1300 })
     -- Групповое реле перегрузки 1-3 (РП1-3)
     self.Train:LoadSystem("RP1_3","Relay","RM3001",{ trigger_level = 760 }) --630 })
     -- Групповое реле перегрузки 2-4 (РП2-4)
@@ -16,14 +16,14 @@ function TRAIN_SYSTEM:Initialize()
 
     -- Нулевое реле (НР)
     --   Does not use any power source defined, as the operation is calculated from bus voltage
-    self.Train:LoadSystem("NR","Relay","R3150", { power_source = "None", coil_res = 690,trigger_level = 0.001 })
+    self.Train:LoadSystem("NR","Relay","R3150", { power_source = "None", coil_res = 690,pickup_current = 0.001, hasCoil = true })
     -- Реле системы управления
-    self.Train:LoadSystem("RSU","Relay","R3100", {coil_res = 275,trigger_level = 0.003})
+    self.Train:LoadSystem("RSU","Relay","R3100", {coil_res = 275,pickup_current = 0.003, hasCoil = true})
     self.Train:LoadSystem("RU","Relay","R3100")
 
     -- Реле заземления (РЗ-1, РЗ-2, РЗ-3)
-    self.Train:LoadSystem("RZ_1","Relay","RM3001", {coil_res    = 338,trigger_level = 0.003})
-    self.Train:LoadSystem("RZ_2","Relay","RM3001", {coil_res    = 73,trigger_level = 0.012})
+    self.Train:LoadSystem("RZ_1","Relay","RM3001", {coil_res    = 338,pickup_current = 0.003, hasCoil = true})
+    self.Train:LoadSystem("RZ_2","Relay","RM3001", {coil_res    = 73,pickup_current = 0.012, hasCoil = true})
     self.Train:LoadSystem("RZ_3","Relay","RM3001")
     -- Возврат реле перегрузки (РПвозврат)
     self.Train:LoadSystem("RPvozvrat","Relay","RM3001",{
@@ -31,25 +31,26 @@ function TRAIN_SYSTEM:Initialize()
         power_open = "None",        -- Power source for the open signal
         power_close = "Mechanical", -- Power source for the close signal
         coil_res = 73,
-        trigger_level = 0.012,
+        pickup_current = 0.012,
+        hasCoil = true
     })
 
     -- Реле времени РВ1
-    self.Train:LoadSystem("RV1","Relay","RM3100",{ open_time = 0.7, coil_res = 31.7,trigger_level = 0.004 })  --указаны сопротивления обмоток СДРК
+    self.Train:LoadSystem("RV1","Relay","RM3100",{ open_time = 0.7, coil_res = 31.7,pickup_current = 0.004, hasCoil = true })  --указаны сопротивления обмоток СДРК
     -- Реле времени РВ2 (задерживает отключение ЛК2)
-    self.Train:LoadSystem("RV2","Relay","RM3100",{ open_time = 0.7, coil_res = 200,trigger_level = 0.004 })
-    self.Train:LoadSystem("RR","Relay","RPU-116T", { coil_res = 160, trigger_level = 0.005 })
+    self.Train:LoadSystem("RV2","Relay","RM3100",{ open_time = 0.7, coil_res = 200,pickup_current = 0.004, hasCoil = true })
+    self.Train:LoadSystem("RR","Relay","RPU-116T", { coil_res = 160, pickup_current = 0.005, hasCoil = true })
 
     -- Реле ручного тормоза (РРТ)
-    self.Train:LoadSystem("RRT","Relay", {coil_res = 28})
+    self.Train:LoadSystem("RRT","Relay", {coil_res = 28, hasCoil = true})
     -- Реле резервного пуска (РРП)
-    self.Train:LoadSystem("RRP","Relay", {coil_res = 162,trigger_level = 0.005})
+    self.Train:LoadSystem("RRP","Relay", {coil_res = 162,pickup_current = 0.005, hasCoil = true})
     -- Стоп-реле (СР1)
-    self.Train:LoadSystem("SR1","Relay","RM3000",{ iterations=16,open_time=0,coil_res=3.34,trigger_level = 0.003 })   --указаны сопротивления обмоток СДРК
+    self.Train:LoadSystem("SR1","Relay","RM3000",{ iterations=16,open_time=0,coil_res=3.34,pickup_current = 0.003, hasCoil = true })   --указаны сопротивления обмоток СДРК
     -- Реле контроля реверсоров
-    self.Train:LoadSystem("RKR","Relay","RM3000", {coil_res = 372,trigger_level = 0.003})
+    self.Train:LoadSystem("RKR","Relay","RM3000", {coil_res = 372,pickup_current = 0.003, hasCoil = true})
     -- Реле ускорения, торможения (РУТ)
-    self.Train:LoadSystem("RUT","Relay","R-52B", {coil_res = 25})
+    self.Train:LoadSystem("RUT","Relay","R-52B", {coil_res = 25, hasCoil = true})
 
 
     -- Only in Ezh
