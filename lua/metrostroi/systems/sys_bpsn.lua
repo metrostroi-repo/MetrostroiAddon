@@ -34,7 +34,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "X2_2", "X6_2", "car_control_load" }
+    return { "X2_2", "X6_2", "car_control_load", "VoltageOut" }
 end
 
 

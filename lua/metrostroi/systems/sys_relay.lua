@@ -8,8 +8,10 @@ Metrostroi.DefineSystem("Relay")
 
 local relay_types = {
     ["PK-162"] = {
+        hasCoil = true,
         pneumatic       = true,
         contactor       = true,
+        pickup_current = 0.015*math.random() + 0.085,
     },
     ["Switch"] = {
         contactor       = true,
@@ -31,9 +33,55 @@ local relay_types = {
         open_time = 0,
     },
     ["ARS"] = {
+        hasCoil = true,
         close_time = 0,
         open_time = 0,
-    }
+    },
+    ["ARS-DOP"] = {
+        hasCoil = true,
+        pickup_current = 0.01*math.random() + 0.04,
+    },
+    ["KPD-110E"] = {
+        hasCoil = true,
+        coil_res = 50,
+    },
+    ["REV-813T"] = {
+        hasCoil = true,
+    },
+    ["REV-814T"] = {
+        hasCoil = true,
+    },
+    ["REV-811T"] = {
+        hasCoil = true,
+    },
+    ["REV-821"] = {
+        hasCoil = true,
+    },
+    ["PR-143"] = {
+        hasCoil = true,
+    },
+    ["KPP-113"] = {
+        hasCoil = true,
+    },
+    ["KPD-110"] = {
+        hasCoil = true,
+    },
+    ["KPP-110"] = {
+        hasCoil = true,
+        coil_res = 85,
+    },
+    ["REM-651D"] = {
+        hasCoil = true,
+    },
+    ["R-52B"] = {
+        hasCoil = true,
+    },
+    ["RPUZ-114-T-UHLZA"] = {
+        hasCoil = true,
+    },
+    ["TRTP-115"] = {
+        hasCoil = true,
+    },
 }
 
 function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
@@ -45,7 +93,7 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
         if relay_types[relay_type] then
             parameters = relay_types[relay_type]
         else
-            --print("[sys_relay.lua] Unknown relay type: "..parameters)
+            print("[sys_relay.lua] Unknown relay type: "..parameters, self.Name)
             parameters = {}
         end
         parameters.relay_type = relay_type
@@ -74,14 +122,12 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
     parameters.latched          = parameters.latched or false
     -- Should relay be spring-returned to initial position
     parameters.returns          = parameters.returns or (not parameters.latched)
-    -- Relay has coil (no by default)
-    parameters.hasCoil          = parameters.hasCoil
     -- Trigger level for the relay
     parameters.trigger_level    = parameters.trigger_level or 0.5
     -- Relay pickup current, A 
-    parameters.pickup_current   = parameters.pickup_current or 0.008*math.random() + 0.03
+    parameters.pickup_current   = parameters.pickup_current or 0.008*math.random() + 0.028
     -- Relay holding current, A
-    parameters.holding_current  = parameters.holding_current or 0.002*math.random() + 0.01
+    parameters.holding_current  = parameters.holding_current or 0.006*math.random() + 0.011
     -- Relay coil resistance, Ohm
     parameters.coil_res         = parameters.coil_res or parameters.hasCoil and math.random(100,300) or 1e12
     for k,v in pairs(parameters) do
@@ -298,7 +344,6 @@ function TRAIN_SYSTEM:Think(dT)
         self.SpuriousTripTimer = nil
     end
 
-    --print("РД = ",self.Train.Battery.Consumers[self.Train.RD])
     if self.hasCoil then
         self.Current = self.TargetValue*self.Train.Battery.eds_eq/self.coil_res
     end
@@ -309,7 +354,6 @@ function TRAIN_SYSTEM:Think(dT)
     -- Switch relay
     if self.ChangeTime and (self.Time > self.ChangeTime) and not self.SpuriousTripTimer then
         if self.TargetValue > 0.5 and self.Current >= self.pickup_current or self.TargetValue < 0.5 and self.Current < self.holding_current or not self.hasCoil then
-            -- Electropneumatic relays make this sound
             if self.bass and self.Value ~= self.TargetValue then
                 if self.bass_separate then
                     if self.TargetValue > 0 then
@@ -322,7 +366,6 @@ function TRAIN_SYSTEM:Think(dT)
                 end
             end
             self.Value = self.TargetValue
-            --self.Train.Battery.Consumers[self][1] = self.Value
             self.ChangeTime = nil
 
             -- Age relay a little

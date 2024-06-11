@@ -569,10 +569,6 @@ end
 --------------------------------------------------------------------------------
 function ENT:Think()
     self.RetVal = self.BaseClass.Think(self)
-    --[[if self.Battery.Consumers[self.RD] then
-        print("RD.pickup_current = "..tostring(self.RD.pickup_current),"RD current = "..self.Battery.Consumers[self.RD][3])
-    end]]
-    --print("Entity RD = ",self.RD.Value)
     local Panel = self.Panel
     local Pneumatic = self.Pneumatic
     local power = Panel.V1 > -1.5

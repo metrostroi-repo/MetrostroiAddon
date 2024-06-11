@@ -53,11 +53,11 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.cranPres = 0
 
     --DKPT
-    self.Train:LoadSystem("DKPT","Relay","R-52B") --
+    self.Train:LoadSystem("DKPT","Relay","") --
     -- Valve #1
-    self.Train:LoadSystem("PneumaticNo1","Relay","", {hasCoil = true})
+    self.Train:LoadSystem("PneumaticNo1","Relay","", {coil_res = 200, hasCoil = true})
     -- Valve #2
-    self.Train:LoadSystem("PneumaticNo2","Relay","", {hasCoil = true})
+    self.Train:LoadSystem("PneumaticNo2","Relay","", {coil_res = 200, hasCoil = true})
     -- Автоматический выключатель торможения (АВТ)
     self.Train:LoadSystem("AVT","Relay","AVT-325")
     -- Регулятор давления (АК)
