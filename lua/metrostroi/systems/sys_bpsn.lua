@@ -21,7 +21,7 @@ function TRAIN_SYSTEM:Initialize()
     self.X2_1 = 0
 
     self.OutputVoltage = math.random(78,82) -- volts
-    self.IResistance = 0.05--1.33 --Ohm
+    self.IResistance = 0.01 --Ohm (сам выдумал, примерно на порядок ниже, чем у АКБ)
     self.car_control_load= 0 --Amp
     self.VoltageOut = 0
 

@@ -9,41 +9,51 @@ TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize()
     -- Предохранители цепей (ПА1, ПА2)
-    self.Train:LoadSystem("PA1","Relay","PP-28", { trigger_level = 31.5 }) -- A
-    self.Train:LoadSystem("PA2","Relay","PP-28", { trigger_level = 31.5 }) -- A
+    self.Train:LoadSystem("PA1","Relay","PP-28", { trigger_level = 31.5 })  -- A
+    self.Train:LoadSystem("PA2","Relay","PP-28", { trigger_level = 31.5 })  -- A
 
     -- Battery parameters
-    self.ElementCapacity    = 80                                -- A*hour
-    self.Capacity = self.ElementCapacity * 3600
-    self.Charge = self.Capacity
+    self.ElementCapacity                = 80                                -- A*hour
+    self.Capacity                       = self.ElementCapacity * 3600
+    self.Charge                         = self.Capacity
+    self.FullCapacity                   = self.Capacity
     -- Current through battery in amperes
     self.Current = 0
     self.Charging = 0
     self.ElementCount                   = 52
-    self.StartVoltage                   = 75                    -- 1.44 volt per fully charged new NiCd-cell
+    self.StartVoltage                   = 75                                -- 1.44 volt per fully charged new NiCd-cell
     self.Voltage = self.StartVoltage
-    self.IResistance                    = 0.018*52              -- 0.018 Ohm is a standard internal resistance of a fully-charged and rested new 80 Ah NiCd-cell
-    self.SoC0v                          = 52                    -- 52 volts at 0% state of charge assuming 1.0 volt per fully discharged cell
-    self.SoC                            = 1.00                  -- fully charged
-    self.CutoffVoltage                  = 40                    -- we want deep discharge <_<
-    self.EthaCE0                        = 0.94                  -- Coulomb efficiency coeff
+    self.TargetVoltage                  = self.Voltage
+    self.Vpart                          = 0
+    self.CellIRes                       = 0.009                             -- 9 mOhm is a standard^w fake internal resistance of a fully-charged and rested new HKH-80 Ah NiCd-cell
+    self.IResistance                    = self.CellIRes*self.ElementCount
+    self.SoC0v                          = 52                                -- 52 volts at 0% state of charge assuming 1.0 volt per fully discharged cell
+    self.SoC                            = 1.00                              -- fully charged
+    self.CutoffVoltage                  = 45                                -- we want deep discharge <_<
+    self.EthaCE0                        = 0.94                              -- Coulomb efficiency coeff
     self.EthaCE                         = self.EthaCE0
     self.Ibatt                          = 0
     self.eds_eq                         = 0
     self.hvcounter                      = 0
     self.Consumers                      = {}
-    self.Ibatt_sigma                    = 0
-    self.CCcurrent_sigma                = 0
-    self.Dischar = false
-    self.ComputerCar = false
+    --self.Ibatt_sigma                    = 0
+    --self.CCcurrent_sigma                = 0
+    self.Dischar                        = false
+    self.ComputerCar                    = false
+
+    ---------------------------------------------
+    -- 10 mV/min — voltage covery/recovery speed during first 30 minutes after charging/discharging stopped
+    -- 1.0 (1.2) Volt/cell    - fully discharged under load (OCV)
+    -- 1.7 (1.44) Volt/cell    - fully charged under load (OCV)
+    ---------------------------------------------
 
     for k,v in pairs(self.Train.Systems) do
         if v.hasCoil and not self.Consumers[v] then
-            print("Registering relay",v.Name, "Train: ", self.Train)
+            --print("Registering relay",v.Name, "Train: ", self.Train)
             self.Consumers[v] = {0,v.coil_res,0}
         end
     end
-    print "------------------\n"
+    --print "------------------\n"
 end
 
 -- TODO: - расставить параметры для всех оставшихся реле (убедиться, что подъемный ток ниже номинального)
@@ -81,12 +91,12 @@ function TRAIN_SYSTEM:Think(dT)
         end
 
         if self.Train.ComputerCar then
-            local nodecurr_sum, branchcond_sum = 0, 0
-            local eds_eq = 0
+            local nodecurr_sum, branchcond_sum = 0.0, 0.0
+            local eds_eq = 0.0
             local hvcounter = 0
-            self.Ibatt_sigma = 0
-            self.CCcurrent_sigma = 0
-            
+            --self.Ibatt_sigma = 0
+            --self.CCcurrent_sigma = 0
+
             for k,v in ipairs(self.Train.WagonList) do
                 if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
                     hvcounter = hvcounter + 1
@@ -117,50 +127,63 @@ function TRAIN_SYSTEM:Think(dT)
                 v.Battery.Ibatt = math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))
                             *(math.min(1,(v.VB.Value*v.A56.Value+v.A24.Value))*v.VB.Value*((v.A56.Value*(eds_eq - v.Battery.Voltage)
                             + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance -- math.max(0,(2.4*(v.Battery.Voltage/v.Battery.StartVoltage)-2.39))
-                self.Ibatt_sigma = self.Ibatt_sigma + v.Battery.Ibatt
-                self.CCcurrent_sigma = self.CCcurrent_sigma + v.PowerSupply.car_control_load
+                --self.Ibatt_sigma = self.Ibatt_sigma + v.Battery.Ibatt
+                --self.CCcurrent_sigma = self.CCcurrent_sigma + v.PowerSupply.car_control_load
                 v.Battery.eds_eq = eds_eq
                 v.Battery.hvcounter = hvcounter
                 v.eds_eq = v.Battery.eds_eq
-                --print(v.eds_eq, branchcond_sum)
-                --print(v.PowerSupply.car_control_load,v.Battery.Ibatt,v.Battery.IResistance)
+                if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
+                    print(v.eds_eq, nodecurr_sum, branchcond_sum)
+                    --print(v.PowerSupply.car_control_load,v.Battery.Ibatt,v.Battery.IResistance)
+                end
             end
-            for k,v in ipairs(self.Train.WagonList) do
-                v.Battery.Ibatt_sigma = self.Ibatt_sigma
-                v.Battery.CCcurrent_sigma = self.CCcurrent_sigma
-            end
+            --for k,v in ipairs(self.Train.WagonList) do
+                --v.Battery.Ibatt_sigma = self.Ibatt_sigma
+                --v.Battery.CCcurrent_sigma = self.CCcurrent_sigma
+            --end
         end
-        -- Calculate state of charge and internal resistance
+        -- Calculate state of charge, internal resistance and battery voltage
         if self.Dischar then
-            --self.EthaCE0 = self.EthaCE0 - dT * 1.16e-7                                     -- ~ 1% per day
-            self.Capacity = self.Capacity - dT * 0.033                                       -- ~ 1% per day
+            self.Capacity = self.Capacity - dT * (self.FullCapacity*0.1/86400)               -- make capacity loss ~ 10% per day (just a game abstraction)
             if self.Ibatt > 0 then
                 if self.Ibatt >= 8 then
                     local kCE = (self.EthaCE0 - 0.5)/72
                     local aCE = kCE*80 + 0.5
                     self.EthaCE = aCE - kCE * math.abs(self.Ibatt)
                 else
-                    -- низковат коэффициент; уже при 5 А всего 0.5, надо менять функцию, иначе выше 75 вольт батарею и за год не зарядишь
-                    self.EthaCE = 0.1*math.exp(0.28*self.Ibatt)
+                    self.EthaCE = 0.94-5*math.exp(-self.Ibatt)
                 end
             else
                 if self.SoC <= 1.0 then
                     self.EthaCE = 1
                 else
-                    self.EthaCE = 0.5*math.exp(2.6*self.SoC) - 5.73
+                    self.EthaCE = 0.5*math.exp(2.6*self.SoC) - 5.73         -- не бывает!
                 end
             end
-            -- Возможно, надо ввести ток саморазряда, а не ебаться с выдуманной зависимостью EthaCE от SoC выше 100%
+
+            if self.SoC <= 0 or self.SoC >= 1.0 then self.EthaCE = 0 end
+
+            -- Возможно, надо ввести ток саморазряда, а не ебаться с выдуманной зависимостью EthaCE от SoC выше 100% (которого не бывает >_>)
+            --local CellIResTarget, irt_sign = self.CellIRes, 0
             self.SoC = self.SoC + self.EthaCE*self.Ibatt*dT/self.Capacity
-            local SoC = math.max(0,math.min(132,self.SoC*100))
-            if SoC > 100 then
-                self.IResistance = 3e-4 * (SoC-100) + 0.018                         -- 132 % = 0.028 Ohm
-            elseif 10 <= SoC and SoC <= 100 then
-                self.IResistance = 0.018
-            elseif SoC < 10 then
-                self.IResistance = math.min(0.32, 0.018 + 1.28^-(6+1.48*SoC))       -- just made it up by myself >_>
+            local SoC = math.max(0,math.min(100,self.SoC*100))
+            if 50 <= SoC and SoC <= 100 then
+                self.CellIRes = 0.009
+            elseif SoC >= 0.5 then
+                self.CellIRes = (9+0.1*(50-SoC))*10^(-3)
+            -- 0.035C and 0.08C (idk why...)
+            elseif self.Ibatt < -0.035*self.ElementCapacity or (0.014 < self.CellIRes and self.CellIRes < 0.8296 and self.Ibatt > 0.08*self.ElementCapacity) then
+                -- SoC less than 0.5% and discharging or Vbatt approx. 62 - 52 V and charging
+                if 55 <= self.Voltage and self.Voltage < 62 then
+                    self.CellIRes = 112 - 14*(self.Voltage - 55)
+                elseif 50 <= self.Voltage and self.Voltage < 55 then
+                    self.CellIRes = 1308 - 239.2*(self.Voltage - 50)
+                end
+                --irt_sign = self.CellIRes > CellIResTarget and -1 or 1
+                --self.CellIRes = self.CellIRes + irt_sign*0.001
             end
-            self.IResistance = self.IResistance * self.ElementCount
+            self.IResistance = self.CellIRes * self.ElementCount
+
             --self.Train.BattCurrent = self.Ibatt*self.Train.A24.Value
             self.Train.PA1:TriggerInput("Close",math.abs(self.Ibatt)/2)     -- Это неправильно, но я уже заебалась
             self.Train.PA2:TriggerInput("Close",math.abs(self.Ibatt)/2)
@@ -170,51 +193,75 @@ function TRAIN_SYSTEM:Think(dT)
         -- Calculate battery voltage                                                                           --                     |
         --self.Voltage = self.StartVoltage*(self.Charge/self.Capacity)                                         -- симуляция потери емкости батареи (future feature) — хуюче
 
-        -- Polynomials for battery voltage calculation during charge and discharge (source: https://www.mdpi.com/1996-1073/16/21/7291)
+        -- Polynomials for battery OCV calculation during charge and discharge (source: https://www.mdpi.com/1996-1073/16/21/7291)
         -- Roughly, Vbatt_charge = EMF(SOC) + 𝑈ℎ(SOC), Vbatt_discharge = EMF(SOC) - 𝑈ℎ(SOC)
 
         --EMF(SOC)=−0.68175SOC^8+8.82823SOC^7−24.43179SOC^6+31.87221SOC^5−23.97881SOC^4+11.24774SOC^3−3.40685SOC^2+0.74692SOC+1.22076
         --𝑈ℎ(SOC)=2.62496SOC^8−12.77132SOC^7+22.37586SOC^6−18.04921SOC^5+6.14667SOC^4+0.26467SOC^3−0.82125SOC^2+0.21246SOC+0.02641
 
-        local TargVbatt, EMF_soc, Uh_soc
+        -- open circuit voltage calculation
+        local EMF_soc, Uh_soc, tvb_sign
         EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
         Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
 
-        if self.Ibatt < 0 then                                          --Discharge
-            TargVbatt = EMF_soc - Uh_soc
-            --[[local i_bat = math.abs(self.Ibatt)
-            if self.SoC > 1.0 then
-                self.Voltage = 75 + math.exp(2-9*self.SoC)
-            elseif self.SoC > 0.2 then
-                local Kmin, Kmax = 3/0.8, 13/0.8
-                local KaCe = (Kmax - Kmin)/(63-8)
-                local Akc = Kmax-63*KaCe
-                local Kdis = Akc+KaCe*i_bat
-                local Avb = 75
-                TargVbatt = Avb - Kdis*self.SoC
-            else
-                local Ka = (75-68)/(64-8)
-                local Ai = (64-i_bat)*Ka+68
-                local Kb = (24-13)/(64-8)
-                local Bi = (i_bat-8)*Kb+13
-                TargVbatt = Ai - Bi*math.exp(-7*self.SoC)
-            end]]
-        else                                                            --Charge
-            TargVbatt = EMF_soc + Uh_soc
+        -- Need to implement:
+        -- Battery voltage (EMF in our case) growth rate at SoC > 90%:      0.25 volt per 10%
+        -- Battery voltage (EMF in our case) decrease rate at SoC < 10%:    0.20 volt per 10%
+        --[[local i_bat = math.abs(self.Ibatt)
+        if self.SoC > 1.0 then
+            self.Voltage = 75 + math.exp(2-9*self.SoC)
+        elseif self.SoC > 0.2 then
+            local Kmin, Kmax = 3/0.8, 13/0.8
+            local KaCe = (Kmax - Kmin)/(63-8)
+            local Akc = Kmax-63*KaCe
+            local Kdis = Akc+KaCe*i_bat
+            local Avb = 75
+            TargVbatt = Avb - Kdis*self.SoC
+        else
+            local Ka = (75-68)/(64-8)
+            local Ai = (64-i_bat)*Ka+68
+            local Kb = (24-13)/(64-8)
+            local Bi = (i_bat-8)*Kb+13
+            TargVbatt = Ai - Bi*math.exp(-7*self.SoC)
+        end]]
+        if self.Ibatt > 0.005*self.ElementCapacity then
+            self.TargetVoltage = EMF_soc + Uh_soc
+            if self.SoC > 0.9 and self.Ibatt > 0.005*self.ElementCapacity then
+                if self.Vpart < 0 then self.Vpart = 0 end
+                self.Vpart = math.min(0.3,self.Vpart + 0.05)
+                self.TargetVoltage =  math.min(self.eds_eq/self.ElementCount, self.TargetVoltage + self.Vpart)
+            end
+        else
+            self.TargetVoltage = EMF_soc - Uh_soc
+            if self.SoC < 0.1 and self.Ibatt < -0.005*self.ElementCapacity then
+                if self.Vpart > 0 then self.Vpart = 0 end
+                self.Vpart = math.max(-0.2, self.Vpart - 0.05)
+                self.TargetVoltage = math.max(0.8, self.TargetVoltage + self.Vpart)
+            end
         end
-        TargVbatt = TargVbatt*self.ElementCount
+        self.TargetVoltage = self.TargetVoltage*self.ElementCount
         --print("Target Voltage = "..TargVbatt, self.Train)
 
-        self.Voltage = self.Voltage + (TargVbatt - self.Voltage)*dT*0.05
+        tvb_sign = self.Voltage > self.TargetVoltage and -1 or 1
+        self.Voltage = self.Voltage + tvb_sign*0.05
+        --self.Voltage = self.Voltage + (TargVbatt - self.Voltage)*dT*0.05
         --self.Voltage = (75-self.SoC0v)*(self.Charge/self.Capacity)+self.SoC0v
 
         -- DEBUG
+        -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
-            print("Target Voltage = "..TargVbatt, "self.Voltage = "..self.Voltage)
+            --local tval = 1
+            --print("Target Voltage = "..self.TargetVoltage, "self.Voltage = "..self.Voltage, "train:",self)
             --print("self.SoC = "..self.SoC, "self.Ibatt = "..self.Ibatt)
+            --print("self.eds_eq = "..self.eds_eq)
             --print("self.EthaCE = "..self.EthaCE, "self.IResistance = "..self.IResistance)
             --print("self.Capacity = "..self.Capacity)
+            --[[
+            EMF_soc=-0.68175*tval^8+8.82823*tval^7-24.43179*tval^6+31.87221*tval^5-23.97881*tval^4+11.24774*tval^3-3.40685*tval^2+0.74692*tval+1.22076
+            Uh_soc=2.62496*tval^8-12.77132*tval^7+22.37586*tval^6-18.04921*tval^5+6.14667*tval^4+0.26467*tval^3-0.82125*tval^2+0.21246*tval+0.02641
+            print("EMF_soc = "..EMF_soc, "Uh_soc = "..Uh_soc)--]]
         end
+        -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else
         -- Calculate discharge
         self.Current = 0--self.Train.KVC.Value*90*(self.Train.PowerSupply.XT3_1 > 0 and 3 or -1 + 4*self.Train:ReadTrainWire(27))*50*self.Train.Panel["V1"]
