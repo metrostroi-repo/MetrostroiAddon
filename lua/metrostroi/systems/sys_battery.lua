@@ -97,33 +97,21 @@ function TRAIN_SYSTEM:Think(dT)
             --self.Ibatt_sigma = 0
             --self.CCcurrent_sigma = 0
 
-            for k,v in ipairs(self.Train.WagonList) do
-                if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
-                    hvcounter = hvcounter + 1
-                end
-            end
             --a "two-node method" of 10's wire voltage computing
+            -- разобраться с принципом подзаряда АКБ в момент отключения тумблера
             for k,v in ipairs(self.Train.WagonList) do
                 nodecurr_sum = nodecurr_sum + v.A56.Value*(v.VB.Value*v.Battery.Voltage/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value*v.PowerSupply.VoltageOut/v.PowerSupply.IResistance)
                 --+ 1/((1 - v.VB.Value*v.A49.Value)*1e12 + 1e3)
-                branchcond_sum = branchcond_sum + GetBranchCondSum(v.Battery.Consumers) + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)
-
-                --[[branchcond_sum = branchcond_sum + 1/(v.LK4.Value > 0 and 20 or 1e12) + 1/(v.RV1.Value > 0 and 10 or 1e12)
-                                                + 1/(v.KK.Value > 0 and 24 or 1e12) + 1/(1e3)
-                                                + 1/(v.RC1 and v.RC1.Value > 0 and 32 or 1e12)
-                                                + 1/(v.Panel.Headlights1 and v.Panel.Headlights1 > 0 and 38 or 1e12)
-                                                + 1/(v.Panel.Headlights2 and v.Panel.Headlights2 > 0 and 38 or 1e12)
-                                                + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)]]
+                branchcond_sum = branchcond_sum + GetBranchCondSum(v.Battery.Consumers) + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)-- + (1-v.PowerSupply.X2_1*v.A24.Value)/1e9)
+                -- let's try to do this in one cycle (not quite sure if it won't create any issues)
+                if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
+                    hvcounter = hvcounter + 1
+                end
             end
             eds_eq = nodecurr_sum/branchcond_sum
             --print(eds_eq, nodecurr_sum, branchcond_sum)
             for k,v in ipairs(self.Train.WagonList) do
                 v.PowerSupply.car_control_load = eds_eq*GetBranchCondSum(v.Battery.Consumers)
-                --[[v.PowerSupply.car_control_load = eds_eq*(1/(v.LK4.Value > 0 and 20 or 1e12) + 1/(v.RV1.Value > 0 and 10 or 1e12)
-                                                        + 1/(v.RC1 and v.RC1.Value > 0 and 32 or 1e12)
-                                                        + 1/(v.Panel.Headlights1 and v.Panel.Headlights1 > 0 and 38 or 1e12)
-                                                        + 1/(v.Panel.Headlights2 and v.Panel.Headlights2 > 0 and 38 or 1e12)
-                                                        + 1/(v.KK.Value > 0 and 24 or 1e12))]]
                 v.Battery.Ibatt = math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))
                             *(math.min(1,(v.VB.Value*v.A56.Value+v.A24.Value))*v.VB.Value*((v.A56.Value*(eds_eq - v.Battery.Voltage)
                             + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance -- math.max(0,(2.4*(v.Battery.Voltage/v.Battery.StartVoltage)-2.39))

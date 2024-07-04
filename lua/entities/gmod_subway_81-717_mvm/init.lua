@@ -713,7 +713,7 @@ function ENT:Think()
     self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0)     --BPSN overheat protection in case of RZP button is being pressed constantly
 ----------------------------------*****************************--------------------------------
 
-    self:SetPackedRatio("BatteryVoltage",(self.eds_eq)/150.0)
+    self:SetPackedRatio("BatteryVoltage",(self.Battery.eds_eq)/150.0)
     
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)
     self:SetPackedBool("Buzzer",Panel.Ring >= 1)

@@ -20,8 +20,8 @@ function TRAIN_SYSTEM:Initialize()
     self.X6_2 = 0
     self.X2_1 = 0
 
-    self.OutputVoltage = math.random(78,82) -- volts
-    self.IResistance = 0.01 --Ohm (сам выдумал, примерно на порядок ниже, чем у АКБ)
+    self.OutputVoltage = 76--math.random(78,82) -- volts
+    self.IResistance = 0.01 --Ohm (сам выдумал, примерно на полтора порядка ниже, чем у АКБ)
     self.car_control_load= 0 --Amp
     self.VoltageOut = 0
 
@@ -34,7 +34,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "X2_2", "X6_2", "car_control_load", "VoltageOut" }
+    return { "X2_2", "X6_2", "car_control_load", "VoltageOut", "OutputVoltage" }
 end
 
 
@@ -61,5 +61,6 @@ function TRAIN_SYSTEM:Think()
     self.X2_2 = Train.Electric.Aux750V*self.Active
     self.X6_2 = self.Active
     
-    self.VoltageOut = self.X2_1*((self.OutputVoltage - self.car_control_load*self.IResistance) + (Train.Electric.Aux750V - 600)*2/375)
+    --self.VoltageOut = self.X2_1*((self.OutputVoltage - self.car_control_load*self.IResistance) + (Train.Electric.Aux750V - 600)*2/375)
+    self.VoltageOut = self.X2_1*(self.OutputVoltage + (Train.Electric.Aux750V - 600)*8/375)
 end

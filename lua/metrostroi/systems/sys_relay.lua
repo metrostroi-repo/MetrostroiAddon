@@ -62,9 +62,11 @@ local relay_types = {
     },
     ["KPP-113"] = {
         hasCoil = true,
+        coil_res = 156,
     },
     ["KPD-110"] = {
         hasCoil = true,
+        coil_res = math.random(247,273),
     },
     ["KPP-110"] = {
         hasCoil = true,
