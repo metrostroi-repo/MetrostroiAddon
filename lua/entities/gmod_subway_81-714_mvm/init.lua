@@ -131,7 +131,7 @@ function ENT:Initialize()
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
     }
-    self.BattCurrent = 0
+    --self.BattCurrent = 0
     self.eds_eq = 0
 
     -- Cross connections in train wires
@@ -231,7 +231,7 @@ end
 function ENT:TrainSpawnerUpdate()
     self:SetNW2Bool("Custom",self.CustomSettings)
     self.Battery:TriggerInput("CarType",1)
-    self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
+    --self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
     self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
     local num = self.WagonNumber
     math.randomseed(num+817171)
@@ -386,7 +386,7 @@ function ENT:Think()
 ----------------------------------*****************************--------------------------------
     
     self:SetPackedRatio("BatteryVoltage",(self.Battery.eds_eq)/150.0)
-    self:SetPackedRatio("BatteryCurrent",self.BattCurrent/1000)
+    self:SetPackedRatio("BatteryCurrent",self.Battery.Ibatt/1000)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)

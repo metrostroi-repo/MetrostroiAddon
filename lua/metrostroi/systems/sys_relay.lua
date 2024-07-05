@@ -95,7 +95,7 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
         if relay_types[relay_type] then
             parameters = relay_types[relay_type]
         else
-            print("[sys_relay.lua] Unknown relay type: "..parameters, self.Name)
+            --print("[sys_relay.lua] Unknown relay type: "..parameters, self.Name)
             parameters = {}
         end
         parameters.relay_type = relay_type
