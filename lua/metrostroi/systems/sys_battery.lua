@@ -17,7 +17,7 @@ function TRAIN_SYSTEM:Initialize()
     self.Capacity                       = self.ElementCapacity * 3600
     self.Charge                         = self.Capacity
     self.FullCapacity                   = self.Capacity
-    -- Current through battery in amperes
+    -- Current through battery/A
     self.Current = 0
     self.Charging = 0
     self.ElementCount                   = 52
@@ -39,10 +39,7 @@ function TRAIN_SYSTEM:Initialize()
     self.EthaCE                         = self.EthaCE0
     self.Ibatt                          = 0
     self.eds_eq                         = 0
-    self.hvcounter                      = 0
     self.Consumers                      = {}
-    --self.Ibatt_sigma                    = 0
-    --self.CCcurrent_sigma                = 0
     self.Dischar                        = false
     self.ComputerCar                    = false
 
@@ -98,47 +95,32 @@ function TRAIN_SYSTEM:Think(dT)
         if self.Train.ComputerCar then
             local nodecurr_sum, branchcond_sum = 0.0, 0.0
             local eds_eq = 0.0
-            local hvcounter = 0
-            --self.Ibatt_sigma = 0
-            --self.CCcurrent_sigma = 0
 
             --a "two-node method" of 10's wire voltage computing
             for k,v in ipairs(self.Train.WagonList) do
                 nodecurr_sum = nodecurr_sum + v.A56.Value*(v.VB.Value*v.Battery.Voltage/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value*v.PowerSupply.VoltageOut/v.PowerSupply.IResistance)
-                --+ 1/((1 - v.VB.Value*v.A49.Value)*1e12 + 1e3)
-                branchcond_sum = branchcond_sum + GetBranchCondSum(v.Battery.Consumers) + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)-- + (1-v.PowerSupply.X2_1*v.A24.Value)/1e9)
-                -- let's try to do this in one cycle (not quite sure if it won't create any issues)
-                if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
-                    hvcounter = hvcounter + 1
-                end
+                branchcond_sum = branchcond_sum + GetBranchCondSum(v.Battery.Consumers) + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)
             end
             eds_eq = nodecurr_sum/branchcond_sum
-            -- сделать расчет потребляемого тока БПСН
-            --print(eds_eq, nodecurr_sum, branchcond_sum)
             for k,v in ipairs(self.Train.WagonList) do
                 local consumers_cond = GetBranchCondSum(v.Battery.Consumers)
                 v.PowerSupply.car_control_load = eds_eq*consumers_cond
                 v.Battery.Ibatt = math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))
                             *(math.min(1,(v.VB.Value*v.A56.Value+v.A24.Value))*v.VB.Value*((v.A56.Value*(eds_eq - v.Battery.Voltage)
-                            + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance -- math.max(0,(2.4*(v.Battery.Voltage/v.Battery.StartVoltage)-2.39))
-                --self.Ibatt_sigma = self.Ibatt_sigma + v.Battery.Ibatt
-                --self.CCcurrent_sigma = self.CCcurrent_sigma + v.PowerSupply.car_control_load
+                            + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance
                 v.PowerSupply.Iout = v.VB.Value*math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))*v.A24.Value*(v.PowerSupply.VoltageOut - eds_eq)/v.PowerSupply.IResistance
                                     + v.VB.Value*v.A56.Value*v.A24.Value*(v.PowerSupply.VoltageOut - eds_eq)*consumers_cond
 
                 v.Battery.eds_eq = eds_eq
-                v.Battery.hvcounter = hvcounter
                 v.eds_eq = v.Battery.eds_eq
+
+                -- DEBUG
                 --if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
                     --print(v.eds_eq, nodecurr_sum, branchcond_sum)
                     --print(v.PowerSupply.car_control_load,v.Battery.Ibatt,v.Battery.IResistance)
                     --print(v.PowerSupply.Iout,v.PowerSupply.Icosume)
                 --end
             end
-            --for k,v in ipairs(self.Train.WagonList) do
-                --v.Battery.Ibatt_sigma = self.Ibatt_sigma
-                --v.Battery.CCcurrent_sigma = self.CCcurrent_sigma
-            --end
         end
         -- Calculate state of charge, internal resistance and battery voltage
         if self.Dischar then
@@ -162,7 +144,6 @@ function TRAIN_SYSTEM:Think(dT)
             if self.SoC <= 0 or self.SoC >= 1.0 then self.EthaCE = 0 end
 
             -- Возможно, надо ввести ток саморазряда, а не ебаться с выдуманной зависимостью EthaCE от SoC выше 100% (которого не бывает >_>)
-            --local CellIResTarget, irt_sign = self.CellIRes, 0
             self.SoC = self.SoC + self.EthaCE*self.Ibatt*dT/self.Capacity
             local SoC = math.max(0,math.min(100,self.SoC*100))
             if 50 <= SoC and SoC <= 100 then
@@ -177,19 +158,14 @@ function TRAIN_SYSTEM:Think(dT)
                 elseif 50 <= self.Voltage and self.Voltage < 55 then
                     self.CellIRes = 1308 - 239.2*(self.Voltage - 50)
                 end
-                --irt_sign = self.CellIRes > CellIResTarget and -1 or 1
-                --self.CellIRes = self.CellIRes + irt_sign*0.001
             end
             self.IResistance = self.CellIRes * self.ElementCount
 
             --self.Train.BattCurrent = self.Ibatt*self.Train.A24.Value
             self.Train.PA1:TriggerInput("Close",math.abs(self.Ibatt)/2)     -- Это неправильно, но я уже заебалась
             self.Train.PA2:TriggerInput("Close",math.abs(self.Ibatt)/2)
-            -- Supposed battery voltage range from 29 to 82 volts
-            --self.Charge = math.max(-self.Capacity,math.min(1.32*self.Capacity,self.Charge + self.Ibatt * --[[(self.Ibatt < 0 and 1000/self.SoC0v or 500/self.SoC0v)*]] dT))
-        end                                                                                                    --                     ^
-        -- Calculate battery voltage                                                                           --                     |
-        --self.Voltage = self.StartVoltage*(self.Charge/self.Capacity)                                         -- симуляция потери емкости батареи (future feature) — хуюче
+        end
+        -- Calculate battery voltage
 
         -- Polynomials for battery OCV calculation during charge and discharge (source: https://www.mdpi.com/1996-1073/16/21/7291)
         -- Roughly, Vbatt_charge = EMF(SOC) + 𝑈ℎ(SOC), Vbatt_discharge = EMF(SOC) - 𝑈ℎ(SOC)
@@ -202,14 +178,12 @@ function TRAIN_SYSTEM:Think(dT)
         EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
         Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
 
-        -- Need to implement:
         -- Battery voltage (EMF in our case) growth rate at SoC > 90%:      0.25 volt per 10%
         -- Battery voltage (EMF in our case) decrease rate at SoC < 10%:    0.20 volt per 10%
         if self.Ibatt > 0.005*self.ElementCapacity then
             self.TargetVoltage = EMF_soc + Uh_soc
             if self.SoC > 0.9 and self.Ibatt > 0.005*self.ElementCapacity then
                 if self.Vpart < 0 then self.Vpart = 0 end
-                --self.Vpart = math.min(0.3,self.Vpart + 0.05)
                 self.Vpart = 2.5*(self.SoC-0.9)
                 self.TargetVoltage =  math.min(self.eds_eq/self.ElementCount, self.TargetVoltage + self.Vpart)
             end
@@ -217,18 +191,13 @@ function TRAIN_SYSTEM:Think(dT)
             self.TargetVoltage = EMF_soc - Uh_soc
             if self.SoC < 0.1 and self.Ibatt < -0.005*self.ElementCapacity then
                 if self.Vpart > 0 then self.Vpart = 0 end
-                --self.Vpart = math.max(-0.2, self.Vpart - 0.05)
                 self.Vpart = -2.0*(0.1-self.SoC)
                 self.TargetVoltage = math.max(0.8, self.TargetVoltage + self.Vpart)
             end
         end
-        self.TargetVoltage = self.TargetVoltage*self.ElementCount
-        --print("Target Voltage = "..TargVbatt, self.Train)
 
-        --tvb_sign = self.Voltage > self.TargetVoltage and -1 or 1
-        --self.Voltage = self.Voltage + tvb_sign*0.05
+        self.TargetVoltage = self.TargetVoltage*self.ElementCount
         self.Voltage = self.Voltage + (self.TargetVoltage - self.Voltage)*0.05
-        --self.Voltage = (75-self.SoC0v)*(self.Charge/self.Capacity)+self.SoC0v
 
         -- DEBUG
         -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,6 +215,7 @@ function TRAIN_SYSTEM:Think(dT)
             print("EMF_soc = "..EMF_soc, "Uh_soc = "..Uh_soc)--]]
         --end
         -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    -- Legacy code
     else
         -- Calculate discharge
         self.Current = 0--self.Train.KVC.Value*90*(self.Train.PowerSupply.XT3_1 > 0 and 3 or -1 + 4*self.Train:ReadTrainWire(27))*50*self.Train.Panel["V1"]
@@ -259,5 +229,4 @@ function TRAIN_SYSTEM:Think(dT)
             self.Voltage = 65*(self.Charge/self.Capacity) + (self.Charging > 0 and 17 or 0)
         end
     end
-    --print(self.eds_eq)
 end

@@ -361,7 +361,8 @@ function ENT:Think()
     self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure", Pneumatic.BrakeCylinderPressure/6.0)
 
-----------------------------------*****************************--------------------------------
+--[[-------************* This stupid shit is not needed any more. Overload protection is now implemented correctly inside BPSN system *************---------
+
     --imitating converter overload protection only when control circuits are energized and at least one PC on the train is off; pretty useless btw (but fun)
     local pcloadratio = #self.WagonList/(self.Battery.hvcounter > 0 and self.Battery.hvcounter or 0.5)
     local _A = 90*(6 - 6/(5.01))                                          --assuming one PC on 6 cars can work for 90 secs while the cars' CCs are energized
@@ -383,7 +384,7 @@ function ENT:Think()
         end
     end
     self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0) 	        --BPSN overheat protection in case of RZP button is being pressed constantly
-----------------------------------*****************************--------------------------------
+----------------------------------*****************************--------------------------------]]
     
     self:SetPackedRatio("BatteryVoltage",(self.Battery.eds_eq)/150.0)
     self:SetPackedRatio("BatteryCurrent",self.Battery.Ibatt/1000)
