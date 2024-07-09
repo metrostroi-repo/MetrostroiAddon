@@ -16,7 +16,7 @@ function TRAIN_SYSTEM:Initialize()
 
     -- Нулевое реле (НР)
     --   Does not use any power source defined, as the operation is calculated from bus voltage
-    self.Train:LoadSystem("NR","Relay","R3150", { power_source = "None", coil_res = 690,pickup_current = 0.03, hasCoil = true })
+    self.Train:LoadSystem("NR","Relay","R3150", { power_source = "None" })--, coil_res = 690,pickup_current = 0.03, hasCoil = true })
     -- Реле системы управления
     self.Train:LoadSystem("RSU","Relay","R3100", {coil_res = 275,pickup_current = 0.03, hasCoil = true})
     self.Train:LoadSystem("RU","Relay","R3100")

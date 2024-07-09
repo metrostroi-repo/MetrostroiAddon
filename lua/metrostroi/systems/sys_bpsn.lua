@@ -10,7 +10,7 @@ TRAIN_SYSTEM.DontAccelerateSimulation = true
 function TRAIN_SYSTEM:Initialize()
     self.X2 = {
         [2] = 0,
-        [3] = 0, --overheat protection simulation
+        [3] = 0,
         [4] = 0,
         [5] = 0, -- Out only
         [6] = 0,
@@ -50,21 +50,26 @@ end
 function TRAIN_SYSTEM:Think()
     local Train = self.Train
     -- Get high-voltage input
-    self.X2_1 = Train.KPP.Value * (1-Train.RZP.Value) * (1-self.X2[3]) -- P4
-    self.Icosume = self.VoltageOut*self.Iout/Train.Electric.Aux750V
+    -- X2_1 now indicates that primary converter is operating
+    self.X2_1 = (Train.Electric.Aux750V > 550 and 1 or 0) * Train.KPP.Value * (1-Train.RZP.Value)
+    if Train.Electric.Aux750V >= 550 then
+        self.VoltageOut = self.X2_1*(self.OutputVoltage + (Train.Electric.Aux750V - 550)*8/425)
+    else
+        self.VoltageOut = math.max(0,self.X2_1*(Train.Electric.Aux750V - 300)*76/300)
+    end
+    self.Icosume = Train.NR.Value*self.VoltageOut*self.Iout/(Train.Electric.Aux750V > 0 and Train.Electric.Aux750V or 1)
     
     -- Get battery input
     local XT3_1 = self.X2[5]*self.X2_1
     if Train.Electric.Aux750V*self.X2_1 > 975 or self.Icosume > 28 then     -- should be 25 - 30 amp
         Train.RZP:TriggerInput("Close",1)
+        --print("self.Icosume = "..self.Icosume, "Train.Electric.Aux750V = "..Train.Electric.Aux750V, "self.Iout = "..self.Iout)
+        --print("Train.Battery.eds_eq = "..Train.Battery.eds_eq, "self.VoltageOut = "..self.VoltageOut)
         self.X2_1 = 0
         XT3_1 = 0
     end
     -- Check if enable signal is present
     self.Active = XT3_1>0 and 1 or 0
-    self.X2_2 = Train.Electric.Aux750V*self.Active
-    self.X6_2 = self.Active
-    
-    --self.VoltageOut = self.X2_1*((self.OutputVoltage - self.car_control_load*self.IResistance) + (Train.Electric.Aux750V - 600)*2/375)
-    self.VoltageOut = self.X2_1*(self.OutputVoltage + (Train.Electric.Aux750V - 600)*8/375)
+    self.X2_2 = Train.Electric.Aux750V*self.Active      -- radio, asnp etc.
+    self.X6_2 = Train.KVP.Value--self.Active            -- mainlights
 end

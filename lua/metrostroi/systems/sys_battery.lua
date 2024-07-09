@@ -108,15 +108,14 @@ function TRAIN_SYSTEM:Think(dT)
                 v.Battery.Ibatt = math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))
                             *(math.min(1,(v.VB.Value*v.A56.Value+v.A24.Value))*v.VB.Value*((v.A56.Value*(eds_eq - v.Battery.Voltage)
                             + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance
-                v.PowerSupply.Iout = v.VB.Value*math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))*v.A24.Value*(v.PowerSupply.VoltageOut - eds_eq)/v.PowerSupply.IResistance
-                                    + v.VB.Value*v.A56.Value*v.A24.Value*(v.PowerSupply.VoltageOut - eds_eq)*consumers_cond
-
+                v.PowerSupply.Iout = v.PowerSupply.car_control_load + v.Battery.Ibatt
                 v.Battery.eds_eq = eds_eq
                 v.eds_eq = v.Battery.eds_eq
 
                 -- DEBUG
                 --if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
                     --print(v.eds_eq, nodecurr_sum, branchcond_sum)
+                    --print("v.PowerSupply.X2_1 = "..v.PowerSupply.X2_1)
                     --print(v.PowerSupply.car_control_load,v.Battery.Ibatt,v.Battery.IResistance)
                     --print(v.PowerSupply.Iout,v.PowerSupply.Icosume)
                 --end

@@ -10,14 +10,14 @@ function TRAIN_SYSTEM:Initialize(parameters)
     -- Реле дверей (РД)
     self.Train:LoadSystem("RD","Relay","REV-821",{ close_time = 0.1, coil_res = 448, pickup_current = 0.022 })
     -- Реле включения освещения (РВО)
-    self.Train:LoadSystem("RVO","Relay","REV-814T",{ open_time = 4.0, coil_res = 21, pickup_current = 0.042 })
+    self.Train:LoadSystem("RVO","Relay","REV-814T",{ open_time = 4.5, coil_res = 21, pickup_current = 0.042 })
     -- Реле времени торможения (РВ3)
     self.Train:LoadSystem("RV3","Relay","REV-813T",{ open_time = 2.3, coil_res = 244, pickup_current = 0.032 })
     -- Реле тока (РТ2)
     self.Train:LoadSystem("RT2","Relay","REV-830",{ trigger_level = 130 }) -- A
     self.Train:LoadSystem("RT2r","Relay","",{  close_time = 0, open_time = 0.6}) --UNREALISTIC Repeater for RT2 for MSK trains
     -- Реле контроля тормозного тока (РКТТ)
-    self.Train:LoadSystem("RKTT","Relay","R-52B", { coil_res = 129, pickup_current = 0.018 })
+    self.Train:LoadSystem("RKTT","Relay","R-52B" --[[{ coil_res = 129, pickup_current = 0.018 }]])
     self.Train.RKTTsh = 1
 end
 

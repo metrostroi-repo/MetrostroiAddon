@@ -76,7 +76,7 @@ local relay_types = {
         hasCoil = true,
     },
     ["R-52B"] = {
-        hasCoil = true,
+        --hasCoil = true,
     },
     ["RPUZ-114-T-UHLZA"] = {
         hasCoil = true,
