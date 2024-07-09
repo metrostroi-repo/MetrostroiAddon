@@ -122,6 +122,8 @@ function TRAIN_SYSTEM:Think(dT)
             end
         end
         -- Calculate state of charge, internal resistance and battery voltage
+        -- TODO: перенести как можно больше рассчетов в компьютерный вагон
+        --       сделать, чтобы освещение и фары тоже кушали заряд АКБ (и чтобы свет белых фар тускнел на 25% при отсутствии высокого напряжения (только для .5 и ниже))
         if self.Dischar then
             self.Capacity = self.Capacity - dT * (self.FullCapacity*0.1/86400)               -- make capacity loss ~ 10% per day (just a game abstraction)
             if self.Ibatt > 0 then
@@ -134,7 +136,7 @@ function TRAIN_SYSTEM:Think(dT)
                 end
             else
                 if self.SoC <= 1.0 then
-                    self.EthaCE = 1                         -- maybe I should make it more than 1... (instead of self discharge current)
+                    self.EthaCE = 1.2                         -- maybe I should make it more than 1... (instead of self discharge current)
                 else
                     self.EthaCE = 0.5*math.exp(2.6*self.SoC) - 5.73         -- не бывает!
                 end
@@ -196,13 +198,15 @@ function TRAIN_SYSTEM:Think(dT)
         end
 
         self.TargetVoltage = self.TargetVoltage*self.ElementCount
-        self.Voltage = self.Voltage + (self.TargetVoltage - self.Voltage)*0.05
+        local proximity = 0.055 - (self.TargetVoltage - self.Voltage)*0.045/9
+        self.Voltage = self.Voltage + (self.TargetVoltage - self.Voltage)*proximity
 
         -- DEBUG
         -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        --if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
+        --if self.Train.A54 and self.Train.A54.Value > 0.5 then
             --local tval = 1
             --print("Target Voltage = "..self.TargetVoltage, "self.Voltage = "..self.Voltage, "train:",self)
+            --print(self.Train.PowerSupply.car_control_load,self.Ibatt,self.IResistance,dT)
             --print("self.SoC = "..self.SoC, "self.Ibatt = "..self.Ibatt)
             --print("self.eds_eq = "..self.eds_eq)
             --print("self.EthaCE = "..self.EthaCE, "self.IResistance = "..self.IResistance)
