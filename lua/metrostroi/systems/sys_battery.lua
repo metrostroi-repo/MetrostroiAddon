@@ -24,11 +24,10 @@ function TRAIN_SYSTEM:Initialize()
     self.StartVoltage                   = 75                                -- 1.44 volt per fully charged new NiCd-cell
     self.SoC                            = 0.5 + math.random()*0.5           -- 50-100 %
 
-    local EMF_soc, Uh_soc, tvb_sign
-    EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
-    Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
+    self.EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
+    self.Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
 
-    self.TargetVoltage                  = (EMF_soc - Uh_soc)*self.ElementCount
+    self.TargetVoltage                  = (self.EMF_soc - self.Uh_soc)*self.ElementCount
     self.Voltage                        = self.TargetVoltage
     self.Vpart                          = 0
     self.CellIRes                       = 0.009                             -- 9 mOhm is a standard^w fake internal resistance of a fully-charged and rested new HKH-80 Ah NiCd-cell
@@ -122,8 +121,7 @@ function TRAIN_SYSTEM:Think(dT)
             end
         end
         -- Calculate state of charge, internal resistance and battery voltage
-        -- TODO: перенести как можно больше рассчетов в компьютерный вагон
-        --       сделать, чтобы освещение и фары тоже кушали заряд АКБ (и чтобы свет белых фар тускнел на 25% при отсутствии высокого напряжения (только для .5 и ниже))
+        -- TODO: сделать, чтобы освещение и фары тоже кушали заряд АКБ (и чтобы свет белых фар тускнел на 25% при отсутствии высокого напряжения (только для .5 и ниже))
         if self.Dischar then
             self.Capacity = self.Capacity - dT * (self.FullCapacity*0.1/86400)               -- make capacity loss ~ 10% per day (just a game abstraction)
             if self.Ibatt > 0 then
@@ -162,34 +160,34 @@ function TRAIN_SYSTEM:Think(dT)
             end
             self.IResistance = self.CellIRes * self.ElementCount
 
+            -- open circuit voltage calculation
+
+            -- Polynomials for battery OCV calculation during charge and discharge (source: https://www.mdpi.com/1996-1073/16/21/7291)
+            -- Roughly, Vbatt_charge = EMF(SOC) + 𝑈ℎ(SOC), Vbatt_discharge = EMF(SOC) - 𝑈ℎ(SOC)
+
+            --EMF(SOC)=−0.68175SOC^8+8.82823SOC^7−24.43179SOC^6+31.87221SOC^5−23.97881SOC^4+11.24774SOC^3−3.40685SOC^2+0.74692SOC+1.22076
+            --𝑈ℎ(SOC)=2.62496SOC^8−12.77132SOC^7+22.37586SOC^6−18.04921SOC^5+6.14667SOC^4+0.26467SOC^3−0.82125SOC^2+0.21246SOC+0.02641
+
+            self.EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
+            self.Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
+
             --self.Train.BattCurrent = self.Ibatt*self.Train.A24.Value
             self.Train.PA1:TriggerInput("Close",math.abs(self.Ibatt)/2)     -- Это неправильно, но я уже заебалась
             self.Train.PA2:TriggerInput("Close",math.abs(self.Ibatt)/2)
         end
         -- Calculate battery voltage
 
-        -- Polynomials for battery OCV calculation during charge and discharge (source: https://www.mdpi.com/1996-1073/16/21/7291)
-        -- Roughly, Vbatt_charge = EMF(SOC) + 𝑈ℎ(SOC), Vbatt_discharge = EMF(SOC) - 𝑈ℎ(SOC)
-
-        --EMF(SOC)=−0.68175SOC^8+8.82823SOC^7−24.43179SOC^6+31.87221SOC^5−23.97881SOC^4+11.24774SOC^3−3.40685SOC^2+0.74692SOC+1.22076
-        --𝑈ℎ(SOC)=2.62496SOC^8−12.77132SOC^7+22.37586SOC^6−18.04921SOC^5+6.14667SOC^4+0.26467SOC^3−0.82125SOC^2+0.21246SOC+0.02641
-
-        -- open circuit voltage calculation
-        local EMF_soc, Uh_soc, tvb_sign
-        EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
-        Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
-
         -- Battery voltage (EMF in our case) growth rate at SoC > 90%:      0.25 volt per 10%
         -- Battery voltage (EMF in our case) decrease rate at SoC < 10%:    0.20 volt per 10%
         if self.Ibatt > 0.005*self.ElementCapacity then
-            self.TargetVoltage = EMF_soc + Uh_soc
+            self.TargetVoltage = self.EMF_soc + self.Uh_soc
             if self.SoC > 0.9 and self.Ibatt > 0.005*self.ElementCapacity then
                 if self.Vpart < 0 then self.Vpart = 0 end
                 self.Vpart = 2.5*(self.SoC-0.9)
                 self.TargetVoltage =  math.min(self.eds_eq/self.ElementCount, self.TargetVoltage + self.Vpart)
             end
         else
-            self.TargetVoltage = EMF_soc - Uh_soc
+            self.TargetVoltage = self.EMF_soc - self.Uh_soc
             if self.SoC < 0.1 and self.Ibatt < -0.005*self.ElementCapacity then
                 if self.Vpart > 0 then self.Vpart = 0 end
                 self.Vpart = -2.0*(0.1-self.SoC)
