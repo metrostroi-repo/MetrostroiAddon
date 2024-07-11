@@ -14,7 +14,7 @@ function TRAIN_SYSTEM:Initialize()
 
     -- Battery parameters
     self.ElementCapacity                = 80                                -- A*hour
-    self.Capacity                       = self.ElementCapacity * 3600
+    self.Capacity                       = self.ElementCapacity * 3600 * (0.7 + math.random()*0.3)
     self.Charge                         = self.Capacity
     self.FullCapacity                   = self.Capacity
     -- Current through battery/A
@@ -121,7 +121,7 @@ function TRAIN_SYSTEM:Think(dT)
             end
         end
         -- Calculate state of charge, internal resistance and battery voltage
-        -- TODO: сделать, чтобы освещение и фары тоже кушали заряд АКБ (и чтобы свет белых фар тускнел на 25% при отсутствии высокого напряжения (только для .5 и ниже))
+        -- TODO: сделать, чтобы освещение и фары тоже потребляли ток
         if self.Dischar then
             self.Capacity = self.Capacity - dT * (self.FullCapacity*0.1/86400)               -- make capacity loss ~ 10% per day (just a game abstraction)
             if self.Ibatt > 0 then
@@ -143,8 +143,8 @@ function TRAIN_SYSTEM:Think(dT)
             if self.SoC <= 0 or self.SoC >= 1.0 then self.EthaCE = 0 end
 
             -- Возможно, надо ввести ток саморазряда, а не ебаться с выдуманной зависимостью EthaCE от SoC выше 100% (которого не бывает >_>)
-            self.SoC = self.SoC + self.EthaCE*self.Ibatt*dT/self.Capacity
-            local SoC = math.max(0,math.min(100,self.SoC*100))
+            self.SoC = math.max(0,math.min(1,self.SoC + self.EthaCE*self.Ibatt*dT/self.Capacity))
+            local SoC = self.SoC*100
             if 50 <= SoC and SoC <= 100 then
                 self.CellIRes = 0.009
             elseif SoC >= 0.5 then

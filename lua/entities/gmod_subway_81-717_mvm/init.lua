@@ -572,12 +572,12 @@ function ENT:Think()
     local Panel = self.Panel
     local Pneumatic = self.Pneumatic
     local power = Panel.V1 > -1.5
-    local brightness = math.min(1,Panel.Headlights1)*0.60 +
-                        math.min(1,Panel.Headlights2)*0.40
+    --local brightness = math.min(1,Panel.Headlights1)*0.60 +
+                        --math.min(1,Panel.Headlights2)*0.40
     --local T = {}
 
-    self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
-    self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
+    self:SetPackedRatio("Headlights1",Panel.Headlights1*math.max(0,(self.Battery.eds_eq-50)/30))
+    self:SetPackedRatio("Headlights2",Panel.Headlights2*math.max(0,(self.Battery.eds_eq-50)/30))
     self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
     self:SetPackedBool("CabLights",Panel.CabLights>0)
     self:SetPackedBool("EqLights",Panel.EqLights>0)
