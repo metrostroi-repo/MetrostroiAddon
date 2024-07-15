@@ -601,7 +601,9 @@ function ENT:Think()
             self:SetPackedBool("lightsActive"..i,false)
         end
     end
-	
+    self.Battery.Consumers["SalonLights"] = {Panel.MainLights+Panel.EmergencyLights,(Panel.MainLights*36^-1 + Panel.EmergencyLights*74^-1)^-1,0}
+    self.Battery.Consumers["HeadLights"] = {Panel.Headlights1*(1+Panel.Headlights2),(Panel.Headlights1*22^-1*(1 + Panel.Headlights2))^-1,0}
+
     if self:ReadTrainWire(4)*self:ReadTrainWire(5)*self:ReadTrainWire(10) > 0 then
         self.A54:TriggerInput("Set",0)
     end

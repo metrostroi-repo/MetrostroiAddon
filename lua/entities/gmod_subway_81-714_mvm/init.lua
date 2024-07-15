@@ -331,6 +331,7 @@ function ENT:Think()
             self:SetPackedBool("lightsActive"..i,false)
         end
     end
+    self.Battery.Consumers["SalonLights"] = {Panel.MainLights+Panel.EmergencyLights,(Panel.MainLights*36^-1 + Panel.EmergencyLights*74^-1)^-1,0}
 
     self:SetPackedBool("DoorsW",Panel.DoorsW > 0)
     self:SetPackedBool("GRP",Panel.GreenRP > 0)

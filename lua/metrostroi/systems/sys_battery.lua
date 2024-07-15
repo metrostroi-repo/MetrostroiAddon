@@ -50,7 +50,7 @@ function TRAIN_SYSTEM:Initialize()
 
     for k,v in pairs(self.Train.Systems) do
         if v.hasCoil and not self.Consumers[v] then
-            --print("Registering relay",v.Name, "Train: ", self.Train)
+            --print("Registering relay",v.Name, "Train: ", self.Train, type(v))
             self.Consumers[v] = {0,v.coil_res,0}
         end
     end
@@ -87,41 +87,50 @@ function TRAIN_SYSTEM:Think(dT)
     if self.CarType == 1 then
 
         for k,v in pairs(self.Consumers) do
-            v[1] = k.Value
-            v[3] = k.Current
+            if type(k) == "table" then
+                v[1] = k.Value
+                v[3] = k.Current
+            end
         end
 
         if self.Train.ComputerCar then
             local nodecurr_sum, branchcond_sum = 0.0, 0.0
+            local src_cond_sum, sump_cond_sum = 0.0, 0.0
             local eds_eq = 0.0
 
             --a "two-node method" of 10's wire voltage computing
             for k,v in ipairs(self.Train.WagonList) do
                 nodecurr_sum = nodecurr_sum + v.A56.Value*(v.VB.Value*v.Battery.Voltage/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value*v.PowerSupply.VoltageOut/v.PowerSupply.IResistance)
-                branchcond_sum = branchcond_sum + GetBranchCondSum(v.Battery.Consumers) + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)
+                v.Battery.sump_cond = GetBranchCondSum(v.Battery.Consumers)
+                sump_cond_sum = sump_cond_sum + v.Battery.sump_cond
+                src_cond_sum = src_cond_sum + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)
             end
+            branchcond_sum = sump_cond_sum + src_cond_sum
             eds_eq = nodecurr_sum/branchcond_sum
+            local load_curr_sum = eds_eq*sump_cond_sum
+            local batt_curr_sum = 0
             for k,v in ipairs(self.Train.WagonList) do
-                local consumers_cond = GetBranchCondSum(v.Battery.Consumers)
-                v.PowerSupply.car_control_load = eds_eq*consumers_cond
+                v.PowerSupply.car_control_sigma = load_curr_sum
+                v.PowerSupply.car_control_load = eds_eq*v.Battery.sump_cond
                 v.Battery.Ibatt = math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))
                             *(math.min(1,(v.VB.Value*v.A56.Value+v.A24.Value))*v.VB.Value*((v.A56.Value*(eds_eq - v.Battery.Voltage)
                             + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance
-                v.PowerSupply.Iout = v.PowerSupply.car_control_load + v.Battery.Ibatt
+                batt_curr_sum = batt_curr_sum + v.Battery.Ibatt
                 v.Battery.eds_eq = eds_eq
                 v.eds_eq = v.Battery.eds_eq
-
-                -- DEBUG
-                --if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
-                    --print(v.eds_eq, nodecurr_sum, branchcond_sum)
-                    --print("v.PowerSupply.X2_1 = "..v.PowerSupply.X2_1)
-                    --print(v.PowerSupply.car_control_load,v.Battery.Ibatt,v.Battery.IResistance)
-                    --print(v.PowerSupply.Iout,v.PowerSupply.Icosume)
-                --end
+            end
+            for k,v in ipairs(self.Train.WagonList) do
+                v.PowerSupply.car_control_sigma = v.PowerSupply.car_control_sigma + batt_curr_sum
             end
         end
+        -- DEBUG
+        if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
+            --print(v.eds_eq, nodecurr_sum, branchcond_sum)
+            --print("v.PowerSupply.X2_1 = "..v.PowerSupply.X2_1,self.Train.Battery.IResistance)
+            print(self.Train.PowerSupply.car_control_sigma,self.Train.PowerSupply.car_control_load,self.Train.Battery.Ibatt)
+            print(self.Train.PowerSupply.Iout,self.Train.PowerSupply.Icosume)
+        end
         -- Calculate state of charge, internal resistance and battery voltage
-        -- TODO: сделать, чтобы освещение и фары тоже потребляли ток
         if self.Dischar then
             self.Capacity = self.Capacity - dT * (self.FullCapacity*0.1/86400)               -- make capacity loss ~ 10% per day (just a game abstraction)
             if self.Ibatt > 0 then
@@ -171,7 +180,6 @@ function TRAIN_SYSTEM:Think(dT)
             self.EMF_soc=-0.68175*self.SoC^8+8.82823*self.SoC^7-24.43179*self.SoC^6+31.87221*self.SoC^5-23.97881*self.SoC^4+11.24774*self.SoC^3-3.40685*self.SoC^2+0.74692*self.SoC+1.22076
             self.Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
 
-            --self.Train.BattCurrent = self.Ibatt*self.Train.A24.Value
             self.Train.PA1:TriggerInput("Close",math.abs(self.Ibatt)/2)     -- Это неправильно, но я уже заебалась
             self.Train.PA2:TriggerInput("Close",math.abs(self.Ibatt)/2)
         end
