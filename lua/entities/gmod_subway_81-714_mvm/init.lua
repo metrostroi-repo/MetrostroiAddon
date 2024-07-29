@@ -132,7 +132,7 @@ function ENT:Initialize()
         },
     }
     --self.BattCurrent = 0
-    self.eds_eq = 0
+    --self.eds_eq = 0
 
     -- Cross connections in train wires
     self.TrainWireInverts = {
@@ -388,7 +388,7 @@ function ENT:Think()
 ----------------------------------*****************************--------------------------------]]
     
     self:SetPackedRatio("BatteryVoltage",(self.Battery.eds_eq)/150.0)
-    self:SetPackedRatio("BatteryCurrent",self.Battery.Ibatt/1000)
+    self:SetPackedRatio("BatteryCurrent",0.5 + 0.5*self.Battery.Ibatt/500.0)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)

@@ -659,7 +659,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     if isDot2 then Train:WriteTrainWire(11,B*Train.VA.Value) end
 
-    S["B9"] = B*Train.A53.Value
+    S["B9"] = (BO+BO2)*Train.A53.Value
     S["22B"] = T[10]*Train.A10.Value*Train.VMK.Value
     Train:WriteTrainWire(22,(S["22B"]+T[44])*Train.AK.Value)
     Train:WriteTrainWire(44,S["22B"])

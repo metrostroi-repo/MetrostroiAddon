@@ -225,7 +225,7 @@ function ENT:Initialize()
     self.OtsekDoor1 = false
     self.OtsekDoor2 = false
     --self.BattCurrent = 0
-    self.eds_eq = 0
+    --self.eds_eq = 0
 
     self.Lamps = {
         broken = {},
@@ -387,14 +387,14 @@ function ENT:TrainSpawnerUpdate()
     self.Battery:TriggerInput("CarType",1)
     --self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
     self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
-    local ccc = 0
+    --[[local ccc = 0
     self.ComputerCar = false
     for k,v in ipairs(self.WagonList) do
         if v.AR63 and v.ComputerCar then ccc = ccc + 1; break end
     end
     if ccc == 0 then
         self.ComputerCar = true
-    end
+    end]]
     math.randomseed(num+817171)
     if self.CustomSettings then
     --{"Type","Spawner.717.Type","List",{"Spawner.717.Type.717","Spawner.717.Type.7175"}},

@@ -250,7 +250,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     --Train:WriteTrainWire(36,S["36N"]*(1-Train.BPSNon.Value))
     --Train:WriteTrainWire(69,T[36]*Train.BPSNon.Value)
 
-    S["B9"] = B*Train.A53.Value
+    S["B9"] = (BO+BO2)*Train.A53.Value
     S["B9a"] = S["B9"]*Train.VB.Value
     Train.KVC:TriggerInput("Set",S["B9a"])
     --Train.KUP:TriggerInput("Set",S["B9a"]*Train.A75.Value)

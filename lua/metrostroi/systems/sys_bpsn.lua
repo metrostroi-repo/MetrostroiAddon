@@ -22,8 +22,8 @@ function TRAIN_SYSTEM:Initialize()
 
     self.OutputVoltage              = 76        -- volts
     self.IResistance                = 0.01      -- Ohm (сам выдумал, примерно на полтора порядка ниже, чем у АКБ)
-    self.car_control_load           = 0         -- Amp
-    self.car_control_sigma          = 0         -- Amp
+    --self.car_control_load           = 0         -- Amp
+    --self.car_control_sigma          = 0         -- Amp
     self.Icosume                    = 0         -- 3rd rail current consumption, amp
     self.Iout                       = 0         -- output current, amp
     self.VoltageOut                 = 0
@@ -38,7 +38,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "X2_2", "X6_2", "car_control_load", "car_control_sigma", "VoltageOut", "OutputVoltage", "Icosume", "Iout" }
+    return { "X2_2", "X6_2", "VoltageOut", "OutputVoltage", "Icosume", "Iout" }
 end
 
 
@@ -53,24 +53,25 @@ function TRAIN_SYSTEM:Think()
     local Train = self.Train
     -- Get high-voltage input
     -- X2_1 now indicates that primary converter is operating
-    self.X2_1 = (Train.Electric.Aux750V > 550 and 1 or 0) * Train.KPP.Value * (1-Train.RZP.Value)
+    self.X2_1 = (Train.Electric.Aux750V > 300 and 1 or 0) * Train.KPP.Value * (1-Train.RZP.Value)
     if Train.Electric.Aux750V >= 550 then
         self.VoltageOut = self.X2_1*(self.OutputVoltage + (Train.Electric.Aux750V - 550)*8/425)
     else
         self.VoltageOut = math.max(0,self.X2_1*(Train.Electric.Aux750V - 300)*76/300)
     end
 
-    if self.car_control_sigma > 0 then
-        self.Iout = Train.A24.Value*Train.PowerSupply.X2_1*self.car_control_sigma
+    --[[if self.car_control_sigma > 0 then
+        self.Iout = self.car_control_sigma
         for k,v in ipairs(Train.WagonList) do
             if v ~= Train then
                 self.Iout = math.max(0,self.Iout - v.A24.Value*v.PowerSupply.X2_1*(v.PowerSupply.car_control_load + v.A56.Value*v.Battery.Ibatt))
             end
         end
         self.car_control_sigma = 0
-    end
+    end]]
 
-    self.Icosume = Train.NR.Value*self.VoltageOut*self.Iout/(Train.Electric.Aux750V > 0 and Train.Electric.Aux750V or 1)
+    --self.Iout = self.car_control_load
+    self.Icosume = --[[Train.NR.Value*]]self.VoltageOut*self.Iout/(Train.Electric.Aux750V > 0 and Train.Electric.Aux750V or 1)
     
     -- Get battery input
     local XT3_1 = self.X2[5]*self.X2_1

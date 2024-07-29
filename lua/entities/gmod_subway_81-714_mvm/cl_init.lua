@@ -272,7 +272,7 @@ ENT.ButtonMap["Voltages"] = {
 
     buttons = {
         {ID = "!BatteryVoltage", x=0, y=0, w=72.5,h=75, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryVoltage"),ent:GetPackedRatio("BatteryVoltage")*150) end},
-        {ID = "!BatteryCurrent", x=72.5, y=0, w=72.5,h=75, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryCurrent"),ent:GetPackedRatio("BatteryCurrent")*500) end},
+        {ID = "!BatteryCurrent", x=72.5, y=0, w=72.5,h=75, tooltip="",tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.BatteryCurrent"),(ent:GetPackedRatio("BatteryCurrent")-0.5)*500/0.5) end},
     }
 }
 ENT.ButtonMap["Pressures"] = {
@@ -995,7 +995,7 @@ function ENT:Think()
     self:Animate("train_line",      self:GetPackedRatio("TLPressure"),0.14, 0.875,  256,2)--,,0.01)
     self:Animate("brake_cylinder",  self:GetPackedRatio("BCPressure"),0.14, 0.875,  256,2)--,,0.03)
     self:Animate("voltmeter",       self:GetPackedRatio("BatteryVoltage"),0.601, 0.400)
-    self:Animate("ampermeter",      0.5+self:GetPackedRatio("BatteryCurrent"),0.604, 0.398)
+    self:Animate("ampermeter",      self:GetPackedRatio("BatteryCurrent"),0.604, 0.398)
 
     local typ = self:GetNW2Int("LampType",1)
     if self.LampType ~= typ then

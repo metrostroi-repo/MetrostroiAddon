@@ -38,9 +38,10 @@ function TRAIN_SYSTEM:Initialize()
     self.EthaCE                         = self.EthaCE0
     self.Ibatt                          = 0
     self.eds_eq                         = 0
+    self.sump_cond                      = 0                                 -- car consumers summary conductivity
     self.Consumers                      = {}
     self.Dischar                        = false
-    self.ComputerCar                    = false
+    --self.ComputerCar                    = false
 
     ---------------------------------------------
     -- 10 mV/min — voltage covery/recovery speed during first 30 minutes after charging/discharging stopped
@@ -93,10 +94,13 @@ function TRAIN_SYSTEM:Think(dT)
             end
         end
 
-        if self.Train.ComputerCar then
+        if self.Train.TrainWireLeader then
             local nodecurr_sum, branchcond_sum = 0.0, 0.0
             local src_cond_sum, sump_cond_sum = 0.0, 0.0
-            local eds_eq = 0.0
+            local eds_eq = self.eds_eq
+
+            -- TODO: реализовать тепловую защиту БПСН от длительных токов свыше 60 А
+            --       сделать возможность заменять сгоревшие предохранители АКБ (не более 10 шт. на состав)
 
             --a "two-node method" of 10's wire voltage computing
             for k,v in ipairs(self.Train.WagonList) do
@@ -106,29 +110,43 @@ function TRAIN_SYSTEM:Think(dT)
                 src_cond_sum = src_cond_sum + v.A56.Value*(v.VB.Value/v.Battery.IResistance + v.PowerSupply.X2_1*v.A24.Value/v.PowerSupply.IResistance)
             end
             branchcond_sum = sump_cond_sum + src_cond_sum
-            eds_eq = nodecurr_sum/branchcond_sum
-            local load_curr_sum = eds_eq*sump_cond_sum
-            local batt_curr_sum = 0
+            if branchcond_sum > 0 then eds_eq = nodecurr_sum/branchcond_sum end
             for k,v in ipairs(self.Train.WagonList) do
-                v.PowerSupply.car_control_sigma = load_curr_sum
-                v.PowerSupply.car_control_load = eds_eq*v.Battery.sump_cond
-                v.Battery.Ibatt = math.min(1,(2-self.Train.PA1.Value-self.Train.PA2.Value))
-                            *(math.min(1,(v.VB.Value*v.A56.Value+v.A24.Value))*v.VB.Value*((v.A56.Value*(eds_eq - v.Battery.Voltage)
-                            + v.PowerSupply.X2_1*(1-v.A56.Value)*(v.PowerSupply.VoltageOut*v.A24.Value - v.Battery.Voltage))))/v.Battery.IResistance
-                batt_curr_sum = batt_curr_sum + v.Battery.Ibatt
+                v.Battery.Ibatt = (v.A56.Value*v.VB.Value*math.min(1,(2-v.PA1.Value-v.PA2.Value))*(eds_eq - v.Battery.Voltage)
+                                + v.PowerSupply.X2_1*v.A24.Value*v.VB.Value*(1-v.A56.Value)*math.min(1,(2-v.PA1.Value-v.PA2.Value))*(v.PowerSupply.VoltageOut - v.Battery.Voltage))
+                                /v.Battery.IResistance
+
                 v.Battery.eds_eq = eds_eq
-                v.eds_eq = v.Battery.eds_eq
-            end
-            for k,v in ipairs(self.Train.WagonList) do
-                v.PowerSupply.car_control_sigma = v.PowerSupply.car_control_sigma + batt_curr_sum
+                --v.eds_eq = v.Battery.eds_eq
+                --v.Battery.nodecurr_sum = nodecurr_sum
+                --v.Battery.branchcond_sum = branchcond_sum
             end
         end
+        local iload_sum, ibatt_sum, isply_sum, isupply = 0, 0, 0, 0
+        for k,v in ipairs(self.Train.WagonList) do
+            iload_sum = iload_sum + v.Battery.eds_eq*v.Battery.sump_cond
+            if v.Battery.Ibatt > 0 then
+                ibatt_sum = ibatt_sum + v.VB.Value*v.A56.Value*math.min(1,(2-v.PA1.Value-v.PA2.Value))*v.Battery.Ibatt
+            end
+            if v ~= self.Train then
+                isupply = math.max(0,(v.PowerSupply.VoltageOut-v.Battery.eds_eq)/v.PowerSupply.IResistance)
+                isply_sum = isply_sum + v.PowerSupply.X2_1*v.A24.Value*v.VB.Value*v.A56.Value*isupply
+            end
+        end
+        local BPSN = self.Train.PowerSupply
+        local Train = self.Train
+        BPSN.Iout = (ibatt_sum + iload_sum - isply_sum)*BPSN.X2_1*Train.A24.Value*Train.VB.Value*Train.A56.Value
+                                + BPSN.X2_1*Train.A24.Value*(1-Train.A56.Value*Train.VB.Value)*self.Ibatt
+
         -- DEBUG
-        if self.Train.R_VPR and self.Train.R_VPR.Value < 0.5 then
-            --print(v.eds_eq, nodecurr_sum, branchcond_sum)
-            --print("v.PowerSupply.X2_1 = "..v.PowerSupply.X2_1,self.Train.Battery.IResistance)
-            print(self.Train.PowerSupply.car_control_sigma,self.Train.PowerSupply.car_control_load,self.Train.Battery.Ibatt)
-            print(self.Train.PowerSupply.Iout,self.Train.PowerSupply.Icosume)
+        if self.Train.A49 and self.Train.A49.Value < 0.5 then
+            --print(Format("self.nodecurr_sum = %.1f A,\tself.branchcond_sum = %.1f См,\tself.proximity = %.8f",self.nodecurr_sum, self.branchcond_sum,self.proximity))
+            --print(iload_sum, ibatt_sum, isply_sum, isupply)
+            print("BPSN.X2_1 = "..BPSN.X2_1,"R АКБ вн. = "..Train.Battery.IResistance.. " Ом","Счетный вагон: "..(Train.TrainWireLeader and "да" or "нет"))
+            print(Format("БПСН, Iout = %.1f A,\tТок заряда батареи = %.1f A,\tU АКБ цель = %.1f B",BPSN.Iout,self.Ibatt,self.TargetVoltage))
+            print(Format("БПСН, Vout = %.1f B,\tБПСН, ток потр. = %.1f A,\tU 10 пр. = %.1f B",BPSN.VoltageOut,BPSN.Icosume,self.eds_eq))
+            --print(Train.PA1.Value,Train.PA2.Value)
+            print(Format("U АКБ = %.1f B,\tSoC = %.2f %%,\tG load = %.1f См\tПА1, ПА2 = %d, %d\n",self.Voltage,self.SoC,self.sump_cond,Train.PA1.Value,Train.PA2.Value))
         end
         -- Calculate state of charge, internal resistance and battery voltage
         if self.Dischar then
@@ -181,7 +199,7 @@ function TRAIN_SYSTEM:Think(dT)
             self.Uh_soc=2.62496*self.SoC^8-12.77132*self.SoC^7+22.37586*self.SoC^6-18.04921*self.SoC^5+6.14667*self.SoC^4+0.26467*self.SoC^3-0.82125*self.SoC^2+0.21246*self.SoC+0.02641
 
             self.Train.PA1:TriggerInput("Close",math.abs(self.Ibatt)/2)     -- Это неправильно, но я уже заебалась
-            self.Train.PA2:TriggerInput("Close",math.abs(self.Ibatt)/2)
+            self.Train.PA2:TriggerInput("Close",math.abs(self.Ibatt)/2)     -- (хотя, для .5 это как раз правильно)
         end
         -- Calculate battery voltage
 
@@ -204,7 +222,8 @@ function TRAIN_SYSTEM:Think(dT)
         end
 
         self.TargetVoltage = self.TargetVoltage*self.ElementCount
-        local proximity = 0.055 - (self.TargetVoltage - self.Voltage)*0.045/9
+        local proximity = math.min(0.14, 0.01*math.abs(self.TargetVoltage - self.Voltage))
+        --self.proximity = proximity
         self.Voltage = self.Voltage + (self.TargetVoltage - self.Voltage)*proximity
 
         -- DEBUG
