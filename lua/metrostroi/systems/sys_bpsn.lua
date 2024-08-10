@@ -20,14 +20,20 @@ function TRAIN_SYSTEM:Initialize()
     self.X6_2 = 0
     self.X2_1 = 0
 
-    self.OutputVoltage              = 76        -- volts
-    self.IResistance                = 0.01      -- Ohm (сам выдумал, примерно на полтора порядка ниже, чем у АКБ)
-    --self.car_control_load           = 0         -- Amp
-    --self.car_control_sigma          = 0         -- Amp
-    self.Icosume                    = 0         -- 3rd rail current consumption, amp
-    self.Iout                       = 0         -- output current, amp
+    self.OutputVoltage              = 76                    -- volts
+    self.IResistance                = 0.01                  -- Ohm (сам выдумал, примерно на полтора порядка ниже, чем у АКБ)
+    self.Icosume                    = 0                     -- 3rd rail current consumption, amp
+    self.Iout                       = 0                     -- output current, amp
     self.VoltageOut                 = 0
     self.ISumpSetpoint              = math.random(25,30)    -- overload consumption current protection setpoint
+    self.EnvTemp                    = 20                    -- Celcius degree
+    self.Temp                       = self.EnvTemp          -- internal temperature
+    self.TempThreshold              = 90                    -- overheat protection threshold
+    self.TempHyst                   = 5                     -- temperature threshold hysteresis
+
+    self.Q                          = 0
+    self.Q_p                        = 0
+    self.Q_i                        = 0
 
     self.Active = 0
     self.Train:LoadSystem("ConverterProtection","Relay","Switch", {bass = true})
@@ -38,7 +44,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "X2_2", "X6_2", "VoltageOut", "OutputVoltage", "Icosume", "Iout" }
+    return { "X2_2", "X6_2", "VoltageOut", "OutputVoltage", "Icosume", "Iout", "Temp" }
 end
 
 
@@ -60,26 +66,24 @@ function TRAIN_SYSTEM:Think()
         self.VoltageOut = math.max(0,self.X2_1*(Train.Electric.Aux750V - 300)*76/300)
     end
 
-    --[[if self.car_control_sigma > 0 then
-        self.Iout = self.car_control_sigma
-        for k,v in ipairs(Train.WagonList) do
-            if v ~= Train then
-                self.Iout = math.max(0,self.Iout - v.A24.Value*v.PowerSupply.X2_1*(v.PowerSupply.car_control_load + v.A56.Value*v.Battery.Ibatt))
-            end
-        end
-        self.car_control_sigma = 0
-    end]]
-
-    --self.Iout = self.car_control_load
-    self.Icosume = --[[Train.NR.Value*]]self.VoltageOut*self.Iout/(Train.Electric.Aux750V > 0 and Train.Electric.Aux750V or 1)
+    self.Icosume = self.VoltageOut*self.Iout/(Train.Electric.Aux750V > 0 and Train.Electric.Aux750V or 1)
     
+    -- temperature calculations (ugly af)
+    --local alpha_p = math.exp(-0.025*(self.Temp - self.EnvTemp)+1.2)
+    --self.dQ = self.Icosume^2*self.IResistance*Train.DeltaTime
+    ----self.Q = self.Q + self.dQ
+    --self.Q_i = 4*math.exp(0.04*(self.Temp - self.EnvTemp)-4.6)
+    --self.Q_p = alpha_p*self.dQ
+    --self.Temp = math.min(120, math.max(self.EnvTemp,self.Temp + self.Q_p - self.Q_i*Train.DeltaTime))
+    --self.Temp = 20
+
     -- Get battery input
     local XT3_1 = self.X2[5]*self.X2_1
     if Train.Electric.Aux750V*self.X2_1 > 975 or self.Icosume > self.ISumpSetpoint then
         Train.RZP:TriggerInput("Close",1)
-        print "-------------------------------------------------------------------------------------------\n"
-        print(Format("Сработала защита БПСН вагона %s:",Train.WagonNumber))
-        print(Format("I потр = %.2f A\tI вых = %.2f A\tI уст = %.2f A\tU кс = %.1f B", self.Icosume, self.Iout, self.ISumpSetpoint, Train.Electric.Aux750V))
+        --print "-------------------------------------------------------------------------------------------\n"
+        --print(Format("Сработала защита БПСН вагона %s:",Train.WagonNumber))
+        --print(Format("I потр = %.2f A\tI вых = %.2f A\tI уст = %.2f A\tU кс = %.1f B", self.Icosume, self.Iout, self.ISumpSetpoint, Train.Electric.Aux750V))
         --print("Train.Battery.eds_eq = "..Train.Battery.eds_eq, "self.VoltageOut = "..self.VoltageOut)
         self.X2_1 = 0
         XT3_1 = 0

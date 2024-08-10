@@ -387,14 +387,6 @@ function ENT:TrainSpawnerUpdate()
     self.Battery:TriggerInput("CarType",1)
     --self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
     self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
-    --[[local ccc = 0
-    self.ComputerCar = false
-    for k,v in ipairs(self.WagonList) do
-        if v.AR63 and v.ComputerCar then ccc = ccc + 1; break end
-    end
-    if ccc == 0 then
-        self.ComputerCar = true
-    end]]
     math.randomseed(num+817171)
     if self.CustomSettings then
     --{"Type","Spawner.717.Type","List",{"Spawner.717.Type.717","Spawner.717.Type.7175"}},

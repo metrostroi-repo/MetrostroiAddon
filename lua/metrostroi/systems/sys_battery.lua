@@ -100,7 +100,7 @@ function TRAIN_SYSTEM:Think(dT)
             local eds_eq = self.eds_eq
 
             -- TODO: реализовать тепловую защиту БПСН от длительных токов свыше 60 А
-            --       сделать возможность заменять сгоревшие предохранители АКБ (не более 10 шт. на состав)
+            --       сделать возможность заменять сгоревшие предохранители АКБ
 
             --a "two-node method" of 10's wire voltage computing
             for k,v in ipairs(self.Train.WagonList) do
@@ -139,15 +139,15 @@ function TRAIN_SYSTEM:Think(dT)
                                 + BPSN.X2_1*Train.A24.Value*(1-Train.A56.Value*Train.VB.Value)*self.Ibatt
 
         -- DEBUG
-        if self.Train.A49 and self.Train.A49.Value < 0.5 then
+        --if self.Train.A49 and self.Train.A49.Value < 0.5 then
             --print(Format("self.nodecurr_sum = %.1f A,\tself.branchcond_sum = %.1f См,\tself.proximity = %.8f",self.nodecurr_sum, self.branchcond_sum,self.proximity))
             --print(iload_sum, ibatt_sum, isply_sum, isupply)
-            print("BPSN.X2_1 = "..BPSN.X2_1,"R АКБ вн. = "..Train.Battery.IResistance.. " Ом","Счетный вагон: "..(Train.TrainWireLeader and "да" or "нет"))
-            print(Format("БПСН, Iout = %.1f A,\tТок заряда батареи = %.1f A,\tU АКБ цель = %.1f B",BPSN.Iout,self.Ibatt,self.TargetVoltage))
-            print(Format("БПСН, Vout = %.1f B,\tБПСН, ток потр. = %.1f A,\tU 10 пр. = %.1f B",BPSN.VoltageOut,BPSN.Icosume,self.eds_eq))
-            --print(Train.PA1.Value,Train.PA2.Value)
-            print(Format("U АКБ = %.1f B,\tSoC = %.2f %%,\tG load = %.1f См\tПА1, ПА2 = %d, %d\n",self.Voltage,self.SoC,self.sump_cond,Train.PA1.Value,Train.PA2.Value))
-        end
+            --print("BPSN.X2_1 = "..BPSN.X2_1,"R АКБ вн. = "..Train.Battery.IResistance.. " Ом","Счетный вагон: "..(Train.TrainWireLeader and "да" or "нет"))
+            --print(Format("БПСН, Iout = %.1f A,\tТок заряда батареи = %.1f A,\tU АКБ цель = %.1f B",BPSN.Iout,self.Ibatt,self.TargetVoltage))
+            --print(Format("БПСН, Vout = %.1f B,\tБПСН, ток потр. = %.1f A,\tU 10 пр. = %.1f B",BPSN.VoltageOut,BPSN.Icosume,self.eds_eq))
+            --print(Format("Темп. БПСН = %.1f °C",BPSN.Temp))
+            --print(Format("U АКБ = %.1f B,\tSoC = %.2f %%,\tG load = %.1f См\tПА1, ПА2 = %d, %d\n",self.Voltage,self.SoC,self.sump_cond,Train.PA1.Value,Train.PA2.Value))
+        --end
         -- Calculate state of charge, internal resistance and battery voltage
         if self.Dischar then
             self.Capacity = self.Capacity - dT * (self.FullCapacity*0.1/86400)               -- make capacity loss ~ 10% per day (just a game abstraction)
@@ -230,13 +230,6 @@ function TRAIN_SYSTEM:Think(dT)
         -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         --if self.Train.A54 and self.Train.A54.Value > 0.5 then
             --local tval = 1
-            --print("Target Voltage = "..self.TargetVoltage, "self.Voltage = "..self.Voltage, "train:",self)
-            --print(self.Train.PowerSupply.car_control_load,self.Ibatt,self.IResistance,dT)
-            --print("self.SoC = "..self.SoC, "self.Ibatt = "..self.Ibatt)
-            --print("self.eds_eq = "..self.eds_eq)
-            --print("self.EthaCE = "..self.EthaCE, "self.IResistance = "..self.IResistance)
-            --print("self.Capacity = "..self.Capacity)
-            --print("self.Train.PA2 = "..self.Train.PA2.Value)
             --[[
             EMF_soc=-0.68175*tval^8+8.82823*tval^7-24.43179*tval^6+31.87221*tval^5-23.97881*tval^4+11.24774*tval^3-3.40685*tval^2+0.74692*tval+1.22076
             Uh_soc=2.62496*tval^8-12.77132*tval^7+22.37586*tval^6-18.04921*tval^5+6.14667*tval^4+0.26467*tval^3-0.82125*tval^2+0.21246*tval+0.02641
