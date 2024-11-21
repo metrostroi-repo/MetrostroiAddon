@@ -202,15 +202,43 @@ end
 --------------------------------------------------------------------------------
 -- NEW API
 local OSes = {
-    Windows = "win32",
-    Windows64 = "win64",
-    Linux = "linux",
-    Linux64 = "linux64",
-    BSD = "linux",
-    POSIX = "linux",
-    OSX = "osx",
+    Windows = {
+        x86 = "win32",
+        x64 = "win64"
+    },
+    Linux = {
+        x86 = "linux",
+        x64 = "linux64"
+    },
+    BSD = {
+        x86 = "linux",
+        x64 = "linux64"
+    },
+    POSIX = {
+        x86 = "linux",
+        x64 = "linux64"
+    },
+    OSX = {
+        x86 = "osx",
+        x64 = "osx"
+    },
+    Other = {
+        x86 = "linux",
+        x64 = "linux64"
+    }
 }
-local dllPath = "./garrysmod/lua/bin/gmsv_turbostroi_"..(OSes[jit.os] or "win32")..".dll"
+
+local postfix
+if OSes[jit.os] then
+    postfix = OSes[jit.os][jit.arch]
+end
+
+if postfix == nil then
+    print("Can't find gm_turbostroi DLL")
+    return
+end
+
+local dllPath = "./garrysmod/lua/bin/gmsv_turbostroi_"..postfix..".dll"
 
 local ffi = require("ffi")
 ffi.cdef[[
