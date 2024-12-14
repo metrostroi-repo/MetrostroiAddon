@@ -224,6 +224,10 @@ function ENT:Initialize()
             ID = "AirDistributorDisconnectToggle",
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
+        {
+            ID = "AutostopValveToggle",
+            Pos = Vector(377, -66, -50), Radius = 20,
+        },
     }
 
     -- Cross connections in train wires
@@ -342,6 +346,16 @@ function ENT:TrainSpawnerUpdate()
     local cabtex = "Def_PUAV"
     local ring,puring = math.ceil(math.random()*4)
     self:SetNW2Int("RingType",ring)
+
+    local offs = math.random(1,3)
+    if self:GetNW2Int("RetainerLoad",1) == 5 then self:SetNW2Int("RetainerLoad",math.random(1,4)) end
+    self.Pneumatic:TriggerInput("KM013offset",5.0 + 0.1*(offs-1))
+    self.Pneumatic:TriggerInput("VZ1Offset",0.9)
+    self.Pneumatic:TriggerInput("VZ2Offset",2.5)
+    self.CompressorEfficiency = math.random()*0.05 + 0.02
+    self.AirConsumeRatio = math.random()*0.04 + 0.06
+    self.AirLeakRatio = math.random()*0.002 + 0.001
+
     if typ == 1 then --PAKSDM
         self.Electric:TriggerInput("X2PS",0)
         self.Electric:TriggerInput("Type",self.Electric.LVZ_4)

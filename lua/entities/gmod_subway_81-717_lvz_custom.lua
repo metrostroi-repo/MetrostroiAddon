@@ -46,6 +46,16 @@ ENT.Spawner = {
             train.NumberRangesID = typ
         end
     end,
+    postfunc = function(cartable,wagnum)
+        for k,v in ipairs(cartable) do
+            local val = v._Settings.SpawnMode
+            v.CarCount = wagnum
+            v.InitIsoCountNeeded = true
+            v.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+            v.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
+            v.Pneumatic.BrakeLinePressure = val==4 and 5.2 or 2.3
+        end
+    end,
     {"Type","Spawner.717.Type","List",{"Spawner.717.Type.Line2","Spawner.717.Type.Line4","Spawner.717.Type.Line5"}},
     {"Scheme","Spawner.717.Schemes","List",function()
         local Schemes = {}
@@ -59,6 +69,7 @@ ENT.Spawner = {
     {},
     {"SeatType","Spawner.717.SeatType","List",{"Spawner.717.Common.Random","Spawner.717.Common.Old","Spawner.717.Common.New","Spawner.717.Common.NewBlue"}},
     {},
+    {"RetainerLoad","Spawner.717.RetainerLoad","List",{"Spawner.717.RetainerLoad.1","Spawner.717.RetainerLoad.2","Spawner.717.RetainerLoad.3","Spawner.717.RetainerLoad.4","Spawner.717.Common.Random"}},    
     {"SpawnMode","Spawner.717.SpawnMode","List",{"Spawner.717.SpawnMode.Full","Spawner.717.SpawnMode.Deadlock","Spawner.717.SpawnMode.NightDeadlock","Spawner.717.SpawnMode.Depot"}, nil,function(ent,val,rot,i,wagnum,rclk)
         if rclk then return end
         if ent._SpawnerStarted~=val then

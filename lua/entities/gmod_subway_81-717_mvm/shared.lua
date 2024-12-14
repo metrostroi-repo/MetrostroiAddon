@@ -948,6 +948,16 @@ ENT.Spawner = {
     --Metrostroi.Skins.GetTable("Texture","Spawner.Texture",false,"train"),
     --Metrostroi.Skins.GetTable("PassTexture","Spawner.PassTexture",false,"pass"),
     --Metrostroi.Skins.GetTable("CabTexture","Spawner.CabTexture",false,"cab"),
+    postfunc = function(cartable,wagnum)
+        for k,v in ipairs(cartable) do
+            local val = v._Settings.SpawnMode
+            v.CarCount = wagnum
+            v.InitIsoCountNeeded = true
+            v.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+            v.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
+            v.Pneumatic.BrakeLinePressure = val==4 and 5.2 or 2.3
+        end
+    end,
     {"Announcer","Spawner.717.Announcer","List",function()
         local Announcer = {}
         for k,v in pairs(Metrostroi.AnnouncementsASNP or {}) do if not v.riu then Announcer[k] = v.name or k end end

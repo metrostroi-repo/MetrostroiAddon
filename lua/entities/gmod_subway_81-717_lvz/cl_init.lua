@@ -2417,6 +2417,21 @@ ENT.ButtonMap["AirDistributor"] = {
     }
 }
 
+ENT.ButtonMap["AutostopValve"] = {
+    pos = Vector(365.8,-67.6,-56),
+    ang = Angle(0,0,90),
+    width = 130,
+    height = 40,
+    scale = 0.1,
+    hideseat=0.1,
+    hide=true,
+    screenHide = true,
+
+    buttons = {
+        {ID = "AutostopValveSet",x=0,y=0,w= 130,h = 40,tooltip="Сорвать срывной клапан"},
+    }
+}
+
 for i=0,4 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/common/bort_numbers.mdl",
@@ -3686,6 +3701,9 @@ function ENT:DrawPost()
     end)
     self:DrawOnPanel("AirDistributor",function()
         draw.DrawText(self:GetNW2Bool("AD") and "Air Distributor ON" or "Air Distributor OFF","Trebuchet24",0,0,Color(0,0,0,255))
+    end)
+    self:DrawOnPanel("AutostopValve",function()
+        draw.DrawText("Autostop Valve", "Trebuchet24",0,6,Color(0,0,0,255))
     end)
 end
 

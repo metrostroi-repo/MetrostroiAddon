@@ -379,6 +379,15 @@ function ENT:TrainSpawnerUpdate()
     end--]]
     --self:SetNW2String("PassTexture","Def_717MSKBlue")
     --
+    local offs = math.random(1,3)
+    if self:GetNW2Int("RetainerLoad",1) == 5 then self:SetNW2Int("RetainerLoad",math.random(1,4)) end
+    self.Pneumatic:TriggerInput("KM013offset",5.0 + 0.1*(offs-1))
+    self.Pneumatic:TriggerInput("VZ1Offset",0.9)
+    self.Pneumatic:TriggerInput("VZ2Offset",2.5)
+    self.CompressorEfficiency = math.random()*0.05 + 0.02
+    self.AirConsumeRatio = math.random()*0.04 + 0.06
+    self.AirLeakRatio = math.random()*0.002 + 0.001
+
     local num = self.WagonNumber
     self:SetNW2Bool("Custom",self.CustomSettings)
     math.randomseed(num+817171)

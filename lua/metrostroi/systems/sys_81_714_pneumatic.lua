@@ -1,15 +1,14 @@
 --------------------------------------------------------------------------------
--- 81-717 pneumatic system
+-- 81-714 pneumatic system
 --------------------------------------------------------------------------------
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_717_Pneumatic")
+Metrostroi.DefineSystem("81_714_Pneumatic")
 TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize(parameters)
     self.ValveType = 1
-    self.DisconnectType = parameters and parameters.br013_1
     -- Position of the train drivers valve
     --  Type 1 (334)
     -- 1 Accelerated charge
@@ -35,7 +34,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.TrainLinePressure = 8.0 -- atm
     -- Pressure in trains brake line
     self.BrakeLinePressure = 0.0 -- atm
-    self.EPKPressure = 0.0 -- atm
     -- Pressure in brake cylinder
     self.BrakeCylinderPressure = 0.0 -- atm
     self.OldBrakeLinePressure = 0.0
@@ -64,8 +62,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("AVT","Relay","AVT-325")
     -- Регулятор давления (АК)
     self.Train:LoadSystem("AK","Relay","AK-11B")
-    -- Автоматический выключатель управления (АВУ)
-    self.Train:LoadSystem("AVU","Relay","AVU-045")
     -- Блокировка тормозов
     self.Train:LoadSystem("BPT","Relay","")
     -- Блокировка дверей
@@ -75,8 +71,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("VDOP","Relay","", {bass = true})
     self.Train:LoadSystem("VDZ","Relay","", {bass = true})
 
-    -- Разобщение клапана машиниста
-    self.Train:LoadSystem("DriverValveDisconnect","Relay","Switch", {bass = true})
     -- Краны двойной тяги
     self.Train:LoadSystem("DriverValveTLDisconnect","Relay","Switch", {bass = true})
     self.Train:LoadSystem("DriverValveBLDisconnect","Relay","Switch", {bass = true})
@@ -84,24 +78,13 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("EmergencyBrakeValve","Relay","Switch")
     -- Воздухораспределитель
     self.Train:LoadSystem("AirDistributorDisconnect","Relay","Switch")
-    --УАВА
-    self.Train:LoadSystem("UAVA","Relay","Switch",{ bass = true})
-    self.Train:LoadSystem("UAVAContact","Relay","Switch")
-    self.Train:LoadSystem("UAVAC","Relay","",{normally_closed=true,bass=true})
-    --Срывной клапан
-    self.Train:LoadSystem("AutostopValve","Relay","Switch")
     --Стояночный тормоз
     self.Train:LoadSystem("ParkingBrake","Relay","Switch",{bass = true})
-    --ЭПК
-    self.Train:LoadSystem("EPK","Relay","Switch",{ bass = true})
-    self.Train:LoadSystem("SOT","Relay")
     -- Isolation valves
     self.Train:LoadSystem("FrontBrakeLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
     self.Train:LoadSystem("RearBrakeLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
     self.Train:LoadSystem("FrontTrainLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
     self.Train:LoadSystem("RearTrainLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
-
-    self.Train:LoadSystem("SQ3","Relay","")
 
     -- Brake cylinder atmospheric valve open
     self.BrakeCylinderValve = 0
@@ -111,9 +94,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
 
     -- Compressor simulation
     self.Compressor = 0 --Simulate overheat with TRK FIXME
-
-    -- Disconnect valve status
-    self.DriverValveDisconnectPrevious = 0
 
     -- Doors state
     if not TURBOSTROI then
@@ -142,8 +122,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.BLDisconnect = true
     self.TLDisconnect = true
 
-    self.EmergencyValve = false
-    self.EmergencyValveEPK = false
     self.OldValuePos = self.DriverValvePosition
 
     self.WeightLoadRatio = 0
@@ -175,25 +153,13 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         self:TriggerInput("BrakeSet",self.DriverValvePosition-1)
     elseif name == "ValveType" then
         self.ValveType = math.floor(value)
+    elseif name == "KM013offset" then
+        self.KM013offset = value
     elseif name:match("VZ%dOffset") then
         local idx = name:match("VZ(%d)Offset")
         self["GN"..idx.."Offset"] = math.random(2,10)*0.02 + value
         self["GN"..idx.."Start"] = value
         --PrintMessage(HUD_PRINTTALK, Format("Вагон %u; ВЗ-1: %.1f; ВЗ-2: %.1f",self.Train:GetWagonNumber(),self.GN1Offset or 0,self.GN2Offset or 0))
-    elseif name == "KM013offset" then
-        self.KM013offset = value
-    elseif name == "Autostop" then
-        local HaveUAVA = not self.Train.SubwayTrain or not self.Train.SubwayTrain.ARS or not self.Train.SubwayTrain.ARS.NoUAVA
-        if HaveUAVA and self.Train.UAVA.Value == 0 then
-            self.EmergencyValve = true
-            if value ~= 2 then
-                self.Train.UAVAC:TriggerInput("Set",0)
-                if not self.Train.AutoStopNotify then
-		            self.Train.AutoStopNotify = true
-		            RunConsoleCommand("say","Autostop braking",self.Train:GetDriverName())
-		        end
-	        end
-        end
     end
 end
 
@@ -323,13 +289,11 @@ function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
     local retainer = Train:GetNW2Int("RetainerLoad", 4)
     self.WeightLoadRatio = retainer == 4 and math.max(0,math.min(1,(Train:GetNW2Float("PassengerCount")/200))) or (retainer-1)*0.5
-    Train.Panel.UAVACOpened = (1-Train.UAVAC.Value)*((CurTime()-CurTime()%0.5)%1)
 
     ----------------------------------------------------------------------------
     -- Accumulate derivatives
     self.TrainLinePressure_dPdT = 0.0
     self.BrakeLinePressure_dPdT = 0.0
-    self.EPKPressure_dPdT = 0.0
     self.ReservoirPressure_dPdT = 0.0
     self.BrakeCylinderPressure_dPdT = 0.0
     self.ParkingBrakePressure_dPdT = 0.0
@@ -344,15 +308,11 @@ function TRAIN_SYSTEM:Think(dT)
     local HaveEPK = not Train.SubwayTrain or not Train.SubwayTrain.ARS or not Train.SubwayTrain.ARS.NoEPK
 
     local pr_speed = 1
-    -- работа срывного клапана
-    if Train.AutostopValve.Value > 0 then
-	    self:TriggerInput("Autostop",self.BrakeLinePressure > 1.86 and 1 or 2)	--value == 2 — просто открыть срывной клапан без размыкания контактов УАВА
-    end
 
     if self.ValveType == 1 then
         self.BLDisconnect = Train.DriverValveBLDisconnect.Value > 0
         self.TLDisconnect = Train.DriverValveTLDisconnect.Value > 0 and self.RealDriverValvePosition ~= 3
-        pr_speed = 1*wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6)
+        pr_speed = 1*wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6) --2
         if self.TLDisconnect then self.TLDisconnectPressure = self.TrainLinePressure end
         if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
         -- 334: 1 Fill reservoir from train line, fill brake line from train line
@@ -371,7 +331,7 @@ function TRAIN_SYSTEM:Think(dT)
         if (self.RealDriverValvePosition == 2) then
             if self.TLDisconnect then
                 local a = 1
-                if self.EmergencyValve or Train.EmergencyBrakeValve.Value > 0.5 then a = 1.85 end
+                if --[[self.EmergencyValve or ]]Train.EmergencyBrakeValve.Value > 0.5 then a = 1.85 end
                 if self.BLDisconnect then
                     self.ReservoirPressure = self.BrakeLinePressure
                     self:equalizePressure(dT,"BrakeLinePressure", self.TrainToBrakeReducedPressure, pr_speed*0, pr_speed*0.6*a, nil, 1.6)
@@ -408,7 +368,7 @@ function TRAIN_SYSTEM:Think(dT)
         -- утечка через неплотность уравнительного поршня
         if self.BLDisconnect then self:equalizePressure(dT, "ReservoirPressure", self.BrakeLinePressure, 0.06, 0) end
         if (self.RealDriverValvePosition > 2) and (self.RealDriverValvePosition < 5) then
-            local pr_speed = 1.25*wagc
+                        local pr_speed = 1.25*wagc
             if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
             local _a = 0
             for _i = 1, #Train.WagonList do
@@ -454,24 +414,10 @@ function TRAIN_SYSTEM:Think(dT)
         -- 7    |   6.100
         -- 8    |   5.900
         --pr_speed = (0.4*math.exp(0.1*wagc-1)+1)*160/(2*wagc+20) --2
-        --[[
-            ---------------debug---------------------
-            self.brreadtimer = self.brreadtimer or CurTime()
-            if CurTime() - self.brreadtimer > 1.0 then
-                self.brreadtimer = CurTime()
-                if Train:GetDriver() and Train.R_Radio.Value > 0 then
-                    --PrintMessage(HUD_PRINTTALK, Format("br_threshold = %.3f; WcBl = %s",br_threshold, tostring(WcBl)))
-                    --PrintMessage(HUD_PRINTTALK, Format("Это %s", isLVZ and "ЛВЗ" or "не ЛВЗ"))
-                    --PrintMessage(HUD_PRINTTALK, Format("Вагон %u; Авторежим: %.3f",Train:GetWagonNumber(),self.WeightLoadRatio))
-                    --PrintMessage(HUD_PRINTTALK, Format("wagc = %u",wagc))
-                end
-            end
-            ---------------debug---------------------]]                
-            --local frc = 0.4--0.35
-        --if Train.EPK.Value > 0 or self.EmergencyValve or self.BrakeLineOpen then pz_speed = pr_speed*0.75 else pz_speed = pr_speed*1.3 end
-        if self.Leak or self.BrakeLineOpen then pz_speed = pr_speed*0.75 else pz_speed = pr_speed*1.3 end
-        self.BLDisconnect = self.DisconnectType and Train.DriverValveBLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
-        self.TLDisconnect = self.DisconnectType and Train.DriverValveTLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
+        --local frc = 0.6--0.35
+        if self.Leak or self.BrakeLineOpen then pz_speed = pr_speed*0.25 else pz_speed = pr_speed*1.3 end--*frc end
+        self.BLDisconnect = Train.DriverValveBLDisconnect.Value > 0
+        self.TLDisconnect = Train.DriverValveTLDisconnect.Value > 0
         if self.RealDriverValvePosition > 4 and not self.km13_error2 then self.km13_error2 = 0.7 end
         -- 013: 1 Overcharge
         if (self.RealDriverValvePosition == 1) and self.BLDisconnect and (self.TLDisconnect or self.BrakeLinePressure > self.TrainLinePressure) then
@@ -513,64 +459,17 @@ function TRAIN_SYSTEM:Think(dT)
         end
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeLinePressure_dPdT)
     end
-    local leak
     self.Leak = false
     if wagc ~= Train.OldWagIsoCount or not Train.pr_spd_init then
         pr_speed = (0.4*math.exp(0.1*wagc-1)+1)*160/(2*wagc+20) --2
         Train.OldWagIsoCount = wagc
         Train.pr_spd_init = true
     end
-    if HaveEPK and Train.EPKC then
-        local leak = 0
-        local epkDiff = math.abs(self.EPKPressure-self.BrakeLinePressure)
-        if self.BLDisconnect and Train.EPK.Value>0 then
-            if Train.EPKC.Value>0 then
-                self:equalizePressure(dT,"EPKPressure", self.BrakeLinePressure,math.min(1,epkDiff)*6, math.min(1,epkDiff)*16,false,4*epkDiff*2)
-            end
-            if self.EPKPressure<self.BrakeLinePressure and math.abs(self.EPKPressure-self.BrakeLinePressure)>0.3 then
-                leak = self:equalizePressure(dT,"BrakeLinePressure", self.EPKPressure,pr_speed*epkDiff/3.8,pr_speed*epkDiff/3.28)
-            end
-            self.Leak = self.Leak or leak<-0.1
-        end
-        if Train.EPK.Value == 0 or Train.EPKC.Value == 0 then
-            leak = leak+self:equalizePressure(dT,"EPKPressure", 0,16,false,false,5)
-        end
-        if self.ValveType==2 and not self.BLDisconnect then
-            self:equalizePressure(dT,"EPKPressure", 0,16,false,false,5)
-        end
-        Train:SetPackedRatio("EmergencyValveEPK_dPdT", -leak/wagc*8)
-    end
     if self.ValveType == 1 then
         Train:SetPackedRatio("Crane_dPdT", self.ReservoirPressure_dPdT )
     else
         Train:SetPackedRatio("Crane_dPdT", self.BrakeLinePressure_dPdT/wagc*3 )
     end
-    if self.EmergencyValveDisable then
-        self.EmergencyValveDisable=false
-        self.EmergencyValve=false
-        Train.AutoStopNotify=false
-    end
-    local leak = 0
-    if self.EmergencyValve then
-        local leakst = self.BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.0) or math.max(1.6,math.log(0.63*self.BrakeLinePressure,1.15))
-        leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst*wagc/6)--,false,false,10)
-        if Train.UAVA.Value > 0 or (self.BrakeLinePressure < 1.8 and Train.AutostopValve.Value == 0) then	--пока держим ЛКМ нажатой, срывной клапан открыт
-            self.EmergencyValveDisable = true
-        end
-        self.Leak = true
-    end
-    
-    local UAVABlocked = (self.BrakeLinePressure>1.8 and Train.UAVA.Value==0)
-    if (Train.UAVA.Blocked>0) ~= UAVABlocked then
-        Train.UAVA:TriggerInput("Block",UAVABlocked and 1 or 0)
-    end
-    
-    local UAVACBlocked = self.EmergencyValve and not self.EmergencyValveDisable
-    if (Train.UAVAC.Blocked>0) ~= UAVACBlocked then
-        Train.UAVAC:TriggerInput("Block",UAVACBlocked and 1 or 0)
-    end
-
-    Train:SetPackedRatio("EmergencyValve_dPdT", -0.6*leak/wagc)				--Регулировка свиста срывного клапана was -1.8
 
     local leak = 0
     if Train.EmergencyBrakeValve and Train.EmergencyBrakeValve.Value > 0.5 then
@@ -592,8 +491,8 @@ function TRAIN_SYSTEM:Think(dT)
     end
 
     trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.WorkingChamberPressure_dPdT*0.2)
-    self.GN2Offset = self.GN2Offset or math.random(20,100)*0.002 + (self.GN2Start or 2.5)
-    self.GN1Offset = self.GN1Offset or math.random(20,100)*0.002 + (self.GN1Start or 0.9)
+    self.GN2Offset = self.GN2Offset or math.random(20,100)*0.002 + (self.GN2Start or 2.4)
+    self.GN1Offset = self.GN1Offset or math.random(20,100)*0.002 + (self.GN1Start or 0.8)
     self.BcBl = (self.GN2Offset + self.WeightLoadRatio*(self.GN2Offset - 1.4))/1.82--1.92
     if Train.AirDistributorDisconnect.Value == 0 and aird_ready then
         -- Valve #1
@@ -606,7 +505,7 @@ function TRAIN_SYSTEM:Think(dT)
         end
         -- Valve #2
         if Train.PneumaticNo2.Value == 1.0 then
-            self.PN2 = math.min(self.TrainLinePressure,(self.GN2Offset + self.WeightLoadRatio*1.3))
+                self.PN2 = math.min(self.TrainLinePressure,(self.GN2Offset + self.WeightLoadRatio*1.3))
                 if self.BePN2 == false and self.BrakeCylinderPressure > 1.6 then
                     Train:PlayOnce("PN2end","stop")
                 end
@@ -614,6 +513,19 @@ function TRAIN_SYSTEM:Think(dT)
             elseif self.PN2 > 0.0 then
             self.PN2 = self.BrakeCylinderPressure > 0.4 and 0.2 or self.PN2 - 0.5*dT
         end
+        --[[
+            ---------------debug---------------------
+            self.brreadtimer = self.brreadtimer or CurTime()
+            if CurTime() - self.brreadtimer > 1.0 then
+                self.brreadtimer = CurTime()
+                if Train:GetDriver() then
+                    --PrintMessage(HUD_PRINTTALK, Format("br_threshold = %.3f; WcBl = %s",br_threshold, tostring(WcBl)))
+                    --PrintMessage(HUD_PRINTTALK, Format("Это %s", isLVZ and "ЛВЗ" or "не ЛВЗ"))
+                    --PrintMessage(HUD_PRINTTALK, Format("Вагон %u; Авторежим: %.3f",Train:GetWagonNumber(),self.WeightLoadRatio))
+                    --PrintMessage(HUD_PRINTTALK, Format("wagc = %u; wagd = %u",wagc,wagd))
+                end
+            end
+            ---------------debug---------------------]]                
 
         self.BchExh = self.WorkingChamberPressure < 4.8 and self.BrakeLinePressure < 3.4 and 0 or 1
         self.cranPres = math.max(0,self.BcBl*(self.WorkingChamberPressure - self.BrakeLinePressure*self.BchExh)*(self.BrakeLinePressure > self.KM013offset and (0.6 + self.PN1*0.43) or 1))
@@ -653,11 +565,6 @@ function TRAIN_SYSTEM:Think(dT)
         Train:PlayOnce("PN2end","stop")
     end
 
-    if Train.UAVAContact.Value > 0.5 and Train.UAVAC.Value < 0.5 then
-        Train.UAVAC:TriggerInput("Set",1)
-        Train:PlayOnce("uava_reset","bass",1)
-    end
-
     --Parking brake simulation
     local PBPressure = math.Clamp(self.TrainLinePressure/5,0,1)*2.7
     if Train.ParkingBrake.Value == 0 then
@@ -691,13 +598,8 @@ function TRAIN_SYSTEM:Think(dT)
     Train.AVT:TriggerInput("Close",self.BrakeCylinderPressure < 0.9) -- 0.9 - 1.5
     Train.AK:TriggerInput( "Open", self.TrainLinePressure > 8.2)
     Train.AK:TriggerInput( "Close",self.TrainLinePressure < 6.3)
-    Train.AVU:TriggerInput("Open", self.BrakeLinePressure < 2.7) -- 2.7 - 2.9
-    Train.AVU:TriggerInput("Close",self.BrakeLinePressure > 3.5) -- 3.5 - 3.7
-    Train.SOT:TriggerInput("Open", self.EPKPressure < 1.3) -- 2.7 - 2.9
-    Train.SOT:TriggerInput("Close", self.EPKPressure > 1.5) -- 2.7 - 2.9
     Train.BPT:TriggerInput("Set",  (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.3)
     Train.DKPT:TriggerInput("Set", self.BrakeCylinderPressure > 0.3) -- 1.8 - 2.0
-    Train.SQ3:TriggerInput("Set",  Train.PassengerDoor and 0 or 1)
 
     ----------------------------------------------------------------------------
     -- Simulate doors opening, closing
@@ -771,38 +673,12 @@ function TRAIN_SYSTEM:Think(dT)
     Train.BD:TriggerInput("Set",not Train.RightDoorsOpen and not Train.LeftDoorsOpen)
 
     ----------------------------------------------------------------------------
-    if self.DriverValveDisconnectPrevious ~= Train.DriverValveDisconnect.Value then
-        self.DriverValveDisconnectPrevious = Train.DriverValveDisconnect.Value
-        if self.DriverValveDisconnectPrevious == 0 then
-            self.DVDOffTimer = CurTime()
-            Train:PlayOnce("pneumo_disconnect2","cabin",0.9)
-        else
-            self.DVDOffTimer = nil
-            Train:PlayOnce("pneumo_disconnect1","cabin",0.9)
-        end
-    end
-    --Написано в описании КМ013, что при закрытии разобщительного он снижает давление в ТМ на 0.7, значит так и сделаем!
-    --(и обработку случая, когда в обеих кабинах разобщительный открыт не забудем)
-    local km013_setpoint = {6.4, self.KM013offset, 4.3, 4.0, 3.7, 3.0, 0}
-    if self.DVDOffTimer then
-        if self.BrakeLinePressure - (km013_setpoint[self.RealDriverValvePosition]-0.7) > 0.02 and CurTime()-self.DVDOffTimer < wagc*5/8 then
-            --print "Снижение давления в ТМ..."
-            local pr_speed = 22--1.4*wagc --2
-            self:equalizePressure(dT,"BrakeLinePressure", math.max(0,km013_setpoint[self.RealDriverValvePosition]-0.7), pr_speed)
-        else
-            --print("Снижение давления в ТМ завершено за "..(CurTime()-self.DVDOffTimer).." секунд")
-            self.DVDOffTimer = nil
-        end
-    end
-
-    ----------------------------------------------------------------------------
     -- FIXME
     Train:SetNW2Bool("FbI",Train.FrontBrakeLineIsolation.Value ~= 0)
     Train:SetNW2Bool("RbI",Train.RearBrakeLineIsolation.Value ~= 0)
     Train:SetNW2Bool("FtI",Train.FrontTrainLineIsolation.Value ~= 0)
     Train:SetNW2Bool("RtI",Train.RearTrainLineIsolation.Value ~= 0)
     Train:SetNW2Bool("AD",Train.AirDistributorDisconnect.Value == 0)
-	Train:SetNW2Bool("UAVAContacts",Train.UAVAC.Value ~= 0)
 
     local ValveType = self.ValveType > 1
     self.Timer = self.Timer or CurTime()

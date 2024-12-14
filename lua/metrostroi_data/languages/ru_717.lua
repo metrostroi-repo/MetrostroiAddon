@@ -19,19 +19,20 @@ Spawner.717.Line2   = Состав с МПЛ
 Spawner.717.Line4   = Состав с ПБЛ
 Spawner.717.Line5   = Состав с ФПЛ
 
-Spawner.717.Type        = Тип состава
-Spawner.717.BodyType    = Тип кузова
-Spawner.717.MVM         = МВМ
-Spawner.717.LVZ         = ЛВЗ
-Spawner.717.MaskType    = Тип маски
-Spawner.717.CranType    = Тип крана машиниста
-Spawner.717.LampType    = Тип ламп
-Spawner.717.Lamp1       = ЛПВ-02
-Spawner.717.Lamp2       = ЛЛВ-01
-Spawner.717.SeatType    = Тип сидений
-Spawner.717.ARS         = Тип панели АРС
-Spawner.717.RingType    = Тип звонка
-Spawner.717.BPSNType    = Тип БПСН
+Spawner.717.Type            = Тип состава
+Spawner.717.BodyType        = Тип кузова
+Spawner.717.MVM             = МВМ
+Spawner.717.LVZ             = ЛВЗ
+Spawner.717.MaskType        = Тип маски
+Spawner.717.CranType        = Тип крана машиниста
+Spawner.717.LampType        = Тип ламп
+Spawner.717.Lamp1           = ЛПВ-02
+Spawner.717.Lamp2           = ЛЛВ-01
+Spawner.717.SeatType        = Тип сидений
+Spawner.717.ARS             = Тип панели АРС
+Spawner.717.RingType        = Тип звонка
+Spawner.717.BPSNType        = Тип БПСН
+Spawner.717.RetainerLoad    = Авторежим
 
 #######Buttons###########
 Train.Buttons.RZP = Сработала защита БПСН
@@ -197,6 +198,11 @@ Common.PA.Enter                 = Ввод
 
 Common.714.Start                = Пуск тяговых двигателей
 Common.714.RV                   = Переключатель направления
+
+Common.717.RetEmpty             = Порожний
+Common.717.RetMedium            = Средняя загрузка
+Common.717.RetFull              = Груженый
+Common.717.RetPassengers        = Пассажиры
 
 #gmod_subway_81-717
 Entities.gmod_subway_81-717_mvm.Buttons.Battery_C.1:UOSToggle   = @[Common.ALL.UOS]
@@ -1202,6 +1208,14 @@ Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.11      = @[Common.Spawn
 Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.12      = @[Common.Spawner.Type] 11
 Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.13      = @[Common.Spawner.Type] 12
 Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.14      = @[Common.Spawner.Type] 13
+
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.Name    = @[Spawner.717.RetainerLoad]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.1       = @[Common.717.RetEmpty]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.2       = @[Common.717.RetMedium]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.3       = @[Common.717.RetFull]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.4       = @[Common.717.RetPassengers]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.5       = @[Common.Spawner.Random]
+
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.Name   = @[Common.Spawner.SpawnMode]
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.1      = @[Common.Spawner.SpawnMode.Full]
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.2      = @[Common.Spawner.SpawnMode.Deadlock]
@@ -1209,6 +1223,13 @@ Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.3      = @[Common.Spawn
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.4      = @[Common.Spawner.SpawnMode.Depot]
 
 #Spawner:
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.Name    = @[Spawner.717.RetainerLoad]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.1       = @[Common.717.RetEmpty]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.2       = @[Common.717.RetMedium]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.3       = @[Common.717.RetFull]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.4       = @[Common.717.RetPassengers]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.5       = @[Common.Spawner.Random]
+
 Entities.gmod_subway_81-717_lvz.Spawner.Texture.Name        = @[Common.Spawner.Texture]
 Entities.gmod_subway_81-717_lvz.Spawner.PassTexture.Name    = @[Common.Spawner.PassTexture]
 Entities.gmod_subway_81-717_lvz.Spawner.CabTexture.Name     = @[Common.Spawner.CabTexture]

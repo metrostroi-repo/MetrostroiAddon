@@ -276,6 +276,10 @@ function ENT:Initialize()
     self.PrevRightDoorsOpening = false
     self.RightDoorsOpening = false
 
+    self.BrakeLineConnectedCarsCounter = 1
+    self.TrainLineConnectedCarsCounter = 1
+    self.CarCount = false
+
     -- Get default train mass
     if IsValid(self:GetPhysicsObject()) then
         self.NormalMass = self:GetPhysicsObject():GetMass()
@@ -549,6 +553,48 @@ end
 
 function ENT:GetWagonCount()
     return #self.WagonList
+end
+
+function ENT:UpdateIsolation(wagnum)
+    if not self.IsoCountTimer and (self.InitIsoCountNeeded or self.RepeatIsoUpdate) then
+        self.IsoCountTimer = CurTime()
+    end
+    if (self.InitIsoCountNeeded or self.RepeatIsoUpdate) and (CurTime() - self.IsoCountTimer > 2) then
+        self:UpdateIsolationConnectedCarCounter("Brake")
+        self:UpdateIsolationConnectedCarCounter("Train")
+        if self:GetBLConnectedWagonCount() == wagnum and self:GetTLConnectedWagonCount() == wagnum or self.RepeatIsoUpdate then
+            self.InitIsoCountNeeded = false
+            self.RepeatIsoUpdate = nil
+        end
+        self.IsoCountTimer = nil
+    end
+end
+
+function ENT:UpdateIsolationConnectedCarCounter(line)
+    self[line.."LineConnectedCarsCounter"] = 1
+    local checked = {}
+    local function count(this)
+        checked[this] = true
+        if this.FrontTrain and not checked[this.FrontTrain] and this["Front"..line.."LineIsolation"].Value == 0 then
+            if this.FrontTrain.FrontTrain == this and this.FrontTrain["Front"..line.."LineIsolation"].Value == 0 or this.FrontTrain.RearTrain == this and this.FrontTrain["Rear"..line.."LineIsolation"].Value == 0 then count(this.FrontTrain) end
+        end
+        if this.RearTrain and not checked[this.RearTrain] and this["Rear"..line.."LineIsolation"].Value == 0 then
+            if this.RearTrain.FrontTrain == this and this.RearTrain["Front"..line.."LineIsolation"].Value == 0 or this.RearTrain.RearTrain == this and this.RearTrain["Rear"..line.."LineIsolation"].Value == 0 then count(this.RearTrain) end
+        end
+    end
+    count(self)
+    local b = 0
+    for k,v in pairs(checked) do b = b + 1 end
+    for k,v in pairs(checked) do k[line.."LineConnectedCarsCounter"] = b end
+    --PrintMessage(HUD_PRINTTALK, Format("Вагон %u; line: %s; cars: %u",self:GetWagonNumber(), line, self[line.."LineConnectedCarsCounter"]))
+end
+
+function ENT:GetBLConnectedWagonCount()
+    return self.BrakeLineConnectedCarsCounter
+end
+
+function ENT:GetTLConnectedWagonCount()
+    return self.TrainLineConnectedCarsCounter
 end
 
 function ENT:ReadCell(Address)
@@ -1991,6 +2037,8 @@ function ENT:Think()
     self:SetNW2Float("Accel",math.Round((self.OldSpeed or 0) - (self.Speed or 0)*(self.SpeedSign or 0),2))
     self:SetNW2Float("TrainSpeed",self.Speed)
     self.OldSpeed = (self.Speed or 0)*(self.SpeedSign or 0)
+    
+    if self.InitIsoCountNeeded or self.RepeatIsoUpdate then self:UpdateIsolation(self.CarCount) end
 
     for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
     self:NextThink(CurTime()+0.05)
@@ -2162,6 +2210,7 @@ function ENT:ButtonEvent(button,state,ply)
     if ShouldFireEvents(self.ButtonBuffer[button],state) then
         if state == false and not self:OnButtonRelease(button,ply) then
             self:TriggerInput(button,0.0)
+            if button:match("LineIsolationToggle") then self:UpdateIsolationConnectedCarCounter(button:sub(-24,-20)) end
         elseif state ~= false and not self:OnButtonPress(button,ply) then
             self:TriggerInput(button,1.0)
             if self.Plombs and button:sub(-2,-1) == "Pl" and self.Plombs[button:sub(1,-3)]  then

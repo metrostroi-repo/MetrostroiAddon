@@ -47,6 +47,16 @@ ENT.Spawner = {
             train.NumberRangesID = body>1 and (math.random()>0.5 and 6 or 7) or (math.random()>0.5 and 4 or 5)
         end
     end,
+    postfunc = function(cartable,wagnum)
+        for k,v in ipairs(cartable) do
+            local val = v._Settings.SpawnMode
+            v.CarCount = wagnum
+            v.InitIsoCountNeeded = true
+            v.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+            v.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
+            v.Pneumatic.BrakeLinePressure = val==4 and 5.2 or 2.3
+        end
+    end,
     {"Type","Spawner.717.Type","List",{"81-717","81-717.5"}},
     {"BodyType","Spawner.717.BodyType","List",{"Spawner.717.Type.MVM","Spawner.717.Type.LVZ"}},
     {"Scheme","Spawner.717.Schemes","List",function()
@@ -72,6 +82,7 @@ ENT.Spawner = {
     {"RingType","Spawner.717.RingType","List",{"Spawner.717.Common.Random","Spawner.717.RingType.1","Spawner.717.RingType.2","Spawner.717.RingType.3","Spawner.717.RingType.4","Spawner.717.RingType.5","Spawner.717.RingType.6","Spawner.717.RingType.7","Spawner.717.RingType.8"}},
     {"BPSNType","Spawner.717.BPSNType","List",{"Spawner.717.Common.Random","Spawner.717.BPSNType.1","Spawner.717.BPSNType.2","Spawner.717.BPSNType.3","Spawner.717.BPSNType.4","Spawner.717.BPSNType.5","Spawner.717.BPSNType.6","Spawner.717.BPSNType.7","Spawner.717.BPSNType.8","Spawner.717.BPSNType.9","Spawner.717.BPSNType.10","Spawner.717.BPSNType.11","Spawner.717.BPSNType.12","Spawner.717.BPSNType.13"}},
     {},
+    {"RetainerLoad","Spawner.717.RetainerLoad","List",{"Spawner.717.RetainerLoad.1","Spawner.717.RetainerLoad.2","Spawner.717.RetainerLoad.3","Spawner.717.RetainerLoad.4","Spawner.717.Common.Random"}},    
     {"SpawnMode","Spawner.717.SpawnMode","List",{"Spawner.717.SpawnMode.Full","Spawner.717.SpawnMode.Deadlock","Spawner.717.SpawnMode.NightDeadlock","Spawner.717.SpawnMode.Depot"}, nil,function(ent,val,rot,i,wagnum,rclk)
         if rclk then return end
         if ent._SpawnerStarted~=val then

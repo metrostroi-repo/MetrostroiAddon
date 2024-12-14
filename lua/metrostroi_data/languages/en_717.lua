@@ -19,19 +19,20 @@ Spawner.717.Line2   = Train from MPL
 Spawner.717.Line4   = Train from PBL
 Spawner.717.Line5   = Train from FPL
 
-Spawner.717.Type        = Train type
-Spawner.717.BodyType    = Body type
-Spawner.717.MVM         = MVM
-Spawner.717.LVZ         = LVZ
-Spawner.717.MaskType    = Mask type
-Spawner.717.CranType    = Driver's valve type
-Spawner.717.LampType    = Lamps type
-Spawner.717.Lamp1       = LPV-02
-Spawner.717.Lamp2       = LLV-01
-Spawner.717.SeatType    = Seats type
-Spawner.717.ARS         = ARS panel type
-Spawner.717.RingType    = ARS beeper type
-Spawner.717.BPSNType    = BPSN type
+Spawner.717.Type            = Train type
+Spawner.717.BodyType        = Body type
+Spawner.717.MVM             = MVM
+Spawner.717.LVZ             = LVZ
+Spawner.717.MaskType        = Mask type
+Spawner.717.CranType        = Driver's valve type
+Spawner.717.LampType        = Lamps type
+Spawner.717.Lamp1           = LPV-02
+Spawner.717.Lamp2           = LLV-01
+Spawner.717.SeatType        = Seats type
+Spawner.717.ARS             = ARS panel type
+Spawner.717.RingType        = ARS beeper type
+Spawner.717.BPSNType        = BPSN type
+Spawner.717.RetainerLoad    = Retainer load
 
 #######Buttons###########
 Train.Buttons.RZP = BPSN converter protection engaged #NEW
@@ -197,6 +198,11 @@ Common.PA.Enter                 = Enter
 
 Common.714.Start                = Start traction-motors #FIXME
 Common.714.RV                   = Direction switch #FIXME
+
+Common.717.RetEmpty             = Empty car
+Common.717.RetMedium            = Medium load
+Common.717.RetFull              = Full load
+Common.717.RetPassengers        = Passengers load
 
 #gmod_subway_81-717
 Entities.gmod_subway_81-717_mvm.Buttons.Battery_C.1:UOSToggle   = @[Common.ALL.UOS]
@@ -1202,6 +1208,14 @@ Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.11      = @[Common.Spawn
 Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.12      = @[Common.Spawner.Type] 11
 Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.13      = @[Common.Spawner.Type] 12
 Entities.gmod_subway_81-717_mvm_custom.Spawner.BPSNType.14      = @[Common.Spawner.Type] 13
+
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.Name    = @[Spawner.717.RetainerLoad]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.1       = @[Common.717.RetEmpty]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.2       = @[Common.717.RetMedium]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.3       = @[Common.717.RetFull]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.4       = @[Common.717.RetPassengers]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.RetainerLoad.5       = @[Common.Spawner.Random]
+
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.Name   = @[Common.Spawner.SpawnMode]
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.1      = @[Common.Spawner.SpawnMode.Full]
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.2      = @[Common.Spawner.SpawnMode.Deadlock]
@@ -1209,6 +1223,13 @@ Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.3      = @[Common.Spawn
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.4      = @[Common.Spawner.SpawnMode.Depot]
 
 #Spawner:
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.Name    = @[Spawner.717.RetainerLoad]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.1       = @[Common.717.RetEmpty]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.2       = @[Common.717.RetMedium]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.3       = @[Common.717.RetFull]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.4       = @[Common.717.RetPassengers]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.RetainerLoad.5       = @[Common.Spawner.Random]
+
 Entities.gmod_subway_81-717_lvz.Spawner.Texture.Name        = @[Common.Spawner.Texture]
 Entities.gmod_subway_81-717_lvz.Spawner.PassTexture.Name    = @[Common.Spawner.PassTexture]
 Entities.gmod_subway_81-717_lvz.Spawner.CabTexture.Name     = @[Common.Spawner.CabTexture]
