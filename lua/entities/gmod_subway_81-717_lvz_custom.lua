@@ -75,6 +75,14 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
+            ent.Pneumatic.LeftDoorState = val ~= 4 and {1,1,1,1} or {0,0,0,0}
+            ent.Pneumatic.RightDoorState = val ~= 4 and {1,1,1,1} or {0,0,0,0}
+			for _i = 1,4 do
+				ent.Pneumatic.DSprev[_i][1] = ent.Pneumatic.RightDoorState[_i]
+				ent.Pneumatic.DSprev[_i][2] = ent.Pneumatic.LeftDoorState[_i]
+			end
+            ent.Pneumatic.DoorLeft = val == 4 and true or false
+            ent.Pneumatic.DoorRight = val == 4 and true or false
             if ent.AR63  then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.OhrSig:TriggerInput("Set",val<4 and 1 or 0)

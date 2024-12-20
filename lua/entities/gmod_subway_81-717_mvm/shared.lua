@@ -429,6 +429,18 @@ function ENT:InitializeSounds()
     self.SoundNames["release2"] = {loop=true,"subway_trains/common/pneumatic/release_low.wav"}
     self.SoundPositions["release2"] = {350,1e9,Vector(-183,0,-70),0.4}
 
+    self.SoundNames["releasedl"] = {loop=true,"subway_trains/717/door_cyl/vdo_on.mp3"}
+    self.SoundPositions["releasedl"] = {150,20,Vector(282,62,12.5),1.5}
+    self.SoundNames["releasedr"] = {loop=true,"subway_trains/717/door_cyl/vdo2_on.mp3"}
+    self.SoundPositions["releasedr"] = {150,20,Vector(281,-62,12.8),1.5}
+    self.SoundNames["releasede"] = {loop=true,"subway_trains/717/door_cyl/vdo3_on.mp3"}
+    self.SoundPositions["releasede"] = {150,20,Vector(278,-62,-2),1.5}
+
+    self.SoundNames["dcyl_op_exh"] = "subway_trains/common/pneumatic/parking_brake_stop2.mp3"
+    self.SoundNames["dcyl_cl_exh"] = self.SoundNames["dcyl_op_exh"]
+    self.SoundPositions["dcyl_op_exh"] = {480,1e9,Vector(-420,45,-30),0.4}
+    self.SoundPositions["dcyl_cl_exh"] = {480,1e9,Vector(-420,45,-30),1.2}
+
     self.SoundNames["parking_brake"] = {loop=true,"subway_trains/common/pneumatic/parking_brake.wav"}
     self.SoundNames["parking_brake_en"] = "subway_trains/common/pneumatic/parking_brake_stop.mp3"
     self.SoundNames["parking_brake_rel"] = "subway_trains/common/pneumatic/parking_brake_stop2.mp3"
@@ -823,7 +835,7 @@ function ENT:InitializeSystems()
     self:LoadSystem("PR_14X_Panels")
 
     -- Пневмосистема 81-710
-    self:LoadSystem("Pneumatic","81_717_Pneumatic")
+    self:LoadSystem("Pneumatic","81_717_NewPneumatic")
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_717_Panel")
     -- Everything else
@@ -973,6 +985,14 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
+            ent.Pneumatic.LeftDoorState = val ~= 4 and {1,1,1,1} or {0,0,0,0}
+            ent.Pneumatic.RightDoorState = val ~= 4 and {1,1,1,1} or {0,0,0,0}
+			for _i = 1,4 do
+				ent.Pneumatic.DSprev[_i][1] = ent.Pneumatic.RightDoorState[_i]
+				ent.Pneumatic.DSprev[_i][2] = ent.Pneumatic.LeftDoorState[_i]
+			end
+            ent.Pneumatic.DoorLeft = val == 4 and true or false
+            ent.Pneumatic.DoorRight = val == 4 and true or false
             if ent.AR63  then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.A53:TriggerInput("Set",val<=2 and 1 or 0)

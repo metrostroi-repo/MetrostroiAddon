@@ -4,7 +4,7 @@
 -- Copyright (C) 2013-2018 Metrostroi Team & FoxWorks Aerospace s.r.o.
 -- Contains proprietary code. See license.txt for additional information.
 --------------------------------------------------------------------------------
-Metrostroi.DefineSystem("81_714_Pneumatic")
+Metrostroi.DefineSystem("81_714_NewPneumatic")
 TRAIN_SYSTEM.DontAccelerateSimulation = true
 
 function TRAIN_SYSTEM:Initialize(parameters)
@@ -39,6 +39,13 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.OldBrakeLinePressure = 0.0
     -- Pressure in the door line
     self.DoorLinePressure = 0.0 -- atm
+	self.LeftDoorCloseCylPressure = 0.0
+	self.LeftDoorOpenCylPressure = 0.0
+	self.RightDoorCloseCylPressure = 0.0
+	self.RightDoorOpenCylPressure = 0.0
+    self.LeftExhausted = false
+    self.RightExhausted = false
+
     self.OldBrakeLinePressure = 0.0
     self.BCPressure = 0
     -- Air distrubutor part
@@ -85,6 +92,38 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.Train:LoadSystem("RearBrakeLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
     self.Train:LoadSystem("FrontTrainLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
     self.Train:LoadSystem("RearTrainLineIsolation","Relay","Switch", { normally_closed = true, bass = true})
+    ------------------------------------------------------------------------------------------------
+	--Ручное управление дверьми
+    --Краны выключения дверей и разобщительный кран ДВР
+	self.Train:LoadSystem("DoorReleaseRight","Relay","Switch")
+	self.Train:LoadSystem("DoorReleaseLeft","Relay","Switch")
+	self.Train:LoadSystem("DVRDisconnect","Relay","Switch", { normally_closed = false, bass = true})
+	--Механическая блокировка дверей
+    self.Train:LoadSystem("IDLK1","Relay","VB-11", {bass = true})	--4 левый
+    self.Train:LoadSystem("IDLK2","Relay","VB-11", {bass = true})	--3 левый
+    self.Train:LoadSystem("IDLK3","Relay","VB-11", {bass = true})	--2 левый
+    self.Train:LoadSystem("IDLK4","Relay","VB-11", {bass = true})	--1 левый
+    self.Train:LoadSystem("IDLK5","Relay","VB-11", {bass = true})	--1 правый
+    self.Train:LoadSystem("IDLK6","Relay","VB-11", {bass = true})	--2 правый
+    self.Train:LoadSystem("IDLK7","Relay","VB-11", {bass = true})	--3 правый
+    self.Train:LoadSystem("IDLK8","Relay","VB-11", {bass = true})	--4 правый
+	--раздвинуть/сдвинуть створки руками
+	self.Train:LoadSystem("iod1","Relay","Switch")
+	self.Train:LoadSystem("iod2","Relay","Switch")
+	self.Train:LoadSystem("iod3","Relay","Switch")
+	self.Train:LoadSystem("iod4","Relay","Switch")
+	self.Train:LoadSystem("iod5","Relay","Switch")
+	self.Train:LoadSystem("iod6","Relay","Switch")
+	self.Train:LoadSystem("iod7","Relay","Switch")
+	self.Train:LoadSystem("iod8","Relay","Switch")
+	self.Train:LoadSystem("icd1","Relay","Switch")
+	self.Train:LoadSystem("icd2","Relay","Switch")
+	self.Train:LoadSystem("icd3","Relay","Switch")
+	self.Train:LoadSystem("icd4","Relay","Switch")
+	self.Train:LoadSystem("icd5","Relay","Switch")
+	self.Train:LoadSystem("icd6","Relay","Switch")
+	self.Train:LoadSystem("icd7","Relay","Switch")
+	self.Train:LoadSystem("icd8","Relay","Switch")
 
     -- Brake cylinder atmospheric valve open
     self.BrakeCylinderValve = 0
@@ -95,15 +134,23 @@ function TRAIN_SYSTEM:Initialize(parameters)
     -- Compressor simulation
     self.Compressor = 0 --Simulate overheat with TRK FIXME
 
+    -- Door release valve status
+	self.DoorReleaseRightPrevious = 0
+    self.DoorReleaseLeftPrevious = 0
+
     -- Doors state
     if not TURBOSTROI then
-        self.LeftDoorState = { 0,0,0,0 }
-        self.RightDoorState = { 0,0,0,0 }
-        self.LeftDoorDir = { 0,0,0,0 }
-        self.RightDoorDir = { 0,0,0,0 }
-        self.LeftDoorSpeed = {0,0,0,0}
-        self.RightDoorSpeed = {0,0,0,0}
-        local start = math.Rand(0.6,0.8)
+        self.LeftDoorState = self.LeftDoorState or { 0,0,0,0 }
+        self.RightDoorState = self.RightDoorState or { 0,0,0,0 }
+        --self.LeftDoorDir = { 0,0,0,0 }
+        --self.RightDoorDir = { 0,0,0,0 }
+        self.LeftDoorSpeed = {1,1,1,1}
+        self.RightDoorSpeed = {1,1,1,1}
+		self.DSprev = {{0,0},{0,0},{0,0},{0,0}}
+        self.LeftDoorStuck = {false, false, false, false}
+        self.RightDoorStuck = {false, false, false, false}
+
+        local start = math.Rand(0.6,1.0)
         -- 0.6-1
         self.DoorSpeedMain = -math.Rand(start,math.Rand(start+0.1,start+0.2))
         for i=1,#self.LeftDoorSpeed do
@@ -133,8 +180,8 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "BrakeLinePressure", "BrakeCylinderPressure", "DriverValvePosition", "WorkingChamberPressure",
-             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio" }
+    return { "BrakeLinePressure", "BrakeCylinderPressure", "DriverValvePosition", "WorkingChamberPressure", "LeftDoorCloseCylPressure", "LeftDoorOpenCylPressure",
+             "ReservoirPressure", "TrainLinePressure", "DoorLinePressure", "WeightLoadRatio", "RightDoorCloseCylPressure", "RightDoorOpenCylPressure" }
 end
 
 function TRAIN_SYSTEM:TriggerInput(name,value)
@@ -290,6 +337,45 @@ function TRAIN_SYSTEM:Think(dT)
     local retainer = Train:GetNW2Int("RetainerLoad", 4)
     self.WeightLoadRatio = retainer == 4 and math.max(0,math.min(1,(Train:GetNW2Float("PassengerCount")/200))) or (retainer-1)*0.5
 
+    --if not Train.DoorSpeedsDone then
+    --    local start
+    --    if #Train.WagonList == Train.CarCount and Train.d_speeds then
+    --        start = math.Rand(unpack(Train.d_speeds[math.random(1,#Train.d_speeds)]))
+    --    end
+    --    if start then
+    --        MsgC(Color(200,200,200),"Setting doors speed for car "..tostring(self.Train).."; start = "..tostring(start).."...")
+    --        self.DoorSpeedMain = start--math.Rand(start,math.Rand(start+0.1,start+0.2))
+    --        for i=1,#self.LeftDoorSpeed do
+    --            --if math.random() > 0.7 then
+    --            --    self.LeftDoorSpeed[i] = math.Rand(self.DoorSpeedMain-0.2,self.DoorSpeedMain+0.2)
+    --            --    self.RightDoorSpeed[i] = math.Rand(self.DoorSpeedMain-0.2,self.DoorSpeedMain+0.2)
+    --            --else
+    --                self.LeftDoorSpeed[i] = math.Rand(self.DoorSpeedMain-0.1,self.DoorSpeedMain)
+    --                self.RightDoorSpeed[i] = math.Rand(self.DoorSpeedMain-0.1,self.DoorSpeedMain)
+    --            --end
+    --        end
+    --        Train.DoorSpeedsDone = true
+    --        MsgC(Color(200,200,200),"done\n")
+    --    else
+    --        MsgC(Color(200,200,200),"failed!\n")
+    --    end
+    --end
+    if not Train.DoorSpeedsDone and Train.CarCount then
+        local set
+        if #Train.WagonList == Train.CarCount and Train.d_speeds then
+            set = math.random(1,#Train.d_speeds)
+            local a,b = unpack(Train.d_speeds[set])
+            --MsgC(Color(200,200,200),"Setting doors speed for car "..tostring(self.Train).."; set = {"..a..", "..b.."} ...")
+            for i=1,#self.LeftDoorSpeed do
+                self.LeftDoorSpeed[i] = math.Rand(a,b)
+                self.RightDoorSpeed[i] = math.Rand(a,b)
+            end
+            Train.DoorSpeedsDone = true
+            --MsgC(Color(200,200,200),"done\n")
+        else
+            --MsgC(Color(200,200,200),"failed!\n")
+        end
+    end
     ----------------------------------------------------------------------------
     -- Accumulate derivatives
     self.TrainLinePressure_dPdT = 0.0
@@ -299,10 +385,17 @@ function TRAIN_SYSTEM:Think(dT)
     self.ParkingBrakePressure_dPdT = 0.0
     self.WorkingChamberPressure_dPdT = 0.0
 
+    -- Doors
+	self.LeftDoorCloseCylPressure_dPdT = 0.0
+	self.RightDoorCloseCylPressure_dPdT = 0.0
+	self.LeftDoorOpenCylPressure_dPdT = 0.0
+	self.RightDoorOpenCylPressure_dPdT = 0.0
+	self.DoorLinePressure_dPdT = 0.0
+
     -- Reduce pressure for brake line
     self.TrainToBrakeReducedPressure = math.min(self.KM013offset,self.TrainLinePressure) -- * 0.725)
     -- Feed pressure to door line
-    self.DoorLinePressure = self.TrainToBrakeReducedPressure * 0.90
+    self.DoorLinePressure = Train.DVRDisconnect.Value == 0 and math.min(3.6,self.TrainLinePressure) or self.DoorLinePressure
     local trainLineConsumption_dPdT = 0.0
     local wagc = Train:GetBLConnectedWagonCount()
     local HaveEPK = not Train.SubwayTrain or not Train.SubwayTrain.ARS or not Train.SubwayTrain.ARS.NoEPK
@@ -579,11 +672,167 @@ function TRAIN_SYSTEM:Think(dT)
     self:UpdatePressures(Train,dT)
 
     ----------------------------------------------------------------------------
+    -- Simulate doors opening, closing
+	local LeftRelease = Train.DoorReleaseLeft.Value == 0
+	local RightRelease = Train.DoorReleaseRight.Value == 0
+    if self.DoorLinePressure >= 1.9 then	--was > 2.6
+        -- Simulate DVR engage lag
+        if Train.VDOL.Value == 1.0 and not Train.VDOLEnergized then
+            Train.VDOLEnergized = true
+            Train.VDOLTime = RealTime()
+        elseif Train.VDOL.Value == 0.0 then
+            Train.VDOLEnergized = false
+        end
+        if Train.VDOP.Value == 1.0 and not Train.VDOPEnergized then
+            Train.VDOPEnergized = true
+            Train.VDOPTime = RealTime()
+        elseif Train.VDOP.Value == 0.0 then
+            Train.VDOPEnergized = false
+        end
+        if (Train.VDOL.Value == 1.0) and (Train.VDOP.Value == 0.0) and not self.DoorLeft then
+            if Train.VDOLTime and RealTime() - Train.VDOLTime > (Train.DVRLag or 0) then self.DoorLeft = true end
+            if self.VDOLLoud then Train:PlayOnce("vdol_loud","cabin",0.8+math.random()*0.2,self.VDOLLoud) end
+        end
+        if (Train.VDOL.Value == 0.0) and (Train.VDOP.Value == 1.0) and not self.DoorRight then
+            if Train.VDOPTime and RealTime() - Train.VDOPTime > (Train.DVRLag or 0) then self.DoorRight = true end
+            if self.VDORLoud then Train:PlayOnce("vdop_loud","cabin",0.8+math.random()*0.2,self.VDORLoud) end
+        end
+        if Train.DVRHiss == 2 then 
+            if Train.RD.Value == 1 and Train.VDOL.Value == 1 and not self.LeftExhausted then
+                Train:PlayOnce("dcyl_op_exh","bass",1,1)
+                self.LeftExhausted = true
+            end
+            if Train.RD.Value == 1 and Train.VDOP.Value == 1 and not self.RightExhausted then
+                Train:PlayOnce("dcyl_op_exh","bass",1,1)
+                self.RightExhausted = true
+            end
+        end
+        if (Train.VDZ.Value == 1.0 or Train.VDOL.Value == 1.0 and Train.VDOP.Value == 1.0 or self.RZDTimer) and (self.DoorLeft or self.DoorRight) then
+            --if not self.OpenWaitL or CurTime()-self.OpenWaitL < 0.2 then
+                self.DoorLeft = false
+            --end
+            --if not self.OpenWaitR or CurTime()-self.OpenWaitR < 0.2 then
+                self.DoorRight = false
+            --end
+            if Train.DVRHiss == 2 then
+                if Train.RD.Value == 0 and (self.LeftExhausted or self.RightExhausted) then
+                    Train:PlayOnce("dcyl_cl_exh","bass",1,0.6)
+                    self.LeftExhausted = false
+                    self.RightExhausted = false
+                end
+            end
+        else
+            self.CloseValue = nil
+        end
+        if Train.VDOL.Value == 1.0 and Train.VDOP.Value == 1.0 then
+            self.RZDTimer = CurTime()
+        elseif self.RZDTimer and CurTime()-self.RZDTimer > 0.1 then
+            self.RZDTimer = nil
+        end
+    end
+	-- Тут было бы лучше сделать не 2 цилиндра на вагон, а 8, но тогда будет не 4 вызова функции, а 16...
+    self:equalizePressure(dT,"RightDoorOpenCylPressure", self.DoorRight and self.DoorLinePressure or 0.0, 2.2, 10)
+    self:equalizePressure(dT,"RightDoorCloseCylPressure", not self.DoorRight and RightRelease and self.DoorLinePressure or 0.0, 2.2, 10)
+    self:equalizePressure(dT,"LeftDoorOpenCylPressure", self.DoorLeft and self.DoorLinePressure or 0.0, 2.2, 10)
+    self:equalizePressure(dT,"LeftDoorCloseCylPressure", not self.DoorLeft and LeftRelease and self.DoorLinePressure or 0.0, 2.2, 10)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorOpenCylPressure_dPdT*0.005)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorOpenCylPressure_dPdT*0.005)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorCloseCylPressure_dPdT*0.005)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorCloseCylPressure_dPdT*0.005)
+    Train:SetPackedRatio("RightDoorCloseCylPressure_dPdT",not RightRelease and self.RightDoorCloseCylPressure_dPdT or 0)
+    Train:SetPackedRatio("LeftDoorCloseCylPressure_dPdT",not LeftRelease and self.LeftDoorCloseCylPressure_dPdT or 0)
+	if self.DoorReleaseRightPrevious ~= Train.DoorReleaseRight.Value then
+		self.DoorReleaseRightPrevious = Train.DoorReleaseRight.Value
+		---[[
+		if not self.DoorRight and self.DoorReleaseRightPrevious == 1 then
+			self:equalizePressure(dT,"RightDoorCloseCylPressure", 0, 3)		--was DoorLinePressure
+		end--]]
+	end
+	if self.DoorReleaseLeftPrevious ~= Train.DoorReleaseLeft.Value then
+		self.DoorReleaseLeftPrevious = Train.DoorReleaseLeft.Value
+		---[[
+		if not self.DoorLeft and self.DoorReleaseLeftPrevious == 1 then
+			self:equalizePressure(dT,"LeftDoorCloseCylPressure", 0, 6)		--was DoorLinePressure
+		end--]]
+	end
+    if self.VDOL ~= Train.VDOL.Value then
+        self.VDOL = Train.VDOL.Value
+        self:equalizePressure(dT,Train.DVRDisconnect.Value == 0 and "TrainLinePressure" or "DoorLinePressure", 0.0, 0.05)	--was 0.3
+    end
+    if self.VDOP ~= Train.VDOP.Value then
+        self.VDOP = Train.VDOP.Value
+        self:equalizePressure(dT,Train.DVRDisconnect.Value == 0 and "TrainLinePressure" or "DoorLinePressure", 0.0, 0.05)	--was 0.3
+    end
+    if self.VDZ ~= Train.VDZ.Value then
+        self.VDZ = Train.VDZ.Value
+        self:equalizePressure(dT,Train.DVRDisconnect.Value == 0 and "TrainLinePressure" or "DoorLinePressure", 0.0, 0.05)	--was 0.3
+    end
+    trainLineConsumption_dPdT = trainLineConsumption_dPdT + (Train.DVRDisconnect.Value == 0 and math.max(0,self.DoorLinePressure_dPdT*0.2) or 0)
+    if Train.CanStuckPassengerLeft then
+        for i in ipairs(self.LeftDoorStuck) do
+            self.LeftDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.LeftDoorSpeed[i])*0.2)*Train.CanStuckPassengerLeft*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
+        end
+        Train.CanStuckPassengerLeft = false
+    end
+    if Train.CanStuckPassengerRight then
+        for i in ipairs(self.RightDoorStuck) do
+            self.RightDoorStuck[i] = math.random() < (0.6+math.min(2,2-self.RightDoorSpeed[i])*0.2)*Train.CanStuckPassengerRight*0.6 and (math.random() > 0.7 and CurTime()+math.random()*15)
+        end
+        Train.CanStuckPassengerRight = false
+    end
+
+
+    Train.LeftDoorsOpen = false
+    Train.RightDoorsOpen = false
+    local openL = true
+    local openR = true
+	local llocked = false
+	local rlocked = false
+	local rmOpen = false							--|Right and left doors
+	local rmClose = false							--|
+	local lmOpen = false							--|
+    local lmClose = false							--|manual opening-closing
+	local v = "IDLK"
+	local m = "iod"
+	local n = "icd"
+    for i=1,4 do
+        rlocked = Train[v..i].Value > 0
+		llocked = Train[v..tostring(9-i)].Value > 0
+		rmOpen = Train[m..i].Value > 0
+		lmOpen = Train[m..tostring(9-i)].Value > 0
+		rmClose = Train[n..i].Value > 0
+		lmClose = Train[n..tostring(9-i)].Value > 0
+        self.LeftDoorState[i] = math.Clamp(self.LeftDoorState[i] + (not llocked and ((lmOpen and 1.5 or lmClose and -1.5 or 0) + (self.DoorLinePressure > 1.0 and (math.Round(self.LeftDoorOpenCylPressure - self.LeftDoorCloseCylPressure,1))*0.36*(not (lmOpen or lmClose) and self.LeftDoorSpeed[i] or 1) or 0))*dT or 0),self.LeftDoorStuck[i] and 0.3 or 0,1)
+        self.RightDoorState[i] = math.Clamp(self.RightDoorState[i] + (not rlocked and ((rmOpen and 1.5 or rmClose and -1.5 or 0) + (self.DoorLinePressure > 1.0 and (math.Round(self.RightDoorOpenCylPressure - self.RightDoorCloseCylPressure,1))*0.36*(not (rmOpen or rmClose) and self.RightDoorSpeed[i] or 1) or 0))*dT or 0),self.RightDoorStuck[i] and 0.3 or 0,1)
+        if not Train.LeftDoorsOpen and self.LeftDoorState[i] > 0.02 then	--was 0.06
+            Train.LeftDoorsOpen = true
+        end
+        if not Train.RightDoorsOpen and self.RightDoorState[i] > 0.02 then	--was 0.06
+            Train.RightDoorsOpen = true
+        end
+        Train:SetPackedRatio("DoorL"..i,self.LeftDoorState[i])
+        Train:SetPackedRatio("DoorR"..i,self.RightDoorState[i])
+        if self.LeftDoorStuck[i] and (self.DoorLeft or type(self.LeftDoorStuck[i]) == "number" and CurTime()-self.LeftDoorStuck[i] > 0) then
+            self.LeftDoorStuck[i] = false
+        end
+        if self.RightDoorStuck[i] and (self.DoorRight or type(self.RightDoorStuck[i]) == "number" and CurTime()-self.RightDoorStuck[i] > 0) then
+            self.RightDoorStuck[i] = false
+        end
+        Train:SetPackedBool("DoorLS"..i,self.LeftDoorStuck[i])
+        Train:SetPackedBool("DoorRS"..i,self.RightDoorStuck[i])
+    end
+    Train:SetPackedBool("DoorL",self.DoorLeft)
+    Train:SetPackedBool("DoorR",self.DoorRight)
+    Train.BD:TriggerInput("Set",not Train.RightDoorsOpen and not Train.LeftDoorsOpen)
+    Train.LeftDoorsOpening = self.DoorLeft
+    Train.RightDoorsOpening = self.DoorRight
+
+    ----------------------------------------------------------------------------
     -- Simulate compressor operation and train line depletion
     self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
-    self.TrainLinePressure = self.TrainLinePressure - Train.AirConsumeRatio*trainLineConsumption_dPdT*dT -- 0.190 --0.170 --0.07
-    if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency) end -- 0.04
-    self:equalizePressure(dT,"TrainLinePressure", 0,Train.AirLeakRatio)
+    self.TrainLinePressure = self.TrainLinePressure - (Train.AirConsumeRatio or 1)*trainLineConsumption_dPdT*dT -- 0.190 --0.170 --0.07
+    if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency or 0.04) end -- 0.04
+    self:equalizePressure(dT,"TrainLinePressure", 0,Train.AirLeakRatio or 0.003)
     -- Overpressure
     if self.TrainLinePressure > math.max(7.2, (9.2 - self.TrainLineOverpressureValve*0.2)) and self.TrainLineOverpressureValve%2 == 0 then self.TrainLineOverpressureValve = self.TrainLineOverpressureValve + 1 end
     if self.TrainLineOverpressureValve%2 == 1 then
@@ -602,83 +851,14 @@ function TRAIN_SYSTEM:Think(dT)
     Train.DKPT:TriggerInput("Set", self.BrakeCylinderPressure > 0.3) -- 1.8 - 2.0
 
     ----------------------------------------------------------------------------
-    -- Simulate doors opening, closing
-    if self.DoorLinePressure > 3.5 then
-        if (Train.VDOL.Value == 1.0) and (Train.VDOP.Value == 0.0) and not self.DoorLeft then
-            self.DoorLeft = true
-            if self.VDOLLoud then Train:PlayOnce("vdol_loud","cabin",0.8+math.random()*0.2,self.VDOLLoud) end
-        end
-        if (Train.VDOL.Value == 0.0) and (Train.VDOP.Value == 1.0) and not self.DoorRight then
-            self.DoorRight = true
-            if self.VDORLoud then Train:PlayOnce("vdop_loud","cabin",0.8+math.random()*0.2,self.VDORLoud) end
-        end
-        if (Train.VDZ.Value == 1.0 or Train.VDOL.Value == 1.0 and Train.VDOP.Value == 1.0 or self.RZDTimer) and (self.DoorLeft or self.DoorRight) then
-            if not self.OpenWaitL or CurTime()-self.OpenWaitL < 0.2 then
-                self.DoorLeft = false
-            end
-            if not self.OpenWaitR or CurTime()-self.OpenWaitR < 0.2 then
-                self.DoorRight = false
-            end
-        else
-            self.CloseValue = nil
-        end
-        if Train.VDOL.Value == 1.0 and Train.VDOP.Value == 1.0 then
-            self.RZDTimer = CurTime()
-        elseif self.RZDTimer and CurTime()-self.RZDTimer > 0.1 then
-            self.RZDTimer = nil
-        end
-    end
-    if self.VDOL ~= Train.VDOL.Value then
-        self.VDOL = Train.VDOL.Value
-        self:equalizePressure(dT,"TrainLinePressure", 0.0, 0.05)
-    end
-    if self.VDOP ~= Train.VDOP.Value then
-        self.VDOP = Train.VDOP.Value
-        self:equalizePressure(dT,"TrainLinePressure", 0.0, 0.05)
-    end
-    if self.VDZ ~= Train.VDZ.Value then
-        self.VDZ = Train.VDZ.Value
-        self:equalizePressure(dT,"TrainLinePressure", 0.0, 0.05)
-    end
-
-
-    Train.LeftDoorsOpen = false
-    Train.RightDoorsOpen = false
-    local openL = true
-    local openR = true
-    for i=1,4 do
-        self.LeftDoorDir[i] = math.Clamp(self.LeftDoorDir[i]+dT/(self.DoorLeft and self.LeftDoorSpeed[i] or -self.LeftDoorSpeed[i]),-1,1)
-        self.RightDoorDir[i] = math.Clamp(self.RightDoorDir[i]+dT/(self.DoorRight and self.RightDoorSpeed[i] or -self.RightDoorSpeed[i]),-1,1)
-        self.LeftDoorState[i]  = math.Clamp(self.LeftDoorState[i] + ((self.LeftDoorDir[i]/self.LeftDoorSpeed[i])*dT),0,1)
-        if self.LeftDoorState[i] == 0 or self.LeftDoorState[i] == 1 then self.LeftDoorDir[i] = 0 end
-        self.RightDoorState[i]  = math.Clamp(self.RightDoorState[i] + ((self.RightDoorDir[i]/self.RightDoorSpeed[i])*dT),0,1)
-        if self.RightDoorState[i] == 0 or self.RightDoorState[i] == 1 then self.RightDoorDir[i] = 0 end
-        if not Train.LeftDoorsOpen and self.LeftDoorState[i] > 0 then
-            Train.LeftDoorsOpen = true
-        end
-        if self.LeftDoorState[i] > self.LeftDoorSpeed[i]/20 then self.OpenWaitL = false end
-        if self.RightDoorState[i] > self.LeftDoorSpeed[i]/20 then self.OpenWaitR = false end
-        if self.LeftDoorState[i] > 0 then openL = false end
-        if self.RightDoorState[i] > 0 then openR = false end
-        if not Train.RightDoorsOpen and self.RightDoorState[i] > 0 then
-            Train.RightDoorsOpen = true
-        end
-        Train:SetPackedRatio("DoorL"..i,self.LeftDoorState[i])
-        Train:SetPackedRatio("DoorR"..i,self.RightDoorState[i])
-    end
-    if openL and not self.OpenWaitL then self.OpenWaitL = CurTime() end
-    if openR and not self.OpenWaitR then self.OpenWaitR = CurTime() end
-    Train:SetPackedBool("DoorL",self.DoorLeft)
-    Train:SetPackedBool("DoorR",self.DoorRight)
-    Train.BD:TriggerInput("Set",not Train.RightDoorsOpen and not Train.LeftDoorsOpen)
-
-    ----------------------------------------------------------------------------
     -- FIXME
     Train:SetNW2Bool("FbI",Train.FrontBrakeLineIsolation.Value ~= 0)
     Train:SetNW2Bool("RbI",Train.RearBrakeLineIsolation.Value ~= 0)
     Train:SetNW2Bool("FtI",Train.FrontTrainLineIsolation.Value ~= 0)
     Train:SetNW2Bool("RtI",Train.RearTrainLineIsolation.Value ~= 0)
     Train:SetNW2Bool("AD",Train.AirDistributorDisconnect.Value == 0)
+	Train:SetNW2Bool("DoorReleaseRight",Train.DoorReleaseRight.Value ~= 0)
+	Train:SetNW2Bool("DoorReleaseLeft",Train.DoorReleaseLeft.Value ~= 0)
 
     local ValveType = self.ValveType > 1
     self.Timer = self.Timer or CurTime()

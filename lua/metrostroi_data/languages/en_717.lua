@@ -204,6 +204,16 @@ Common.717.RetMedium            = Medium load
 Common.717.RetFull              = Full load
 Common.717.RetPassengers        = Passengers load
 
+Common.717.AUTOSTOP             = Engage emergency stop valve
+
+Common.717.HOD                  = Manually open
+Common.717.HCD                  = Manually close
+Common.717.HDLK                 = Lock doors
+Common.717.DoorReleaseExt       = First door manual open valve
+Common.717.DoorReleaseLeft      = Emergency left doors manual open valve
+Common.717.DoorReleaseRight     = Emergency right doors manual open valve
+Common.717.DVR87                = Door air distrubutor disconnect valve
+
 #gmod_subway_81-717
 Entities.gmod_subway_81-717_mvm.Buttons.Battery_C.1:UOSToggle   = @[Common.ALL.UOS]
 Entities.gmod_subway_81-717_mvm.Buttons.Battery_R.2:UOSToggle   = @[Common.ALL.UOS]
@@ -565,6 +575,39 @@ Entities.gmod_subway_81-717_mvm.Buttons.OtsekDoor2.OtsekDoor2                   
 Entities.gmod_subway_81-717_mvm.Buttons.EPKDisconnect.EPKToggle                                 = @[Common.ALL.EPK]
 Entities.gmod_subway_81-717_mvm.Buttons.EPVDisconnect.EPKToggle                                 = @[Common.ALL.EPV]
 Entities.gmod_subway_81-717_mvm.Buttons.ParkingBrake.ParkingBrakeToggle                         = @[Common.ALL.ParkingBrake]
+
+Entities.gmod_subway_81-717_mvm.Buttons.AutostopValve.AutostopValveSet                          = @[Common.717.AUTOSTOP]
+
+#Doors manual controls
+Entities.gmod_subway_81-717_mvm.Buttons.Doors7_8_right.hod4Set                                  = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors5_6_right.hod3Set                                  = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors3_4_right.hod2Set                                  = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors1_2_right.hod1Set                                  = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors7_8_right.hcd4Set                                  = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors5_6_right.hcd3Set                                  = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors3_4_right.hcd2Set                                  = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors1_2_right.hcd1Set                                  = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors7_8_left.hod5Set                                   = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors5_6_left.hod6Set                                   = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors3_4_left.hod7Set                                   = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors1_2_left.hod8Set                                   = @[Common.717.HOD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors7_8_left.hcd5Set                                   = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors5_6_left.hcd6Set                                   = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors3_4_left.hcd7Set                                   = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors1_2_left.hcd8Set                                   = @[Common.717.HCD]                
+Entities.gmod_subway_81-717_mvm.Buttons.Doors1_2_right_outer.outerhod1Set                       = @[Common.717.HOD]           
+Entities.gmod_subway_81-717_mvm.Buttons.bldr7_8_rgh.HDLK4Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr5_6_rgh.HDLK3Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr3_4_rgh.HDLK2Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr1_2_rgh.HDLK1Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr7_8_lft.HDLK5Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr5_6_lft.HDLK6Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr3_4_lft.HDLK7Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.bldr1_2_lft.HDLK8Toggle                                 = @[Common.717.HDLK]               
+Entities.gmod_subway_81-717_mvm.Buttons.DoorReleaseExtra.DoorReleaseExtraToggle                 = @[Common.717.DoorReleaseExt]      
+Entities.gmod_subway_81-717_mvm.Buttons.DoorReleaseLeft.DoorReleaseLeftToggle                   = @[Common.717.DoorReleaseLeft]     
+Entities.gmod_subway_81-717_mvm.Buttons.DoorReleaseRight.DoorReleaseRightToggle                 = @[Common.717.DoorReleaseRight]    
+Entities.gmod_subway_81-717_mvm.Buttons.DVR_87.DVRDisconnectToggle                              = @[Common.717.DVR87]                   
 
 
 #gmod_subway_81-717_lvz
@@ -985,6 +1028,39 @@ Entities.gmod_subway_81-717_lvz.Buttons.EPKDisconnect.EPKToggle                 
 Entities.gmod_subway_81-717_lvz.Buttons.EPVDisconnect.EPKToggle                                 = @[Common.ALL.EPV]
 Entities.gmod_subway_81-717_lvz.Buttons.ParkingBrake.ParkingBrakeToggle                         = @[Common.ALL.ParkingBrake]
 
+Entities.gmod_subway_81-717_lvz.Buttons.AutostopValve.AutostopValveSet                          = @[Common.717.AUTOSTOP]
+
+#Doors manual controls
+Entities.gmod_subway_81-717_lvz.Buttons.Doors7_8_right.hod4Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors5_6_right.hod3Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors3_4_right.hod2Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors1_2_right.hod1Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors7_8_right.hcd4Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors5_6_right.hcd3Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors3_4_right.hcd2Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors1_2_right.hcd1Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors7_8_left.hod5Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors5_6_left.hod6Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors3_4_left.hod7Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors1_2_left.hod8Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors7_8_left.hcd5Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors5_6_left.hcd6Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors3_4_left.hcd7Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors1_2_left.hcd8Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-717_lvz.Buttons.Doors1_2_right_outer.outerhod1Set                       = @[Common.717.HOD]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr7_8_rgh.HDLK4Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr5_6_rgh.HDLK3Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr3_4_rgh.HDLK2Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr1_2_rgh.HDLK1Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr7_8_lft.HDLK5Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr5_6_lft.HDLK6Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr3_4_lft.HDLK7Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.bldr1_2_lft.HDLK8Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-717_lvz.Buttons.DoorReleaseExtra.DoorReleaseExtraToggle                 = @[Common.717.DoorReleaseExt]
+Entities.gmod_subway_81-717_lvz.Buttons.DoorReleaseLeft.DoorReleaseLeftToggle                   = @[Common.717.DoorReleaseLeft]
+Entities.gmod_subway_81-717_lvz.Buttons.DoorReleaseRight.DoorReleaseRightToggle                 = @[Common.717.DoorReleaseRight]
+Entities.gmod_subway_81-717_lvz.Buttons.DVR_87.DVRDisconnectToggle                              = @[Common.717.DVR87]
+
 #gmod_subway_81-714_mvm
 Entities.gmod_subway_81-714_mvm.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle            = @[Common.ALL.FrontBrakeLineIsolationToggle]
 Entities.gmod_subway_81-714_mvm.Buttons.FrontPneumatic.FrontTrainLineIsolationToggle            = @[Common.ALL.FrontTrainLineIsolationToggle]
@@ -1069,6 +1145,37 @@ Entities.gmod_subway_81-714_mvm.Buttons.Voltages.!BatteryCurrent        = @[Comm
 Entities.gmod_subway_81-714_mvm.Buttons.Pressures.!BCPressure           = @[Common.ALL.BCPressure]
 Entities.gmod_subway_81-714_mvm.Buttons.Pressures.!BLTLPressure         = @[Common.ALL.BLTLPressure]
 
+#Doors manual controls
+Entities.gmod_subway_81-714_mvm.Buttons.Doors7_8_right.iod8Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors5_6_right.iod7Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors3_4_right.iod6Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors1_2_right.iod5Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors7_8_right.icd8Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors5_6_right.icd7Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors3_4_right.icd6Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors1_2_right.icd5Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors7_8_left.iod1Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors5_6_left.iod2Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors3_4_left.iod3Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors1_2_left.iod4Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors7_8_left.icd1Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors5_6_left.icd2Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors3_4_left.icd3Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors1_2_left.icd4Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_mvm.Buttons.Doors1_2_right_outer.outerhod1Set                       = @[Common.717.HOD]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr7_8_rgh.IDLK8Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr5_6_rgh.IDLK7Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr3_4_rgh.IDLK6Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr1_2_rgh.IDLK5Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr7_8_lft.IDLK1Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr5_6_lft.IDLK2Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr3_4_lft.IDLK3Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.bldr1_2_lft.IDLK4Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_mvm.Buttons.DoorReleaseLeft.DoorReleaseLeftToggle                   = @[Common.717.DoorReleaseLeft]
+Entities.gmod_subway_81-714_mvm.Buttons.DoorReleaseRight.DoorReleaseRightToggle                 = @[Common.717.DoorReleaseRight]
+Entities.gmod_subway_81-714_mvm.Buttons.DVR_87.DVRDisconnectToggle                              = @[Common.717.DVR87]
+
+
 #gmod_subway_81-714_lvz
 Entities.gmod_subway_81-714_lvz.Buttons.FrontPneumatic.FrontBrakeLineIsolationToggle            = @[Common.ALL.FrontBrakeLineIsolationToggle]
 Entities.gmod_subway_81-714_lvz.Buttons.FrontPneumatic.FrontTrainLineIsolationToggle            = @[Common.ALL.FrontTrainLineIsolationToggle]
@@ -1146,6 +1253,36 @@ Entities.gmod_subway_81-714_lvz.Buttons.Voltages.!BatteryVoltage        = @[Comm
 Entities.gmod_subway_81-714_lvz.Buttons.Voltages.!BatteryCurrent        = @[Common.ALL.BatteryCurrent]
 Entities.gmod_subway_81-714_lvz.Buttons.Pressures.!BCPressure           = @[Common.ALL.BCPressure]
 Entities.gmod_subway_81-714_lvz.Buttons.Pressures.!BLTLPressure         = @[Common.ALL.BLTLPressure]
+
+#Doors manual controls
+Entities.gmod_subway_81-714_lvz.Buttons.Doors7_8_right.iod8Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors5_6_right.iod7Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors3_4_right.iod6Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors1_2_right.iod5Set                                  = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors7_8_right.icd8Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors5_6_right.icd7Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors3_4_right.icd6Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors1_2_right.icd5Set                                  = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors7_8_left.iod1Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors5_6_left.iod2Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors3_4_left.iod3Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors1_2_left.iod4Set                                   = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors7_8_left.icd1Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors5_6_left.icd2Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors3_4_left.icd3Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors1_2_left.icd4Set                                   = @[Common.717.HCD]
+Entities.gmod_subway_81-714_lvz.Buttons.Doors1_2_right_outer.outerhod1Set                       = @[Common.717.HOD]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr7_8_rgh.IDLK8Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr5_6_rgh.IDLK7Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr3_4_rgh.IDLK6Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr1_2_rgh.IDLK5Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr7_8_lft.IDLK1Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr5_6_lft.IDLK2Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr3_4_lft.IDLK3Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.bldr1_2_lft.IDLK4Toggle                                 = @[Common.717.HDLK]
+Entities.gmod_subway_81-714_lvz.Buttons.DoorReleaseLeft.DoorReleaseLeftToggle                   = @[Common.717.DoorReleaseLeft]
+Entities.gmod_subway_81-714_lvz.Buttons.DoorReleaseRight.DoorReleaseRightToggle                 = @[Common.717.DoorReleaseRight]
+Entities.gmod_subway_81-714_lvz.Buttons.DVR_87.DVRDisconnectToggle                              = @[Common.717.DVR87]
 
 #Spawner:
 Entities.gmod_subway_81-717_mvm.Spawner.Announcer.Name  = @[Common.Spawner.Announcer]
