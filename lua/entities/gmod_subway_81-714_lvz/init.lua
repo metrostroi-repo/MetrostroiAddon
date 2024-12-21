@@ -6,8 +6,8 @@ ENT.BogeyDistance = 650 -- Needed for gm trainspawner
 ENT.SyncTable = {
     "A53","A56","A54","A24","A39","A23","A14","A13","A31","A32","A16","A12","A49","A15","A27","A50","A8","A52","A19","A10","A22","A30","A1","A2","A3","A4","A5","A6","A72","A38","A20","A25","A37","A55","A45","A66","A51","A65","A28",
     "A70","A81","A80","A18",
-    "VB","GV",
-    "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake",
+    "VB","GV","IDLK1","IDLK2","IDLK3","IDLK4","IDLK5","IDLK6","IDLK7","IDLK8",
+    "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight",
     "A84","BPSNon","ConverterProtection","L_1","Start","VozvratRP","EmergencyBrakeValve"
 }
 
@@ -145,6 +145,22 @@ function ENT:Initialize()
     self:SetNW2Int("BPSNType",self.BPSNType)
     self.OldTexture = 0
 
+    self.OldPedestrianCount = 0
+
+    self.d_slow_speeds = {
+        {0.4, 0.8},
+        --{0.3, 0.4},
+        --{0.2, 0.3},
+        --{0.3, 0.4},
+        --{0.2, 0.3},
+    }
+    self.d_fast_speeds = {
+        {1.2, 1.8},
+        --{1.7, 1.8},
+        --{1.8, 1.9},
+        --{1.7, 1.8},
+        --{2.1, 2.2},
+    }
     self.Lamps = {
         broken = {},
     }
@@ -235,6 +251,11 @@ function ENT:TrainSpawnerUpdate()
     self.CompressorEfficiency = math.random()*0.05 + 0.02
     self.AirConsumeRatio = math.random()*0.04 + 0.06
     self.AirLeakRatio = math.random()*0.002 + 0.001
+    self.DVRLag = math.random()*0.5
+    self.DVRHiss = math.random(2,5)
+    self.d_speeds = nil
+    self.DoorSpeedsDone = false
+    self.StuckSet = nil
 
     math.randomseed(num+817171)
     local kvr=false
@@ -365,7 +386,29 @@ function ENT:Think()
         (Pneumatic.RightDoorState[3] > 0.5) or
         (Pneumatic.RightDoorState[4] > 0.5)
 
-    --self:SetPackedRatio("Crane", Pneumatic.RealDriverValvePosition)
+    if self.Speed > 1 and not self.LeftDoorsOpen and not self.RightDoorsOpen and not self.PedChecked then
+        self.OldPedestrianCount = self:GetNW2Float("PassengerCount")
+        self.PedChecked = true
+        self.left_side = nil
+        self.StuckSet = false
+    end
+    if not self.StuckSet then
+        local passenger_count = self:GetNW2Float("PassengerCount")
+        if self.Speed < 1 and math.abs(self.OldPedestrianCount - passenger_count) >= 1 and self.left_side == nil then
+            self.OldPedestrianCount = self:GetNW2Float("PassengerCount")
+            self.left_side = self.Pneumatic.DoorLeft or false
+            self.PedChecked = false
+        end
+        if self.left_side ~= nil then
+            if not (self.Pneumatic.DoorLeft or self.Pneumatic.DoorRight) then
+                local luava = math.random()
+                self["CanStuckPassenger"..(self.left_side and "Left" or "Right")] = (1-passenger_count/200) < luava and luava < 1 and 1--0.912 < luava and luava < 0.987
+                self.StuckSet = true
+                if self.CanStuckPassengerLeft or self.CanStuckPassengerRight then print(self,"passenger to be caught! :D") end
+            end
+        end
+    end
+        --self:SetPackedRatio("Crane", Pneumatic.RealDriverValvePosition)
     --self:SetPackedRatio("Controller", (self.KV.ControllerPosition+3)/7)
     if Pneumatic.ValveType == 1 then
         self:SetPackedRatio("BLPressure", Pneumatic.ReservoirPressure/16.0)
@@ -458,7 +501,7 @@ function ENT:OnButtonPress(button,ply)
         if self.CouchCap and self.Pneumatic.DriverValvePosition>2 then return end
         self.CouchCap = not self.CouchCap
     end
-    if not self.CouchCap and (not button:find("VB") and not button:find("GV") and not button:find("Isolation") and not button:find("Parking") and not button:find("Air")) then return true end
+    --if not self.CouchCap and (not button:find("VB") and not button:find("GV") and not button:find("Isolation") and not button:find("Parking") and not button:find("Air")) then return true end
 
     if button == "DriverValveDisconnect" then
         if self.DriverValveBLDisconnect.Value == 0 or self.DriverValveTLDisconnect.Value == 0 then

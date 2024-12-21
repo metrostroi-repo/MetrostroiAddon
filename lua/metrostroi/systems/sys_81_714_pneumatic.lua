@@ -36,10 +36,9 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.BrakeLinePressure = 3.0 -- atm
     -- Pressure in brake cylinder
     self.BrakeCylinderPressure = 0.0 -- atm
-    self.OldBrakeLinePressure = 0.0
+    self.OldBrakeLinePressure = 3.0
     -- Pressure in the door line
     self.DoorLinePressure = 0.0 -- atm
-    self.OldBrakeLinePressure = 0.0
     self.BCPressure = 0
     -- Air distrubutor part
     self.WorkingChamberPressure = 5.2
@@ -304,7 +303,7 @@ function TRAIN_SYSTEM:Think(dT)
     -- Feed pressure to door line
     self.DoorLinePressure = self.TrainToBrakeReducedPressure * 0.90
     local trainLineConsumption_dPdT = 0.0
-    local wagc = Train:GetBLConnectedWagonCount()
+    local wagc = Train.CarCount and Train:GetBLConnectedWagonCount() or #Train.WagonList
     local HaveEPK = not Train.SubwayTrain or not Train.SubwayTrain.ARS or not Train.SubwayTrain.ARS.NoEPK
 
     local pr_speed = 1
@@ -581,9 +580,9 @@ function TRAIN_SYSTEM:Think(dT)
     ----------------------------------------------------------------------------
     -- Simulate compressor operation and train line depletion
     self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
-    self.TrainLinePressure = self.TrainLinePressure - Train.AirConsumeRatio*trainLineConsumption_dPdT*dT -- 0.190 --0.170 --0.07
-    if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency) end -- 0.04
-    self:equalizePressure(dT,"TrainLinePressure", 0,Train.AirLeakRatio)
+    self.TrainLinePressure = self.TrainLinePressure - (Train.AirConsumeRatio or 0.06)*trainLineConsumption_dPdT*dT -- 0.190 --0.170 --0.07
+    if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency or 0.07) end -- 0.04
+    self:equalizePressure(dT,"TrainLinePressure", 0,Train.AirLeakRatio or 0.003)
     -- Overpressure
     if self.TrainLinePressure > math.max(7.2, (9.2 - self.TrainLineOverpressureValve*0.2)) and self.TrainLineOverpressureValve%2 == 0 then self.TrainLineOverpressureValve = self.TrainLineOverpressureValve + 1 end
     if self.TrainLineOverpressureValve%2 == 1 then

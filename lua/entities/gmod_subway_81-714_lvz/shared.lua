@@ -196,6 +196,16 @@ function ENT:InitializeSounds()
     self.SoundNames["release2"] = {loop=true,"subway_trains/common/pneumatic/release_low.wav"}
     self.SoundPositions["release2"] = {350,1e9,Vector(-183,0,-70),0.4}
 
+    self.SoundNames["releasedl"] = {loop=true,"subway_trains/717/door_cyl/vdo_on.mp3"}
+    self.SoundPositions["releasedl"] = {150,20,Vector(282,62,12.5),1.5}
+    self.SoundNames["releasedr"] = {loop=true,"subway_trains/717/door_cyl/vdo2_on.mp3"}
+    self.SoundPositions["releasedr"] = {150,20,Vector(281,-62,12.8),1.5}
+
+    self.SoundNames["dcyl_op_exh"] = "subway_trains/common/pneumatic/parking_brake_stop2.mp3"
+    self.SoundNames["dcyl_cl_exh"] = self.SoundNames["dcyl_op_exh"]
+    self.SoundPositions["dcyl_op_exh"] = {480,1e9,Vector(-420,45,-30),0.4}
+    self.SoundPositions["dcyl_cl_exh"] = {480,1e9,Vector(-420,45,-30),1.2}
+    
     self.SoundNames["parking_brake"] = {loop=true,"subway_trains/common/pneumatic/parking_brake.wav"}
     self.SoundNames["parking_brake_en"] = "subway_trains/common/pneumatic/parking_brake_stop.mp3"
     self.SoundNames["parking_brake_rel"] = "subway_trains/common/pneumatic/parking_brake_stop2.mp3"
@@ -343,7 +353,7 @@ function ENT:InitializeSystems()
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_714_Panel")
     -- Пневмосистема 81-710
-    self:LoadSystem("Pneumatic","81_714_Pneumatic",{br013_1 = true})
+    self:LoadSystem("Pneumatic","81_714_NewPneumatic",{br013_1 = true})
     -- Everything else
     self:LoadSystem("Battery")
     self:LoadSystem("PowerSupply","BPSN")
