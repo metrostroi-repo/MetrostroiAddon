@@ -208,11 +208,11 @@ Common.717.AUTOSTOP             = Engage emergency stop valve
 
 Common.717.HOD                  = Manually open
 Common.717.HCD                  = Manually close
-Common.717.HDLK                 = Lock doors
-Common.717.DoorReleaseExt       = First door manual open valve
-Common.717.DoorReleaseLeft      = Emergency left doors manual open valve
-Common.717.DoorReleaseRight     = Emergency right doors manual open valve
-Common.717.DVR87                = Door air distrubutor disconnect valve
+Common.717.HDLK                 = Doors lock
+Common.717.DoorReleaseExt       = First right door emergency open valve
+Common.717.DoorReleaseLeft      = Left doors emergency open valve
+Common.717.DoorReleaseRight     = Right doors emergency open valve
+Common.717.DVR87                = Doors air distrubutor disconnect valve
 
 #gmod_subway_81-717
 Entities.gmod_subway_81-717_mvm.Buttons.Battery_C.1:UOSToggle   = @[Common.ALL.UOS]

@@ -2210,7 +2210,7 @@ function ENT:ButtonEvent(button,state,ply)
     if ShouldFireEvents(self.ButtonBuffer[button],state) then
         if state == false and not self:OnButtonRelease(button,ply) then
             self:TriggerInput(button,0.0)
-            if button:match("LineIsolationToggle") then self:UpdateIsolationConnectedCarCounter(button:sub(-24,-20)) end
+            if button:match("LineIsolationToggle") and self.CarCount then self:UpdateIsolationConnectedCarCounter(button:sub(-24,-20)) end
         elseif state ~= false and not self:OnButtonPress(button,ply) then
             self:TriggerInput(button,1.0)
             if self.Plombs and button:sub(-2,-1) == "Pl" and self.Plombs[button:sub(1,-3)]  then
