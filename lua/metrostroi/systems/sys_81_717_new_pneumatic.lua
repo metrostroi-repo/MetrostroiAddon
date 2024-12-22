@@ -60,6 +60,7 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.PN2 = 0
     self.cranPres = 0
     self.KM013offset    = 5.2
+    self.km013_overcharge = false
 
     --DKPT
     self.Train:LoadSystem("DKPT","Relay","R-52B") --
@@ -232,6 +233,8 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         --PrintMessage(HUD_PRINTTALK, Format("Вагон %u; ВЗ-1: %.1f; ВЗ-2: %.1f",self.Train:GetWagonNumber(),self.GN1Offset or 0,self.GN2Offset or 0))
     elseif name == "KM013offset" then
         self.KM013offset = value
+    elseif name == "KM013Over" then
+        self.km013_overcharge = value
     elseif name == "Autostop" then
         local HaveUAVA = not self.Train.SubwayTrain or not self.Train.SubwayTrain.ARS or not self.Train.SubwayTrain.ARS.NoUAVA
         if HaveUAVA and self.Train.UAVA.Value == 0 then
@@ -537,7 +540,7 @@ function TRAIN_SYSTEM:Think(dT)
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.BrakeLinePressure_dPdT)
         trainLineConsumption_dPdT = trainLineConsumption_dPdT + math.max(0,self.ReservoirPressure_dPdT)*0.05
     else
-        pr_speed = 2.8--1.25*wagc --2
+        pr_speed = 2.8
         local pz_speed
         -- wagc | pr_speed
         ------------------
@@ -563,12 +566,11 @@ function TRAIN_SYSTEM:Think(dT)
                 end
             end
             ---------------debug---------------------]]                
-            --local frc = 0.4--0.35
-        --if Train.EPK.Value > 0 or self.EmergencyValve or self.BrakeLineOpen then pz_speed = pr_speed*0.75 else pz_speed = pr_speed*1.3 end
+            --local frc = 0.4--0.35                         = 2.1                           = 3.64
         if self.Leak or self.BrakeLineOpen then pz_speed = pr_speed*0.75 else pz_speed = pr_speed*1.3 end
         self.BLDisconnect = self.DisconnectType and Train.DriverValveBLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
         self.TLDisconnect = self.DisconnectType and Train.DriverValveTLDisconnect.Value > 0 or Train.DriverValveDisconnect.Value > 0
-        if self.RealDriverValvePosition > 4 and not self.km13_error2 then self.km13_error2 = 0.7 end
+        if self.km013_overcharge and self.RealDriverValvePosition > 4 and not self.km13_error2 then self.km13_error2 = math.random()*0.3+0.4 end
         -- 013: 1 Overcharge
         if (self.RealDriverValvePosition == 1) and self.BLDisconnect and (self.TLDisconnect or self.BrakeLinePressure > self.TrainLinePressure) then
 	        self:equalizePressure(dT,"BrakeLinePressure", math.min(6.4,self.TrainLinePressure), pr_speed, pz_speed, nil, 1.0)
@@ -585,22 +587,22 @@ function TRAIN_SYSTEM:Think(dT)
 
         -- 013: 3 4.3 Atm
         if (self.RealDriverValvePosition == 3) and self.BLDisconnect and (self.TLDisconnect or self.BrakeLinePressure > math.min(4.3,self.TrainToBrakeReducedPressure)) then
-            self:equalizePressure(dT,"BrakeLinePressure", math.min(4.3,self.TrainToBrakeReducedPressure), pr_speed,pz_speed, nil, 2.5)
+            self:equalizePressure(dT,"BrakeLinePressure", math.min(4.3,self.TrainToBrakeReducedPressure), pr_speed*1.5,pz_speed, nil, 2.5)
         end
 
         -- 013: 4 4.0 Atm
         if (self.RealDriverValvePosition == 4) and self.BLDisconnect and (self.TLDisconnect or self.BrakeLinePressure > math.min(4.0,self.TrainToBrakeReducedPressure)) then
-            self:equalizePressure(dT,"BrakeLinePressure", math.min(4.0,self.TrainToBrakeReducedPressure), pr_speed,pz_speed, nil, 2.5)
+            self:equalizePressure(dT,"BrakeLinePressure", math.min(4.0,self.TrainToBrakeReducedPressure), pr_speed*1.5,pz_speed, nil, 2.5)
         end
 
         -- 013: 5 3.7 Atm
         if (self.RealDriverValvePosition == 5) and self.BLDisconnect and (self.TLDisconnect or self.BrakeLinePressure > math.min(3.7,self.TrainToBrakeReducedPressure)) then
-            self:equalizePressure(dT,"BrakeLinePressure", math.min(3.7,self.TrainToBrakeReducedPressure), pr_speed,pz_speed, nil, 2.5)
+            self:equalizePressure(dT,"BrakeLinePressure", math.min(3.7,self.TrainToBrakeReducedPressure), pr_speed*1.5,pz_speed, nil, 2.5)
         end
 
         -- 013: 6 3.0 Atm
         if (self.RealDriverValvePosition == 6) and self.BLDisconnect and (self.TLDisconnect or self.BrakeLinePressure > math.min(3.0,self.TrainToBrakeReducedPressure)) then
-            self:equalizePressure(dT,"BrakeLinePressure", math.min(3.0,self.TrainToBrakeReducedPressure), pr_speed,pz_speed, nil, 2.5)
+            self:equalizePressure(dT,"BrakeLinePressure", math.min(3.0,self.TrainToBrakeReducedPressure), pr_speed*1.5,pz_speed, nil, 2.5)
         end
 
         -- 013: 7 0.0 Atm

@@ -250,6 +250,7 @@ function ENT:TrainSpawnerUpdate()
     local offs = math.random(1,3)
     if self:GetNW2Int("RetainerLoad",1) == 5 then self:SetNW2Int("RetainerLoad",math.random(1,4)) end
     self.Pneumatic:TriggerInput("KM013offset",5.0 + 0.1*(offs-1))
+    self.Pneumatic:TriggerInput("KM013Over",math.random()>0.92)
     self.Pneumatic:TriggerInput("VZ1Offset",0.8)
     self.Pneumatic:TriggerInput("VZ2Offset",2.4)
     self.CompressorEfficiency = math.random()*0.05 + 0.02
