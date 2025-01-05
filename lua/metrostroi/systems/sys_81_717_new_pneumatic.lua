@@ -451,15 +451,17 @@ function TRAIN_SYSTEM:Think(dT)
     if self.ValveType == 1 then
         self.BLDisconnect = Train.DriverValveBLDisconnect.Value > 0
         self.TLDisconnect = Train.DriverValveTLDisconnect.Value > 0 and self.RealDriverValvePosition ~= 3
-        pr_speed = 1*wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6)
+        pr_speed = 1*6--wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6)
         if self.TLDisconnect then self.TLDisconnectPressure = self.TrainLinePressure end
         if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
         -- 334: 1 Fill reservoir from train line, fill brake line from train line
         if (self.RealDriverValvePosition == 1) then
             if self.TLDisconnect or self.ReservoirPressure ~= self.TLDisconnectPressure then
                 if self.BLDisconnect then
-                    self.ReservoirPressure = self.BrakeLinePressure
-                    self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, pr_speed*(pr_speed < wagc and 1 or 1.35),nil,nil,2)--0.7
+                    self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 1.4,nil,nil,2)
+                    self:equalizePressure(dT,"ReservoirPressure", self.BrakeLinePressure, 0,1.2,nil,2)
+                    self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, 6.0,nil,nil,0.2)
+                    --self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, pr_speed*(pr_speed < wagc and 1 or 1.35),nil,nil,2)
                 else
                     self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 3.55,nil,nil,2)
                 end
@@ -472,7 +474,8 @@ function TRAIN_SYSTEM:Think(dT)
                 local a = 1
                 if self.EmergencyValve or Train.EmergencyBrakeValve.Value > 0.5 then a = 1.85 end
                 if self.BLDisconnect then
-                    self.ReservoirPressure = self.BrakeLinePressure
+                    --self.ReservoirPressure = self.BrakeLinePressure
+                    self:equalizePressure(dT,"ReservoirPressure", self.BrakeLinePressure,6,nil,nil,2)
                     self:equalizePressure(dT,"BrakeLinePressure", self.TrainToBrakeReducedPressure, pr_speed*0, pr_speed*0.6*a, nil, 1.6)
                     self.ReservoirPressure_dPdT = self.BrakeLinePressure_dPdT*0.8 
                 else
@@ -497,17 +500,17 @@ function TRAIN_SYSTEM:Think(dT)
         -- 334: 5 Reservoir and brake line open to atmosphere
         if (self.RealDriverValvePosition == 5) then
             self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate5)--,nil,nil,2)--1.70
-            local pr_speed = 1.25*wagc
+            local pr_speed = 1.25*6--wagc
             if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
             if self.BLDisconnect then
                 if self.Leak then pr_speed = pr_speed*6.2 end
                 self:equalizePressure(dT,"BrakeLinePressure", 0.0, pr_speed,nil,nil,2)
             end
         end
-        -- утечка через неплотность уравнительного поршня
+        -- утечка через неплотность уравнительного поршня (реальный говнокод; очень хотелось бы переписать)
         if self.BLDisconnect then self:equalizePressure(dT, "ReservoirPressure", self.BrakeLinePressure, 0.06, 0) end
         if (self.RealDriverValvePosition > 2) and (self.RealDriverValvePosition < 5) then
-            local pr_speed = 1.25*wagc
+            local pr_speed = 1.25*6--wagc
             if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
             local _a = 0
             for _i = 1, #Train.WagonList do
@@ -626,7 +629,7 @@ function TRAIN_SYSTEM:Think(dT)
                 self:equalizePressure(dT,"EPKPressure", self.BrakeLinePressure,math.min(1,epkDiff)*6, math.min(1,epkDiff)*16,false,4*epkDiff*2)
             end
             if self.EPKPressure<self.BrakeLinePressure and math.abs(self.EPKPressure-self.BrakeLinePressure)>0.3 then
-                leak = self:equalizePressure(dT,"BrakeLinePressure", self.EPKPressure,pr_speed*epkDiff/3.8,pr_speed*epkDiff/3.28)
+                leak = self:equalizePressure(dT,"BrakeLinePressure", self.EPKPressure,pr_speed*epkDiff/1.2,pr_speed*epkDiff/3.28)
             end
             self.Leak = self.Leak or leak<-0.1
         end
@@ -651,7 +654,7 @@ function TRAIN_SYSTEM:Think(dT)
     local leak = 0
     if self.EmergencyValve then
         local leakst = self.BLDisconnect and math.max(0.3,math.log(self.BrakeLinePressure,1.2) - 2.0) or math.max(1.6,math.log(0.63*self.BrakeLinePressure,1.15))
-        leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst*wagc/6)--,false,false,10)
+        leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst*(0.68+0.07*wagc))
         if Train.UAVA.Value > 0 or (self.BrakeLinePressure < 1.8 and Train.AutostopValve.Value == 0) then	--пока держим ЛКМ нажатой, срывной клапан открыт
             self.EmergencyValveDisable = true
         end
@@ -774,7 +777,7 @@ function TRAIN_SYSTEM:Think(dT)
 	local LeftRelease = Train.DoorReleaseLeft.Value == 0
 	local RightRelease = Train.DoorReleaseRight.Value == 0
 	local _1stRightRelease = Train.DoorReleaseExtra.Value == 0
-    if self.DoorLinePressure >= 1.9 then	--was > 2.6
+    if self.DoorLinePressure >= 1.4 then	--was > 2.6
         -- Simulate DVR engage lag
         if Train.VDOL.Value == 1.0 and not Train.VDOLEnergized then
             Train.VDOLEnergized = true
@@ -831,18 +834,18 @@ function TRAIN_SYSTEM:Think(dT)
     self:equalizePressure(dT,"_1stRightDoorCloseCylPressure", not self.DoorRight and _1stRightRelease and RightRelease and self.DoorLinePressure or 0.0, 2.2, 10)
     self:equalizePressure(dT,"LeftDoorOpenCylPressure", self.DoorLeft and self.DoorLinePressure or 0.0, 2.2, 10)
     self:equalizePressure(dT,"LeftDoorCloseCylPressure", not self.DoorLeft and LeftRelease and self.DoorLinePressure or 0.0, 2.2, 10)
-    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorOpenCylPressure_dPdT*0.005)
-    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorOpenCylPressure_dPdT*0.005)
-    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorCloseCylPressure_dPdT*0.005)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorOpenCylPressure_dPdT*0.01)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorOpenCylPressure_dPdT*0.01)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.RightDoorCloseCylPressure_dPdT*0.01)
     self.DoorLinePressure = self.DoorLinePressure-math.max(0,self._1stRightDoorCloseCylPressure_dPdT*0.002)
-    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorCloseCylPressure_dPdT*0.005)
+    self.DoorLinePressure = self.DoorLinePressure-math.max(0,self.LeftDoorCloseCylPressure_dPdT*0.01)
     Train:SetPackedRatio("RightDoorCloseCylPressure_dPdT",not RightRelease and self.RightDoorCloseCylPressure_dPdT or 0)
     Train:SetPackedRatio("LeftDoorCloseCylPressure_dPdT",not LeftRelease and self.LeftDoorCloseCylPressure_dPdT or 0)
     Train:SetPackedRatio("_1stRightDoorCloseCylPressure_dPdT",not _1stRightRelease and self._1stRightDoorCloseCylPressure_dPdT or 0)
 	if self.DoorReleaseRightPrevious ~= Train.DoorReleaseRight.Value then
 		self.DoorReleaseRightPrevious = Train.DoorReleaseRight.Value
 		if not self.DoorRight and self.DoorReleaseRightPrevious == 1 then
-			self:equalizePressure(dT,"RightDoorCloseCylPressure", 0, 3)		--was DoorLinePressure
+			self:equalizePressure(dT,"RightDoorCloseCylPressure", 0, 6)		--was DoorLinePressure
 		end
 	end
 	if self.DoorReleaseExtraPrevious ~= Train.DoorReleaseExtra.Value then
@@ -920,9 +923,9 @@ function TRAIN_SYSTEM:Think(dT)
         --    (self.DoorLinePressure > 1.0 and (math.Round(self.RightDoorOpenCylPressure - (i == 1 and self._1stRightDoorCloseCylPressure or self.RightDoorCloseCylPressure),1))*0.36*(not (rmOpen or rmClose) and self.RightDoorSpeed[i] or 1) or 0))*dT or 0),self.RightDoorStuck[i] and 0.3 or 0,1)
         
         self.LeftDoorState[i] = math.Clamp(self.LeftDoorState[i] + (not llocked and ((lmOpen and 1.5 or lmClose and -1.5 or 0) +
-            (self.DoorLinePressure > 1.0 and (self.LeftDoorOpenCylPressure - self.LeftDoorCloseCylPressure)*0.36*(not (lmOpen or lmClose) and self.LeftDoorSpeed[i] or 1) or 0))*dT or 0),self.LeftDoorStuck[i] and 0.3 or 0,1)
+            (self.DoorLinePressure > 1.4 and (self.LeftDoorOpenCylPressure - self.LeftDoorCloseCylPressure)*0.36*(not (lmOpen or lmClose) and self.LeftDoorSpeed[i] or 1) or 0))*dT or 0),self.LeftDoorStuck[i] and 0.3 or 0,1)
         self.RightDoorState[i] = math.Clamp(self.RightDoorState[i] + (not rlocked and ((rmOpen and 1.5 or rmClose and -1.5 or 0) +
-            (self.DoorLinePressure > 1.0 and (self.RightDoorOpenCylPressure - (i == 1 and self._1stRightDoorCloseCylPressure or self.RightDoorCloseCylPressure))*0.36*(not (rmOpen or rmClose) and self.RightDoorSpeed[i] or 1) or 0))*dT or 0),self.RightDoorStuck[i] and 0.3 or 0,1)
+            (self.DoorLinePressure > 1.4 and (self.RightDoorOpenCylPressure - (i == 1 and self._1stRightDoorCloseCylPressure or self.RightDoorCloseCylPressure))*0.36*(not (rmOpen or rmClose) and self.RightDoorSpeed[i] or 1) or 0))*dT or 0),self.RightDoorStuck[i] and 0.3 or 0,1)
         if not Train.LeftDoorsOpen and self.LeftDoorState[i] > 0.02 then	--was 0.06
             Train.LeftDoorsOpen = true
         end
