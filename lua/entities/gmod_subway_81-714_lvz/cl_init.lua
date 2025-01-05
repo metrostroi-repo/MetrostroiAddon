@@ -1400,7 +1400,7 @@ function ENT:Think()
             local id,sid = st..(i+1),"door"..i.."x"..k
             local state = self:GetPackedRatio(id)
 			local prevstate = self.DSprev[i+1][k+1]
-			if (prevstate ~= state) then
+            if math.abs(prevstate - state) > 0.01 then
                 self.DoorLoopStates[id] = math.Clamp((self.DoorLoopStates[id] or 0) + 2*self.DeltaTime,0,1)
 				self.DoorDelta[i+1][k+1] = 0.0
 			else
