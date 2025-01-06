@@ -1444,7 +1444,7 @@ function ENT:Think()
 
     if not self.DoorStates then self.DoorStates = {} end
     if not self.DoorLoopStates then self.DoorLoopStates = {} end
-	if not self.DSprev then self.DSprev = {{},{},{},{}} end
+	if not self.DSprev then self.DSprev = {{1,1},{1,1},{1,1},{1,1}} end
 	if not self.DoorDelta then self.DoorDelta = {{0.0,0.0},{0.0,0.0},{0.0,0.0},{0.0,0.0}} end
     for i=0,3 do
         for k=0,1 do
