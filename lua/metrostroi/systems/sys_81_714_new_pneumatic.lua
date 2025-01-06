@@ -464,7 +464,7 @@ function TRAIN_SYSTEM:Think(dT)
         -- утечка через неплотность уравнительного поршня
         if self.BLDisconnect then self:equalizePressure(dT, "ReservoirPressure", self.BrakeLinePressure, 0.06, 0) end
         if (self.RealDriverValvePosition > 2) and (self.RealDriverValvePosition < 5) then
-                        local pr_speed = 1.25*6--wagc
+            local pr_speed = 1.25*6--wagc
             if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
             local _a = 0
             for _i = 1, #Train.WagonList do
