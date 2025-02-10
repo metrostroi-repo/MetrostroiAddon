@@ -23,7 +23,7 @@ Spawner.717.Type        = maTarebiLis varianTi
 Spawner.717.BodyType    = karkasis varianTi
 Spawner.717.MVM         = МВМ
 Spawner.717.LVZ         = ЛВЗ
-Spawner.717.MaskType    = Тип маски
+Spawner.717.MaskType    = farebis varianti
 Spawner.717.CranType    = memanqanis kranis varianTi
 Spawner.717.LampType    = ganetebis varianTi
 Spawner.717.Lamp1       = ЛПВ-02
@@ -63,8 +63,8 @@ Common.717.RZPL                 = РЗП: kvebis bLokis dacvis reLei
 Common.717.VPAOn                = ВПА: maTarebLis aparaTuris chartva
 Common.717.VPAOff               = ВПА: maTarebLis aparaTuris gamortva
 Common.717.VZD                  = ВЗД: karebis chamkeTi
-Common.717.VKST                 = ВКСТ: Выключатель контроля состояния тормозов 
-Common.717.IST                  = ИСТ: Индикатор состояния тормозов
+Common.717.VKST                 = ВКСТ: muxruchis mdgomareobis kontrolis gatishva
+Common.717.IST                  = ИСТ: muxruchis mdgomareobis indikatori
 
 Common.717.A53                  = А53: damxmare konTaqTorebi
 Common.717.A56                  = А56: baTarea
@@ -166,11 +166,11 @@ Common.717.RC2                  = РЦ-2: avTodraivis sisTemis moxsna
 Common.717.VAU                  = ВАУ: avTodraivis sisTemis chamrtveLi
 
 Common.717.LampDV               = ДВ: roTaciis sensoris gaumartaoba
-Common.717.ARSL20               = sichqaris shezghudva 20 km / st
-Common.717.ARSL40               = sichqaris shezghudva 40 km / st
-Common.717.ARSL60               = sichqaris shezghudva 60 km / st
-Common.717.ARSL70               = sichqaris shezghudva 70 km / st
-Common.717.ARSL80               = sichqaris shezghudva 80 km / st
+Common.717.ARSL20               = sichqaris shezghudva 20 km/st
+Common.717.ARSL40               = sichqaris shezghudva 40 km/st
+Common.717.ARSL60               = sichqaris shezghudva 60 km/st
+Common.717.ARSL70               = sichqaris shezghudva 70 km/st
+Common.717.ARSL80               = sichqaris shezghudva 80 km/st
 
 Common.PUAV.K16                 = ЛК16: eLeqTroenergiis miwodeba naturaze 16 (karis daxurva)
 Common.PUAV.OS                  = ЛОС: ПУАВ sisTemis sichqaris shezghudvis rezhimis natura
