@@ -38,7 +38,7 @@ Common.718.KDLR     = marcxena karebis sarezervo gaxsna
 Common.718.UOS      = УОС: sichqaris shemzghudveLi mowyobiLoba (martva ЭПК\\ЭПВ gareshe)
 
 Common.718.KES      = КЭС: gadaudebeLi komunikaciis martvis natura
-Common.718.CUV      = ЦУВ: ЦУВ-is ar chartvis natura vagonze
+Common.718.CUV      = ЦУВ: ЦУВ-is ar chartvis vagonze natura
 Common.718.AIP      = АИП: xandzris gamafrtxiLebeLi natura (maTarebLis cecxLi)
 Common.718.RIP      = РИП: xandzris indikaciis natura
 Common.718.VS1      = ВС1: natura I jgufi venTiLaciis gamortvis
@@ -191,44 +191,44 @@ Common.718.MALP1DIF      = @[Common.718.MALP1]: I da II jgufebis dzabvis sxvaoba
 Common.718.MALP1650      = @[Common.718.MALP1]: Ток якоря I группы выше 650А
 Common.718.MALP10        = @[Common.718.MALP1]: Якорный ток I группы отсутствует
 Common.718.MALP1ARS      = @[Common.718.MALP1]: sixshiris dawyebis darghveva
-Common.718.MALP1ITA      = @[Common.718.MALP1]: Пробой тормозного тиристора I группы > 100А
-Common.718.MALP1TR       = @[Common.718.MALP1]: Наличие в I группе реостатного тока > 100А
+Common.718.MALP1ITA      = @[Common.718.MALP1]: I jgufis damuxruchebis tiristoris dashla > 100A
+Common.718.MALP1TR       = @[Common.718.MALP1]: reaostatikuri denis arseboba I jgufshi > 100A
 Common.718.MALP1SN       = @[Common.718.MALP1]: dzabvis sqema ar aris awyobiLi
 Common.718.MALP1VN       = @[Common.718.MALP1]: venTiLaTorebis gaumartavoba
 
 
 Common.718.MVDOTK        = @[Common.718.MVD]: gaumartaobis rezhimebi
-Common.718.MVDRP         = @[Common.718.MVD]: Сработка РП
+Common.718.MVDRP         = @[Common.718.MVD]: РП-s amoqmebeda
 
 Common.718.MALP2MSU      = @[Common.718.MALP1]: parameTrebi chamoyra
 Common.718.MALP2800      = @[Common.718.MALP1]: muxTi qseLshi 800v
 Common.718.MALP2975      = @[Common.718.MALP1]: maqsimaLuri dzabvis sakonTaqTo qseLshi
-Common.718.MALP250       = @[Common.718.MALP1]: Наличие тока якоря II группы
-Common.718.MALP2650      = @[Common.718.MALP1]: Ток якоря II группы выше 650А
-Common.718.MALP20        = @[Common.718.MALP1]: Якорный ток II группы отсутствует
+Common.718.MALP250       = @[Common.718.MALP1]: II jgufis armaturis denis arseboba
+Common.718.MALP2650      = @[Common.718.MALP1]: II jgufis armaturis deni 650A zemot
+Common.718.MALP20        = @[Common.718.MALP1]: II jgufis armaturis deni ar aris
 Common.718.MALP2BV       = @[Common.718.MALP1]: БВ-s amoqmedeba
-Common.718.MALP2ITB      = @[Common.718.MALP1]: Пробой тормозного тиристора II группы > 100А
+Common.718.MALP2ITB      = @[Common.718.MALP1]: II jgufis damuxruchebis tiristoris dashla > 100A
 
 Common.718.MGRTP1        = @[Common.718.MGR]: 1 panTografis dachera
 Common.718.MGRTP3        = @[Common.718.MGR]: 3 panTografis dachera
-Common.718.MGRKHA        = @[Common.718.MGR]: Включение контакторов хода I группы
-Common.718.MGRKTA        = @[Common.718.MGR]: Включение контакторов тормоза I группы
+Common.718.MGRKHA        = @[Common.718.MGR]: svlis I jgufis kontaqtoris chartva
+Common.718.MGRKTA        = @[Common.718.MGR]: muxruchis I jgufis kontaqtoris chartva
 Common.718.MGRTP2        = @[Common.718.MGR]: 2 panTografis dachera
 Common.718.MGRTP4        = @[Common.718.MGR]: 4 panTografis dachera
-Common.718.MGRKHB        = @[Common.718.MGR]: Включение контакторов хода II группы
-Common.718.MGRKTB        = @[Common.718.MGR]: Включение контакторов тормоза II группы
-Common.718.MGRKRV        = @[Common.718.MGR]: Включение контакторов реверса вперёд
-Common.718.MGRNV         = @[Common.718.MGR]: Неисправность вентилятора ПТТИ
+Common.718.MGRKHB        = @[Common.718.MGR]: svlis II jgufis kontaqtoris chartva
+Common.718.MGRKTB        = @[Common.718.MGR]: II jgufis kontaqtoris chartva
+Common.718.MGRKRV        = @[Common.718.MGR]: reversis win kontaqtoris chartva
+Common.718.MGRNV         = @[Common.718.MGR]: ПТТИ ventilaciis gaumartaoba
 Common.718.MGRBV         = @[Common.718.MGR]: БВ chartuLia
-Common.718.MGRLK         = @[Common.718.MGR]: Включение линейного контактора
-Common.718.MGRKRN        = @[Common.718.MGR]: Включение контакторов реверса назад
+Common.718.MGRLK         = @[Common.718.MGR]: xazis kontaqtoris chartva
+Common.718.MGRKRN        = @[Common.718.MGR]: reversis ukan kontaqtoris chartva
 
 Common.718.MLUAKT        = @[Common.718.MLU]: muxruchis brdzaneba
 Common.718.MLUAXH        = @[Common.718.MLU]: svLis brdzaneba
-Common.718.MLUAVP        = @[Common.718.MLU]: Команда включения реверса вперёд
-Common.718.MLUANZ        = @[Common.718.MLU]: Команда включения реверса назад
+Common.718.MLUAVP        = @[Common.718.MLU]: reversis win chartvis brdzaneba
+Common.718.MLUANZ        = @[Common.718.MLU]: reversis ukan chartvis brdzaneba
 Common.718.MLUASS        = @[Common.718.MLU]: awyobiLi sqemis signaLi
-Common.718.MLUAPV        = @[Common.718.MLU]: Команда включения подвозбудителя
+Common.718.MLUAPV        = @[Common.718.MLU]: agznebis gaaqtuirebis brdzaneba
 Common.718.MLUALK        = @[Common.718.MLU]: xazis konTaqToris daxurvis brdzaneba
 
 Common.718.MUVK1V1       = @[Common.718.MUVK]: chanacvLebis sarqvLis spiraLis konTroLi №1
