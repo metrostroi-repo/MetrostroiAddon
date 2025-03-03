@@ -526,7 +526,7 @@ function TRAIN_SYSTEM:Think(dT)
         end
 
         if not self.TLDisconnect then
-            self.TLDisconnectPressure = math.max(0,self.TLDisconnectPressure - math.abs(self.ReservoirPressure_dPdT)*dT)
+            self.TLDisconnectPressure = math.max(0,self.TLDisconnectPressure - math.abs(self.ReservoirPressure_dPdT)*0.074)
         end
         self.ReservoirPressure_dPdT = self.ReservoirPressure_dPdT + self.BrakeLinePressure_dPdT*0.2
         Train:SetPackedRatio("ReservoirPressure_dPdT",self.ReservoirPressure_dPdT/wagc*2)
