@@ -453,17 +453,25 @@ function TRAIN_SYSTEM:Think(dT)
         self.TLDisconnect = Train.DriverValveTLDisconnect.Value > 0 and self.RealDriverValvePosition ~= 3
         pr_speed = 1*6--wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6)
         if self.TLDisconnect then self.TLDisconnectPressure = self.TrainLinePressure end
+        if self.BLDisconnect then self.BLDisconnectPressure = self.BrakeLinePressure end
         if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
         -- 334: 1 Fill reservoir from train line, fill brake line from train line
         if (self.RealDriverValvePosition == 1) then
-            if self.TLDisconnect or self.ReservoirPressure ~= self.TLDisconnectPressure then
+            if self.TLDisconnect or self.ReservoirPressure ~= self.TLDisconnectPressure  or self.ReservoirPressure ~= self.BLDisconnectPressure then
                 if self.BLDisconnect then
-                    self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 1.4,nil,nil,2)
-                    self:equalizePressure(dT,"ReservoirPressure", self.BrakeLinePressure, 0,1.2,nil,2)
-                    self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, 6.0,nil,nil,0.2)
+                    if self.TLDisconnect then
+                        self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 0, 1.0,nil,2)
+                        self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, 0, 6.0,nil,0.2)
+                    end
+                    if not self.TLDisconnect then
+                        self:equalizePressure(dT,"TLDisconnectPressure", self.BrakeLinePressure, 16, 0,nil,2)
+                        self:equalizePressure(dT,"ReservoirPressure", self.BrakeLinePressure, 0.4, 0.06,nil,2)
+                        self:equalizePressure(dT,"BrakeLinePressure", self.ReservoirPressure, 6.5, 0,nil,0.2)
+                    end
                     --self:equalizePressure(dT,"BrakeLinePressure", self.TLDisconnectPressure, pr_speed*(pr_speed < wagc and 1 or 1.35),nil,nil,2)
                 else
-                    self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 3.55,nil,nil,2)
+                    self:equalizePressure(dT,"ReservoirPressure", self.TLDisconnectPressure, 0, self.TLDisconnect and 3.55 or 2.0,nil,2)
+                    self:equalizePressure(dT,"TLDisconnectPressure", self.ReservoirPressure, 16, 0,nil,2)
                 end
             end
         end
@@ -472,11 +480,11 @@ function TRAIN_SYSTEM:Think(dT)
         if (self.RealDriverValvePosition == 2) then
             if self.TLDisconnect then
                 local a = 1
-                if self.EmergencyValve or Train.EmergencyBrakeValve.Value > 0.5 then a = 1.85 end
+                if self.EmergencyValve or Train.EmergencyBrakeValve.Value > 0.5 then a = 4 end
                 if self.BLDisconnect then
                     --self.ReservoirPressure = self.BrakeLinePressure
-                    self:equalizePressure(dT,"ReservoirPressure", self.BrakeLinePressure,6,nil,nil,2)
-                    self:equalizePressure(dT,"BrakeLinePressure", self.TrainToBrakeReducedPressure, pr_speed*0, pr_speed*0.6*a, nil, 1.6)
+                    self:equalizePressure(dT,"ReservoirPressure", self.BrakeLinePressure,6,0.8,nil,2)
+                    self:equalizePressure(dT,"BrakeLinePressure", self.TrainToBrakeReducedPressure, pr_speed*0, pr_speed*0.3*a, nil, 1.6)
                     self.ReservoirPressure_dPdT = self.BrakeLinePressure_dPdT*0.8 
                 else
                     self:equalizePressure(dT,"ReservoirPressure", self.TrainToBrakeReducedPressure,0,1.55,nil,2)
@@ -490,11 +498,11 @@ function TRAIN_SYSTEM:Think(dT)
             self:equalizePressure(dT,"ReservoirPressure", 0.00, 0.001)
         end
 
-        local res_dischrg_rate4 = self.BLDisconnect and 0.55 or 8
+        local res_dischrg_rate4 = 0.28--self.BLDisconnect and 0.55 or 1
         local res_dischrg_rate5 = self.BLDisconnect and 1.12 or 8
         -- 334: 4 Reservoir open to atmosphere, brake line equalizes with reservoir
         if (self.RealDriverValvePosition == 4) then
-            self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate4, nil,nil,6)--0.35)-0.55
+            self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate4, nil,nil,1)--0.35)-0.55
         end
 
         -- 334: 5 Reservoir and brake line open to atmosphere
@@ -507,27 +515,28 @@ function TRAIN_SYSTEM:Think(dT)
                 self:equalizePressure(dT,"BrakeLinePressure", 0.0, pr_speed,nil,nil,2)
             end
         end
-        -- утечка через неплотность уравнительного поршня (а ниже реальный говнокод; очень хотелось бы переписать)
+        -- утечка через неплотность уравнительного поршня
         if self.BLDisconnect then self:equalizePressure(dT, "ReservoirPressure", self.BrakeLinePressure, 0.06, 0) end
-        if (self.RealDriverValvePosition > 2) and (self.RealDriverValvePosition < 5) then
+
+        if (self.RealDriverValvePosition > 1) and (self.RealDriverValvePosition < 5) then
             local pr_speed = 1.25*6--wagc
             if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
             local _a = 0
-            for _i = 1, #Train.WagonList do
-                if Train.WagonList[_i].Pneumatic.TLDisconnect and Train.WagonList[_i].Pneumatic.BLDisconnect and (Train.WagonList[_i].Pneumatic.RealDriverValvePosition == 2 or Train.WagonList[_i].Pneumatic.RealDriverValvePosition == 1) then
+            for k,v in ipairs(Train.WagonList) do
+                if v.Pneumatic.TLDisconnect and v.Pneumatic.BLDisconnect and (v.Pneumatic.RealDriverValvePosition == 2 or v.Pneumatic.RealDriverValvePosition == 1) then
                     _a = _a + 1
                 end
-                if _a > 0 then break end
+                if _a > 1 then break end
             end
-            if _a > 0 then pr_speed = pr_speed*0.1 end
-            if self.BLDisconnect and self.BrakeLinePressure - self.ReservoirPressure > (self.RealDriverValvePosition == 3 and 0 or self.RealDriverValvePosition == 4 and 0.2 or 100) then      --0.2 bar is a piston sensitivity
+            if _a > 1 then pr_speed = pr_speed*0.1 end
+            if self.BLDisconnect and self.BrakeLinePressure - self.ReservoirPressure > (self.RealDriverValvePosition == 3 and 0 or 0.2) then      --0.2 bar is a piston sensitivity
                 self:equalizePressure(dT, "BrakeLinePressure", 0, pr_speed*math.abs(self.BrakeLinePressure - self.ReservoirPressure), nil, nil, 6)
             end
         end
 
-        if not self.TLDisconnect then
-            self.TLDisconnectPressure = math.max(0,self.TLDisconnectPressure - math.abs(self.ReservoirPressure_dPdT)*0.074)
-        end
+        --[[if not self.TLDisconnect then
+            self.TLDisconnectPressure = math.max(0,self.TLDisconnectPressure - math.abs(self.ReservoirPressure_dPdT)*0.8)
+        end]]
         self.ReservoirPressure_dPdT = self.ReservoirPressure_dPdT + self.BrakeLinePressure_dPdT*0.2
         Train:SetPackedRatio("ReservoirPressure_dPdT",self.ReservoirPressure_dPdT/wagc*2)
         --[[
