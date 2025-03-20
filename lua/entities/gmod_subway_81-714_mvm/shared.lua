@@ -370,6 +370,7 @@ function ENT:InitializeSystems()
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_714_Panel")
     -- Пневмосистема 81-710
+    self:LoadSystem("KM334")
     self:LoadSystem("Pneumatic","81_714_NewPneumatic",{br013_1 = true})
     -- Everything else
     self:LoadSystem("Battery")

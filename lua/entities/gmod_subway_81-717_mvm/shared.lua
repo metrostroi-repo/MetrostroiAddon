@@ -410,10 +410,14 @@ function ENT:InitializeSounds()
         "subway_trains/ezh3/pneumatic/brake_line_on.mp3",
         "subway_trains/ezh3/pneumatic/brake_line_on2.mp3",
     }
+    self.SoundNames["pneumo_TL_connect"] = {
+        "subway_trains/common/334/334_open.mp3",
+    }
     self.SoundNames["pneumo_TL_disconnect"] = {
         "subway_trains/common/334/334_close.mp3",
     }
     self.SoundPositions["pneumo_TL_open"] = {60,1e9,Vector(431.8,-24.1+1.5,-33.7),0.7}
+    self.SoundPositions["pneumo_TL_connect"] = {60,1e9,Vector(431.8,-24.1+1.5,-33.7),0.7}
     self.SoundPositions["pneumo_TL_disconnect"] = {60,1e9,Vector(431.8,-24.1+1.5,-33.7),0.7}
     self.SoundNames["pneumo_BL_disconnect"] = {
         "subway_trains/common/334/334_close.mp3",
@@ -835,7 +839,9 @@ function ENT:InitializeSystems()
     self:LoadSystem("PR_14X_Panels")
 
     -- Пневмосистема 81-710
+    self:LoadSystem("KM334")
     self:LoadSystem("Pneumatic","81_717_NewPneumatic")
+    
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_717_Panel")
     -- Everything else

@@ -727,7 +727,7 @@ function ENT:Think()
     self:SetNW2Int("KRUPosition", self.KRU.Position)
 
     if Pneumatic.ValveType == 1 then
-        self:SetPackedRatio("BLPressure", Pneumatic.ReservoirPressure/16.0)
+        self:SetPackedRatio("BLPressure", self.KM334.ResvPres/16.0)
     else
         self:SetPackedRatio("BLPressure", Pneumatic.BrakeLinePressure/16.0)
     end

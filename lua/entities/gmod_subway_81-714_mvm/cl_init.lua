@@ -1568,20 +1568,20 @@ function ENT:Think()
         end
         self:SetSoundState("crane013_brake2",math.Clamp(-self.CraneRamp*1.5-0.95,0,1.5)^2,1.0)
     else
-        self:SetSoundState("crane013_brake",0,1.0)
-        self:SetSoundState("crane013_release",0,1.0)
-        --self:SetSoundState("crane013_brake2",0,1.0)
-
-        self.CraneRamp = math.Clamp(self.CraneRamp + 8.0*((1*self:GetPackedRatio("Crane_dPdT",0))-self.CraneRamp)*dT,-1,1)
-
-        self:SetSoundState("crane334_brake_low",math.Clamp((-self.CraneRamp)*2,0,1)^2,1)
-        local high = math.Clamp(((-self.CraneRamp)-0.5)/0.5,0,1)^1
-        self:SetSoundState("crane334_brake_high",high,1.0)
-        self:SetSoundState("crane013_brake2",high*2,1.0)
-        self:SetSoundState("crane334_brake_eq_high",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.2,0,1)^0.8*1,1)
-        self:SetSoundState("crane334_brake_eq_low",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.4,0,1)^0.8*1.3,1)
-
-        self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
+        --self:SetSoundState("crane013_brake",0,1.0)
+        --self:SetSoundState("crane013_release",0,1.0)
+        ----self:SetSoundState("crane013_brake2",0,1.0)
+--
+        --self.CraneRamp = math.Clamp(self.CraneRamp + 8.0*((1*self:GetPackedRatio("Crane_dPdT",0))-self.CraneRamp)*dT,-1,1)
+--
+        --self:SetSoundState("crane334_brake_low",math.Clamp((-self.CraneRamp)*2,0,1)^2,1)
+        --local high = math.Clamp(((-self.CraneRamp)-0.5)/0.5,0,1)^1
+        --self:SetSoundState("crane334_brake_high",high,1.0)
+        --self:SetSoundState("crane013_brake2",high*2,1.0)
+        --self:SetSoundState("crane334_brake_eq_high",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.2,0,1)^0.8*1,1)
+        --self:SetSoundState("crane334_brake_eq_low",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.4,0,1)^0.8*1.3,1)
+--
+        --self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
     end
     local emergencyBrakeValve = self:GetPackedRatio("EmergencyBrakeValve_dPdT", 0)
     self.EmergencyBrakeValveRamp = math.Clamp(self.EmergencyBrakeValveRamp + (emergencyBrakeValve-self.EmergencyBrakeValveRamp)*dT*8,0,1)

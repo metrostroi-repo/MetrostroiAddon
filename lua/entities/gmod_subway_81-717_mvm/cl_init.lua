@@ -1809,7 +1809,7 @@ ENT.ButtonMap["DriverValveBLDisconnect"] = {
     buttons = {
         {ID = "DriverValveBLDisconnectToggle", x=0, y=0, w=200, h=100, tooltip="", model = {
             var="DriverValveBLDisconnect",sndid="brake_disconnect",
-            sndvol = 1, snd = function(val) return "disconnect_valve" end,
+            sndvol = 1, snd = function(val) return val and "pneumo_TL_connect" or "pneumo_TL_disconnect" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
             states={"Train.Buttons.Closed","Train.Buttons.Opened"},
         }},
@@ -1825,7 +1825,7 @@ ENT.ButtonMap["DriverValveTLDisconnect"] = {
     buttons = {
         {ID = "DriverValveTLDisconnectToggle", x=0, y=0, w=200, h=90, tooltip="", model = {
             var="DriverValveTLDisconnect",sndid="train_disconnect",
-            sndvol = 1, snd = function(val) return val and "pneumo_TL_open" or "pneumo_TL_disconnect" end,
+            sndvol = 1, snd = function(val) return val and "pneumo_TL_connect" or "pneumo_TL_disconnect" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
             states={"Train.Buttons.Closed","Train.Buttons.Opened"},
         }},
@@ -3621,20 +3621,20 @@ function ENT:Think()
         end
         self:SetSoundState("crane013_brake2",math.Clamp(-self.CraneRamp*1.5-0.95,0,1.5)^2,1.0)
     else
-        self:SetSoundState("crane013_brake",0,1.0)
-        self:SetSoundState("crane013_release",0,1.0)
-        --self:SetSoundState("crane013_brake2",0,1.0)
-
-        self.CraneRamp = math.Clamp(self.CraneRamp + 8.0*((1*self:GetPackedRatio("Crane_dPdT",0))-self.CraneRamp)*dT,-1,1)
-
-        self:SetSoundState("crane334_brake_low",math.Clamp((-self.CraneRamp)*2,0,1)^2,1)
-        local high = math.Clamp(((-self.CraneRamp)-0.5)/0.5,0,1)^1
-        self:SetSoundState("crane334_brake_high",high,1.0)
-        self:SetSoundState("crane013_brake2",high*2,1.0)
-        self:SetSoundState("crane334_brake_eq_high",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.2,0,1)^0.8*1,1)
-        self:SetSoundState("crane334_brake_eq_low",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.4,0,1)^0.8*1.3,1)
-
-        self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
+        --self:SetSoundState("crane013_brake",0,1.0)
+        --self:SetSoundState("crane013_release",0,1.0)
+        ----self:SetSoundState("crane013_brake2",0,1.0)
+--
+        --self.CraneRamp = math.Clamp(self.CraneRamp + 8.0*((1*self:GetPackedRatio("Crane_dPdT",0))-self.CraneRamp)*dT,-1,1)
+--
+        --self:SetSoundState("crane334_brake_low",math.Clamp((-self.CraneRamp)*2,0,1)^2,1)
+        --local high = math.Clamp(((-self.CraneRamp)-0.5)/0.5,0,1)^1
+        --self:SetSoundState("crane334_brake_high",high,1.0)
+        --self:SetSoundState("crane013_brake2",high*2,1.0)
+        --self:SetSoundState("crane334_brake_eq_high",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.2,0,1)^0.8*1,1)
+        --self:SetSoundState("crane334_brake_eq_low",--[[ math.Clamp(-self.CraneRamp*0,0,1)---]] math.Clamp(-self:GetPackedRatio("ReservoirPressure_dPdT")-0.4,0,1)^0.8*1.3,1)
+--
+        --self:SetSoundState("crane334_release",math.Clamp(self.CraneRamp,0,1)^2,1.0)
     end
     local emergencyValveEPK = self:GetPackedRatio("EmergencyValveEPK_dPdT",0)
     self.EmergencyValveEPKRamp = math.Clamp(self.EmergencyValveEPKRamp + 1.0*((0.5*emergencyValveEPK)-self.EmergencyValveEPKRamp)*12*dT,0,1)
