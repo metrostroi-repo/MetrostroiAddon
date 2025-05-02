@@ -3,6 +3,8 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 -----------------------------------DUPLICATOR----------------------------------
 
+local addAllTrainWiresConVar = CreateConVar("metrostroi_wiremod_wires_count", "20", {FCVAR_ARCHIVE, FCVAR_ARCHIVE_XBOX, FCVAR_UNLOGGED}, "Allow Wiremod to access some or all (-1) TrainWires", -1)
+
 function ENT:PreEntityCopy()
     local BaseDupe = {}
     local Tbl = {}
@@ -118,8 +120,6 @@ function ENT:Initialize()
     self:InitializeSounds()
     if self.NoTrain then return end
 
-    -- Possible number of train wires
-    self.TrainWireCount = self.TrainWireCount or 36
     -- Train wires
     self:ResetTrainWires()
     self:UpdateWagonList()
@@ -137,6 +137,8 @@ function ENT:Initialize()
     end
     self:LoadSystem("FailSim")
 
+    -- Possible number of train wires
+    self.TrainWireCount = self.TrainWireCount or #self.TrainWires or 36
 
     if Wire_CreateInputs then
         -- Initialize wire interface
@@ -206,8 +208,12 @@ function ENT:Initialize()
 
         -- Add I/O for train wires
         if self.SubwayTrain then
-            --for i=1,self.TrainWireCount do
-            for i=1,20 do
+            -- Getting ConVar value, -1 = unlimited
+            local wmTrainWireCount = addAllTrainWiresConVar:GetInt()
+            wmTrainWireCount = wmTrainWireCount == -1 and math.huge or wmTrainWireCount
+            wmTrainWireCount = math.min(wmTrainWireCount, self.TrainWireCount)
+
+            for i=1,wmTrainWireCount do
                 table.insert(inputs,"TrainWire"..i)
                 table.insert(inputTypes,"NORMAL")
                 table.insert(outputs,"TrainWire"..i)
