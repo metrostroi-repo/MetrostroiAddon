@@ -936,6 +936,8 @@ concommand.Add("metrostroi_capture_rt",function(_,_,args)
     local train = LocalPlayer().InMetrostroiTrain
     if not IsValid(train) then return end
 
+    gui.HideGameUI()
+
     local oldRt = render.GetRenderTarget() -- we'll save the old screen and draw on a new one!
     file.CreateDir("rt_captures")
     for i,v in ipairs(RTs) do
