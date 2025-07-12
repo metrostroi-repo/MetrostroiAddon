@@ -201,6 +201,45 @@ end
 -- Turbostroi scripts
 --------------------------------------------------------------------------------
 -- NEW API
+local OSes = {
+    Windows = {
+        x86 = "win32",
+        x64 = "win64"
+    },
+    Linux = {
+        x86 = "linux",
+        x64 = "linux64"
+    },
+    BSD = {
+        x86 = "linux",
+        x64 = "linux64"
+    },
+    POSIX = {
+        x86 = "linux",
+        x64 = "linux64"
+    },
+    OSX = {
+        x86 = "osx",
+        x64 = "osx"
+    },
+    Other = {
+        x86 = "linux",
+        x64 = "linux64"
+    }
+}
+
+local postfix
+if OSes[jit.os] then
+    postfix = OSes[jit.os][jit.arch]
+end
+
+if postfix == nil then
+    print("Can't find gm_turbostroi DLL")
+    return
+end
+
+local dllPath = "./garrysmod/lua/bin/gmsv_turbostroi_"..postfix..".dll"
+
 local ffi = require("ffi")
 ffi.cdef[[
 bool ThreadSendMessage(void *p, int message, const char* system_name, const char* name, double index, double value);
@@ -215,22 +254,7 @@ typedef struct {
 thread_msg ThreadRecvMessage(void* p);
 ]]
 
-local OSName = "gmsv_turbostroi_"
-
-if jit.os == "Windows" then
-	OSName = OSName.."win"
-elseif jit.os == "Linux" then
-	OSName = OSName.."linux"
-end
-
-if jit.arch == "x86" then
-	OSName = OSName.."32"
-else
-	OSName = OSName.."64"
-end
-
-
-local TS = ffi.load(OSName)
+local TS = ffi.load(dllPath)
 
 Metrostroi = {}
 local dataCache = {wires = {},wiresW = {},wiresL = {}}
