@@ -641,7 +641,7 @@ function ENT:ReadCell(Address)
 
             if Address == 49169 then return current > 0 and current or next end
             if Address == 49170 then return cPlatID > 0 and cPlatID or nPlatID end
-            if Address == 49170 then return x2 - pos.x end
+            if Address == 49171 then return x2 - pos.x end
         end
         return 0
     end
