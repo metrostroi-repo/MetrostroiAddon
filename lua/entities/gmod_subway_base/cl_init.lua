@@ -873,6 +873,7 @@ function ENT:OnRemove(nfinal)
     self.Sounds = {loop = {},isloop = {}}
     self.PassengerEnts = {}
     self.PassengerEntsStucked = {}
+    self.DisableSeatShadows = nil
 end
 
 function ENT:CalcAbsolutePosition(pos, ang)
