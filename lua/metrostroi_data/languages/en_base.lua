@@ -28,6 +28,7 @@ StationList.NamePos         = Position
 StationList.Select          = Select station
 StationList.Teleport        = Teleport
 StationList.NoConfig        = This map is not configured
+StationList.NoULX           = ULX not installed
 
 #Client settings
 Panel.Admin             = Admin

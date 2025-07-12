@@ -28,6 +28,7 @@ StationList.NamePos         = Позиция
 StationList.Select          = Выберите станцию
 StationList.Teleport        = Телепортироваться!
 StationList.NoConfig        = Эта карта не сконфигурирована
+StationList.NoULX           = ULX не установлен
 
 #Client settings
 Panel.Admin             = Админ
