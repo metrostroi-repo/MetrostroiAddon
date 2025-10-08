@@ -297,17 +297,15 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
                 if self.Line < 1 then self.Line = #rri end
             end
             rriL = rri[self.Line]
-            self.FirstStation = -1
             if not rriL.Loop then
-                self.LastStation = #rri[self.Line]+1
-                repeat
-                    self.FirstStation = self.FirstStation + 1
-                    if self.FirstStation > #rriL then self.FirstStation = 1 end
-                until (not rriL[self.FirstStation] or (rriL[self.FirstStation].arrlast and rriL[self.FirstStation].arrlast[self.FirstStation > self.LastStation and 2 or 1]))-- and self.FirstStation ~= self.LastStation
-                repeat
-                    self.LastStation = self.LastStation - 1
-                    if self.LastStation < (rriL.Loop and 0 or 1) then self.LastStation = #rriL end
-                until (not rriL[self.LastStation] or (rriL[self.LastStation].arrlast and rriL[self.LastStation].arrlast[self.FirstStation > self.LastStation]) or rriL.Loop and self.LastStation == 0) and self.LastStation ~= self.FirstStation
+                if self.Path then
+                    self.FirstStation = #rriL
+                    self.LastStation = 1
+                else
+                    self.FirstStation = 1
+                    self.LastStation = #rriL
+                end
+                self.Station = self.FirstStation
             else
                 self.LastStation = 0
             end
