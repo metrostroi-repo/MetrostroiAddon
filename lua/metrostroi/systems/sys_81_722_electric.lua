@@ -169,10 +169,16 @@ function TRAIN_SYSTEM:Think(dT)
         Train:WriteTrainWire(24,BTB*S["NEmergencyBrake"])
         Train:WriteTrainWire(25,BTB*self.BTB*(self.KTR==3 and 0 or 1))
 
-        Train:WriteTrainWire(37,(S["RU"]+Train.BUKP.DoorRight)*Train.SF7.Value*Train.DoorRight.Value)
-        Train:WriteTrainWire(38,(S["RU"]+Train.BUKP.DoorLeft)*Train.SF7.Value*(Train.DoorLeft1.Value+Train.DoorLeft2.Value))
-        Train:WriteTrainWire(39,S["RU"]*Train.SF7.Value*C(Train.DoorClose.Value==0))
-
+        Panel.DoorLeft1 = Train.DoorLeft1.Value*Train.SF7.Value
+        Panel.DoorLeft2 = Train.DoorLeft2.Value*Train.SF7.Value
+        Panel.DoorRight = Train.DoorRight.Value*Train.SF7.Value
+        Panel.DoorClose = C(Train.DoorClose.Value==0)*Train.SF7.Value
+        Panel.DoorCloseAVT = C(Train.DoorClose.Value==2)*Train.SF7.Value
+        Panel.DoorSelect = Train.DoorSelect.Value*Train.SF7.Value
+        Panel.DoorBack = Train.DoorBack.Value*Train.SF7.Value
+        Train:WriteTrainWire(37,(S["RU"]+Train.BUKP.DoorRight)*Panel.DoorRight)
+        Train:WriteTrainWire(38,(S["RU"]+Train.BUKP.DoorLeft)*(Panel.DoorLeft1+Panel.DoorLeft2))
+        Train:WriteTrainWire(39,S["RU"]*C(Panel.DoorClose==0)*C(Panel.DoorCloseAVT==0))
 
         Panel.BattOn = BO
         Panel.BattOff = BO*Train.BatteryOff.Value
@@ -192,9 +198,8 @@ function TRAIN_SYSTEM:Think(dT)
         Panel.ARSPower = Panel.BARSPower*(1-Train.BUKP.Back)*Train.ARS.Value
         Panel.ALSPower = BO*(1-Train.BUKP.Back)*Train.ALS.Value
 
-        Panel.UPOPower = BO*S["RV"]*Train.R_UPO.Value
-        Train:WriteTrainWire(15,BO*(Train.UPO.LineOut*Train.SarmatUPO.UPOActive+Train.SarmatUPO.LineOut))
-        --print(W[15],Train.UPO.LineOut*Train.SarmatUPO.UPOActive,Train.SarmatUPO.LineOut)
+        Panel.UPOPower = BO*S["RV"]*Train.BMCIK.UPOActive
+        Train:WriteTrainWire(15,BO*(Train.BMCIK.LineOut + Train.UPO.LineOut))
 
         self.Emer = S["RU"]
     end

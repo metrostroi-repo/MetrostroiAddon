@@ -440,42 +440,42 @@ ENT.Lights = {
     [20] = { "light",Vector(-46.4,-66,28.1)+Vector(0,-0.8,-4.1), Angle(0,0,0), Color(40,240,122), brightness = 0.3, scale = 0.1, texture = "sprites/light_glow02.vmt" },
 }
 
-ENT.ButtonMap["Tickers1"] = {
-    pos = Vector(-455.4,-11.1,52.8),
+ENT.ButtonMap["BIT1"] = {
+    pos = Vector(-455.75,-10.92504,52.35969),
     ang = Angle(0,90,90),
-    width = 300,
-    height = 64,
-    scale = 0.094,
-    hideseat=1.5,
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
 }
-ENT.ButtonMap["Tickers2"] = {
-    pos = Vector(2,-11.3,52.5),
-    ang = Angle(0,90,90+10),
-    width = 300,
-    height = 64,
-    scale = 0.099,
-    hideseat=1.5,
+ENT.ButtonMap["BIT2"] = {
+    pos = Vector(1.55365,-10.92493,51.99417),
+    ang = Angle(0,90,97),
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
 }
-ENT.ButtonMap["Tickers3"] = {
-    pos = Vector(-5,11.3,52.7),
-    ang = Angle(0,-90,90+10),
-    width = 300,
-    height = 64,
-    scale = 0.1,
-    hideseat=1.5,
+ENT.ButtonMap["BIT3"] = {
+    pos = Vector(-4.83291,10.92509,51.99417),
+    ang = Angle(0,-90,97),
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
 }
-ENT.ButtonMap["Tickers4"] = {
-    pos = Vector(449.3,11.1,52.8),
+ENT.ButtonMap["BIT4"] = {
+    pos = Vector(449.44,10.92504,52.35969),
     ang = Angle(0,-90,90),
-    width = 300,
-    height = 64,
-    scale = 0.094,
-    hideseat=1.5,
+    width = 1024,
+    height = 192,
+    scale = 0.026947,
+    hideseat = 1.5
 }
 function ENT:Initialize()
     self.BaseClass.Initialize(self)
 
-    self.Tickers = self:CreateRT("721Tickers",1024,128)
+    self.BITScr = self:CreateRT("722BIT",1024,256)
 
     self.FrontLeak = 0
     self.RearLeak = 0
@@ -484,7 +484,6 @@ function ENT:Initialize()
     self.PreviousCompressorState = false
     self.CompressorVol = 0
     self.ParkingBrake = 0
-    self.BPSNBuzzVolume = 0
 end
 function ENT:UpdateWagonNumber()
     local count = math.max(4,math.ceil(math.log10(self.WagonNumber+1)))
@@ -505,17 +504,22 @@ function ENT:UpdateWagonNumber()
         --end
     end
 end
+local function getBitValue(value, offset, bitCount)
+    local mask = bit.lshift(bit.lshift(1,bitCount)-1,offset)
+    return bit.rshift(bit.band(value,mask),offset)
+end
 function ENT:Think()
     self.BaseClass.Think(self)
     if not self.RenderClientEnts or self.CreatingCSEnts then
         return
     end
 
+    local sarmatInvert = self:GetNW2Bool("SarmatInvert")
     if not self.PassSchemesDone then
         local sarmat,sarmatr = self.ClientEnts.sarmat,self.ClientEnts.sarmatr
         local scheme = Metrostroi.Skins["722_schemes"] and Metrostroi.Skins["722_schemes"][self.Scheme]
         if IsValid(sarmat) and IsValid(sarmatr) and scheme then
-            if self:GetNW2Bool("SarmatInvert") then
+            if sarmatInvert then
                 sarmat:SetSubMaterial(0,scheme[2])
                 sarmatr:SetSubMaterial(0,scheme[1])
             else
@@ -530,12 +534,13 @@ function ENT:Think()
         self.PassSchemesDone = false
         self.Scheme = self:GetNW2Int("Scheme",1)
     end
-    if self.InvertSchemes ~= self:GetNW2Bool("SarmatInvert",false) then
+    if self.InvertSchemes ~= sarmatInvert then
         self.PassSchemesDone=false
-        self.InvertSchemes = self:GetNW2Bool("SarmatInvert",false)
+        self.InvertSchemes = sarmatInvert
     end
     
     local passlight = self:GetPackedRatio("SalonLighting")
+    self:ShowHideSmooth("lamps_salon",passlight)
     self:SetLightPower(11,passlight > 0, passlight)
     self:SetLightPower(12,passlight > 0, passlight)
     self:SetLightPower(13,passlight > 0, passlight)
@@ -551,43 +556,53 @@ function ENT:Think()
     self:SetLightPower(17,BortBV,1)
     self:SetLightPower(20,BortBV,1)
 
-    self:ShowHideSmooth("lamps_salon",self:GetPackedRatio("SalonLighting"))
-    self:ShowHide("doorl_l",self:GetPackedBool("DoorAlarmL"))
-    self:ShowHide("doorl_r",self:GetPackedBool("DoorAlarmR"))
+    local doorAlarm = self:GetNW2Int("BNT:DoorAlarm")
+    self:SetSoundState("door_alarm",getBitValue(doorAlarm,0,1),1)
+    self:ShowHide("doorl_l",getBitValue(doorAlarm,1,1) > 0) 
+    self:ShowHide("doorl_r",getBitValue(doorAlarm,2,1) > 0)
 
     self:Animate("FrontBrake", self:GetNW2Bool("FbI") and 0 or 1,0,1, 3, false)
     self:Animate("FrontTrain",  self:GetNW2Bool("FtI") and 1 or 0,0,1, 3, false)
     self:Animate("RearBrake",   self:GetNW2Bool("RbI") and 0 or 1,0,1, 3, false)
     self:Animate("RearTrain",   self:GetNW2Bool("RtI") and 1 or 0,0,1, 3, false)
 
-    local led_back = self:GetPackedBool("PassSchemesLEDO",false)
-    if self:GetPackedBool("SarmatInvert",false) then led_back = not led_back end
-    local sleft,sright = self:GetPackedBool("SarmatLeft"),self:GetPackedBool("SarmatRight")
-    for i=1,4 do
-        self:ShowHide("led_l_f"..i,not led_back and sleft)
-        self:ShowHide("led_l_b"..i,led_back and sleft)
-        self:ShowHide("led_r_f"..i,not led_back and sright)
-        self:ShowHide("led_r_b"..i,led_back and sright)
+    local bntL = self:GetNW2Int("BNT:Left")
+    local bntR = self:GetNW2Int("BNT:Right")
+    local bntPowerL = getBitValue(bntL,0,1)
+    local bntPowerR = getBitValue(bntR,0,1)
+    local initL,initR = getBitValue(bntL,1,1) > 0, getBitValue(bntR,1,1) > 0
+    local currL,currR = getBitValue(bntL,9,6),getBitValue(bntR,9,6)
+
+    local invL,invR = getBitValue(bntL,2,1) > 0, getBitValue(bntR,2,1) > 0
+    if sarmatInvert then
+        invL = not invL
+        invR = not invR
     end
-    local scurr = self:GetNW2Int("PassSchemesLED")
-    local snext = self:GetNW2Int("PassSchemesLEDN")
-    local led = scurr
-    if snext ~= 0 and CurTime()%2 > 1 then led = led + snext end
-    if scurr < 0 then led = math.floor(CurTime()%16.5*2) end
-    if led_back then
-        if sleft then
-            for i=1,4 do if IsValid(self.ClientEnts["led_l_b"..i]) then self.ClientEnts["led_l_b"..i]:SetSkin(math.Clamp(led-((i-1)*8),0,8)) end end
+
+    if initL then
+        local nextL = getBitValue(bntL,3,6)
+        if nextL == 0 then nextL = -1 end
+        if CurTime()%2>1 then
+            currL = currL + nextL
         end
-        if sright then
-            for i=1,4 do if IsValid(self.ClientEnts["led_r_b"..i]) then self.ClientEnts["led_r_b"..i]:SetSkin(math.Clamp(led-((i-1)*8),0,8)) end end
+    end
+    if initR then
+        local nextR = getBitValue(bntR,3,6)
+        if nextR == 0 then nextR = -1 end
+        if CurTime()%2>1 then
+            currR = currR + nextR
         end
-    else
-        if sleft then
-            for i=1,4 do if IsValid(self.ClientEnts["led_l_f"..i]) then self.ClientEnts["led_l_f"..i]:SetSkin(math.Clamp(led-((i-1)*8),0,8)) end end
-        end
-        if sright then
-            for i=1,4 do if IsValid(self.ClientEnts["led_r_f"..i]) then self.ClientEnts["led_r_f"..i]:SetSkin(math.Clamp(led-((i-1)*8),0,8)) end end
-        end
+    end
+    for i=1,4 do
+        self:ShowHide("led_l_f"..i,not invL)
+        self:ShowHide("led_l_b"..i,invL)
+        self:ShowHide("led_r_f"..i,not invR)
+        self:ShowHide("led_r_b"..i,invR)
+        
+        if IsValid(self.ClientEnts["led_l_f"..i]) then self.ClientEnts["led_l_f"..i]:SetSkin(math.Clamp(currL-((i-1)*8),0,8)) end
+        if IsValid(self.ClientEnts["led_l_b"..i]) then self.ClientEnts["led_l_b"..i]:SetSkin(math.Clamp(currL-((i-1)*8),0,8)) end
+        if IsValid(self.ClientEnts["led_r_f"..i]) then self.ClientEnts["led_r_f"..i]:SetSkin(math.Clamp(currR-((i-1)*8),0,8)) end
+        if IsValid(self.ClientEnts["led_r_b"..i]) then self.ClientEnts["led_r_b"..i]:SetSkin(math.Clamp(currR-((i-1)*8),0,8)) end
     end
 
     local playL = false
@@ -632,7 +647,6 @@ function ENT:Think()
     end
     --print(self.DoorSoundState)
     self:SetSoundState("doorl",self.DoorSoundState or 0,1)
-
 
     local door_f = self:GetPackedBool("FrontDoor")
     local door_b = self:GetPackedBool("RearDoor")
@@ -699,7 +713,6 @@ function ENT:Think()
     self:SetSoundState("rolling_60",rollingi*rol60,1)
     self:SetSoundState("rolling_70",rollingi*rol70,1)
 
-
     local rol10 = math.Clamp(speed/15,0,1)*(1-math.Clamp((speed-18)/35,0,1))
     local rol10p = Lerp((speed-15)/14,0.6,0.78)
     local rol40 = math.Clamp((speed-18)/35,0,1)*(1-math.Clamp((speed-55)/40,0,1))
@@ -728,51 +741,60 @@ function ENT:Think()
     self:SetSoundState("chopper", tunstreet*self:GetPackedRatio("chopper"), 1)
 
     local work = self:GetPackedBool("AnnPlay")
-    local UPO = work and self:GetPackedBool("AnnPlayUPO")
+    local UPO = work and self.Announcer.AnnTable == "AnnouncementsUPO"
+    local noise = self:GetNW2Int("AnnouncerNoise")
+    
+    local volBMCIK = self:GetNW2Int("BMCIK:VolCab",0)/10
+    local volBNT = self:GetNW2Int("BNT:Volumes",0)
 
-    local noise = self:GetNW2Int("AnnouncerNoise", -1)
-    local volume = self:GetNW2Float("UPOVolume",1)
-    local noisevolume = self:GetNW2Float("UPONoiseVolume",1)
-    local buzzvolume = volume
-    if self.Sounds["announcer1"] and IsValid(self.Sounds["announcer1"]) then buzzvolume = UPO and (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 or 0 end
-    if self.BPSNBuzzVolume > buzzvolume then
-        self.BPSNBuzzVolume = math.Clamp(self.BPSNBuzzVolume + 8*(buzzvolume-self.BPSNBuzzVolume)*dT,0.1,1)
+    local volSalon = 0
+    local noisevolume = 0
+    if UPO then
+        noisevolume = self:GetNW2Float("UPONoiseVolume",1)
+        volSalon = getBitValue(volBNT,4,4)/10*self:GetNW2Float("UPOVolume",1)
     else
-        self.BPSNBuzzVolume = math.Clamp(self.BPSNBuzzVolume + 0.4*(buzzvolume-self.BPSNBuzzVolume)*dT,0.1,1)
+        volSalon = getBitValue(volBNT,0,4)/10
     end
 
     for k,v in ipairs(self.AnnouncerPositions) do
-        self:SetSoundState("announcer_noiseW"..k,UPO and noisevolume*volume*0.7 or 0,1)
-        for i=1,3 do
-            self:SetSoundState(Format("announcer_noise%d_%d",i,k),(UPO and i==noise) and volume*self.BPSNBuzzVolume*self:GetNW2Float("UPOBuzzVolume",1)*0.7 or 0,1)
+        local targetVol = 0
+        if work then
+            if v[4] == 0x4C then -- [L]eft side
+                targetVol = v[3]*volSalon*bntPowerL
+            elseif v[4] == 0x52 then -- [R]ight side
+                targetVol = v[3]*volSalon*bntPowerR
+            elseif v[4] == 0x43 then -- [C]abin
+                targetVol = v[3]*volBMCIK
+            end
         end
 
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*(UPO and volume or 1) or 0) end
+        self:SetSoundState("announcer_noiseW"..k,targetVol*noisevolume,1)
+        for i=1,3 do
+            self:SetSoundState(Format("announcer_noise%d_%d",i,k),(UPO and i==noise) and targetVol*noisevolume or 0,1)
+        end
+
+        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(targetVol) end
     end
 end
 
-function ENT:OnAnnouncer(volume)
-    local work = self:GetPackedBool("AnnPlay")
-    local UPO = work and self:GetPackedBool("AnnPlayUPO")
+-- function ENT:OnAnnouncer(volume)
+--     local work = self:GetPackedBool("AnnPlay")
+--     local UPO = work and self:GetPackedBool("AnnPlayUPO")
 
-    return work and volume*(UPO and self:GetNW2Float("UPOVolume",1) or 1) or 0
-end
+--     return work and volume*(UPO and self:GetNW2Float("UPOVolume",1) or 1) or 0
+-- end
 
 function ENT:Draw()
     self.BaseClass.Draw(self)
 end
 
 function ENT:DrawPost()
-    self.RTMaterial:SetTexture("$basetexture", self.Tickers)
+    self.RTMaterial:SetTexture("$basetexture", self.BITScr)
     surface.SetMaterial(self.RTMaterial)
-    surface.SetDrawColor(255,255,255)
+    surface.SetDrawColor(255,255,255,200)
     for i=1,4 do
-        self:DrawOnPanel("Tickers"..i,function(...)
-            if (i==2 or i==3) then
-                surface.DrawTexturedRectRotated(245,32,490,64,0)
-            else
-                surface.DrawTexturedRectRotated(256,32,512,64,0)
-            end
+        self:DrawOnPanel("BIT"..i,function(...)
+            surface.DrawTexturedRectRotated(512,128,1024,256,0)
         end)
     end
 end

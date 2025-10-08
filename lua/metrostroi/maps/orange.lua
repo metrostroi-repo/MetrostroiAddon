@@ -220,7 +220,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO RHINO", {
 },{
     {
         LED = {2, 2, 3, 3, 4, 3, 3, 3, 3, 3, 3},
-        Name = "Line 1",
+        Name = "Orange",
         -- Loop = false,
         {
             462,"Икарус","Ikarus",

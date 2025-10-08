@@ -1,5 +1,5 @@
 local Map = game.GetMap():lower() or ""
-if Map:find("gm_metro_crossline_c") then
+if Map:find("gm_metro_crossline_c") or Map:find("gm_metro_crossline_n") then
     Metrostroi.PlatformMap = "gm_metro_crossline"
     Metrostroi.CurrentMap = "gm_metro_crossline"
 else
@@ -9,12 +9,12 @@ Metrostroi.AddPassSchemeTex("717_new","1 Line",{
     "models/metrostroi_schemes/map_1",
 })
 Metrostroi.AddPassSchemeTex("720","Crossline",{
-    "metrostroi_skins/81-720_schemes/crossline",
-    "metrostroi_skins/81-720_schemes/crossliner",
+    "metrostroi_skins/81-720_schemes/crossline_a3",
+    "metrostroi_skins/81-720_schemes/crossliner_a3",
 })
 Metrostroi.AddPassSchemeTex("722","Crossline",{
-    "metrostroi_skins/81-722_schemes/crossline",
-    "metrostroi_skins/81-722_schemes/crossliner",
+    "metrostroi_skins/81-722_schemes/crossline_a3", 
+    "metrostroi_skins/81-722_schemes/crossliner_a3",
 })
 Metrostroi.AddLastStationTex("702",110,"models/metrostroi_schemes/destination_table_black/label_mezhdunarodnaya")
 Metrostroi.AddLastStationTex("702",115,"models/metrostroi_schemes/destination_table_black/label_oktyabrskaya")
@@ -155,7 +155,7 @@ Metrostroi.AddANSPAnnouncer("ASNP Boiko + Pyaseckaya",{
     vokzalnaya_f = {"subway_announcers/asnp/pyaseckaya/crossline/2/vokzalnaya.mp3",1.175854},
 },{
     { --МАРШРУТ
-        LED = {5,4,4,4,5,4,2,2}, --FIXME
+        LED = {4,3,4,5,3,4,3,4},
         Name = "Линия 1",
         spec_last = {"last_m",0.5,"things_m"},
         spec_last_f = {"last_f",0.5,"things_f"},
@@ -315,7 +315,7 @@ Metrostroi.AddANSPAnnouncer("RIU Boiko + Pyaseckaya",{
     to_rechnaya_f = {"subway_announcers/riu/pyaseckaya/crossline/1/to_rechnaya.mp3",3.336893},
 },{
     { --МАРШРУТ
-        LED = {5,4,4,4,5,4,2,2},
+        LED = {4,3,4,5,3,4,3,4},
         Name = "Линия 1",
         NameEn = "Line 1",
         spec_last = {"last_m",0.5,"things_m"},
@@ -728,7 +728,8 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO Artur",{
     spec_attention_politeness = {"subway_announcers/sarmat_upo/crossline_artur/spec_attention_politeness.mp3",5.614417},
 },{
     { --МАРШРУТ
-        LED = {3,4,5,5,5,5,3,2},
+        LED = {4,4,4,4,4,4,4,4},
+        Name = "Кировская",
         {
             110,"Международная","Mezhdunarodnaya",
             arr = {nil,"last_mejdunarodnaya"},

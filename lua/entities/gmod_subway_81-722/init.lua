@@ -4,7 +4,7 @@ include("shared.lua")
 
 ENT.BogeyDistance = 650 -- Needed for gm trainspawner
 ENT.SyncTable = {
-    "SF1","SF2","SF3","SF4","SF5","SF6","SF7","SF8","SF9","R_UPO","SF01","SF10","SF11","SF12","SF13","SF02",
+    "SF1","SF2","SF3","SF4","SF5","SF6","SF7","SF8","SF9","SF00","SF01","SF10","SF11","SF12","SF13","SF02",
     "SF14","SF15","SF16","SF17","SF18","SF19","SF20","SF21","SF22","SF23","SF24","SF25","SF26","SF27","SF03","SF04",
 
     "SF31","SF32","SF33","SF34","SF35","SF36","SF37","SF38","SF41","SF42","SF43","SF44","SF45","SF46","SF47","SF48","SF49","SF51","SF52","SF53","SF54","SF55","SF56","SF57","SF58","SF59",
@@ -102,6 +102,8 @@ function ENT:Initialize()
         [KEY_7] = "PanelKV7",
         [KEY_8] = "EmergencyDriveSet",
 
+        [KEY_EQUAL] = "SarmatStartSet",
+
         [KEY_0] = "KRO+",
         [KEY_9] = "KRO-",
         [KEY_V] = "DoorCloseA",
@@ -109,20 +111,19 @@ function ENT:Initialize()
         [KEY_D] = "DoorRight",
         [KEY_SPACE] = "PBSet",
         [KEY_BACKSPACE] = {"EmergencyBrakeToggle",helper="EmergencyBrakeValveToggle"},
-        [KEY_PAD_ENTER] = "KVWrenchKV",
         [KEY_LSHIFT] = {
             [KEY_2] = "RingSet",
             [KEY_S] = "PanelKV7",
             [KEY_V] = "DoorCloseM",
             [KEY_SPACE] = "VigilanceSet",
-
-            [KEY_PAD_ENTER] = "KVWrenchNone",
         },
         [KEY_LALT] = {
             [KEY_UP] = "SarmatUpSet",
             [KEY_DOWN] = "SarmatDownSet",
             [KEY_RIGHT] = "SarmatEnterSet",
             [KEY_LEFT] = "SarmatEscSet",
+            [KEY_PAD_ENTER] = "SarmatEnterSet",
+            [KEY_PAD_DECIMAL] = "SarmatEscSet",
             [KEY_PAD_1] = "SarmatF1Set",
             [KEY_PAD_2] = "SarmatF2Set",
             [KEY_PAD_3] = "SarmatF3Set",
@@ -189,8 +190,8 @@ function ENT:Initialize()
     self.CabinDoorRight = false
     self.RearDoor = false
 
-    self:SetNW2Float("UPONoiseVolume",math.Rand(0,0.3))
-    self:SetNW2Float("UPOVolume",math.Rand(0.8,1))
+    self.UPONoiseVolume = math.Rand(0,0.3)
+    self.UPOVolume = math.Rand(0.8,1)
 
     self.Scheme = 1
 end
@@ -205,7 +206,7 @@ function ENT:NonSupportTrigger()
 end
 
 function ENT:OnUPOArrived()
-    return self.SarmatUPO:TriggerInput("CheckUPO")
+    return self.BMCIK:TriggerInput("CheckUPO")
 end
 
 --------------------------------------------------------------------------------
@@ -304,8 +305,6 @@ function ENT:Think()
 
     self:SetPackedRatio("CabLights",self.Panel.CabLights==0.5 and 0.3 or self.Panel.CabLights)
     self:SetPackedBool("PanelLighting",self.Panel.PanelLights>0)
-    self:SetPackedBool("Headlights1",self.Panel.Headlights1 > 0)
-    self:SetPackedBool("Headlights2",self.Panel.Headlights2 > 0)
     self:SetPackedRatio("Headlight",self.Panel.Headlights2 > 0 and 1 or self.Panel.Headlights1 > 0 and 0.5 or 0)
     self:SetPackedBool("RedLights",self.Panel.RedLights>0)
 
@@ -337,15 +336,6 @@ function ENT:Think()
     self:SetPackedBool("RingEnabled",self.BUKP.Ring)
     self:SetPackedBool("RingEnabledBARS",self.BARS.Ring>0)
 
-    self:SetPackedBool("DoorAlarmL",self.BUKV.CloseRing)
-    self:SetPackedBool("DoorAlarmR",self.BUKV.CloseRing)
-
-    self:SetNW2Int("PassSchemesLED",self.PassSchemes.PassSchemeCurr)
-    self:SetNW2Int("PassSchemesLEDN",self.PassSchemes.PassSchemeNext)
-    self:SetPackedBool("PassSchemesLEDO",self.PassSchemes.PassSchemePath)
-    self:SetPackedBool("SarmatLeft",self.Panel.PassSchemePowerL)
-    self:SetPackedBool("SarmatRight",self.Panel.PassSchemePowerR)
-
     self:SetPackedBool("PassengerDoor",self.PassengerDoor)
     self:SetPackedBool("CabinDoorLeft",self.CabinDoorLeft)
     self:SetPackedBool("CabinDoorRight",self.CabinDoorRight)
@@ -354,8 +344,6 @@ function ENT:Think()
     self:SetNW2Bool("VityazLamp", self.MFDU.State~=0)
 
     self:SetPackedBool("AnnPlay",self.Panel.AnnouncerPlaying > 0)
-    self:SetPackedBool("AnnPlayUPO",self.Announcer.AnnTable=="AnnouncementsUPO")
-    --print(self.Panel.AnnouncerPlaying,self.UPO.LineOut)
 
     self:SetPackedRatio("Speed", self.Speed)
     self.AsyncInverter:TriggerInput("Speed",self.Speed)
@@ -436,6 +424,10 @@ function ENT:OnButtonPress(button,ply)
             self.DoorClose:TriggerInput("Set",1)
         end
     end
+    if button == "RouteNumber13" then
+        self.RouteNumber1:TriggerInput("Set",1)
+        self.RouteNumber3:TriggerInput("Set",1)
+    end
 end
 function ENT:OnButtonRelease(button,ply)
     if string.find(button,"PneumaticBrakeSet") then
@@ -449,5 +441,9 @@ function ENT:OnButtonRelease(button,ply)
     end
     if button == "DoorRight" then
         self.DoorRight:TriggerInput("Set",0)
+    end
+    if button == "RouteNumber13" then
+        self.RouteNumber1:TriggerInput("Set",0)
+        self.RouteNumber3:TriggerInput("Set",0)
     end
 end

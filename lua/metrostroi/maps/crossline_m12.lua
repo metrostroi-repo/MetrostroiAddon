@@ -699,6 +699,7 @@ Metrostroi.AddSarmatUPOAnnouncer("UPO Artur",{
 },{
     { --МАРШРУТ
         LED = {3,4,5,5,5,5,3,2},
+        Name = "Кировская",
         {
             909,"Международная","Mezhdunarodnaya",
             arr = {nil,"last_mejdunarodnaya"},

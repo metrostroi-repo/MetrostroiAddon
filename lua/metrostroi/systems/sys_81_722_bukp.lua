@@ -72,6 +72,7 @@ function TRAIN_SYSTEM:CStateTarget(name,targetname,targetsys,targetid,value)
 end
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
+    local Panel = Train.Panel
     local Electric = Train.Electric
     local BUKV = Train.BUKV
     self.Power = Train.SF19.Value*Train.Electric.Power
@@ -194,6 +195,7 @@ function TRAIN_SYSTEM:Think(dT)
     local RR = Train.KRO.Value~=1
     if self.Prepared==true and Electric.CabActive>0 and Electric.Emer == 0 then
         local MFDU = Train.MFDU
+        local BMCIK = Train.BMCIK
         local TrainCount = #self.Trains
         local TrainCHalf = TrainCount/2
         if not self.PVU.Sync then
@@ -325,7 +327,11 @@ function TRAIN_SYSTEM:Think(dT)
         else
             self.PowerCommand = 0
         end
+        
         self.DoorsClosed = Train.Electric.LSD>0 and self.LSD and (self.DoorsClosed or pos<=0)
+        if (self.LSD and self.DoorsClosed ~= self.LSD) then
+            BMCIK:TriggerInput("ClosedDoors")
+        end
         MFDU:Error(64,1,Train.Electric.LSD==0 and (pos>0 or MFDU:ErrorGet("64_1")))
         --MFDU:Error(64,1,Train.Electric.LSD==0 and self.States.CloseDoors,4)
         MFDU:Error(5,1,not self.LSD and self.States.CloseDoors and (pos>0 or MFDU:ErrorGet("5_1")))
@@ -338,7 +344,7 @@ function TRAIN_SYSTEM:Think(dT)
         end
         if not RR or back or Train.BKCU.Emergency>0 then
             self.PowerCommand = 0
-        elseif  self.PowerCommand>0 and (not self.DoorsClosed and Train.VAD.Value==0 or Train.BARS.MOT==0 and Train.RCARS.Value>0 or Train.RCARS.Value==0 and Train.PB.Value==0 and Train.VAH.Value==0 or self.Blocked) --[[or fault]] then
+        elseif self.PowerCommand>0 and (not self.DoorsClosed and Train.VAD.Value==0 or Train.BARS.MOT==0 and Train.RCARS.Value>0 or Train.RCARS.Value==0 and Train.PB.Value==0 and Train.VAH.Value==0 or self.Blocked) --[[or fault]] then
             self.PowerCommand = 0
             self.Blocked = true
         else
@@ -358,11 +364,18 @@ function TRAIN_SYSTEM:Think(dT)
         self:CState("Brake",self.PowerCommand < 0 or Command~=nil)
         self:CState("ARSBrake",Train.BARS.T1 > 0)
         --Door controls
-        self.DoorLeft = (RR and Train.DoorSelect.Value==0 and Train.DoorClose.Value==1 and self.Speed<3) and 1 or 0
-        self.DoorRight = (RR and Train.DoorSelect.Value==1 and Train.DoorClose.Value==1 and self.Speed<3) and 1 or 0
-        MFDU:Error(61,1,(Train.DoorLeft1.Value > 0 or Train.DoorLeft2.Value > 0) and self.DoorLeft == 0 or Train.DoorRight.Value > 0 and self.DoorRight == 0)
-        self.OpenLeft = not self.States.CloseDoors and (Train.DoorLeft1.Value > 0 or Train.DoorLeft2.Value > 0) and self.DoorLeft > 0
-        self.OpenRight = not self.States.CloseDoors and Train.DoorRight.Value > 0 and self.DoorRight > 0
+        local allowOpenDoors = RR and Panel.DoorClose==0 and Panel.DoorCloseAVT==0 and self.Speed<3
+        self.DoorLeft = (allowOpenDoors and Panel.DoorSelect==0) and 1 or 0
+        self.DoorRight = (allowOpenDoors and Panel.DoorSelect==1) and 1 or 0
+        MFDU:Error(61,1,(Panel.DoorLeft1 > 0 or Panel.DoorLeft2 > 0) and self.DoorLeft == 0 or Panel.DoorRight > 0 and self.DoorRight == 0)
+        local openLeft,openRight = self.OpenLeft,self.OpenRight
+        self.OpenLeft = (Panel.DoorLeft1 > 0 or Panel.DoorLeft2 > 0) and self.DoorLeft > 0
+        self.OpenRight = Panel.DoorRight > 0 and self.DoorRight > 0
+        
+        if (self.OpenLeft and openLeft ~= self.OpenLeft) or (self.OpenRight and openRight ~= self.OpenRight) then
+            BMCIK:TriggerInput("OpenDoors",self.OpenRight and 0x52 or 0x4C) -- 'L', 'R'
+        end
+
         self:CState("OpenLeft",not self.States.CloseDoors and (self.States.OpenLeft or self.OpenLeft))
         self:CState("OpenRight",not self.States.CloseDoors and (self.States.OpenRight or self.OpenRight))
         if MFDU:ErrorGet("49_1") and MFDU:ErrorGet("49_1")[4] then
@@ -374,12 +387,21 @@ function TRAIN_SYSTEM:Think(dT)
         else
             self.BackDoors = nil
         end
-        MFDU:Error(49,1,(Train.DoorBack.Value>0 and Train.DoorSelect.Value==1 or MFDU:ErrorGet("49_1") and self.BackDoors~=nil) and not self.States.CloseDoors)
+        MFDU:Error(49,1,(Panel.DoorBack>0 and Panel.DoorSelect==1 or MFDU:ErrorGet("49_1") and self.BackDoors~=nil) and not self.States.CloseDoors)
         Train:CANWrite("BUKP",Train:GetWagonNumber(),"BUKV",self.Trains[#self.Trains].ID,"OpenRightBack",self.BackDoors and self.BackDoors~=true)
 
-        if self.CloseRing and (Train.DoorLeft1.Value > 0 or Train.DoorLeft2.Value > 0 or Train.DoorRight.Value > 0 or self.LSD) then self.CloseRing = false end
-        if (not self.CloseRing or self.CloseRing and CurTime()-self.CloseRing<0) and Train.DoorClose.Value==2 and not self.LSD then self.CloseRing = CurTime() end
-        self:CState("CloseDoors",RR and Train.SF7.Value>0 and (Train.DoorClose.Value == 0 or (not self.CloseRing and Train.DoorClose.Value==2 or self.CloseRing and CurTime()-self.CloseRing>4)))
+        if self.CloseDoorsDelay then
+            if self.DoorsClosed or (Panel.DoorCloseAVT==0 and (self.OpenLeft or self.OpenRight)) then
+                self.CloseDoorsDelay = nil
+            end
+        else
+            if RR and Panel.DoorCloseAVT>0 and not self.DoorsClosed then
+                self.CloseDoorsDelay = CurTime()+4
+                BMCIK:TriggerInput("CloseDoorsAVT")
+            end
+        end
+
+        self:CState("CloseDoors",RR and (Panel.DoorClose>0 or self.CloseDoorsDelay and CurTime()>self.CloseDoorsDelay))
         self:CState("PassLight",Train.PassLight.Value>0)
         self:CState("PassVent",Train.PassVent.Value-1)
         if BARSPower and Train.BARS.V2 > 0 or not BARSPower and math.abs(self.Speed) < 0.5 and self.PowerCommand < 0 then
@@ -401,7 +423,6 @@ function TRAIN_SYSTEM:Think(dT)
             self:CState("PN1",false)
             self:CState("PN2",false)
         end
-        self:CState("CloseRing",self.CloseRing and (CurTime()-self.CloseRing)%1<=0.5)
         --[[
         self:CState("RVPB",(1-Train.RV["KRO5-6"])*Train.SF2.Value > 0)
         self.ControllerState = stength

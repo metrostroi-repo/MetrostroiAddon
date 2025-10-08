@@ -61,6 +61,7 @@ if SERVER then
             local train = self.Train.WagonList[i]
             net.WriteEntity(train)
             net.WriteString(msg)
+            net.WriteString(self.AnnTable)
             net.Broadcast()
         end
     end
@@ -69,12 +70,14 @@ if SERVER then
     function TRAIN_SYSTEM:Think()
         if #self.Schedule > 0 and not self.Playing then
             for i = 1, #self.Train.WagonList do
-                self.Train.WagonList[i]:SetNW2Bool("AnnouncerPlaying", true)
+                local train = self.Train.WagonList[i]
+                train:SetNW2Bool("AnnouncerPlaying", true)
             end
             self.Playing = true
         elseif #self.Schedule == 0 and self.Playing and not self.AnnounceTimer then
             for i = 1, #self.Train.WagonList do
-                self.Train.WagonList[i]:SetNW2Bool("AnnouncerPlaying", false)
+                local train = self.Train.WagonList[i]
+                train:SetNW2Bool("AnnouncerPlaying", false)
             end
             self.Playing = false
         end
@@ -145,6 +148,7 @@ else
         local train = net.ReadEntity()
         if not IsValid(train) or not train.RenderClientEnts then return end
         local snd = net.ReadString()
+        train.Announcer.AnnTable = net.ReadString()
 
         if train.AnnouncerPositions then
             for k, v in ipairs(train.AnnouncerPositions) do
@@ -155,7 +159,8 @@ else
         end
     end)
 
-    function TRAIN_SYSTEM:ClientInitialize()
+    function TRAIN_SYSTEM:ClientInitialize(tbl)
+        self.AnnTable = tbl
     end
 
     function TRAIN_SYSTEM:ClientThink()

@@ -33,6 +33,12 @@ for i=0,3 do
     table.insert(ENT.RightDoorPositions,GetDoorPosition(i,0))
 end
 
+ENT.AnnouncerPositions = {}
+for i=1,4 do
+    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230+37.5,47,44),100,1,0x4C}) --[L]eft side speakers
+    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230,-47,44),100,1,0x52}) --[R]ight side speakers
+end
+
 function ENT:InitializeSounds()
     self.BaseClass.InitializeSounds(self)
     self.SoundNames["release"] = {loop=true,"subway_trains/722/pneumo_release2.wav"}
@@ -79,9 +85,6 @@ function ENT:InitializeSounds()
     self.SoundNames["battery_off_loop"]   = {loop=true,"subway_trains/722/battery/battery_off_loop.wav"}
     self.SoundPositions["battery_off_loop"] = {100,1e9,Vector(182,50,-75),0.02}
 
-    self.SoundNames["door_alarm"] = "subway_trains/722/door_alarm.mp3"
-    self.SoundPositions["door_alarm"] = {800,1e9,Vector(0,0,0),0.5}
-
     self.SoundNames["door_cab_open"] = "subway_trains/common/door/cab/door_open.mp3"
     self.SoundNames["door_cab_close"] = "subway_trains/common/door/cab/door_close.mp3"
 
@@ -95,8 +98,8 @@ function ENT:InitializeSounds()
             self.SoundPositions["door"..i.."x"..k.."c"] = {800,1e9,GetDoorPosition(i,k),0.2}
         end
     end
-    self.SoundNames["door_alarm"] = {"subway_trains/722/door_alarm.mp3"}
-    self.SoundPositions["door_alarm"] = {800,1e9,Vector(0,0,0),0.5}
+    self.SoundNames["door_alarm"] = {loop=1.1,"subway_trains/722/door_alarm_start.mp3","subway_trains/722/door_alarm_loop.wav","subway_trains/722/door_alarm_end.mp3"}
+    self.SoundPositions["door_alarm"] = {485,1e9,Vector(0,0,0),0.35}
     for i = 1,10 do
         local id1 = Format("b1tunnel_%d",i)
         local id2 = Format("b2tunnel_%d",i)
@@ -107,13 +110,15 @@ function ENT:InitializeSounds()
     end
     for k,v in ipairs(self.AnnouncerPositions) do
         self.SoundNames["announcer_noise1_"..k] = {loop=true,"subway_announcers/upo/noiseS1.wav"}
-        self.SoundPositions["announcer_noise1_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noise1_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noise2_"..k] = {loop=true,"subway_announcers/upo/noiseS2.wav"}
-        self.SoundPositions["announcer_noise2_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noise2_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noise3_"..k] = {loop=true,"subway_announcers/upo/noiseS3.wav"}
-        self.SoundPositions["announcer_noise3_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noise3_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noiseW"..k] = {loop=true,"subway_announcers/upo/noiseW.wav"}
-        self.SoundPositions["announcer_noiseW"..k] = {v[2] or 300,1e9,v[1],v[3]*0.2}
+        self.SoundPositions["announcer_noiseW"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
+        self.SoundNames["announcer_sarmat_start"..k] = {"subway_announcers/sarmat_upo/sarmat_start.mp3"}
+        self.SoundPositions["announcer_sarmat_start"..k] = {v[2] or 300,1e9,v[1],v[3]}
     end
 end
 
@@ -132,20 +137,13 @@ function ENT:InitializeSystems()
     self:LoadSystem("Panel","81_724_Panel")
 
     self:LoadSystem("Announcer","81_71_Announcer", "AnnouncementsSarmatUPO")
-    self:LoadSystem("Tickers","81_722_Tickers")
-    self:LoadSystem("PassSchemes","81_722_PassScheme")
+    self:LoadSystem("BIT","81_722_BIT")
+    self:LoadSystem("BNT","81_722_BNT")
 
 end
 
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("Type",self.Electric.T724)
-end
-
-ENT.AnnouncerPositions = {
-}
-for i=1,4 do
-    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230+37.5,47 ,44),100,0.1})
-    table.insert(ENT.AnnouncerPositions,{Vector(323-(i-1)*230,-47,44),100,0.1})
 end
 ---------------------------------------------------
 -- Defined train information
