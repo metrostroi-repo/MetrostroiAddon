@@ -1130,7 +1130,7 @@ function TRAIN_SYSTEM:SolveThyristorController(Train, dT)
             self.ThyristorState = 0.92
             if I > 162 then--I > T * 0.9 then
                 self.PrepareElectric = false
-                self.ThyristorState = (1 - math.max(0, math.min(1, ((Train.Engines.Speed - 50) / 32)) ^ 0.5)) * 0.9
+                self.ThyristorState = (1 - math.max(0, math.min(1, (math.max(0, Train.Engines.Speed - 50) / 32)) ^ 0.5)) * 0.9
             end
         else
             self.ThyristorState = math.max(0, math.min(1, self.ThyristorState + dC / rnd * dT))
