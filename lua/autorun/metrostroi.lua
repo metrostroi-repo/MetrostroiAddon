@@ -729,7 +729,6 @@ if SERVER then
     --Cvars
     local CV_Enabled = CreateConVar("metrostroi_monitoring_allow",1, FCVAR_ARCHIVE,"Enables metrostroi servers monitoring for this server. Send only basic info(map,ip,port,hostname) for metrostroi servers list")
     local CV_Key     = CreateConVar("metrostroi_monitoring_key","", FCVAR_ARCHIVE,"Unique key for metrostroi servers monitoring. Used for server identification for servers with dynamic IP")
-    local CV_Pass    = GetConVar("sv_password")
     local State,LastSend,LastRec,LastSucc = 0
     local LastErr
 
@@ -752,7 +751,6 @@ if SERVER then
 
         State = 0
     end
-    local oldPass = CV_Pass:GetString()
     local function init()
         if monitoringStarted() then destroy() end
         if not CV_Enabled:GetBool() then return end
@@ -878,33 +876,7 @@ if SERVER then
         local ip,port = string.match(game.GetIPAddress(),"([%d.]+):([%d]+)")
         local key = CV_Key:GetString("metrostroi_monitoring_key")
         if #key ~= 128 then key = "" end
-        if  CV_Pass:GetString("sv_password") ~= "" then
-            --if key ~= "" then
-                post{
-                    --[[ ip = ip,
-                    port = port,
-                    hostname = "",
-                    map = "",
-                    maxplayers = "0",
-                    players = "0",
-                    version = "0",--]]
-
-                    status = "1",
-                    uid = key,
-                }
-            --end
-            destroy()
-            --Detect sv_password changes for monitoring status change
-            timer.Create("MetrostroiMonitoringPass",1,0,function()
-                local value = CV_Pass:GetString()
-                if oldPass ~= value and value == "" then
-                    init()
-                    timer.Remove("MetrostroiMonitoringPass")
-                end
-                oldPass = value
-            end)
-            State = -1
-        elseif typ==2 then
+        if typ==2 then
             post{
                 uid = key,
                 owner = ply,
