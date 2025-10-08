@@ -198,7 +198,7 @@ net.Receive("metrostroi-signal", function()
     if ent.RemoveModels then ent:RemoveModels() end
 end)
 
-local C_RenderDistance      = GetConVar("metrostroi_signal_distance")
+local C_RenderDistance      = GetConVar("metrostroi_distance_signal")
 local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
 
 local timer = CurTime()
