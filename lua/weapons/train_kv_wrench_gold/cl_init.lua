@@ -357,8 +357,8 @@ function SWEP:CreateModels( tab )
                 string.find(v.model, ".mdl") and file.Exists (v.model, "GAME") ) then
 
             v.modelEnt = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
-            v.modelEnt:SetModel(v.model)
             if (IsValid(v.modelEnt)) then
+                v.modelEnt:SetModel(v.model)
                 v.modelEnt:SetPos(self:GetPos())
                 v.modelEnt:SetAngles(self:GetAngles())
                 v.modelEnt:SetParent(self)

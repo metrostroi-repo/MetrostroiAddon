@@ -44,6 +44,7 @@ Panel.FOV               = FOV
 Panel.Z                 = Výška kamery
 Panel.RenderDistance    = Vykreslovací\nvzdálenost
 Panel.RenderSignals     = Traced signals #NEW #FIXME
+Panel.RenderPassengers  = Traced passengers #NEW #FIXME
 Panel.ReloadClient      = Znovu načíst klienta
 
 Panel.ClientAdvanced    = Klient (pokročilý)

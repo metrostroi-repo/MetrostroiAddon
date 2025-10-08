@@ -41,6 +41,7 @@ Panel.FOV               = FOV
 Panel.Z                 = Altezza della videocamera
 Panel.RenderDistance    = Distanza di rendering
 Panel.RenderSignals     = Traced signals #NEW #FIXME
+Panel.RenderPassengers  = Traced passengers #NEW #FIXME
 Panel.ReloadClient      = Ricarica lato utente
 
 Panel.ClientAdvanced    = Utente (Avanzato)

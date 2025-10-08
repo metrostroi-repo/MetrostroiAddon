@@ -42,6 +42,7 @@ Panel.FOV               = FOV
 Panel.Z                 = Kamera magassága
 Panel.RenderDistance    = Renderelési távolság
 Panel.RenderSignals     = Traced signals #NEW #FIXME
+Panel.RenderPassengers  = Traced passengers #NEW #FIXME
 Panel.ReloadClient      = Kliens oldal újraindítása
 
 Panel.ClientAdvanced    = Kliens (haladó)

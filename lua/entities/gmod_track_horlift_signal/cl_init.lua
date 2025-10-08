@@ -124,6 +124,7 @@ function ENT:Think()
             --  --ent.Spawned = true
             --end)
             self.Models[k] = ClientsideModel(self.ModelNames[v[2]],RENDERGROUP_OPAQUE)
+            if not IsValid(self.Models[k]) then break end
             self.Models[k]:SetPos(self:LocalToWorld(v[1]))
             self.Models[k]:SetAngles(self:LocalToWorldAngles(Angle(v[2]==5 and 90 or 0,0,0)))
             if k < 3 then

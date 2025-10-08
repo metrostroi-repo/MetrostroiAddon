@@ -102,6 +102,7 @@ end
 function TOOL:UpdateGhost()
     local good,canDraw
     for i,e in ipairs(self.GhostEntities) do
+        if not IsValid(e) then continue end
         local t = self.Model[i]
         local pos,ang
         if i==1 then
@@ -146,19 +147,20 @@ function TOOL:Think()
             self.GhostEntities = {}
             if type(self.Model) == "string" then
                 self.GhostEntities[1] = ClientsideModel(self.Model,RENDERGROUP_OPAQUE)
-                self.GhostEntities[1]:SetModel(self.Model)
+                if IsValid(self.GhostEntities[1]) then self.GhostEntities[1]:SetModel(self.Model) end
             else
                 for i,t in pairs(self.Model) do
                     if type(t) == "string" then
                         self.GhostEntities[i] = ClientsideModel(t,RENDERGROUP_OPAQUE)
-                        self.GhostEntities[i]:SetModel(t)
+                        if IsValid(self.GhostEntities[i]) then self.GhostEntities[i]:SetModel(t) end
                     else
                         self.GhostEntities[i] = ClientsideModel(t[1],RENDERGROUP_OPAQUE)
-                        self.GhostEntities[i]:SetModel(t[1])
+                        if IsValid(self.GhostEntities[i]) then self.GhostEntities[i]:SetModel(t[1]) end
                     end
                 end
             end
             for i,e in pairs(self.GhostEntities) do
+                if not IsValid(e) then continue end
                 e:SetRenderMode(RENDERMODE_TRANSALPHA)
                 e.GetBodyColor = function() return Vector(1,1,1) end
                 e.GetDirtLevel = function() return 0.25 end

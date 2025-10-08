@@ -57,6 +57,7 @@ function ENT:OnRemove()
     for k,v in pairs(self.ClientModels) do SafeRemoveEntity(v) end
     self.ClientModels = {}
     self.ClientsideModels = {}
+    for k,v in pairs(self.CleanupModels) do SafeRemoveEntity(v.ent) end
     self.CleanupModels = {}
     self.Pool = nil
     self.PassengersLeft = nil
@@ -149,6 +150,7 @@ function ENT:PopulatePlatform(platformStart,platformEnd,stationCenter)
     end
 end
 
+local C_PassRenderDistance      = GetConVar("metrostroi_passengers_distance")
 
 --------------------------------------------------------------------------------
 -- Think loop that manages clientside models
@@ -164,7 +166,7 @@ function ENT:Think()
     self.PrevTime = self.PrevTime or CurTime()
     self.DeltaTime = (CurTime() - self.PrevTime)
     self.PrevTime = CurTime()
-    if self:IsDormant() then
+    if self:IsDormant() or Metrostroi and Metrostroi.ReloadClientside then
         if self.Pool then
             self:OnRemove()
         end
@@ -214,10 +216,12 @@ function ENT:Think()
         self:PopulatePlatform(platformStart,platformEnd,stationCenter)
     end
 
+    local plyPos = LocalPlayer():GetPos()
     local modelCount = 0
     -- Check if set of models changed
     if (CurTime() - (self.ModelCheckTimer or 0) > 1.0) and poolReady then
         self.ModelCheckTimer = CurTime()
+        local dist = C_PassRenderDistance:GetInt()/0.01905
 
         local WindowStart = self:GetNW2Int("WindowStart")
         local WindowEnd = self:GetNW2Int("WindowEnd")
@@ -227,7 +231,7 @@ function ENT:Think()
             if WindowStart >  WindowEnd then in_bounds = (i >= WindowStart) or (i <= WindowEnd) end
             if in_bounds then
                 -- Model in window
-                if not self.ClientModels[i] then
+                if not self.ClientModels[i] and plyPos:Distance(self.Pool[i].pos) <= dist then
                     --self.ClientModels[i] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
                     --self.ClientModels[i]:SetModel(self.Pool[i].model)
                     --hook.Add("MetrostroiBigLag",self.ClientModels[i],function(ent)
@@ -238,6 +242,7 @@ function ENT:Think()
                     --    --ent.Spawned = true
                     --end)
                     self.ClientModels[i] = ClientsideModel(self.Pool[i].model,RENDERGROUP_OPAQUE)
+                    if not IsValid(self.ClientModels[i]) then continue end
                     self.ClientModels[i]:SetPos(self.Pool[i].pos)
                     self.ClientModels[i]:SetAngles(self.Pool[i].ang)
                     self.ClientModels[i]:SetSkin(math.floor(self.ClientModels[i]:SkinCount()*self.Pool[i].skin))
@@ -246,6 +251,8 @@ function ENT:Think()
                     self.ClientModels[i]:DrawShadow(false)
                     modelCount = modelCount + 1
                     if modelCount > 15 then poolReady = false self.ModelCheckTimer = self.ModelCheckTimer - 0.9 break end
+                elseif IsValid(self.ClientModels[i]) and (plyPos:Distance(self.Pool[i].pos) > dist or self.ClientModels[i]:IsDormant()) then
+                    SafeRemoveEntity(self.ClientModels[i])
                 end
             else
                 -- Model found that is not in window
@@ -292,6 +299,7 @@ function ENT:Think()
         --    --ent.Spawned = true
         --end)
         local ent= ClientsideModel(self.Pool[i].model,RENDERGROUP_OPAQUE)
+        if not IsValid(ent) then break end
         ent:SetPos(pos)
         ent:SetSkin(math.floor(ent:SkinCount()*self.Pool[i].skin))
         ent:SetModelScale(self.Pool[i].scale,0)
@@ -321,6 +329,10 @@ function ENT:Think()
         if not IsValid(v.ent) then
             self.CleanupModels[k] = nil
             continue
+        elseif v.ent:IsDormant() then
+            v.ent:Remove()
+            self.CleanupModels[k] = nil
+            continue
         end
         -- Get pos and target in XY plane
         local pos = v.ent:GetPos()
@@ -331,7 +343,7 @@ function ENT:Think()
         local distance = pos:DistToSqr(target)
         local count = self:GetNW2Int("TrainDoorCount",0)
         -- Delete if reached the target point
-        if distance < 2*256--[[threshold]] or math.abs(LocalPlayer():GetPos().z - v.ent:GetPos().z) > 256 or count == 0 then
+        if distance < 2*256--[[threshold]] or math.abs(plyPos.z - v.ent:GetPos().z) > 256 or count == 0 then
             v.ent:Remove()
             self.CleanupModels[k] = nil
             continue

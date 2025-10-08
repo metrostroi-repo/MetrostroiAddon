@@ -23,6 +23,7 @@ function ENT:Think()
             --    --ent.Spawned = true
             --end)
             self.Digits[k] = ClientsideModel("models/mus/ussr_clock_model/num_"..(k == 1 and "no" or "").."zero.mdl",RENDERGROUP_OPAQUE)
+            if not IsValid(self.Digits[k]) then break end
             self.Digits[k]:SetPos(self:LocalToWorld(v))
             self.Digits[k]:SetAngles(self:GetAngles())
             self.Digits[k]:SetSkin(10)

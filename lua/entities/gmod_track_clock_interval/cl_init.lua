@@ -30,6 +30,7 @@ function ENT:Think()
             --    ent:SetPos(self:LocalToWorld(v[1]))
             --end)
             self.Digits[k] = ClientsideModel(model, RENDERGROUP_OPAQUE)
+            if not IsValid(self.Digits[k]) then break end
 
             --if ent.Spawned then hook.Remove("MetrostroiBigLag",ent) end
             --ent.Spawned = true
