@@ -524,7 +524,7 @@ function TOOL:SendSettings()
         net.SendToServer()
     elseif self.Type == 3 then
         if not self.Auto then return end
-        RunConsoleCommand("signalling_autodata",util.TableToJSON(self.aUTO))
+        RunConsoleCommand("signalling_autodata",util.TableToJSON(self.Auto))
         net.Start "metrostroi-stool-signalling"
             net.WriteUInt(2,8)
             --net.WriteEntity(self)
