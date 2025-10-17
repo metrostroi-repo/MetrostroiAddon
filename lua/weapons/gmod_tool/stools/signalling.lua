@@ -508,7 +508,7 @@ function TOOL:SendSettings()
     if self.Type == 1 then
         if not self.Signal then return end
         RunConsoleCommand("signalling_signaldata",util.TableToJSON(self.Signal))
-        net.Start "metrostroi-stool-signalling"
+        net.Start("metrostroi-stool-signalling")
             net.WriteUInt(0,8)
             --net.WriteEntity(self)
             net.WriteTable(self.Signal)
@@ -517,15 +517,15 @@ function TOOL:SendSettings()
     elseif self.Type == 2 then
         if not self.Sign then return end
         RunConsoleCommand("signalling_signdata",util.TableToJSON(self.Sign))
-        net.Start "metrostroi-stool-signalling"
+        net.Start("metrostroi-stool-signalling")
             net.WriteUInt(1,8)
             --net.WriteEntity(self)
             net.WriteTable(self.Sign)
         net.SendToServer()
     elseif self.Type == 3 then
         if not self.Auto then return end
-        RunConsoleCommand("signalling_autodata",util.TableToJSON(self.aUTO))
-        net.Start "metrostroi-stool-signalling"
+        RunConsoleCommand("signalling_autodata",util.TableToJSON(self.Auto))
+        net.Start("metrostroi-stool-signalling")
             net.WriteUInt(2,8)
             --net.WriteEntity(self)
             net.WriteTable(self.Auto)
