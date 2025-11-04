@@ -936,23 +936,33 @@ concommand.Add("metrostroi_capture_rt",function(_,_,args)
     local train = LocalPlayer().InMetrostroiTrain
     if not IsValid(train) then return end
 
-    local oldRt = render.GetRenderTarget() -- we'll save the old screen and draw on a new one!
-    file.CreateDir("rt_captures")
-    for i,v in ipairs(RTs) do
-        local RT = train[v]
-        if RT and type(RT) == "ITexture" then
+    print("Close menu window, for capture RenderTarget train")
 
-            render.SetRenderTarget( train[v] )
+    hook.Add("HUDPaint","Metrostroi.CaptureRT",function() -- gui.HideGameUI() not working and deprecated
+        local train = LocalPlayer().InMetrostroiTrain
+        if IsValid(train) then
+            local oldRt = render.GetRenderTarget() -- we'll save the old screen and draw on a new one!
+            file.CreateDir("rt_captures")
+            for i,v in ipairs(RTs) do
+                local RT = train[v]
+                if RT and type(RT) == "ITexture" then
 
-            local data = render.Capture( { format = "png", quality = 100, x = 0, y = 0, h = RT:Height(), w = RT:Width() } )
+                    render.SetRenderTarget( train[v] )
 
-            local pictureFile = file.Open("rt_captures/"..train:EntIndex().." "..v.." "..os.date("!%d%m%y_%H%M%S",os.time())..".png", "wb", "DATA" )
-            pictureFile:Write( data )
-            pictureFile:Close()
+                    local data = render.Capture( { format = "png", quality = 100, x = 0, y = 0, h = RT:Height(), w = RT:Width() } )
+
+                    print("Request rt_capture "..v..", saved: "..#data.." bytes")
+
+                    local pictureFile = file.Open("rt_captures/"..train:EntIndex().." "..v.." "..os.date("!%d%m%y_%H%M%S",os.time())..".png", "wb", "DATA" )
+                    pictureFile:Write( data )
+                    pictureFile:Close()
+                end
+            end
+
+            render.SetRenderTarget( oldRt )
         end
-    end
-
-    render.SetRenderTarget( oldRt )
+        hook.Remove("HUDPaint","Metrostroi.CaptureRT")
+    end)
 end)
 
 --------------------------------------------------------------------------------
