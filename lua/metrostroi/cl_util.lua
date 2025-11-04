@@ -936,7 +936,7 @@ concommand.Add("metrostroi_capture_rt",function(_,_,args)
     local train = LocalPlayer().InMetrostroiTrain
     if not IsValid(train) then return end
 
-    print("Close menu window, for capture RenderTarget train")
+    print("Close menu window for capture RenderTarget train")
 
     hook.Add("HUDPaint","Metrostroi.CaptureRT",function() -- gui.HideGameUI() not working and deprecated
         local train = LocalPlayer().InMetrostroiTrain
