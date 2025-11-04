@@ -303,6 +303,11 @@ function ENT:GetWagonNumber()
 end
 -- Remove entity
 function ENT:OnRemove()
+    -- Remove FailSim objects
+    for k,v in pairs(self.Systems) do
+        if FailSim.Objects[v] then FailSim.Objects[v] = nil end
+    end
+
     -- Remove all linked objects
     constraint.RemoveAll(self)
     if self.TrainEntities then
