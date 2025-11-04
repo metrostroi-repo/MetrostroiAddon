@@ -12,5 +12,6 @@ permission for purposes of prototyping a subway train simulator inside Garry's-M
 git config lfs.url https://git.metrostroi.net/metrostroi-repo/MetrostroiAddon.git/info/lfs
 git lfs fetch
 git reset --hard
+git config lfs.url https://github.com/metrostroi-repo/MetrostroiAddon.git/info/lfs
 ```
 **Warning:** This will discard all your local changes in the working copy and the index!
