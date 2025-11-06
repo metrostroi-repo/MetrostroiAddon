@@ -146,6 +146,7 @@ Entities.gmod_subway_81-717_mvm.Name  = 81-717 (Номерной МСК голо
 Entities.gmod_subway_81-717_mvm_custom.Name     = 81-717 (Номерной МСК кастом)
 Entities.gmod_subway_81-714_mvm.Name  = 81-714 (Номерной МСК промежуточный)
 Entities.gmod_subway_81-717_lvz.Name  = 81-717 (Номерной СПБ головной)
+Entities.gmod_subway_81-717_lvz_custom.Name     = 81-717 (Номерной СПБ кастом)
 Entities.gmod_subway_81-714_lvz.Name  = 81-714 (Номерной СПБ промежуточный)
 Entities.gmod_subway_81-718.Name      = 81-718 (ТИСУ головной)
 Entities.gmod_subway_81-719.Name      = 81-719 (ТИСУ промежуточный)
