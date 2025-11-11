@@ -26,7 +26,10 @@ function TRAIN_SYSTEM:Initialize()
     self.BrightKeys = 0
     self.NumberState = 42
     if not TURBOSTROI then
+        self.Max = 3
         self.Number = IsValid(self.Train.Owner) and tonumber(self.Train.Owner:GetInfo("metrostroi_route_number","61")) or 777
+        self.RouteNumber = Format("%03d",self.Number%1000)
+        self.Train:SetNW2String("RouteNumber",self.RouteNumber)
     end
 end
 if TURBOSTROI then return end
@@ -115,6 +118,9 @@ if SERVER then
                 Train:SetNW2Int("TNM:Number",self.NewNumber or self.Number)
             elseif self.State == 0 then
                 self.State = 1
+                self.RouteNumber = Format("%03d",self.Number%1000)
+                Train:SetNW2String("RouteNumber",self.Number)
+                Train:SetNW2Int("TNM:Number",self.Number)
             elseif self.State == 2 then
                 if self.BrightKeys > 1 and not self.KeysLock then
                     self.State = 1
@@ -133,7 +139,11 @@ if SERVER then
                     if self.Number ~= self.NewNumber then
                         self.NumberState = math.max(0,self.NumberState - 1)
                         Train:PlayOnce("blinker_off"..(self.NumberState%2+1),"bass",0.6+math.random()*0.3,1)
-                        if self.NumberState == 0 then self.Number = self.NewNumber end
+                        if self.NumberState == 0 then
+                            self.Number = self.NewNumber
+                            self.RouteNumber = Format("%03d",self.Number%1000)
+                            Train:SetNW2String("RouteNumber",self.Number)
+                        end
                     elseif self.Number == self.NewNumber then
                         self.NumberState = math.min(42,self.NumberState + 1)
                         Train:PlayOnce("blinker_on"..(self.NumberState%2+1),"bass",0.6+math.random()*0.3,1)
