@@ -37,8 +37,9 @@ function ENT:Use(_,ply)
         self.Cover:SetOwner(self.Owner)
         local phys = self.Cover:GetPhysicsObject()
         phys:ApplyForceCenter(self.Cover:GetUp()*phys:GetMass()*40+self.Cover:GetRight()*phys:GetMass()*35 )
-        if CPPI and IsValid(self.Owner) then
-            self.Cover:CPPISetOwner(self.Owner)
+        if IsValid(self.Owner) then
+            self.Cover:SetOwner(self.Owner)
+            if CPPI then self.Cover:CPPISetOwner(self.Owner) end
         end
         if self.Code then self:SetNW2Int("Code",self.Code) end
     elseif self:GetModel() == "models/metrostroi_train/reversor/reversor_collection_box2.mdl" then
