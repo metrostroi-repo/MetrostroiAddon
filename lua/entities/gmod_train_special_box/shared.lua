@@ -1,5 +1,5 @@
 ENT.Type            = "anim"
-
+ENT.Base            = "base_gmodentity"
 ENT.PrintName       = "Special box"
 ENT.Author          = ""
 ENT.Contact         = ""
