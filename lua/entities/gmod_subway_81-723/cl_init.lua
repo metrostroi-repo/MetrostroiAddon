@@ -744,7 +744,6 @@ function ENT:Think()
     local UPO = work and self.Announcer.AnnTable == "AnnouncementsUPO"
     local noise = self:GetNW2Int("AnnouncerNoise")
     
-    local volBMCIK = self:GetNW2Int("BMCIK:VolCab",0)/10
     local volBNT = self:GetNW2Int("BNT:Volumes",0)
 
     local volSalon = 0
@@ -763,8 +762,6 @@ function ENT:Think()
                 targetVol = v[3]*volSalon*bntPowerL
             elseif v[4] == 0x52 then -- [R]ight side
                 targetVol = v[3]*volSalon*bntPowerR
-            elseif v[4] == 0x43 then -- [C]abin
-                targetVol = v[3]*volBMCIK
             end
         end
 
