@@ -144,7 +144,7 @@ function ENT:InitializeSounds()
         self.SoundPositions["announcer_noise3_"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
         self.SoundNames["announcer_noiseW"..k] = {loop=true,"subway_announcers/upo/noiseW.wav"}
         self.SoundPositions["announcer_noiseW"..k] = {v[2] or 300,1e9,v[1],v[3]*0.1}
-        self.SoundNames["announcer_sarmat_start"..k] = {"subway_announcers/sarmat_upo/sarmat_start.mp3"}
+        self.SoundNames["announcer_sarmat_start"..k] = {"subway_trains/722/sarmat_start.mp3"}
         self.SoundPositions["announcer_sarmat_start"..k] = {v[2] or 300,1e9,v[1],v[3]}
     end
 end
