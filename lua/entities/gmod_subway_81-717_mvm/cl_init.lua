@@ -2594,13 +2594,13 @@ ENT.ButtonMap["Doors7_8_right"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=1,
 
     buttons = {
-        {ID = "hod4Set",x=298,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd4Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door4Set",x=298,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door4Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr7_8_rgh"] = {
@@ -2609,14 +2609,14 @@ ENT.ButtonMap["bldr7_8_rgh"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=1,
 
     buttons = {
-        {ID = "HDLK4Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock4Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK4",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock4",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2629,13 +2629,13 @@ ENT.ButtonMap["Doors5_6_right"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=1,
 
     buttons = {
-        {ID = "hod3Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd3Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door3Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door3Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr5_6_rgh"] = {
@@ -2644,14 +2644,14 @@ ENT.ButtonMap["bldr5_6_rgh"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=1,
 
     buttons = {
-        {ID = "HDLK3Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock3Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK3",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock3",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2664,13 +2664,13 @@ ENT.ButtonMap["Doors3_4_right"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=1,
 
     buttons = {
-        {ID = "hod2Set",x=302,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd2Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door2Set",x=302,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door2Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr3_4_rgh"] = {
@@ -2679,14 +2679,14 @@ ENT.ButtonMap["bldr3_4_rgh"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "HDLK2Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock2Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK2",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock2",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2699,13 +2699,13 @@ ENT.ButtonMap["Doors1_2_right"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "hod1Set",x=334,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd1Set",x=15,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door1Set",x=334,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door1Set",x=15,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["Doors1_2_right_outer"] = {
@@ -2714,12 +2714,12 @@ ENT.ButtonMap["Doors1_2_right_outer"] = {
     width = 120,
     height = 952,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "outerhod1Set",x=10,y=0,w= 100,h = 952,tooltip=""},
+        {ID = "outer_open1Set",x=10,y=0,w= 100,h = 952,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr1_2_rgh"] = {
@@ -2728,14 +2728,14 @@ ENT.ButtonMap["bldr1_2_rgh"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "HDLK1Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock1Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK1",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock1",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2747,13 +2747,13 @@ ENT.ButtonMap["Doors7_8_left"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "hod5Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd5Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door5Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door5Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr7_8_lft"] = {
@@ -2762,14 +2762,14 @@ ENT.ButtonMap["bldr7_8_lft"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "HDLK5Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock5Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK5",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock5",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2782,13 +2782,13 @@ ENT.ButtonMap["Doors5_6_left"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "hod6Set",x=314,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd6Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door6Set",x=314,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door6Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr5_6_lft"] = {
@@ -2797,14 +2797,14 @@ ENT.ButtonMap["bldr5_6_lft"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "HDLK6Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock6Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK6",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock6",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2817,13 +2817,13 @@ ENT.ButtonMap["Doors3_4_left"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "hod7Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd7Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door7Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door7Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr3_4_lft"] = {
@@ -2832,14 +2832,14 @@ ENT.ButtonMap["bldr3_4_lft"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "HDLK7Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock7Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK7",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock7",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2852,13 +2852,13 @@ ENT.ButtonMap["Doors1_2_left"] = {
     width = 520,
     height = 1000,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "hod8Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "hcd8Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "open_door8Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "close_door8Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
 ENT.ButtonMap["bldr1_2_lft"] = {
@@ -2867,14 +2867,14 @@ ENT.ButtonMap["bldr1_2_lft"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.005,
 
     buttons = {
-        {ID = "HDLK8Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "door_lock8Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="HDLK8",speed=0.5,vmin=1,vmax=0.8,
+            var="door_lock8",speed=0.5,vmin=1,vmax=0.8,
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2886,9 +2886,9 @@ ENT.ButtonMap["DoorReleaseExtra"] = {
     width = 100,
     height = 160,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.1,
 
     buttons = {
         {ID = "DoorReleaseExtraToggle",x=0,y=130,w= 100,h = 30,tooltip="", model = {
@@ -2902,9 +2902,11 @@ ENT.ClientProps["doorsmanual_e"] = {
     model = "models/metrostroi_train/81-717/stop_mvm.mdl",
     pos = Vector(281,-62.3,12.3),
     ang = Angle(0,180,0),
+    hide=true,
+    --screenHide = true,
     hideseat=0.2,
 }
-ENT.ClientSounds["DoorReleaseExtra"] = {{"DoorReleaseExtra",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
+ENT.ClientSounds["DoorReleaseExtra"] = {{"doorsmanual_e",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
 
 
 ENT.ButtonMap["DoorReleaseRight"] = {
@@ -2913,9 +2915,9 @@ ENT.ButtonMap["DoorReleaseRight"] = {
     width = 100,
     height = 160,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.1,
 
     buttons = {
         {ID = "DoorReleaseRightToggle",x=0,y=0,w= 100,h = 30,tooltip="", model = {
@@ -2929,6 +2931,8 @@ ENT.ClientProps["doorsmanual_r"] = {
     model = "models/metrostroi_train/81-717/stop_mvm.mdl",
     pos = Vector(-296,-62.13,12.5),
     ang = Angle(0,180,0),
+    hide=true,
+    --screenHide = true,
     hideseat=0.2,
 }
 ENT.ClientSounds["DoorReleaseRight"] = {{"doorsmanual_r",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
@@ -2940,9 +2944,9 @@ ENT.ButtonMap["DoorReleaseLeft"] = {
     width = 100,
     height = 160,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    hide=0.05,
     screenHide = true,
+    --hideseat=0.1,
 
     buttons = {
         {ID = "DoorReleaseLeftToggle",x=0,y=0,w= 100,h = 30,tooltip="", model = {
@@ -2956,6 +2960,8 @@ ENT.ClientProps["doorsmanual_l"] = {
     model = "models/metrostroi_train/81-717/stop_mvm.mdl",
     pos = Vector(-295.9,62.5,13.59),
     ang = Angle(180,0,0),
+    hide=true,
+    --screenHide = true,
     hideseat=0.2,
 }
 ENT.ClientSounds["DoorReleaseLeft"] = {{"doorsmanual_l",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,90,0)}}
@@ -3062,7 +3068,10 @@ function ENT:Initialize()
     self.ParkingBrake1 = true
     self.ParkingBrake2 = true
     self.DoorStates = {}
-    self.DoorLoopStates = {}
+    self.DoorLoopStates = {
+        DoorL1 = 0, DoorL2 = 0, DoorL3 = 0, DoorL4 = 0,
+        DoorR1 = 0, DoorR2 = 0, DoorR3 = 0, DoorR4 = 0,
+    }
     for i=0,3 do
         for k=0,1 do
             self.DoorStates[(k==1 and "DoorL" or "DoorR")..(i+1)] = false
@@ -3477,14 +3486,13 @@ function ENT:Think()
     -- reworked doors animation and sounds
     local dT = self.DeltaTime
     if not self.DoorStates then self.DoorStates = {} end
-    if not self.DoorLoopStates then self.DoorLoopStates = {} end
 	if not self.DSprev then self.DSprev = {{1,1},{1,1},{1,1},{1,1}} end
 	if not self.DoorDelta then self.DoorDelta = {{0,0},{0,0},{0,0},{0,0}} end
 	for i=0,3 do
         for k=0,1 do
             local st = k==1 and "DoorL" or "DoorR"
             local id,sid = st..(i+1),"door"..i.."x"..k
-            local state = self:GetPackedRatio(id)
+            local state = self:GetPackedRatio(id) or 0
 			local prevstate = self.DSprev[i+1][k+1]
 						
             if math.abs(prevstate - state) > 0.01 then

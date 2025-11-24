@@ -834,10 +834,10 @@ function ENT:InitializeSystems()
     self:LoadSystem("YARD_2")
     self:LoadSystem("PR_14X_Panels")
 
-    -- Пневмосистема 81-710
-    self:LoadSystem("Pneumatic","81_717_NewPneumatic")
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_717_Panel")
+    -- Пневмосистема 81-717
+    self:LoadSystem("Pneumatic","81_717_Pneumatic",{pneumatics = 1, headcar = true})
     -- Everything else
     self:LoadSystem("Battery")
     self:LoadSystem("PowerSupply","BPSN")
@@ -873,6 +873,8 @@ function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("HaveVentilation",1)
     self.BIS200:TriggerInput("SpeedDec",1)
     self.KRU:TriggerInput("LockX3",1)
+    self.Pneumatic:TriggerInput("NewPneumatics",1)
+    self.Pneumatic:TriggerInput("HeadCarPneumatic",1)
 end
 ---------------------------------------------------
 -- Defined train information
@@ -985,12 +987,12 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
-            ent.Pneumatic.LeftDoorState = val ~= 4 and {1,1,1,1} or {0,0,0,0}
-            ent.Pneumatic.RightDoorState = val ~= 4 and {1,1,1,1} or {0,0,0,0}
-			for _i = 1,4 do
-				ent.Pneumatic.DSprev[_i][1] = ent.Pneumatic.RightDoorState[_i]
-				ent.Pneumatic.DSprev[_i][2] = ent.Pneumatic.LeftDoorState[_i]
-			end
+            ent.Pneumatic.LeftDoorState = val == 4 and {1,1,1,1} or {0,0,0,0}
+            ent.Pneumatic.RightDoorState = val == 4 and {1,1,1,1} or {0,0,0,0}
+            for i = 1,4 do
+                ent:SetPackedRatio("DoorL"..i,ent.Pneumatic.LeftDoorState[i])
+                ent:SetPackedRatio("DoorR"..i,ent.Pneumatic.RightDoorState[i])
+            end
             ent.Pneumatic.DoorLeft = val == 4 and true or false
             ent.Pneumatic.DoorRight = val == 4 and true or false
             if ent.AR63  then
@@ -1026,6 +1028,16 @@ ENT.Spawner = {
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
+        --------------------------------------
+        if ent.Pneumatic.NewPneumatics == 1 then
+            ent.DoorLinePressure = val == 3 and math.random()*3.6 or 3.6
+	        ent.LeftDoorCloseCylPressure = val == 4 and 0.0 or 3.6
+	        ent.LeftDoorOpenCylPressure = val == 4 and 3.6 or 0.0
+	        ent.RightDoorCloseCylPressure = val == 4 and 0.0 or 3.6
+	        ent.RightDoorOpenCylPressure = val == 4 and 3.6 or 0.0
+            if ent.AR63 then ent._1stRightDoorCloseCylPressure = val == 4 and 0.0 or 3.6 end
+        end
+        --------------------------------------
         ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
         ent.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
         if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end

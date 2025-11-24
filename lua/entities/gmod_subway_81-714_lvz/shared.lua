@@ -317,6 +317,8 @@ function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("GreenRPRKR",0)
     self.Electric:TriggerInput("Type",self.Electric.LVZ_2)
     self.Electric:TriggerInput("X2PS",1)
+    self.Pneumatic:TriggerInput("NewPneumatics",1)
+    self.Pneumatic:TriggerInput("HeadCarPneumatic",0)
 end
 function ENT:InitializeSystems()
     -- Электросистема 81-710
@@ -353,7 +355,7 @@ function ENT:InitializeSystems()
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_714_Panel")
     -- Пневмосистема 81-710
-    self:LoadSystem("Pneumatic","81_714_NewPneumatic",{br013_1 = true})
+    self:LoadSystem("Pneumatic","81_717_Pneumatic",{br013_1 = true,pneumatics = 1, headcar = false})
     -- Everything else
     self:LoadSystem("Battery")
     self:LoadSystem("PowerSupply","BPSN")

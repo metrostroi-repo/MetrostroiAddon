@@ -18,7 +18,7 @@ ENT.SyncTable = {
     "AIS","A15","A81","A68","A80",
     "RC1","VB","BPS","UOS", "PB", "UAVA","UAVAC",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","DriverValveDisconnect","ParkingBrake","EPK","EmergencyBrakeValve",
-    "VUD2","VDL","Wiper", "GV", "HDLK1","HDLK2","HDLK3","HDLK4","HDLK5","HDLK6","HDLK7","HDLK8","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight","DoorReleaseExtra",
+    "VUD2","VDL","Wiper", "GV", "door_lock1","door_lock2","door_lock3","door_lock4","door_lock5","door_lock6","door_lock7","door_lock8","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight","DoorReleaseExtra",
     "R_ASNPMenu","R_ASNPUp","R_ASNPDown","R_ASNPOn"
     , "ALSFreq","Ring","VBD",
     "V11","V12","V13","UPPS_On","SAB1"
@@ -401,6 +401,8 @@ function ENT:TrainSpawnerUpdate()
     self.Pneumatic:TriggerInput("KM013Over",math.random()>0.92)
     self.Pneumatic:TriggerInput("VZ1Offset",0.9)
     self.Pneumatic:TriggerInput("VZ2Offset",2.5)
+    self.Pneumatic:TriggerInput("VZ1ReleaseRate",math.Rand(1.1,1.3))
+    self.Pneumatic:TriggerInput("VZ2ReleaseRate",math.Rand(1.1,1.3))
     self.CompressorEfficiency = math.random()*0.05 + 0.02
     self.AirConsumeRatio = math.random()*0.04 + 0.06
     self.AirLeakRatio = math.random()*0.002 + 0.001
