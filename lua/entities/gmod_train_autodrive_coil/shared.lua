@@ -1,5 +1,5 @@
 ENT.Type            = "anim"
-
+ENT.Base            = "base_gmodentity"
 ENT.PrintName       = "Autodrive coil"
 ENT.Category		= "Metrostroi (utility)"
 

@@ -108,7 +108,7 @@ function ulx.trains( calling_ply, ToP )
         for k2,ent in pairs(ents) do
             if ent.NoTrain or trains[ent] or (ent.FrontTrain and ent.RearTrain) or not ent.WagonList then continue end
 
-            local owner = CPPI and ent:CPPIGetOwner() or ent:GetOwner()
+            local owner = CPPI and ent:CPPIGetOwner() or ent:GetPlayer()
             local canShow = not ToP or ToP == "" or IsValid(owner) and owner:GetName():find(ToP)
 
             if not canShow and not tonumber(ToP) then continue end
@@ -181,7 +181,7 @@ function ulx.traingoto( calling_ply, ToP)
         for k2,ent in pairs(ents) do
             if ent.NoTrain then continue end
 
-            local owner = CPPI and ent:CPPIGetOwner() or ent:GetOwner()
+            local owner = CPPI and ent:CPPIGetOwner() or ent:GetPlayer()
             local driver = ent:GetDriver()
             if not ToS and owner == calling_ply and not (ent.FrontTrain and ent.RearTrain) then train = ent break end
             if ToS and driver and driver:GetName():find(ToS) and not ulx.getExclusive(driver,calling_ply) then train = ent break end

@@ -57,7 +57,7 @@ function ENT:PostEntityPaste(ply,ent,createdEntities)
             v[1].NoPhysics = v[2] or nil
 
             -- Assign ownership
-            if IsValid(self:GetOwner()) then v[1]:SetOwner(self:GetOwner()) end
+            if IsValid(self:GetPlayer()) then v[1]:SetPlayer(self:GetPlayer()) end
             if CPPI and IsValid(self:CPPIGetOwner()) then v[1]:CPPISetOwner(self:CPPIGetOwner()) end
 
             -- Some shared general information about the bogey
@@ -107,7 +107,7 @@ function ENT:Initialize()
     self:SetUseType(SIMPLE_USE)
     -- Prop-protection related
     if IsValid(self.Owner) then
-        self:SetOwner(self.Owner)
+        self:SetPlayer(self.Owner)
         if CPPI then self:CPPISetOwner(self.Owner) end
     end
     -- Entities that belong to train and must be cleaned up later
@@ -1034,7 +1034,7 @@ function ENT:CreateBogey(pos,ang,forward,typ)
     bogey:Spawn()
 
     -- Assign ownership
-    if IsValid(self:GetOwner()) then bogey:SetOwner(self:GetOwner()) end
+    if IsValid(self:GetPlayer()) then bogey:SetPlayer(self:GetPlayer()) end
     if CPPI and IsValid(self:CPPIGetOwner()) then bogey:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Some shared general information about the bogey
@@ -1072,7 +1072,7 @@ function ENT:CreateBogey(pos,ang,forward,typ)
 end
 function ENT:AddLightSensor(pos,ang,model)
     local sensor = ents.Create("gmod_train_autodrive_coil")
-    if IsValid(self:GetOwner()) then sensor:SetOwner(self:GetOwner()) end
+    if IsValid(self:GetPlayer()) then sensor:SetPlayer(self:GetPlayer()) end
     if CPPI and IsValid(self:CPPIGetOwner()) then sensor:CPPISetOwner(self:CPPIGetOwner()) end
     sensor:SetPos(self:LocalToWorld(pos))
     sensor:SetAngles(self:LocalToWorldAngles(ang))
@@ -1095,7 +1095,7 @@ function ENT:AddAutodriveCoil(bogey,right)
             bogey.CoilL = coil
         end
     -- Assign ownership
-        if IsValid(self:GetOwner()) then coil:SetOwner(self:GetOwner()) end
+        if IsValid(self:GetPlayer()) then coil:SetPlayer(self:GetPlayer()) end
         if CPPI and IsValid(self:CPPIGetOwner()) then coil:CPPISetOwner(self:CPPIGetOwner()) end
     end
     if right then
@@ -1121,7 +1121,7 @@ function ENT:CreateCouple(pos,ang,forward,typ)
     coupler:Spawn()
 
     -- Assign ownership
-    if IsValid(self:GetOwner()) then coupler:SetOwner(self:GetOwner()) end
+    if IsValid(self:GetPlayer()) then coupler:SetPlayer(self:GetPlayer()) end
     if CPPI and IsValid(self:CPPIGetOwner()) then coupler:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Some shared general information about the bogey
@@ -1194,7 +1194,7 @@ function ENT:CreateSeatEntity(seat_info)
     self:DrawShadow(false)
 
     --Assign ownership
-    if IsValid(self:GetOwner()) then seat:SetOwner(self:GetOwner()) end
+    if IsValid(self:GetPlayer()) then seat:SetOwner(self:GetPlayer()) end
     if CPPI and IsValid(self:CPPIGetOwner()) then seat:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Hide the entity visually
