@@ -20,7 +20,8 @@ function ENT:DrawTranslucent(flags)
 end
 
 cvars.AddChangeCallback("metrostroi_drawsignaldebug", function (name, oldValue, newValue)
+    local noDraw = not C_SignalDebug:GetBool()
     for _,ent in pairs(ents.FindByClass("gmod_track_pa_marker")) do
-        ent:SetNoDraw(newValue == 0)
+        ent:SetNoDraw(noDraw)
     end
 end)
