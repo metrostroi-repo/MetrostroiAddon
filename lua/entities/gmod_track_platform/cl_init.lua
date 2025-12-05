@@ -378,32 +378,59 @@ function ENT:Think()
     end
 end
 
+local C_SignalDebug = GetConVar("metrostroi_drawsignaldebug")
 
---------------------------------------------------------------------------------
--- Make sure entity is not drawn
---------------------------------------------------------------------------------
 function ENT:Draw()
-    if GetConVar("metrostroi_drawsignaldebug"):GetInt() ~= 1 then return end
-    local platformStart = self:GetNW2Vector("PlatformStart",false)
-    local platformEnd = self:GetNW2Vector("PlatformEnd",false)
+    if not C_SignalDebug:GetBool() then
+        self:SetNoDraw(true)
+        return
+    end
 
-    local pos = self:GetPos()+Vector(0,0,50)
-    --[[ if platformStart and platformEnd then
-        pos = platformStart + (platformEnd-platformStart)/2+Vector(0,0,50)
-    end--]]
-    --print(2)
-    local ang = self:LocalToWorldAngles(Angle(0,180,90))
-    cam.Start3D2D(pos, ang, 0.25)
-        surface.SetDrawColor(125, 125, 0, 255)
-        surface.DrawRect(0, 0, 160, 24)
+    local pos, ang
+    local stationIndex = self:GetNWInt("StationIndex")
+    local platformIndex = self:GetNWInt("PlatformIndex")
+    local platformStart = self:GetNW2Vector("PlatformStart")
+    local platformEnd = self:GetNW2Vector("PlatformEnd")
 
-        draw.DrawText(Format("[%d]/%d",self:GetNWInt("StationIndex"),self:GetNWInt("PlatformIndex")),"Trebuchet24",5,0,Color(0,0,0,255))
-    cam.End3D2D()
-    local ang = self:LocalToWorldAngles(Angle(0,0,90))
-    cam.Start3D2D(pos, ang, 0.25)
-        surface.SetDrawColor(125, 125, 0, 255)
-        surface.DrawRect(0, 0, 160, 24)
+    for i=0,1 do
+        -- gmod_track_platform
+        pos = self:LocalToWorld(Vector(0,0,50))
+        ang = self:LocalToWorldAngles(Angle(0,i*180,90))
+        cam.Start3D2D(pos, ang, 0.25)
+            if i == 0 then
+                surface.SetDrawColor(125, 125, 0, 255)
+                surface.DrawRect(-75, 0, 150, 24)
+            end
+            draw.DrawText(Format("[%d]/%d",stationIndex,platformIndex,count),"Trebuchet24",-75,0,Color(0,0,0,255))
+        cam.End3D2D()
 
-        draw.DrawText(Format("[%d]/%d",self:GetNWInt("StationIndex"),self:GetNWInt("PlatformIndex")),"Trebuchet24",5,0,Color(0,0,0,255))
-    cam.End3D2D()
+        -- Start platform info_target
+        pos = platformStart + Vector(0,0,35)
+        cam.Start3D2D(pos, ang, 0.25)
+            if i == 0 then
+                surface.SetDrawColor(49, 150, 3, 255)
+                surface.DrawRect(-75, 0, 150, 24)
+            end
+            draw.DrawText(Format("[%d]/%d: Start",stationIndex,platformIndex),"Trebuchet24",-75,0,Color(0,0,0,255))
+        cam.End3D2D()
+
+        -- End platform info_target
+        pos = platformEnd + Vector(0,0,35)
+        cam.Start3D2D(pos, ang, 0.25)
+            if i == 0 then
+                surface.SetDrawColor(125, 50, 0)
+                surface.DrawRect(-75, 0, 150, 24)
+            end
+            draw.DrawText(Format("[%d]/%d: End",stationIndex,platformIndex),"Trebuchet24",-75,0,Color(0,0,0,255))
+        cam.End3D2D()
+
+        render.DrawLine(platformStart, platformEnd, Color(255,0,0,255), true)
+    end
 end
+
+cvars.AddChangeCallback("metrostroi_drawsignaldebug", function()
+    local noDraw = not C_SignalDebug:GetBool()
+    for _,ent in pairs(ents.FindByClass("gmod_track_platform")) do
+        ent:SetNoDraw(noDraw)
+    end
+end)
