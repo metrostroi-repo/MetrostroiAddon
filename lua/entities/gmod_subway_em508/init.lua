@@ -49,13 +49,13 @@ function ENT:Initialize()
     if Metrostroi.BogeyOldMap then
         self.FrontBogey = self:CreateBogey(Vector( 317-5,0,-89),Angle(0,180,0),true,"717")
         self.RearBogey  = self:CreateBogey(Vector(-317+0,0,-89),Angle(0,0,0),false,"717")
-        self.FrontCouple = self:CreateCouple(Vector( 419.5,0,-75),Angle(0,0,0),true,"702")
-        self.RearCouple  = self:CreateCouple(Vector(-421.5,0,-75),Angle(0,180,0),false,"702")
+        self.FrontCouple = self:CreateCouple(Vector( 419.5+3.5,0,-75),Angle(0,0,0),true,"702")
+        self.RearCouple  = self:CreateCouple(Vector(-421.5-3.5,0,-75),Angle(0,180,0),false,"702")
     else
         self.FrontBogey = self:CreateBogey(Vector( 317-11,1.0,-85),Angle(0,180,0),true,"717")
         self.RearBogey  = self:CreateBogey(Vector(-317+0,1.3,-85),Angle(0,0,0),false,"717")
-        self.FrontCouple = self:CreateCouple(Vector( 421-4-3.6-2,1.0,-72),Angle(0,0,0),true,"702")
-        self.RearCouple  = self:CreateCouple(Vector(-421+2+3.6,1.3,-72),Angle(0,180,0),false,"702")
+        self.FrontCouple = self:CreateCouple(Vector( 421-4-3.6+4.5,1.0,-72),Angle(0,0,0),true,"702")
+        self.RearCouple  = self:CreateCouple(Vector(-421+2+3.6-4.5,1.3,-72),Angle(0,180,0),false,"702")
     end
     self.FrontBogey:SetNWInt("MotorSoundType",0)
     self.RearBogey:SetNWInt("MotorSoundType",0)
