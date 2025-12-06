@@ -1194,7 +1194,7 @@ function ENT:CreateSeatEntity(seat_info)
     self:DrawShadow(false)
 
     --Assign ownership
-    if IsValid(self:GetPlayer()) then seat:SetOwner(self:GetPlayer()) end
+    if IsValid(self:GetPlayer()) then seat:SetCreator(self:GetPlayer()) end
     if CPPI and IsValid(self:CPPIGetOwner()) then seat:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Hide the entity visually
