@@ -2,9 +2,9 @@ Metrostroi Subway Simulator 2025
 ================================================================================
 
 ## Working branches:
-`unstable` - Development branch. Contains all last changes, not tested and very unstable. Stable work not guaranteed, use at your own risk.
-`dev` - Stable development branch. All changes are reviewed and tested, but may contain bugs. Can use on servers.
-`release` - Stable branch. Code for Steam Workshop.
+- `unstable` - Development branch. Contains all last changes, not tested and very unstable. Stable work not guaranteed, use at your own risk.
+- `dev` - Stable development branch. All changes are reviewed and tested, but may contain bugs. Can use on servers.
+- `release` - Stable branch. Code for Steam Workshop.
 
 ## Licensing
 ### Models and materials
