@@ -409,12 +409,49 @@ function ENT:InitializeSounds()
     self.SoundPositions["samm_revers_out"] = {60,1e9,Vector(442.2-6,-50,-10)}
     self.SoundPositions["samm_revers_in"] = {60,1e9,Vector(442.2-6,-50,-10)}
 
-    self.SoundNames["ring"] = {loop=0.15,"subway_trains/717/ring/ring_start.wav","subway_trains/717/ring/ring_loop.wav","subway_trains/717/ring/ring_end.wav"}
-    self.SoundPositions["ring"] = {100,1e9,Vector(445,-55,-15),0.2}
+    self.SoundNames["ring"] = {loop=0.15,"subway_trains/717/ring/ringo_start.wav","subway_trains/717/ring/ringo_loop.wav","subway_trains/717/ring/ringo_end.mp3"}--{loop=0.15,"subway_trains/717/ring/ring_start.wav","subway_trains/717/ring/ring_loop.wav","subway_trains/717/ring/ring_end.wav"}
+    self.SoundPositions["ring"] = {60,1e9,Vector(400,-30,55),0.5}--{100,1e9,Vector(445,-55,-15),0.2}
 
     self.SoundNames["cab_door_open"] = "subway_trains/common/door/cab/door_open.mp3"
     self.SoundNames["cab_door_close"] = "subway_trains/common/door/cab/door_close.mp3"
 
+    self.SoundNames["fuseh_in"] = {
+        "subway_trains/710/fuseh_in_1.mp3",
+        "subway_trains/710/fuseh_in_2.mp3",
+        "subway_trains/710/fuseh_in_3.mp3",
+    }
+    self.SoundPositions["fuseh_in"] = {80,1e2,Vector(449+7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fuseh_out"] = {
+        "subway_trains/710/fuseh_out_1.mp3",
+        "subway_trains/710/fuseh_out_2.mp3",
+        "subway_trains/710/fuseh_out_3.mp3",
+    }
+    self.SoundPositions["fuseh_in"] = {80,1e2,Vector(449+7.7,56.0,-10.24349),0.6}
+
+    self.SoundNames["fusecap_open"] = {
+        "subway_trains/710/fusecap_open_1.mp3",
+        "subway_trains/710/fusecap_open_2.mp3",
+    }
+    self.SoundPositions["fusecap_open"] = {80,1e2,Vector(449+7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fusecap_close"] = {
+        "subway_trains/710/fusecap_close_1.mp3",
+        "subway_trains/710/fusecap_close_2.mp3",
+    }
+    self.SoundPositions["fusecap_close"] = {80,1e2,Vector(449+7.7,56.0,-10.24349),0.6}
+     
+     self.SoundNames["fusebox_open"] = {
+        "subway_trains/710/fusebox_open_1.mp3",
+        "subway_trains/710/fusebox_open_2.mp3",
+    }
+    self.SoundPositions["fusebox_open"] = {80,1e2,Vector(449+7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fusebox_close"] = {
+        "subway_trains/710/fusebox_close_1.mp3",
+        "subway_trains/710/fusebox_close_2.mp3",
+    }
+    self.SoundPositions["fusebox_close"] = {80,1e2,Vector(449+7.7,56.0,-10.24349),0.6}
 
     self.SoundNames["parking_brake_rolling"] = {"subway_trains/ezh3/parking_brake_rolling1.mp3","subway_trains/ezh3/parking_brake_rolling2.mp3","subway_trains/ezh3/parking_brake_rolling3.mp3","subway_trains/ezh3/parking_brake_rolling4.mp3"}
     self.SoundPositions["parking_brake_rolling"] = {65,1e9,Vector(449.118378+7.6,33.493385,-14.713276),0.1}
@@ -603,6 +640,8 @@ function ENT:InitializeSystems()
 end
 function ENT:PostInitializeSystems()
     self.YAR_27:TriggerInput("NoRKTT",1)
+    self.YAR_15A:TriggerInput("WithFuse",1)
+    self.Pneumatic:TriggerInput("PowerWithFuse",1)
 end
 
 ENT.SubwayTrain = {

@@ -1,0 +1,12 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/metrostroi_train/81-710/electric/fusebox_cover_base"
+	"$model" "1"
+	"$phong" "1"
+
+	"$phongexponenttexture"	"models/metrostroi_train/81-710/electric/fusebox_cover_roughness"
+	"$phongboost"	1.1
+	"$phongfresnelranges"	"[1 1 1]"
+
+	$normalmapalphaenvmapmask 1
+}

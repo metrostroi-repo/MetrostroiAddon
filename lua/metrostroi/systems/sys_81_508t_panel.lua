@@ -28,11 +28,62 @@ function TRAIN_SYSTEM:Initialize()
 
     -- Автоматические выключатели (АВ)
     self.Train:LoadSystem("VU1","Relay","Switch", {bass = true})
-    self.Train:LoadSystem("VU2","Relay","Switch", {bass = true,  normally_closed = true})
+    self.Train:LoadSystem("VU2","Relay","Switch", {bass = true,  normally_closed = false})
     self.Train:LoadSystem("VU3","Relay","Switch", {bass = true})
     self.Train:LoadSystem("AV","Relay","Switch", {bass = true})
     self.Train:LoadSystem("VU","Relay","Switch", {bass = true, normally_closed = false})
+     
+     self.Train:LoadSystem("Ring","Relay","Switch", {bass = true})
 
+    --Предохранители высоковольтные
+    self.Train:LoadSystem("PR1","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR2","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR5","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR11","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR4","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR9","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR6","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR8","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PR12","Relay","Switch", {normally_closed = true,bass = true})
+     
+    self.Train:LoadSystem("PR1Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR2Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR5Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR11Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR4Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR9Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR6Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR8Cap","Relay","Switch", {normally_closed = false,bass = true})
+    self.Train:LoadSystem("PR12Cap","Relay","Switch", {normally_closed = false,bass = true})
+    --Предохранители низковольтные
+
+    self.Train:LoadSystem("PRL13","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL31","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL17","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL25","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL18","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL24","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL19","Relay","Switch", {normally_closed = true,bass = true})
+    --self.Train:LoadSystem("PRL6A","Relay","Switch", {normally_closed = true,bass = true}) 
+    self.Train:LoadSystem("PRL4A","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL16","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL28","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL2A","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL34","Relay","Switch", {normally_closed = true,bass = true})
+
+    self.Train:LoadSystem("PRL23","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL15","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL22","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL20","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL21","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL32","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL30","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL1A","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL14","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL26","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL12","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL29","Relay","Switch", {normally_closed = true,bass = true})
+    self.Train:LoadSystem("PRL33","Relay","Switch", {normally_closed = true,bass = true})
 
     self.V1 = 0
     self.GRP = 0
@@ -41,13 +92,16 @@ function TRAIN_SYSTEM:Initialize()
     self.SD = 0
     self.Headlights1 = 0
     self.Headlights2 = 0
-    self.RedLights = 0
+    self.RedLight1 = 0
+    self.RedLight2 = 0
     self.EmergencyLights2 = 0
     self.EmergencyLights1 = 0
     self.MainLights1 = 0
     self.MainLights2 = 0
+    self.LightPower = 0
     self.PanelLights = 0
     self.GaugeLights = 0
+    self.Ring = 0
 
     self.AnnouncerPlaying = 0
 
@@ -57,5 +111,5 @@ function TRAIN_SYSTEM:Initialize()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return {"V1","GRP","RRP","TW18","SD","Headlights1","Headlights2","RedLights","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","PanelLights","GaugeLights","AnnouncerPlaying","BatteryVoltmeter","PCBKPower"}
+    return {"V1","GRP","RRP","TW18","SD","Headlights1","Headlights2","RedLight1","RedLight2","EmergencyLights2","EmergencyLights1","MainLights1","MainLights2","PanelLights","GaugeLights","AnnouncerPlaying","BatteryVoltmeter","PCBKPower","LightPower","Ring"}
 end

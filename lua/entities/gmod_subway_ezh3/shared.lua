@@ -318,11 +318,51 @@ function ENT:InitializeSounds()
         "subway_trains/common/uava/uava_reset2.mp3",
         "subway_trains/common/uava/uava_reset4.mp3",
     }
+
     self.SoundPositions["uava_reset"] = {80,1e9,Vector(449+7.7,56.0,-10.24349),0.6}
     self.SoundNames["gv_f"] = self.SoundNames["ezh3_revers_0-b"]
     self.SoundNames["gv_b"] = self.SoundNames["ezh3_revers_b-0"]
     self.SoundPositions["gv_f"]     = {80,1e2,Vector(120,62.0+0.0,-60),0.5}
     self.SoundPositions["gv_b"]     = self.SoundPositions["gv_f"]
+     
+    self.SoundNames["fuseh_in"] = {
+        "subway_trains/710/fuseh_in_1.mp3",
+        "subway_trains/710/fuseh_in_2.mp3",
+        "subway_trains/710/fuseh_in_3.mp3",
+    }
+    self.SoundPositions["fuseh_in"] = {80,1e2,Vector(449+7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fuseh_out"] = {
+        "subway_trains/710/fuseh_out_1.mp3",
+        "subway_trains/710/fuseh_out_2.mp3",
+        "subway_trains/710/fuseh_out_3.mp3",
+    }
+    self.SoundPositions["fuseh_in"] = {80,1e2,Vector(449+7.7,56.0,-10.24349),0.6}
+
+    self.SoundNames["fusecap_open"] = {
+        "subway_trains/710/fusecap_open_1.mp3",
+        "subway_trains/710/fusecap_open_2.mp3",
+    }
+    self.SoundPositions["fusecap_open"] = {80,1e2,Vector(449+7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fusecap_close"] = {
+        "subway_trains/710/fusecap_close_1.mp3",
+        "subway_trains/710/fusecap_close_2.mp3",
+    }
+    self.SoundPositions["fusecap_close"] = {80,1e2,Vector(449+7.7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fusebox_open"] = {
+        "subway_trains/710/fusebox_open_1.mp3",
+        "subway_trains/710/fusebox_open_2.mp3",
+    }
+    self.SoundPositions["fusebox_open"] = {80,1e2,Vector(449+7,56.0,-10.24349),0.6}
+    
+     self.SoundNames["fusebox_close"] = {
+        "subway_trains/710/fusebox_close_1.mp3",
+        "subway_trains/710/fusebox_close_2.mp3",
+    }
+    self.SoundPositions["fusebox_close"] = {80,1e2,Vector(449+7.7,56.0,-10.24349),0.6}
+
 
     --Краны
     self.SoundNames["brake_f"] = {"subway_trains/common/pneumatic/vz_brake_on2.mp3","subway_trains/common/pneumatic/vz_brake_on3.mp3","subway_trains/common/pneumatic/vz_brake_on4.mp3"}
@@ -619,6 +659,8 @@ end
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("RRI",1)
     self.YAR_27:TriggerInput("NoRKTT",1)
+    self.YAR_15A:TriggerInput("WithFuse",1)
+    self.Pneumatic:TriggerInput("PowerWithFuse",1)
 end
 
 ENT.SubwayTrain = {
@@ -654,6 +696,8 @@ ENT.Spawner = {
             ent.UAVA:TriggerInput("Set",1)
             ent.Plombs.VU = true
             ent.Plombs.UAVA = nil
+               ent.PRL26:TriggerInput("Set",0)
+               ent.PRL12:TriggerInput("Set",0)
         end
     end,
     Metrostroi.Skins.GetTable("Texture","Texture",false,"train"),
@@ -683,19 +727,24 @@ ENT.Spawner = {
             if ent.RRI  then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.VU2:TriggerInput("Set",(val<=2 and first) and 1 or 0)
-                ent.ARS:TriggerInput("Set",(val==1 and first and ent.Plombs.RUM) and 1 or 0)
-                ent.ALS:TriggerInput("Set",val==1 and 1 or 0)
+                ent.ARS:TriggerInput("Set",(val<=2 and ent.Plombs.RUM) and 1 or 0)
+                ent.ALS:TriggerInput("Set",val<=2 and 1 or 0)
                 ent.EPK:TriggerInput("Set",(val<=2 and ent.Plombs.RUM) and 1 or 0)
-                ent.RRIEnable:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.RRIAmplifier:TriggerInput("Set",val<=2 and 1 or 0)
+                ent.RRIEnable:TriggerInput("Set",val<=1 and 1 or 0)
+                ent.RRIAmplifier:TriggerInput("Set",val<=1 and 1 or 0)
                 ent.R_ASNPOn:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.R_UNch:TriggerInput("Set",val<=2 and 1 or 0)
-                ent.R_Radio:TriggerInput("Set",val<=2 and 1 or 0)
+                ent.R_UNch:TriggerInput("Set",(val<=1 and first) and 1 or 0)
+                ent.R_Radio:TriggerInput("Set",(val<=1 and first) and 1 or 0)
+                ent.R_G:TriggerInput("Set",(val<=1 and first) and 1 or 0)
+                ent.R_ZS:TriggerInput("Set",(val<=1 and first) and 1 or 0)
+                ent.RST:TriggerInput("Set",(val<=1 and first) and 1 or 0)
                 ent.V1:TriggerInput("Set",(val==1 and first) and 1 or 0)
                 _LastSpawner=CurTime()
                 ent.CabinDoor = val==4 and first
                 ent.PassengerDoor = val==4
                 ent.RearDoor = val==4
+                ent.DriverValveTLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
+                ent.DriverValveBLDisconnect:TriggerInput("Set",(val==4 and first) and 1 or 0)
             else
                 ent.VU2:TriggerInput("Set",0)
                 ent.FrontDoor = val==4
@@ -710,5 +759,7 @@ ENT.Spawner = {
         end
         if val==1 then ent.KO:TriggerInput("Close",1) else ent.KO:TriggerInput("Open",1) end
         ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+        ent.Pneumatic.BrakeLinePressure = val == 4 and 5.2 or val == 1 and 2.3 or math.min(ent.Pneumatic.TrainLinePressure+0.25,math.random()*4)
+        ent.Pneumatic.ReservoirPressure = val == 4 and 5.2 or val == 1 and 2.3 or math.min(ent.Pneumatic.TrainLinePressure+0.25,math.random()*4)
     end},
 }
