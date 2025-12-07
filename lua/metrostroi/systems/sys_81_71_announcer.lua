@@ -148,7 +148,9 @@ else
         local train = net.ReadEntity()
         if not IsValid(train) or not train.RenderClientEnts then return end
         local snd = net.ReadString()
-        train.Announcer.AnnTable = net.ReadString()
+        if train.Announcer then
+            train.Announcer.AnnTable = net.ReadString()
+        end
 
         if train.AnnouncerPositions then
             for k, v in ipairs(train.AnnouncerPositions) do

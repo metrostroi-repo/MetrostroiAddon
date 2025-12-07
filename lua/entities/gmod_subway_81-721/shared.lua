@@ -139,6 +139,8 @@ function ENT:InitializeSystems()
 
     self:LoadSystem("Panel","81_721_Panel")
 
+    self:LoadSystem("Announcer","81_71_Announcer", "AnnouncementsASNP")
+
     self:LoadSystem("Tickers","81_720_Ticker")
     self:LoadSystem("PassSchemes","81_720_PassScheme")
 
