@@ -163,17 +163,6 @@ function TOOL:Think()
                 e.GetBodyColor = function() return Vector(1,1,1) end
                 e.GetDirtLevel = function() return 0.25 end
             end
-            hook.Add("Think",self.GhostEntities[1],function()
-                if not IsValid(self.Owner:GetActiveWeapon()) or self.Owner:GetActiveWeapon():GetClass()~="gmod_tool" or GetConVar("gmod_toolmode"):GetString() ~= "train_spawner" then
-                    self:OnRemove()
-                end
-            end)
-
-            local oldOR = self.GhostEntities[1].OnRemove
-            self.GhostEntities[1].OnRemove = function(ent)
-                hook.Remove("Think",ent)
-                oldOR(ent)
-            end
         else
             self:UpdateGhost()
         end
@@ -386,14 +375,6 @@ function TOOL:SpawnWagon(trace)
     --end
     --self.rot = false
     for k,v in pairs(FIXFIXFIX) do SafeRemoveEntity(v) end
-end
-
-function TOOL:OnRemove()
-    self:Finish()
-end
-function TOOL:Finish()
-    for _,e in pairs(self.GhostEntities) do SafeRemoveEntity(e) end
-    self.GhostEntities = {}
 end
 
 function TOOL:Reload(trace)
