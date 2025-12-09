@@ -569,23 +569,30 @@ ENT.ButtonMap["UAVAPanel"] = {
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(410-15+i*6.6-3*6.6/2,69.07,-25.5),
+        pos = Vector(0,0,0),
         ang = Angle(0,90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberL",i,Vector(360, 69.07,-25.5),TEXT_ALIGN_RIGHT)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberL",i,4,false)
         end,
     }
     ENT.ClientProps["TrainNumberR"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(-392-15-i*6.6-3*6.6/2,-66.37,-26),
+        pos = Vector(0,0,0),
         ang = Angle(0,-90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberR",i,Vector(-416,-66.37,-26),TEXT_ALIGN_RIGHT)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberR",i,4,true)
         end,
     }
 end
+
 ENT.ButtonMap["FrontDoor"] = {
     pos = Vector(460.7,16-1,40),
     ang = Angle(0,-90,90),
@@ -1045,20 +1052,19 @@ function ENT:Initialize()
     self.OldSpeedoDelta = 0
     self.SpeedoDelta = 0
 end
+
 function ENT:UpdateWagonNumber()
+    self.TrainNumberR = false
+    self.TrainNumberL = false
     for i=0,3 do
-        local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
-        local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
-        if IsValid(leftNum) then
-            leftNum:SetPos(self:LocalToWorld(Vector(395+i*6.6-3*6.6/2,69.07,-25.5)))
-            leftNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-        end
-        if IsValid(rightNum) then
-            rightNum:SetPos(self:LocalToWorld(Vector(-407-i*6.6-3*6.6/2,-66.37,-26)))
-            rightNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-        end
+        local cent = self.ClientEnts["TrainNumberR"..i]
+        if IsValid(cent) then cent:Remove() end
+
+        cent = self.ClientEnts["TrainNumberL"..i]
+        if IsValid(cent) then cent:Remove() end
     end
 end
+
 --------------------------------------------------------------------------------
 function ENT:Think()
     self.BaseClass.Think(self)

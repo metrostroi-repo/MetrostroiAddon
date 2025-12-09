@@ -1037,28 +1037,32 @@ ENT.ButtonMap["RearDoor1"] = {
     }
 }
 
-
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(60+i*6.6-4*6.6/2,66.56,18),
+        pos = Vector(0,0,0),
         ang = Angle(-5,90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberL",i,Vector(57.35, 66.56,18),TEXT_ALIGN_CENTER)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberL",i,4,false)
         end,
     }
     ENT.ClientProps["TrainNumberR"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(53-i*6.6+4*6.6/2,-66.56,18),
+        pos = Vector(0,0,0),
         ang = Angle(-5,-90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberR",i,Vector(57.35,-66.56,18),TEXT_ALIGN_CENTER)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberR",i,4,true)
         end,
     }
 end
-
 
 ENT.ClientProps["salon"] = {
     model = "models/metrostroi_train/81-720/720_salon.mdl",
@@ -1643,24 +1647,19 @@ function ENT:Initialize()
         self.VentVol[i] = 0
     end
 end
+
 function ENT:UpdateWagonNumber()
+    self.TrainNumberR = false
+    self.TrainNumberL = false
     for i=0,3 do
-        --self:ShowHide("TrainNumberL"..i,i<count)
-        --self:ShowHide("TrainNumberR"..i,i<count)
-        --if i< count then
-            local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
-            local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
-            if IsValid(leftNum) then
-                leftNum:SetPos(self:LocalToWorld(Vector(60+i*6.6-4*6.6/2,66.56,18)))
-                leftNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-            end
-            if IsValid(rightNum) then
-                rightNum:SetPos(self:LocalToWorld(Vector(53-i*6.6+4*6.6/2,-66.56,18)))
-                rightNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-            end
-        --end
+        local cent = self.ClientEnts["TrainNumberR"..i]
+        if IsValid(cent) then cent:Remove() end
+
+        cent = self.ClientEnts["TrainNumberL"..i]
+        if IsValid(cent) then cent:Remove() end
     end
 end
+
 local Cpos = {
     0,0.24,0.5,0.55,0.6,1
 }

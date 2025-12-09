@@ -867,23 +867,30 @@ ENT.ClientProps["WhiteLights"] = {
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(295+i*6.6-4*6.6/2,69.07,-25.5),
+        pos = Vector(0,0,0),
         ang = Angle(0,90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberL",i,Vector(305, 69.07,-25.5),TEXT_ALIGN_LEFT)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberL",i,4,false)
         end,
     }
     ENT.ClientProps["TrainNumberR"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(-280-i*6.6-4*6.6/2,-66.37,-25.5),
+        pos = Vector(0,0,0),
         ang = Angle(0,-90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberR",i,Vector(-317,-66.37,-25.5),TEXT_ALIGN_LEFT)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberR",i,4,true)
         end,
     }
 end
+
 ENT.Lights = {
     [1] = { "headlight",        Vector(470,0,-35), Angle(0,0,0), Color(200,130,88), brightness = 4 , fov=100, texture = "models/metrostroi_train/equipment/headlight",shadows = 1,headlight=true},
     [22] = { "headlight",       Vector(445,-55,41), Angle(75, 70,45), Color(190, 130, 88), fov=110, farz=65, brightness = 3, shadows = 1, texture = "models/metrostroi_train/equipment/headlight", hidden="Lamps_pult"},
@@ -919,19 +926,17 @@ function ENT:Initialize()
 end
 
 function ENT:UpdateWagonNumber()
+    self.TrainNumberR = false
+    self.TrainNumberL = false
     for i=0,3 do
-        local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
-        local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
-        if IsValid(leftNum) then
-            leftNum:SetPos(self:LocalToWorld(Vector(295+i*6.6-4*6.6/2,69.07,-25.5)))
-            leftNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-        end
-        if IsValid(rightNum) then
-            rightNum:SetPos(self:LocalToWorld(Vector(-280-i*6.6-4*6.6/2,-66.37,-25.5)))
-            rightNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-        end
+        local cent = self.ClientEnts["TrainNumberR"..i]
+        if IsValid(cent) then cent:Remove() end
+
+        cent = self.ClientEnts["TrainNumberL"..i]
+        if IsValid(cent) then cent:Remove() end
     end
 end
+
 --------------------------------------------------------------------------------
 function ENT:Think()
     self.BaseClass.Think(self)
