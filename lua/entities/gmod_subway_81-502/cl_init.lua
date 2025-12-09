@@ -1466,24 +1466,29 @@ ENT.ButtonMap["UAVAPanel"] = {
     }
 }
 
-
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(295+i*6.6-3*6.6/2,69.07,-25.5),
+        pos = Vector(0,0,0),
         ang = Angle(0,90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberL",i,Vector(306, 69.07,-25.5),TEXT_ALIGN_LEFT)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberL",i,4,false)
         end,
     }
     ENT.ClientProps["TrainNumberR"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(-280-i*6.6-3*6.6/2,-66.37,-25.5),
+        pos = Vector(0,0,0),
         ang = Angle(0,-90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberR",i,Vector(-317,-66.37,-25.5),TEXT_ALIGN_LEFT)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberR",i,4,true)
         end,
     }
 end
@@ -2045,18 +2050,52 @@ function ENT:Initialize()
     self.EmergencyBrakeValveRamp = 0
 end
 
+function ENT:NumberCEntCallback(i, cent, id, pos)
+    local x = self[id.."Offset"..i] or 0
+    cent:SetPos(self:LocalToWorld(pos + Vector(x,0,0)))
+end
+
+function ENT:NumberModelCallback(i, id, inv)
+    local wagNum = self.WagonNumber or 0
+    local minc = self.NumberMinSize or 0
+    local count = math.max(self.NumberMinSize, math.ceil(math.log10(wagNum+1)))
+    
+    -- Calc number positions
+    if not self[id] then
+        self[id] = true
+        local x = (count - minc)*3.3
+        local prevOne = false
+
+        for n=0,4 do
+            local iN = inv and (count-n-1) or n
+            local num = math.floor(wagNum%(10^(iN+1))/10^iN)
+
+            if (num == 1) and prevOne then     -- Two and more ones
+                x = x-2.6
+            elseif (num == 1) or prevOne then  -- First one
+                x = x-4.8
+            else                               -- Not one
+                x = x-6.6
+            end
+            prevOne = (num == 1)
+            
+            self[id.."Offset"..iN] = x
+        end
+    end
+    
+    local num = math.floor(wagNum%(10^(i+1))/10^i)
+    return "models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl"
+end
+
 function ENT:UpdateWagonNumber()
+    self.TrainNumberR = false
+    self.TrainNumberL = false
     for i=0,3 do
-        local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
-        local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
-        if IsValid(leftNum) then
-            leftNum:SetPos(self:LocalToWorld(Vector(295+i*6.6-3*6.6/2,69.07,-25.5)))
-            leftNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-        end
-        if IsValid(rightNum) then
-            rightNum:SetPos(self:LocalToWorld(Vector(-280-i*6.6-3*6.6/2,-66.37,-25.5)))
-            rightNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-        end
+        local cent = self.ClientEnts["TrainNumberR"..i]
+        if IsValid(cent) then cent:Remove() end
+
+        cent = self.ClientEnts["TrainNumberL"..i]
+        if IsValid(cent) then cent:Remove() end
     end
 end
 

@@ -569,23 +569,30 @@ ENT.ButtonMap["UAVAPanel"] = {
 for i=0,3 do
     ENT.ClientProps["TrainNumberL"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(400+i*6.6-4*6.6/2,67.67,-26),
+        pos = Vector(0,0,0),
         ang = Angle(0,90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberL",i,Vector(397, 67.67,-26),TEXT_ALIGN_CENTER)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberL",i,3,false)
         end,
     }
     ENT.ClientProps["TrainNumberR"..i] = {
         model = "models/metrostroi_train/81-714_mmz/bortnumber_0.mdl",
-        pos = Vector(-405-i*6.6-4*6.6/2,-67.66,-26),
+        pos = Vector(0,0,0),
         ang = Angle(0,-90,0),
         hide = 1.5,
-        callback = function(ent)
-            ent.WagonNumber = false
+        callback = function(ent,cent)
+            Metrostroi.BortNumberMMZCallback(ent,cent,"TrainNumberR",i,Vector(-430,-67.67,-26),TEXT_ALIGN_CENTER)
+        end,
+        modelcallback = function(ent)
+            return Metrostroi.BortNumberMMZCallbackModel(ent,"TrainNumberR",i,3,true)
         end,
     }
 end
+
 ENT.ButtonMap["FrontDoor"] = {
     pos = Vector(468,16,37),
     ang = Angle(0,-90,90),
@@ -991,23 +998,20 @@ function ENT:Initialize()
     self.EmergencyValveEPKRamp = 0
     self.EmergencyBrakeValveRamp = 0
 end
+
 function ENT:UpdateWagonNumber()
     local count = math.max(3,math.ceil(math.log10(self.WagonNumber+1)))
+    
+    self.TrainNumberR = false
+    self.TrainNumberL = false
     for i=0,3 do
-        self:ShowHide("TrainNumberL"..i,i<count)
-        self:ShowHide("TrainNumberR"..i,i<count)
-        local leftNum,rightNum = self.ClientEnts["TrainNumberL"..i],self.ClientEnts["TrainNumberR"..i]
-        if i<count and self.WagonNumber then
-            local num = math.floor(self.WagonNumber%(10^(i+1))/10^i)
-            if IsValid(leftNum) then
-                leftNum:SetPos(self:LocalToWorld(Vector(400+i*6.6-4*6.6/2,67.67,-26)))
-                leftNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-            end
-            if IsValid(rightNum) then
-                rightNum:SetPos(self:LocalToWorld(Vector(-405-i*6.6-4*6.6/2,-67.66,-26)))
-                rightNum:SetModel("models/metrostroi_train/81-714_mmz/bortnumber_"..num..".mdl")
-            end
-        end
+        self:ShowHide("TrainNumberR"..i, i<count)
+        local cent = self.ClientEnts["TrainNumberR"..i]
+        if IsValid(cent) then cent:Remove() end
+
+        self:ShowHide("TrainNumberL"..i, i<count)
+        cent = self.ClientEnts["TrainNumberL"..i]
+        if IsValid(cent) then cent:Remove() end
     end
 end
 
