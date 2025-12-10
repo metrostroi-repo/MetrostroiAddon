@@ -18,6 +18,7 @@ Train.714.Shunt     = Panneau de contrôle en mannoeuvre, valve du conducteur
 Spawner.717.Line2   = Train de MPL (ligne Moskovsko-Petrogradskaya)
 Spawner.717.Line4   = Train de PBL (ligne Frunzensko-Primorskaya)
 Spawner.717.Line5   = Train de FPL (ligne Pravoberezhnaya)
+Spawner.717.NewBlue = @[Common.Spawner.New] (Bleus)
 
 Spawner.717.Type        = Type de train
 Spawner.717.BodyType    = Type de carrosserie
@@ -1215,4 +1216,22 @@ Entities.gmod_subway_81-717_lvz.Spawner.SpawnMode.1         = @[Common.Spawner.S
 Entities.gmod_subway_81-717_lvz.Spawner.SpawnMode.2         = @[Common.Spawner.SpawnMode.Deadlock]
 Entities.gmod_subway_81-717_lvz.Spawner.SpawnMode.3         = @[Common.Spawner.SpawnMode.NightDeadlock]
 Entities.gmod_subway_81-717_lvz.Spawner.SpawnMode.4         = @[Common.Spawner.SpawnMode.Depot]
+
+Entities.gmod_subway_81-717_lvz_custom.Spawner.Type.Name        = @[Spawner.Common.EType]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.Type.1           = @[Spawner.717.Line2]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.Type.2           = @[Spawner.717.Line4]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.Type.3           = @[Spawner.717.Line5]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.Texture.Name     = @[Common.Spawner.Texture]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.PassTexture.Name = @[Common.Spawner.PassTexture]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.CabTexture.Name  = @[Common.Spawner.CabTexture]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SeatType.Name    = @[Spawner.717.SeatType]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SeatType.1       = @[Common.Spawner.Random]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SeatType.2       = @[Common.Spawner.Old]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SeatType.3       = @[Common.Spawner.New]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SeatType.4       = @[Spawner.717.NewBlue]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SpawnMode.Name   = @[Common.Spawner.SpawnMode]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SpawnMode.1      = @[Common.Spawner.SpawnMode.Full]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SpawnMode.2      = @[Common.Spawner.SpawnMode.Deadlock]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SpawnMode.3      = @[Common.Spawner.SpawnMode.NightDeadlock]
+Entities.gmod_subway_81-717_lvz_custom.Spawner.SpawnMode.4      = @[Common.Spawner.SpawnMode.Depot]
 ]]
