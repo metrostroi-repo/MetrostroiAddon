@@ -568,9 +568,31 @@ function Metrostroi.ScanTrack(itype,node,func,x,dir,checked)
     if node.branches and not ars then
         for k,v in pairs(node.branches) do
             if (v[1] >= min_x) and (v[1] <= max_x) then
-                -- FIXME: somehow define direction and X!
-                local results = {Metrostroi.ScanTrack(itype,v[2],func,v[1],true,checked)}
-                if results[1] ~= nil then return unpack(results) end
+                local check_dir_node1 = node
+                local check_dir_node2 = v[2]
+                if not check_dir_node1.next and check_dir_node1.id>1 then
+                    check_dir_node1 = check_dir_node1.prev
+                end
+                if not check_dir_node2.next and check_dir_node2.id>1 then
+                    check_dir_node2 = check_dir_node2.prev
+                end
+                local check_dir_distance = check_dir_node1.dir:Distance(check_dir_node2.dir)
+                if check_dir_distance <= 0.8 then
+                    -- unidirectional
+                    local results = {Metrostroi.ScanTrack(itype,check_dir_node2,func,check_dir_node2.x,dir,checked)}
+                    if results[1] ~= nil then return unpack(results) end
+                elseif check_dir_distance >= 1.2 then
+                    -- multidirectional
+                    local results = {Metrostroi.ScanTrack(itype,check_dir_node2,func,check_dir_node2.x,not dir,checked)}
+                    if results[1] ~= nil then return unpack(results) end
+                else
+                    -- Perpendicular
+                    -- Scanning in all directions of the X-shaped intersection
+                    local results = {Metrostroi.ScanTrack(itype,check_dir_node2,func,check_dir_node2.x,true,checked)}
+                    if results[1] ~= nil then return unpack(results) end
+                    local results = {Metrostroi.ScanTrack(itype,check_dir_node2.prev,func,check_dir_node2.prev.x,false,checked)}
+                    if results[1] ~= nil then return unpack(results) end
+                end
             end
         end
     end
