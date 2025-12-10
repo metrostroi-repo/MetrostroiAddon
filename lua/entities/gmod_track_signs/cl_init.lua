@@ -1,28 +1,5 @@
 include("shared.lua")
 
-local debug = GetConVar("metrostroi_drawsignaldebug")
-local function enableDebug()
-    if debug:GetBool() then
-        hook.Add("PostDrawTranslucentRenderables","MetrostroiSignDebug",function(bDrawingDepth,bDrawingSkybox)
-            for _,ent in pairs(ents.FindByClass("gmod_track_signs")) do
-                if bDrawingDepth and LocalPlayer():GetPos():DistToSqr(sig:GetPos()) < 262144 then
-                    local pos = sig:LocalToWorld(Vector(0,0,0))
-                    local ang = sig:LocalToWorldAngles(Angle(0,90,90))
-                    cam.Start3D2D(pos, ang, 0.25)
-						surface.SetDrawColor(125, 125, 0, 255)
-						surface.DrawRect(-40, -20, 80, 20)
-                    cam.End3D2D()
-                end
-            end
-        end)
-    else
-        hook.Remove("PostDrawTranslucentRenderables","MetrostroiSignDebug")
-    end
-end
-hook.Remove("PostDrawTranslucentRenderables","MetrostroiSignDebug")
-cvars.AddChangeCallback( "metrostroi_drawsignaldebug", enableDebug)
-enableDebug()
-
 function ENT:Initialize()
 	--self.ModelProp = self:GetNWInt("Model")
 end
@@ -53,11 +30,7 @@ function ENT:Think()
 		self.Type = self:GetNWInt("Type")
 		self.ModelProp = self.SignModels[self.Type-1]
 		self.Left = self:GetNWBool("Left",false)
-		if self.Left then
-			self.Offset = self:GetNWVector("Offset")
-		else
-			self.Offset = self:GetNWVector("Offset")
-		end
+		self.Offset = self:GetNWVector("Offset")
 		self:RemoveModels()
 	end
 	if not self.ModelProp then
@@ -106,5 +79,26 @@ function ENT:Think()
 	return true
 end
 
-function ENT:Draw()
+local C_SignalDebug = GetConVar("metrostroi_drawsignaldebug")
+
+function ENT:Draw(flags)
+	if not C_SignalDebug:GetBool() then
+        self:SetNoDraw(true)
+        return
+    end
+	if LocalPlayer():GetPos():DistToSqr(self:GetPos()) > 200000 then return end
+
+	local pos = self:LocalToWorld(Vector(0,0,0))
+	local ang = self:LocalToWorldAngles(Angle(0,90,90))
+    cam.Start3D2D(pos, ang, 0.25)
+		surface.SetDrawColor(125, 125, 0, 255)
+		surface.DrawRect(-40, -20, 80, 20)
+    cam.End3D2D()
 end
+
+cvars.AddChangeCallback("metrostroi_drawsignaldebug", function()
+    local noDraw = not C_SignalDebug:GetBool()
+    for _,ent in pairs(ents.FindByClass("gmod_track_signs")) do
+        ent:SetNoDraw(noDraw)
+    end
+end)

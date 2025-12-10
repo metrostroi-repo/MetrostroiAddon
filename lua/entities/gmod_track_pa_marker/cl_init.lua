@@ -7,6 +7,7 @@ function ENT:DrawTranslucent(flags)
         self:SetNoDraw(true)
         return
     end
+    if LocalPlayer():GetPos():DistToSqr(self:GetPos()) > 200000 then return end
 
     self:DrawModel(flags)
 
@@ -19,7 +20,7 @@ function ENT:DrawTranslucent(flags)
     cam.End3D()
 end
 
-cvars.AddChangeCallback("metrostroi_drawsignaldebug", function (name, oldValue, newValue)
+cvars.AddChangeCallback("metrostroi_drawsignaldebug", function()
     local noDraw = not C_SignalDebug:GetBool()
     for _,ent in pairs(ents.FindByClass("gmod_track_pa_marker")) do
         ent:SetNoDraw(noDraw)
