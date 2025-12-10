@@ -22,14 +22,12 @@ local function ShowWindowOnCL(ply, id)
 	SetGlobalInt("metrostroi_train_count",Metrostroi.TrainCount())
 	timer.Simple(0,function()
 		net.Start("MetrostroiTrainSpawner")
-		--net.WriteTable(Metrostroi.Skins)
 		net.Send(ply)
 	end)
 end
 timer.Create("metrostroi-maxtrains-hook",5,0,MaxWagonsChangeCallback)
 function ENT:SpawnFunction(ply, tr)
 	if not ply:HasWeapon("gmod_tool") then
-		--ply:Give("gmod_tool")
 		return
 	end
 	ShowWindowOnCL(ply)

@@ -393,6 +393,9 @@ function ENT:TrainSpawnerUpdate()
     ----{"MaskType","Spawner.717.MaskType","List",{"2-2","2-2-2","Spawner.717.MaskType.1","Spawner.717.MaskType.2","1-1","Spawner.717.MaskType.3"}},
     --{"BPSNType","Spawner.717.BPSNType","List",{"Spawner.717.Common.Random","Spawner.717.BPSNType.1","Spawner.717.BPSNType.2","Spawner.717.BPSNType.3","Spawner.717.BPSNType.4","Spawner.717.BPSNType.5","Spawner.717.BPSNType.6","Spawner.717.BPSNType.7","Spawner.717.BPSNType.8","Spawner.717.BPSNType.9","Spawner.717.BPSNType.10","Spawner.717.BPSNType.11","Spawner.717.BPSNType.12","Spawner.717.BPSNType.13"}},
     --{"RingType","Spawner.717.RingType","List",{"Spawner.717.Common.Random","Spawner.717.RingType.1","Spawner.717.RingType.2","Spawner.717.RingType.3","Spawner.717.RingType.4","Spawner.717.RingType.5","Spawner.717.RingType.6","Spawner.717.RingType.7","Spawner.717.RingType.8"}},
+        --local choices = string.Split(self:GetNW2String("TestSelective"),";") or {1}
+        --table.Shuffle(choices)
+        --local final = table.Random(choices)
 
         local dot5 = self:GetNW2Int("Type")==2
         local typ = self:GetNW2Int("BodyType")

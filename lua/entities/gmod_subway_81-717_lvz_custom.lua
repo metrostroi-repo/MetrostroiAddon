@@ -46,6 +46,14 @@ ENT.Spawner = {
             train.NumberRangesID = typ
         end
     end,
+    forinterim = {
+        Type = true,
+        Scheme = true,
+        SeatType = true,
+        Texture = true,
+        PassTexture = true,
+        SpawnMode = true
+    },
     {"Type","Spawner.717.Type","List",{"Spawner.717.Type.Line2","Spawner.717.Type.Line4","Spawner.717.Type.Line5"}},
     {"Scheme","Spawner.717.Schemes","List",function()
         local Schemes = {}

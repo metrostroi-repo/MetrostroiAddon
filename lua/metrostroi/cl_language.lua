@@ -110,6 +110,13 @@ function Metrostroi.LoadLanguage(lang,force)
                             else
                                 errmsg(Color(255,0,0),"No spawner list table for entity ",Color(255,0,255),class,Color(255,0,0)," for phrase:",Color(0,255,0),id)
                             end
+                        elseif v[3] == "Selective" and v[4] then
+                            local numb = tonumber(tbl[4])
+                            if numb and type(v[4]) ~= "function" and v[4][numb] then
+                                v[4][numb] = phrase
+                            else
+                                errmsg(Color(255,0,0),"No spawner list table for entity ",Color(255,0,255),class,Color(255,0,0)," for phrase:",Color(0,255,0),id)
+                            end
                         else
                             errmsg(Color(255,0,0),"Spawner translate error for entity ",Color(255,0,255),class,Color(255,0,0)," for phrase:",Color(0,255,0),id)
                         end
