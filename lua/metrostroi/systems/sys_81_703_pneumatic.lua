@@ -383,9 +383,6 @@ function TRAIN_SYSTEM:Think(dT)
         self.EmergencyValveDisable=false
         self.EmergencyValve=false
     end
-    if Train.UKS and Train.UKS.UKSEmerTriggered > 0 and Train.UKSDisconnect.Value > 0 then
-        self.EmergencyValve=true
-    end
 
     self.OldBrakeLinePressure = self.BrakeLinePressure
     if self.EmergencyValve then

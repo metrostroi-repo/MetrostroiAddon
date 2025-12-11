@@ -90,8 +90,8 @@ function ENT:InitializeSounds()
 
     self.SoundNames["avu_off"] = "subway_trains/717/relays/lsd_2.mp3"
     self.SoundNames["avu_on"] = "subway_trains/717/relays/new/kd_on.mp3"
-    self.SoundPositions["avu_on"] = {60,1e9, Vector(400,-40,-45),0.5}
-    self.SoundPositions["avu_off"] = {60,1e9, Vector(400,-40,-45),0.5}
+    self.SoundPositions["avu_on"] = {60,1e9, Vector(453,-40,-45),0.5}
+    self.SoundPositions["avu_off"] = {60,1e9, Vector(453,-40,-45),0.5}
     --Подвагонка
     self.SoundNames["lk2_on"] = "subway_trains/717/pneumo/lk1_on.mp3"
     self.SoundNames["lk2_off"] = "subway_trains/717/pneumo/lk2_off.mp3"
@@ -560,6 +560,7 @@ function ENT:InitializeSystems()
     self:LoadSystem("LastStation","81_71_LastStation","710","door1")
 
     self:LoadSystem("ALSCoil")
+    self:LoadSystem("UKS","UKS_20M")    
 end
 function ENT:PostInitializeSystems()
     self.Electric:TriggerInput("Type",self.Electric.E)

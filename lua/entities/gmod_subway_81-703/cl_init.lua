@@ -264,6 +264,29 @@ ENT.ButtonMap["AVMain"] = {
     }
 }
 
+ENT.ButtonMap["AVU"] = {
+    pos = Vector(455.35,-19.02,35.5),
+    ang = Angle(0,-95.5,90),
+    width = 95,
+    height = 85,
+    scale = 0.0625,
+    hideseat = 0.2,
+
+    buttons = {
+        {   ID = "OtklAVUToggle",    x=48, y=51, radius=20, tooltip="", model = {
+            model = "models/metrostroi_train/81-710/ezh3_tumbler_t1.mdl",ang = 180,z=-2,
+            var="OtklAVU",speed=16,
+            plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=270,x=-1,y=24,z=-2,var="OtklAVUPl", ID="OtklAVUPl",},
+            sndvol = 1, snd = function(val) return val and "switchbl_on" or "switchbl_off" end,
+            sndmin=30, sndmax = 1e3, sndang = Angle(-90,0,0),
+        }},
+        {ID = "!AVULight",           x=69, y=51, radius=10, tooltip="", model = {
+            model = "models/metrostroi_train/81-710/ezh3_slc77.mdl", skin = 3, z = -4,
+            lamp = {model = "models/metrostroi_train/81-717/buttons/slc_77_lamp.mdl",ang=62,x=-0.3,y=-0.3,z=20.6,var="AVU",color=Color(210,170,255),},
+            sprite = {bright=0.2,size=.5,scale=0.03,z=20,color=Color(210,170,255),},
+        }},
+    }
+}
 
 ---AV1 Panel
 ENT.ButtonMap["AV1"] = {
@@ -610,6 +633,23 @@ ENT.ButtonMap["UAVAPanel"] = {
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),
         }},
         {ID = "UAVACToggle",x=60, y=0, w=120, h=200, tooltip="",var="UAVAC",states={"Train.Buttons.UAVAOff","Train.Buttons.UAVAOn"}},
+    }
+}
+
+ENT.ButtonMap["UKSPanel"] = {
+    pos = Vector(397.9,-25,4),
+    ang = Angle(90,0,0),
+    width = 100,
+    height = 100,
+    scale = 0.0625,
+    
+    buttons = {
+        {ID = "UKSDisconnectToggle",x=0, y=0, w=100, h=100, tooltip="", model = {
+            model = "models/metrostroi_train/81-717/buttons/breaker_common001.mdl",z=15,ang=180,
+            var="UKSDisconnect",speed=0.5,vmin=1,vmax=0.87,
+            sndvol = 0.8,snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80,sndmax = 1e3/3,sndang = Angle(-90,0,0),
+            plomb = {model = "models/metrostroi_train/81/plomb_b.mdl",ang=30,x=28,y=-18,var="UKSDisconnectPl",ID="UKSDisconnectPl",z=-15,},            
+        }},
     }
 }
 

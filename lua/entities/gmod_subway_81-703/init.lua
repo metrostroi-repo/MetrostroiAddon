@@ -12,6 +12,8 @@ ENT.SyncTable = {
     "DriverValveBLDisconnect","DriverValveTLDisconnect","EmergencyBrakeValve",
     "GV",
     "R_Program1","R_Program2","UAVA","UAVAC",
+    "OtklAVU",
+    "UKSDisconnect",
 }
 ENT.SyncFunctions = {
     ""
@@ -22,8 +24,9 @@ function ENT:Initialize()
     self.Plombs = {
         --RST = true,
         Init = true,
-        --OtklAVU = true,
+        OtklAVU = true,
         UAVA = true,
+        UKSDisconnect = true,
     }
     -- Set model and initialize
     self:SetModel("models/metrostroi_train/81-703/81-703.mdl")
@@ -272,6 +275,7 @@ function ENT:Think()
     self:SetPackedBool("VPR",Panel.VPR > 0)
     self:SetPackedBool("Compressor",Pneumatic.Compressor == 1.0)
     self:SetPackedBool("RK",(self.RheostatController.Velocity ~= 0.0))
+    self:SetPackedBool("AVU",Panel.AVU > 0.5)
     self:SetPackedBool("Ring",Panel.Ring > 0.5)
 
     self:SetPackedBool("RearDoor",self.RearDoor)
