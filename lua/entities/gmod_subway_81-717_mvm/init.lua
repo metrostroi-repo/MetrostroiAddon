@@ -18,9 +18,9 @@ ENT.SyncTable = {
     "AIS","A15","A81","A68","A80",
     "RC1","VB","BPS","UOS", "PB", "UAVA","UAVAC",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","DriverValveDisconnect","ParkingBrake","EPK","EmergencyBrakeValve",
-    "VUD2","VDL","Wiper", "GV", "door_lock1","door_lock2","door_lock3","door_lock4","door_lock5","door_lock6","door_lock7","door_lock8","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight","DoorReleaseExtra",
+    "VUD2","VDL","Wiper","GV","DoorLock1","DoorLock2","DoorLock3","DoorLock4","DoorLock5","DoorLock6","DoorLock7","DoorLock8","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight","DoorReleaseExtra",
     "R_ASNPMenu","R_ASNPUp","R_ASNPDown","R_ASNPOn"
-    , "ALSFreq","Ring","VBD",
+    ,"ALSFreq","Ring","VBD",
     "V11","V12","V13","UPPS_On","SAB1"
 }
 ENT.SyncFunctions = {
@@ -601,7 +601,7 @@ function ENT:Think()
     self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
     self:SetPackedBool("CabLights",Panel.CabLights>0)
     self:SetPackedBool("EqLights",Panel.EqLights>0)
-    self:SetPackedBool("ShowDVR",self.OtsekDoor1)
+    --self:SetPackedBool("ShowDVR",self.OtsekDoor1)
 
     self:SetPackedBool("PanelLights",Panel.PanelLights > 0.5)
 

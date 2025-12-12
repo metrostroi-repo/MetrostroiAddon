@@ -9,7 +9,7 @@ ENT.SyncTable = {
     "A22","A30","A1","A2","A3","A4","A5","A6","A72","A38","A20",
     "A25","A37","A55","A45","A66","A51","A65","A28","A70","AV2",
     "AV3","AV4","AV5","A81","AV6","A80","A18",
-    "VB","GV","door_lock1","door_lock2","door_lock3","door_lock4","door_lock5","door_lock6","door_lock7","door_lock8",
+    "VB","GV","DoorLock1","DoorLock2","DoorLock3","DoorLock4","DoorLock5","DoorLock6","DoorLock7","DoorLock8",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight",
     "A84","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP","EmergencyBrakeValve"
 }

@@ -70,8 +70,6 @@ function TRAIN_SYSTEM:Initialize(parameters)
     --end
 
     self.NewPneumatics = parameters and parameters.pneumatics or 0
-    --self:TriggerInput("NewPneumatics",self.NewPneumatics)
-    --self:TriggerInput("HeadCarPneumatic",parameters and parameters.headcar == true and 1 or 0)
     
     --DKPT
     self.Train:LoadSystem("DKPT","Relay","R-52B") --
@@ -115,32 +113,32 @@ function TRAIN_SYSTEM:Initialize(parameters)
 	    self.Train:LoadSystem("DoorReleaseLeft","Relay","Switch")
 	    self.Train:LoadSystem("DVRDisconnect","Relay","Switch", { normally_closed = false, bass = true})
 	    --Механическая блокировка дверей
-        self.Train:LoadSystem("door_lock1","Relay","VB-11", {bass = true})	--1 правый
-        self.Train:LoadSystem("door_lock2","Relay","VB-11", {bass = true})	--2 правый
-        self.Train:LoadSystem("door_lock3","Relay","VB-11", {bass = true})	--3 правый
-        self.Train:LoadSystem("door_lock4","Relay","VB-11", {bass = true})	--4 правый
-        self.Train:LoadSystem("door_lock5","Relay","VB-11", {bass = true})	--4 левый
-        self.Train:LoadSystem("door_lock6","Relay","VB-11", {bass = true})	--3 левый
-        self.Train:LoadSystem("door_lock7","Relay","VB-11", {bass = true})	--2 левый
-        self.Train:LoadSystem("door_lock8","Relay","VB-11", {bass = true})	--1 левый
+        self.Train:LoadSystem("DoorLock1","Relay","Switch", {bass = true})	--1 правый
+        self.Train:LoadSystem("DoorLock2","Relay","Switch", {bass = true})	--2 правый
+        self.Train:LoadSystem("DoorLock3","Relay","Switch", {bass = true})	--3 правый
+        self.Train:LoadSystem("DoorLock4","Relay","Switch", {bass = true})	--4 правый
+        self.Train:LoadSystem("DoorLock5","Relay","Switch", {bass = true})	--4 левый
+        self.Train:LoadSystem("DoorLock6","Relay","Switch", {bass = true})	--3 левый
+        self.Train:LoadSystem("DoorLock7","Relay","Switch", {bass = true})	--2 левый
+        self.Train:LoadSystem("DoorLock8","Relay","Switch", {bass = true})	--1 левый
 	    --раздвинуть/сдвинуть створки руками
-	    self.Train:LoadSystem("outer_open1","Relay","Switch")				--передние правые двери головного вагона (открытие снаружи состава)
-	    self.Train:LoadSystem("open_door1","Relay","Switch")
-	    self.Train:LoadSystem("open_door2","Relay","Switch")
-	    self.Train:LoadSystem("open_door3","Relay","Switch")
-	    self.Train:LoadSystem("open_door4","Relay","Switch")
-	    self.Train:LoadSystem("open_door5","Relay","Switch")
-	    self.Train:LoadSystem("open_door6","Relay","Switch")
-	    self.Train:LoadSystem("open_door7","Relay","Switch")
-	    self.Train:LoadSystem("open_door8","Relay","Switch")
-	    self.Train:LoadSystem("close_door1","Relay","Switch")
-	    self.Train:LoadSystem("close_door2","Relay","Switch")
-	    self.Train:LoadSystem("close_door3","Relay","Switch")
-	    self.Train:LoadSystem("close_door4","Relay","Switch")
-	    self.Train:LoadSystem("close_door5","Relay","Switch")
-	    self.Train:LoadSystem("close_door6","Relay","Switch")
-	    self.Train:LoadSystem("close_door7","Relay","Switch")
-	    self.Train:LoadSystem("close_door8","Relay","Switch")
+	    self.Train:LoadSystem("OpenOutDoor1","Relay","Switch")				--передние правые двери головного вагона (открытие снаружи состава)
+	    self.Train:LoadSystem("OpenDoor1","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor2","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor3","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor4","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor5","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor6","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor7","Relay","Switch")
+	    self.Train:LoadSystem("OpenDoor8","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor1","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor2","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor3","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor4","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor5","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor6","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor7","Relay","Switch")
+	    self.Train:LoadSystem("CloseDoor8","Relay","Switch")
     --end
 
     --if self.Train.SubwayTrain.WagType == 1 then
@@ -184,13 +182,10 @@ function TRAIN_SYSTEM:Initialize(parameters)
     if not TURBOSTROI then
         local start
         if self.NewPneumatics == 1 then
-            self.LeftDoorState = self.LeftDoorState --or { 0,0,0,0 }
-            self.RightDoorState = self.RightDoorState --or { 0,0,0,0 }
-            --self.LeftDoorDir = { 0,0,0,0 }
-            --self.RightDoorDir = { 0,0,0,0 }
+            self.LeftDoorState = self.LeftDoorState
+            self.RightDoorState = self.RightDoorState
             self.LeftDoorSpeed = {1,1,1,1}
             self.RightDoorSpeed = {1,1,1,1}
-		    --self.DSprev = {{0,0},{0,0},{0,0},{0,0}}
             self.LeftDoorStuck = {false, false, false, false}
             self.RightDoorStuck = {false, false, false, false}
 
@@ -416,7 +411,7 @@ function TRAIN_SYSTEM:Think(dT)
         Train.Panel.UAVACOpened = (1-Train.UAVAC.Value)*((CurTime()-CurTime()%0.5)%1)
     end
 
-    if (Train:GetClass():match("81%-71[74]_mvm") or Train:GetClass():match("81%-71[74]_lvz")) and not Train.CarCount then
+    if not Train.CarCount and (Train:GetClass():match("81%-71[74]_mvm") or Train:GetClass():match("81%-71[74]_lvz")) then
         if Train.IgnoreEngine == false then
             self:TriggerInput("NewPneumatics",1)
             Train.CarCount = #Train.WagonList
@@ -480,7 +475,7 @@ function TRAIN_SYSTEM:Think(dT)
     if self.ValveType == 1 then
         self.BLDisconnect = Train.DriverValveBLDisconnect.Value > 0
         self.TLDisconnect = Train.DriverValveTLDisconnect.Value > 0 and self.RealDriverValvePosition ~= 3
-        pr_speed = 1*6--wagc--*((self.BrakeLinePressure-self.ReservoirPressure)/0.6)
+        pr_speed = 6
         if self.TLDisconnect then self.TLDisconnectPressure = self.TrainLinePressure end
         if self.BLDisconnect then self.BLDisconnectPressure = self.BrakeLinePressure end
         if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
@@ -531,13 +526,13 @@ function TRAIN_SYSTEM:Think(dT)
         local res_dischrg_rate5 = self.BLDisconnect and 1.12 or 8
         -- 334: 4 Reservoir open to atmosphere, brake line equalizes with reservoir
         if (self.RealDriverValvePosition == 4) then
-            self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate4, nil,nil,1)--0.35)-0.55
+            self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate4, nil,nil,1)
         end
 
         -- 334: 5 Reservoir and brake line open to atmosphere
         if (self.RealDriverValvePosition == 5) then
-            self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate5)--,nil,nil,2)--1.70
-            local pr_speed = 1.25*6--wagc
+            self:equalizePressure(dT,"ReservoirPressure", 0.0, res_dischrg_rate5)
+            local pr_speed = 1.25*6
             if self.Leak or self.BrakeLineOpen then pr_speed = pr_speed*0.3 end
             if self.BLDisconnect then
                 if self.Leak then pr_speed = pr_speed*6.2 end
@@ -655,7 +650,7 @@ function TRAIN_SYSTEM:Think(dT)
     end
     self.Leak = false
     if wagc ~= Train.OldWagIsoCount or not Train.pr_spd_init then
-        pr_speed = (0.4*math.exp(0.1*wagc-1)+1)*160/(2*wagc+20) --2
+        pr_speed = (0.4*math.exp(0.1*wagc-1)+1)*160/(2*wagc+20)
         Train.OldWagIsoCount = wagc
         Train.pr_spd_init = true
     end
@@ -713,7 +708,7 @@ function TRAIN_SYSTEM:Think(dT)
     local leak = 0
     if Train.EmergencyBrakeValve and Train.EmergencyBrakeValve.Value > 0.5 then
 	    local leakst = math.max(0.5,math.exp(0.5*self.BrakeLinePressure))
-        leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst)--,false,false,10) --was leakst*wagc/5
+        leak = self:equalizePressure(dT,"BrakeLinePressure", 0.0,leakst)
         self.Leak = true
     end
     Train:SetPackedRatio("EmergencyBrakeValve_dPdT", -leak/wagc)
@@ -733,7 +728,7 @@ function TRAIN_SYSTEM:Think(dT)
     self.GN2Offset = self.GN2Offset or math.random(20,100)*0.002 + (self.GN2Start or 2.5)
     self.GN1Offset = self.GN1Offset or math.random(20,100)*0.002 + (self.GN1Start or 0.9)
     local bcrel_thold = self.GN2Offset + self.WeightLoadRatio*(self.GN2Offset - 1.4)
-    self.BcBl = bcrel_thold/1.82--1.92
+    self.BcBl = bcrel_thold/1.82
     if Train.AirDistributorDisconnect.Value == 0 and aird_ready then
         -- Valve #1
         if (Train.PneumaticNo1.Value == 1.0) and (Train.PneumaticNo2.Value == 0.0) then
@@ -838,7 +833,7 @@ function TRAIN_SYSTEM:Think(dT)
 	    local LeftRelease = Train.DoorReleaseLeft.Value == 0
 	    local RightRelease = Train.DoorReleaseRight.Value == 0
 	    _1stRightRelease = Train.DoorReleaseExtra and Train.DoorReleaseExtra.Value == 0
-        if self.DoorLinePressure >= 1.4 then	--was > 2.6
+        if self.DoorLinePressure >= 1.4 then
             -- Simulate DVR engage lag
             if Train.VDOL.Value == 1.0 and not Train.VDOLEnergized then
                 Train.VDOLEnergized = true
@@ -969,13 +964,13 @@ function TRAIN_SYSTEM:Think(dT)
 	    local rmClose = false							--|
 	    local lmOpen = false							--|
         local lmClose = false							--|manual opening-closing
-	    local v = "door_lock"
-	    local m = "open_door"
-	    local n = "close_door"
+	    local v = "DoorLock"
+	    local m = "OpenDoor"
+	    local n = "CloseDoor"
         for i=1,4 do
 	    	rlocked = Train[v..i].Value > 0
 	    	llocked = Train[v..tostring(9-i)].Value > 0
-	    	rmOpen = Train[m..i].Value > 0 or Train["outer_open"..i] and Train["outer_open"..i].Value > 0
+	    	rmOpen = Train[m..i].Value > 0 or Train["OpenOutDoor"..i] and Train["OpenOutDoor"..i].Value > 0
 	    	lmOpen = Train[m..tostring(9-i)].Value > 0
 	    	rmClose = Train[n..i].Value > 0
 	    	lmClose = Train[n..tostring(9-i)].Value > 0
@@ -1084,8 +1079,8 @@ function TRAIN_SYSTEM:Think(dT)
     ----------------------------------------------------------------------------
     -- Simulate compressor operation and train line depletion
     self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
-    self.TrainLinePressure = self.TrainLinePressure - (Train.AirConsumeRatio or 1)*trainLineConsumption_dPdT*dT -- 0.190 --0.170 --0.07
-    if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency or 0.04) end -- 0.04
+    self.TrainLinePressure = self.TrainLinePressure - (Train.AirConsumeRatio or 1)*trainLineConsumption_dPdT*dT
+    if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency or 0.04) end
     self:equalizePressure(dT,"TrainLinePressure", 0,Train.AirLeakRatio or 0.003)
     -- Overpressure
     if self.TrainLinePressure > math.max(7.2, (9.2 - self.TrainLineOverpressureValve*0.2)) and self.TrainLineOverpressureValve%2 == 0 then self.TrainLineOverpressureValve = self.TrainLineOverpressureValve + 1 end
@@ -1098,17 +1093,17 @@ function TRAIN_SYSTEM:Think(dT)
 
     ----------------------------------------------------------------------------
     -- Pressure triggered relays
-    Train.AVT:TriggerInput("Open", self.BrakeCylinderPressure > 1.9) -- 1.8 - 2.0
-    Train.AVT:TriggerInput("Close",self.BrakeCylinderPressure < 0.9) -- 0.9 - 1.5
+    Train.AVT:TriggerInput("Open", self.BrakeCylinderPressure > 1.9)
+    Train.AVT:TriggerInput("Close",self.BrakeCylinderPressure < 0.9)
     Train.AK:TriggerInput( "Open", self.TrainLinePressure > 8.2)
     Train.AK:TriggerInput( "Close",self.TrainLinePressure < 6.3)
     Train.BPT:TriggerInput("Set",  (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.3)
-    Train.DKPT:TriggerInput("Set", self.BrakeCylinderPressure > 0.3) -- 1.8 - 2.0
-    if self.HeadCarPneumatic == 1 or not self.NewPneumatics then
-        Train.AVU:TriggerInput("Open", self.BrakeLinePressure < 2.7) -- 2.7 - 2.9
-        Train.AVU:TriggerInput("Close",self.BrakeLinePressure > 3.5) -- 3.5 - 3.7
-        Train.SOT:TriggerInput("Open", self.EPKPressure < 1.3) -- 2.7 - 2.9
-        Train.SOT:TriggerInput("Close", self.EPKPressure > 1.5) -- 2.7 - 2.9
+    Train.DKPT:TriggerInput("Set", self.BrakeCylinderPressure > 0.3)
+    if self.HeadCarPneumatic and self.HeadCarPneumatic == 1 or not self.NewPneumatics then
+        Train.AVU:TriggerInput("Open", self.BrakeLinePressure < 2.7)
+        Train.AVU:TriggerInput("Close",self.BrakeLinePressure > 3.5)
+        Train.SOT:TriggerInput("Open", self.EPKPressure < 1.3)
+        Train.SOT:TriggerInput("Close", self.EPKPressure > 1.5)
         Train.SQ3:TriggerInput("Set",  Train.PassengerDoor and 0 or 1)
         ----------------------------------------------------------------------------
         if self.DriverValveDisconnectPrevious ~= Train.DriverValveDisconnect.Value then
@@ -1129,7 +1124,7 @@ function TRAIN_SYSTEM:Think(dT)
         if self.DVDOffTimer then
             if self.BrakeLinePressure - (km013_setpoint[self.RealDriverValvePosition]-0.7) > 0.02 and CurTime()-self.DVDOffTimer < wagc*5/8 then
                 --print "Снижение давления в ТМ..."
-                local pr_speed = 22--1.4*wagc --2
+                local pr_speed = 22
                 self:equalizePressure(dT,"BrakeLinePressure", math.max(0,km013_setpoint[self.RealDriverValvePosition]-0.7), pr_speed)
             else
                 --print("Снижение давления в ТМ завершено за "..(CurTime()-self.DVDOffTimer).." секунд")
@@ -1144,6 +1139,7 @@ function TRAIN_SYSTEM:Think(dT)
     Train:SetNW2Bool("FtI",Train.FrontTrainLineIsolation.Value ~= 0)
     Train:SetNW2Bool("RtI",Train.RearTrainLineIsolation.Value ~= 0)
     Train:SetNW2Bool("AD",Train.AirDistributorDisconnect.Value == 0)
+    Train:SetNW2Bool("DVR",Train.DVRDisconnect.Value == 0)
     if self.NewPneumatics == 1 then
 	    Train:SetNW2Bool("DoorReleaseRight",Train.DoorReleaseRight.Value ~= 0)
 	    Train:SetNW2Bool("DoorReleaseLeft",Train.DoorReleaseLeft.Value ~= 0)

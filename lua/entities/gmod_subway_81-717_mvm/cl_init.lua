@@ -2053,18 +2053,19 @@ ENT.ButtonMap["AutostopValve"] = {
 }
 -- ДВР ()
 ENT.ButtonMap["DVR_87"] = {
-    pos = Vector(-398,35,-28),
-    ang = Angle(0,180,5),
-    width = 1000,
-    height = 300,
+    pos = Vector(-453,37,-38),
+    ang = Angle(0,0,127.2),
+    width = 187,
+    height = 80,
     scale = 0.0625,
     hide=0.8,
 
     buttons = {
-        {ID = "DVRDisconnectToggle", x=0, y=0, w=1000, h=300, tooltip="", model = {
-            var="DVRDisconnect",sndid="disconnect_valve",--"brake_disconnect",
-            sndvol = 1, snd = function(val) return "disconnect_valve" end,
-            sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
+        {ID = "DVRDisconnectToggle", x=0, y=0, w=187, h=80, tooltip="",var="DVRDisconnect",states={"Train.Buttons.Opened","Train.Buttons.Closed"},
+        --model = {
+        --    var="DVRDisconnect",sndid="disconnect_valve",--"brake_disconnect",
+        --    sndvol = 1, snd = function(val) return "disconnect_valve" end,
+        --    sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
         },   
     }
 }
@@ -2072,7 +2073,7 @@ ENT.ClientSounds["DVRDisconnect"] = {{"DVR_disconnect",function() return "discon
 
 ENT.ClientProps["DVR_disconnect"] = {
     model = "models/metrostroi_train/81-707/cran1.mdl",
-    pos = Vector(-451.15,43.5,-24.7),
+    pos = Vector(-451.15,43.5,-32.7),
     ang = Angle(-90,-180,-90),
     hideseat=0.2,
 }
@@ -2588,7 +2589,7 @@ for i = 0,24 do
     }
 end
 
-ENT.ButtonMap["Doors7_8_right"] = {
+ENT.ButtonMap["DoorsRight7_8"] = {
     pos = Vector(-386,-62,-50),
     ang = Angle(0,0,-90),
     width = 520,
@@ -2599,11 +2600,11 @@ ENT.ButtonMap["Doors7_8_right"] = {
     --hideseat=1,
 
     buttons = {
-        {ID = "open_door4Set",x=298,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door4Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor4Set",x=298,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor4Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr7_8_rgh"] = {
+ENT.ButtonMap["BlockDoorsRight7_8"] = {
     pos = Vector(-317.5,-64.48,-50),
     ang = Angle(0,90,-90),
     width = 20,
@@ -2614,16 +2615,16 @@ ENT.ButtonMap["bldr7_8_rgh"] = {
     --hideseat=1,
 
     buttons = {
-        {ID = "door_lock4Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock4Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock4",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock4",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
 
-ENT.ButtonMap["Doors5_6_right"] = {
+ENT.ButtonMap["DoorsRight5_6"] = {
     pos = Vector(-157,-62,-50),
     ang = Angle(0,0,-90),
     width = 520,
@@ -2634,11 +2635,11 @@ ENT.ButtonMap["Doors5_6_right"] = {
     --hideseat=1,
 
     buttons = {
-        {ID = "open_door3Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door3Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor3Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor3Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr5_6_rgh"] = {
+ENT.ButtonMap["BlockDoorsRight5_6"] = {
     pos = Vector(-87.5,-64.48,-50),
     ang = Angle(0,90,-90),
     width = 20,
@@ -2649,16 +2650,16 @@ ENT.ButtonMap["bldr5_6_rgh"] = {
     --hideseat=1,
 
     buttons = {
-        {ID = "door_lock3Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock3Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock3",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock3",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
 
-ENT.ButtonMap["Doors3_4_right"] = {
+ENT.ButtonMap["DoorsRight3_4"] = {
     pos = Vector(73,-62,-50),
     ang = Angle(0,0,-90),
     width = 520,
@@ -2669,11 +2670,11 @@ ENT.ButtonMap["Doors3_4_right"] = {
     --hideseat=1,
 
     buttons = {
-        {ID = "open_door2Set",x=302,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door2Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor2Set",x=302,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor2Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr3_4_rgh"] = {
+ENT.ButtonMap["BlockDoorsRight3_4"] = {
     pos = Vector(142.6,-64.48,-50),
     ang = Angle(0,90,-90),
     width = 20,
@@ -2684,16 +2685,16 @@ ENT.ButtonMap["bldr3_4_rgh"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "door_lock2Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock2Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock2",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock2",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
 
-ENT.ButtonMap["Doors1_2_right"] = {
+ENT.ButtonMap["DoorsRight1_2"] = {
     pos = Vector(300,-62,-50),
     ang = Angle(0,0,-90),
     width = 520,
@@ -2704,11 +2705,11 @@ ENT.ButtonMap["Doors1_2_right"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "open_door1Set",x=334,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door1Set",x=15,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor1Set",x=334,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor1Set",x=15,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["Doors1_2_right_outer"] = {
+ENT.ButtonMap["DoorsOutRight1_2"] = {
     pos = Vector(332.5,-66,47),
     ang = Angle(0,0,90),
     width = 120,
@@ -2719,10 +2720,10 @@ ENT.ButtonMap["Doors1_2_right_outer"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "outer_open1Set",x=10,y=0,w= 100,h = 952,tooltip=""},
+        {ID = "OpenOutDoor1Set",x=10,y=0,w= 100,h = 952,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr1_2_rgh"] = {
+ENT.ButtonMap["BlockDoorsRight1_2"] = {
     pos = Vector(372.8,-64.48,-50),
     ang = Angle(0,90,-90),
     width = 20,
@@ -2733,15 +2734,15 @@ ENT.ButtonMap["bldr1_2_rgh"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "door_lock1Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock1Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock1",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock1",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
-ENT.ButtonMap["Doors7_8_left"] = {
+ENT.ButtonMap["DoorsLeft7_8"] = {
     pos = Vector(-386,62,50),
     ang = Angle(0,0,90),
     width = 520,
@@ -2752,11 +2753,11 @@ ENT.ButtonMap["Doors7_8_left"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "open_door5Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door5Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor5Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor5Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr7_8_lft"] = {
+ENT.ButtonMap["BlockDoorsLeft7_8"] = {
     pos = Vector(-317.58,64.45,0),
     ang = Angle(0,-90,90),
     width = 20,
@@ -2767,16 +2768,16 @@ ENT.ButtonMap["bldr7_8_lft"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "door_lock5Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock5Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock5",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock5",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
 
-ENT.ButtonMap["Doors5_6_left"] = {
+ENT.ButtonMap["DoorsLeft5_6"] = {
     pos = Vector(-158,62.8,50),
     ang = Angle(0,0,90),
     width = 520,
@@ -2787,11 +2788,11 @@ ENT.ButtonMap["Doors5_6_left"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "open_door6Set",x=314,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door6Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor6Set",x=314,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor6Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr5_6_lft"] = {
+ENT.ButtonMap["BlockDoorsLeft5_6"] = {
     pos = Vector(-87.5,64.45,0),
     ang = Angle(0,-90,90),
     width = 20,
@@ -2802,16 +2803,16 @@ ENT.ButtonMap["bldr5_6_lft"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "door_lock6Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock6Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock6",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock6",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
 
-ENT.ButtonMap["Doors3_4_left"] = {
+ENT.ButtonMap["DoorsLeft3_4"] = {
     pos = Vector(74,62,50),
     ang = Angle(0,0,90),
     width = 520,
@@ -2822,11 +2823,11 @@ ENT.ButtonMap["Doors3_4_left"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "open_door7Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door7Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor7Set",x=294,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor7Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr3_4_lft"] = {
+ENT.ButtonMap["BlockDoorsLeft3_4"] = {
     pos = Vector(142.56,64.5,0),
     ang = Angle(0,-90,90),
     width = 20,
@@ -2837,16 +2838,16 @@ ENT.ButtonMap["bldr3_4_lft"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "door_lock7Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock7Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock7",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock7",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
 }
 
 
-ENT.ButtonMap["Doors1_2_left"] = {
+ENT.ButtonMap["DoorsLeft1_2"] = {
     pos = Vector(303,62,50),
     ang = Angle(0,0,90),
     width = 520,
@@ -2857,11 +2858,11 @@ ENT.ButtonMap["Doors1_2_left"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "open_door8Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
-        {ID = "close_door8Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
+        {ID = "OpenDoor8Set",x=306,y=0,w= 100,h = 1000,tooltip=""},
+        {ID = "CloseDoor8Set",x=0,y=0,w= 60,h = 1000,tooltip=""},
     }
 }
-ENT.ButtonMap["bldr1_2_lft"] = {
+ENT.ButtonMap["BlockDoorsLeft1_2"] = {
     pos = Vector(372.7,64.5,0),
     ang = Angle(0,-90,90),
     width = 20,
@@ -2872,9 +2873,9 @@ ENT.ButtonMap["bldr1_2_lft"] = {
     --hideseat=0.005,
 
     buttons = {
-        {ID = "door_lock8Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
+        {ID = "DoorLock8Toggle", x=0, y=180, w=20, h=100, tooltip="", model = {
             model = "models/metrostroi_train/81-717/battery_enabler.mdl",
-            var="door_lock8",speed=0.5,vmin=1,vmax=0.8,
+            var="DoorLock8",speed=0.5,vmin=1,vmax=0.8,states={"Train.Buttons.Unlocked","Train.Buttons.Locked"},
             sndvol = 0.8, snd = function(val) return val and "pak_on" or "pak_off" end,sndmin = 80, sndmax = 1e3/3, sndang = Angle(-90,0,0),
         }},
     }
@@ -2892,7 +2893,7 @@ ENT.ButtonMap["DoorReleaseExtra"] = {
 
     buttons = {
         {ID = "DoorReleaseExtraToggle",x=0,y=130,w= 100,h = 30,tooltip="", model = {
-            var="DoorReleaseExtra",sndid="disconnect_valve",--"brake_disconnect",
+            var="DoorReleaseExtra",sndid="disconnect_valve",states={"Train.Buttons.Closed","Train.Buttons.Opened"},--"brake_disconnect",
             sndvol = 1, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
         },
@@ -2921,7 +2922,7 @@ ENT.ButtonMap["DoorReleaseRight"] = {
 
     buttons = {
         {ID = "DoorReleaseRightToggle",x=0,y=0,w= 100,h = 30,tooltip="", model = {
-            var="DoorReleaseRight",sndid="disconnect_valve",--"brake_disconnect",
+            var="DoorReleaseRight",sndid="disconnect_valve",states={"Train.Buttons.Closed","Train.Buttons.Opened"},--"brake_disconnect",
             sndvol = 1, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
 		},
@@ -2950,7 +2951,7 @@ ENT.ButtonMap["DoorReleaseLeft"] = {
 
     buttons = {
         {ID = "DoorReleaseLeftToggle",x=0,y=0,w= 100,h = 30,tooltip="", model = {
-            var="DoorReleaseLeft",sndid="disconnect_valve",--"brake_disconnect",
+            var="DoorReleaseLeft",sndid="disconnect_valve",states={"Train.Buttons.Closed","Train.Buttons.Opened"},--"brake_disconnect",
             sndvol = 50, snd = function(val) return "disconnect_valve" end,
             sndmin = 90, sndmax = 1e3, sndang = Angle(-90,0,0),}
 		},
@@ -3223,10 +3224,10 @@ function ENT:Think()
     self:HidePanel("DriverValveBLDisconnect",self:GetPackedBool("Crane013"))
     self:HidePanel("DriverValveTLDisconnect",self:GetPackedBool("Crane013"))
 
-    local DrawDVR = self:GetPackedBool("ShowDVR")
-    self:ShowHide("DVR_disconnect",DrawDVR)
-    self:HidePanel("DVR_87",not DrawDVR)
-    self:Animate("DVR_disconnect",self:GetPackedBool("DVRDisconnect") and 1 or 0,0.25,0,  4,false)
+    --local DrawDVR = self:GetPackedBool("ShowDVR")
+    --self:ShowHide("DVR_disconnect",DrawDVR)
+    --self:HidePanel("DVR_87",not DrawDVR)
+    --self:Animate("DVR_disconnect",self:GetPackedBool("DVRDisconnect") and 1 or 0,0.25,0,  4,false)
 
     self:Animate("brake334",self:GetPackedRatio("CranePosition")/5,0.35,0.65,256,24)
     self:Animate("brake013",        Cpos[self:GetPackedRatio("CranePosition")] or 0, 0.03, 0.458,  256,24)
@@ -3805,6 +3806,9 @@ function ENT:DrawPost()
     end)
     self:DrawOnPanel("AutostopValve",function()
         draw.DrawText("Autostop Valve", "Trebuchet24",0,6,Color(0,0,0,255))
+    end)
+    self:DrawOnPanel("DVR_87",function()
+        draw.DrawText(self:GetNW2Bool("DVR") and "DVR ON" or "DVR OFF","ContentHeader",0,0,Color(60,70,70,255))
     end)
 end
 
