@@ -829,7 +829,8 @@ function TRAIN_SYSTEM:Think(dT)
     ----------------------------------------------------------------------------
     -- Simulate doors opening, closing
     local _1stRightRelease
-    if self.NewPneumatics == 1 and #Train.WagonList == Train.CarCount then
+    --if self.NewPneumatics == 1 and #Train.WagonList == Train.CarCount then
+    if self.NewPneumatics == 1 and Train.IgnoreEngine == false then
 	    local LeftRelease = Train.DoorReleaseLeft.Value == 0
 	    local RightRelease = Train.DoorReleaseRight.Value == 0
 	    _1stRightRelease = Train.DoorReleaseExtra and Train.DoorReleaseExtra.Value == 0
