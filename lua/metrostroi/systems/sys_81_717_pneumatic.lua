@@ -53,11 +53,11 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.cranPres = 0
 
     --DKPT
-    self.Train:LoadSystem("DKPT","Relay","R-52B") --
+    self.Train:LoadSystem("DKPT","Relay","") --
     -- Valve #1
-    self.Train:LoadSystem("PneumaticNo1","Relay")
+    self.Train:LoadSystem("PneumaticNo1","Relay","", {coil_res = 200, hasCoil = true})
     -- Valve #2
-    self.Train:LoadSystem("PneumaticNo2","Relay")
+    self.Train:LoadSystem("PneumaticNo2","Relay","", {coil_res = 200, hasCoil = true})
     -- Автоматический выключатель торможения (АВТ)
     self.Train:LoadSystem("AVT","Relay","AVT-325")
     -- Регулятор давления (АК)
@@ -69,9 +69,9 @@ function TRAIN_SYSTEM:Initialize(parameters)
     -- Блокировка дверей
     self.Train:LoadSystem("BD","Relay","")
     -- Вентили дверного воздухораспределителя (ВДОЛ, ВДОП, ВДЗ)
-    self.Train:LoadSystem("VDOL","Relay","", {bass = true})
-    self.Train:LoadSystem("VDOP","Relay","", {bass = true})
-    self.Train:LoadSystem("VDZ","Relay","", {bass = true})
+    self.Train:LoadSystem("VDOL","Relay","", {bass = true, coil_res = 175, hasCoil = true})
+    self.Train:LoadSystem("VDOP","Relay","", {bass = true, coil_res = 175, hasCoil = true})
+    self.Train:LoadSystem("VDZ","Relay","", {bass = true, coil_res = 175, hasCoil = true})
 
     -- Разобщение клапана машиниста
     self.Train:LoadSystem("DriverValveDisconnect","Relay","Switch", {bass = true})

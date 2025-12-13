@@ -114,4 +114,5 @@ ENT.Spawner = {
         ent.Pneumatic.BrakeLinePressure = val == 4 and 5.2 or val == 1 and 2.3 or math.min(ent.Pneumatic.TrainLinePressure+0.25,math.random()*4)
         ent.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
     end},
+    {"BattCharge","Spawner.717.Chargeable","Boolean"}
 }

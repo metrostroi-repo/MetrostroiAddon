@@ -51,13 +51,15 @@ local function C(x) return x and 1 or 0 end
 
 local min = math.min
 local max = math.max
+local linearity = 1.2
 
 function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     local P     = Train.PositionSwitch
     local RheostatController = Train.RheostatController
     local RK    = RheostatController.SelectedPosition
-    local B     = (Train.Battery.Voltage > 55) and 1 or 0
-    local BO    = B*Train.VB.Value
+    local B     = Train.Battery.Voltage > Train.Battery.CutoffVoltage and 1 or 0
+    local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
+    local BO2   = B*Train.VB.Value*(1-Train.PA2.Value)
     local T     = Train.SolverTemporaryVariables
     local elType = self.Type
     local isMVM = elType == 1
@@ -81,7 +83,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     --Reverser
     S["7D"] = T[10]*Train.A48.Value
     S["7G"] = S["7D"]*KV["10-7G"] --10-A48-RV-7G --FIXME 34w ARS
-    S["B3"] = B*Train.A44.Value
+    S["B3"] = B*(1-Train.PA2.Value)*Train.A44.Value
     S["14a"] = S["B3"]*KRU["14/1-B3"]
     S["14b"] = S["14a"]*Train.A17.Value
     S["F"] = T[10]*Train.A29.Value
@@ -475,7 +477,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     --Вагонная часть
     S["10A"] = BO*Train.A30.Value
-    S["ZR"] = (1-Train.RRP.Value)+(B*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
+    S["ZR"] = (1-Train.RRP.Value)+(B*(1-Train.PA2.Value)*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
 
     if isMVM then
         S["1A"] = T[1]*Train.A1.Value*Train.IGLA_PCBK.KVC
@@ -657,7 +659,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
 
     if isDot2 then Train:WriteTrainWire(11,B*Train.VA.Value) end
 
-    S["B9"] = B*Train.A53.Value
+    S["B9"] = (BO+BO2)*Train.A53.Value
     S["22B"] = T[10]*Train.A10.Value*Train.VMK.Value
     Train:WriteTrainWire(22,(S["22B"]+T[44])*Train.AK.Value)
     Train:WriteTrainWire(44,S["22B"])
@@ -703,7 +705,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Panel.TW18 = S["18A"]
     Panel.GreenRP = S["10AN"]*S["UO"]
 
-    S["36N"] = BO*Train.A45.Value
+    S["36N"] = BO2*Train.A45.Value
     Train:WriteTrainWire(37,Train.ConverterProtection.Value)
     Train:WriteTrainWire(69,S["36N"]*Train.BPSNon.Value)
     Train:WriteTrainWire(36,T[69]*(1-Train.BPSNon.Value))
@@ -715,7 +717,7 @@ function TRAIN_SYSTEM:SolveAllInternalCircuits(Train,dT,firstIter)
     Train.KUP:TriggerInput("Set",S["B9a"]*Train.A75.Value)
     Panel.KUP = S["B9a"]*Train.KUP.Value
 
-    S["D4"] = BO*Train.A13.Value
+    S["D4"] = BO2*Train.A13.Value
     if isLVZ then
         if isKSD then
             S["D1"] = T[10]*Train.A21.Value*KV["D-D1"]+S["14b"]*KRU["11/3-D1/1"]+T[16]*Train.VUD1.Value
@@ -881,13 +883,13 @@ function TRAIN_SYSTEM:SolveRKInternalCircuits(Train,dT,firstIter)
     local P     = Train.PositionSwitch
     local RheostatController = Train.RheostatController
     local RK    = RheostatController.SelectedPosition
-    local B     = (Train.Battery.Voltage > 55) and 1 or 0
-    local BO    = B*Train.VB.Value
+    local B     = Train.Battery.Voltage > Train.Battery.CutoffVoltage and 1 or 0
+    local BO    = B*Train.VB.Value*(1-Train.PA1.Value)
     local T     = Train.SolverTemporaryVariables
 
     --Вагонная часть
     S["10A"] = BO*Train.A30.Value
-    S["ZR"] = (1-Train.RRP.Value)+(B*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
+    S["ZR"] = (1-Train.RRP.Value)+(B*(1-Train.PA2.Value)*Train.A39.Value*(1-Train.RPvozvrat.Value)*Train.RRP.Value)*-1
 
 
     S["1N"] = C(11<=RK and RK<=18)*(1-Train.LK4.Value)
@@ -1137,7 +1139,6 @@ function TRAIN_SYSTEM:SolveThyristorController(Train, dT)
         end
         --print(self.ThyristorState)
 
-        --print(self.ThyristorState)
         -- Generate resistance
         local keypoints = {0.10, 0.008, 0.20, 0.018, 0.30, 0.030, 0.40, 0.047, 0.50, 0.070, 0.60, 0.105, 0.70, 0.165, 0.80, 0.280, 0.90, 0.650, 1.00, 15.00}
         local TargetField = 0.48 + 0.52 * self.ThyristorState

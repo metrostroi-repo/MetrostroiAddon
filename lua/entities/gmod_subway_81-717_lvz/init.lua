@@ -243,6 +243,8 @@ function ENT:Initialize()
     self.PassengerDoor = false
     self.OtsekDoor1 = false
     self.OtsekDoor2 = false
+    self.BattCurrent = 0
+    self.eds_eq = 0
 
     self.Lamps = {
         broken = {},
@@ -334,6 +336,15 @@ function ENT:TrainSpawnerUpdate()
     local typ = self:GetNW2Int("Type")
     local num = self.WagonNumber
     self:SetNW2Bool("Custom",self.CustomSettings)
+    self.Battery:TriggerInput("CarType",1)
+    self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
+    self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
+    local ccc = 0
+    self.ComputerCar = false
+    for k,v in ipairs(self.WagonList) do
+        if v.AR63 and v.ComputerCar then ccc = ccc + 1; break end
+    end
+    if ccc == 0 then self.ComputerCar = true end
     math.randomseed(num+817171)
     local kvr=false
     local seats=false
@@ -685,7 +696,7 @@ function ENT:Think()
     self:SetPackedRatio("EnginesVoltage", self.Electric.Aux750V/1000.0)
     self:SetPackedRatio("EnginesCurrent2",  0.5 + 0.5*(self.Electric.I13/500.0))
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
-    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)
+    self:SetPackedRatio("BatteryVoltage",(self.eds_eq)/150.0)
     self:SetPackedBool("Compressor",self.Pneumatic.Compressor > 0)
     self:SetPackedBool("Buzzer",Panel.Ring > 0)
     self:SetPackedBool("RK",self.RheostatController.Velocity ~= 0.0)

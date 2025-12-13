@@ -8,8 +8,10 @@ Metrostroi.DefineSystem("Relay")
 
 local relay_types = {
     ["PK-162"] = {
+        hasCoil = true,
         pneumatic       = true,
         contactor       = true,
+        pickup_current = 0.015*math.random() + 0.085,
     },
     ["Switch"] = {
         contactor       = true,
@@ -31,9 +33,57 @@ local relay_types = {
         open_time = 0,
     },
     ["ARS"] = {
+        hasCoil = true,
         close_time = 0,
         open_time = 0,
-    }
+    },
+    ["ARS-DOP"] = {
+        hasCoil = true,
+        pickup_current = 0.01*math.random() + 0.04,
+    },
+    ["KPD-110E"] = {
+        hasCoil = true,
+        coil_res = 50,
+    },
+    ["REV-813T"] = {
+        hasCoil = true,
+    },
+    ["REV-814T"] = {
+        hasCoil = true,
+    },
+    ["REV-811T"] = {
+        hasCoil = true,
+    },
+    ["REV-821"] = {
+        hasCoil = true,
+    },
+    ["PR-143"] = {
+        hasCoil = true,
+    },
+    ["KPP-113"] = {
+        hasCoil = true,
+        coil_res = 156,
+    },
+    ["KPD-110"] = {
+        hasCoil = true,
+        coil_res = math.random(247,273),
+    },
+    ["KPP-110"] = {
+        hasCoil = true,
+        coil_res = 85,
+    },
+    ["REM-651D"] = {
+        hasCoil = true,
+    },
+    ["R-52B"] = {
+        --hasCoil = true,
+    },
+    ["RPUZ-114-T-UHLZA"] = {
+        hasCoil = true,
+    },
+    ["TRTP-115"] = {
+        hasCoil = true,
+    },
 }
 
 function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
@@ -45,7 +95,7 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
         if relay_types[relay_type] then
             parameters = relay_types[relay_type]
         else
-            --print("[sys_relay.lua] Unknown relay type: "..parameters)
+            --print("[sys_relay.lua] Unknown relay type: "..parameters, self.Name)
             parameters = {}
         end
         parameters.relay_type = relay_type
@@ -76,11 +126,15 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
     parameters.returns          = parameters.returns or (not parameters.latched)
     -- Trigger level for the relay
     parameters.trigger_level    = parameters.trigger_level or 0.5
+    -- Relay pickup current, A 
+    parameters.pickup_current   = parameters.pickup_current or 0.008*math.random() + 0.028
+    -- Relay holding current, A
+    parameters.holding_current  = parameters.holding_current or 0.006*math.random() + 0.011
+    -- Relay coil resistance, Ohm
+    parameters.coil_res         = parameters.coil_res or parameters.hasCoil and math.random(100,300) or 1e12
     for k,v in pairs(parameters) do
         self[k] = v
     end
-
-
 
     ----------------------------------------------------------------------------
     -- Relay parameters
@@ -146,6 +200,8 @@ function TRAIN_SYSTEM:Initialize(parameters,extra_parameters)
     self.Time = 0
     self.ChangeTime = nil
     self.Blocked = 0
+    -- Extra fields for current sim
+    self.Current = 0
     -- This increases precision at cost of perfomance
     self.SubIterations = parameters.iterations or 1--relay
 end
@@ -155,7 +211,7 @@ function TRAIN_SYSTEM:Inputs()
 end
 
 function TRAIN_SYSTEM:Outputs()
-    return { "Value" , "Blocked","TargetValue"}
+    return { "Value" , "Blocked", "TargetValue", "pickup_current" , "holding_current" , "Current" , "hasCoil" }
 end
 
 
@@ -206,7 +262,7 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
     if (name == "Block") then
         self.Blocked = value
     elseif (name == "Close") and (value > self.trigger_level) and (self.Value ~= 1.0 or self.TargetValue ~= 1.0) then --(self.TargetValue ~= 1.0 and self.rpb))
-        if self.pneumatic  and self.Train.Pneumatic.TrainLinePressure < 3 then return end
+        if self.pneumatic and self.Train.Pneumatic.TrainLinePressure < 3 then return end
         if (not self.ChangeTime) or (self.TargetValue ~= 1.0) then
             self.ChangeTime = self.Time + FailSim.Value(self,"CloseTime")
         end
@@ -289,60 +345,33 @@ function TRAIN_SYSTEM:Think(dT)
         self.Value = self.TargetValue
         self.SpuriousTripTimer = nil
     end
+
+    if self.hasCoil then
+        self.Current = self.TargetValue*self.Train.Battery.eds_eq/self.coil_res
+    end
+
+    if self.hasCoil and self.Value > 0.5 and self.Current < self.holding_current then
+        self:TriggerInput("Open",1)
+    end
     -- Switch relay
     if self.ChangeTime and (self.Time > self.ChangeTime) and not self.SpuriousTripTimer then
-        -- Electropneumatic relays make this sound
-        if self.bass and self.Value ~= self.TargetValue then
-            --[[
-            if self.Value ~= 0.0 and self.maxvalue ~= 2 or self.Value ~= 1.0 and self.maxvalue == 2 then
-                if self.av3 then self.Train:PlayOnce("vu22b_on","cabin") end
-                if self.igla then self.Train:PlayOnce("igla_on","cabin") end
-                if self.button then self.Train:PlayOnce("button_press","cabin",0.51) end
-                if self.vud then self.Train:PlayOnce("vu22_on","cabin") end
-                if self.uava then self.Train:PlayOnce("uava_on","cabin") end
-                if self.pb then self.Train:PlayOnce("switch6","cabin") end
-                if self.programm then self.Train:PlayOnce("inf_on","cabin") end
-                if self.programm1 then self.Train:PlayOnce("triple_up-0","cabin") end
-                if self.programm2 then self.Train:PlayOnce("triple_down-0","cabin") end
-                if self.av then self.Train:PlayOnce("auto_on","cabin") end
-                if self.mainav then self.Train:PlayOnce("mainauto_on","cabin") end
-                if self.krishka then self.Train:PlayOnce("kr_close","cabin") end
-                if self.paketnik then self.Train:PlayOnce("pak_on","cabin") end
-                if self.switch then self.Train:PlayOnce("switch_on","cabin") end
-                if self.rcr then self.Train:PlayOnce("rcr_on","cabin") end
-            end
-            if self.Value == 0.0 and self.maxvalue ~= 2 or self.Value == 1.0 and self.maxvalue == 2 then
-                if self.av3 then self.Train:PlayOnce("vu22b_off","cabin") end
-                if self.igla then self.Train:PlayOnce("igla_off","cabin") end
-                if self.button then self.Train:PlayOnce("button_release","cabin",0.56) end
-                if self.vud then self.Train:PlayOnce("vu22_off","cabin") end
-                if self.uava then self.Train:PlayOnce("uava_off","cabin") end
-                if self.pb then self.Train:PlayOnce("switch6_off","cabin") end
-                if self.programm then self.Train:PlayOnce("inf_off","cabin") end
-                if self.programm1 then self.Train:PlayOnce("triple_0-up","cabin") end
-                if self.programm2 then self.Train:PlayOnce("triple_0-down","cabin") end
-                if self.av then self.Train:PlayOnce("auto_off","cabin") end
-                if self.mainav then self.Train:PlayOnce("mainauto_off","cabin") end
-                if self.krishka then self.Train:PlayOnce("kr_open","cabin") end
-                if self.paketnik then self.Train:PlayOnce("pak_off","cabin") end
-                if self.switch then self.Train:PlayOnce("switch_off","cabin") end
-                if self.rcr then self.Train:PlayOnce("rcr_off","cabin") end
-            end
-            ]]
-            if self.bass_separate then
-                if self.TargetValue > 0 then
-                    self.Train:PlayOnce(self.Name.."_on","bass",1)
+        if self.TargetValue > 0.5 and self.Current >= self.pickup_current or self.TargetValue < 0.5 and self.Current < self.holding_current or not self.hasCoil then
+            if self.bass and self.Value ~= self.TargetValue then
+                if self.bass_separate then
+                    if self.TargetValue > 0 then
+                        self.Train:PlayOnce(self.Name.."_on","bass",1)
+                    else
+                        self.Train:PlayOnce(self.Name.."_off","bass",1)
+                    end
                 else
-                    self.Train:PlayOnce(self.Name.."_off","bass",1)
+                    self.Train:PlayOnce(self.Name,"bass",self.TargetValue)
                 end
-            else
-                self.Train:PlayOnce(self.Name,"bass",self.TargetValue)
             end
-        end
-        self.Value = self.TargetValue
-        self.ChangeTime = nil
+            self.Value = self.TargetValue
+            self.ChangeTime = nil
 
-        -- Age relay a little
-        FailSim.Age(self,1)
+            -- Age relay a little
+            FailSim.Age(self,1)
+        end
     end
 end

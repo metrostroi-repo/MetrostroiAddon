@@ -128,7 +128,8 @@ function ENT:Initialize()
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
     }
-
+    self.BattCurrent = 0
+    self.eds_eq = 0
 
     -- Cross connections in train wires
     self.TrainWireInverts = {
@@ -226,6 +227,9 @@ end
 function ENT:TrainSpawnerUpdate()
     local typ = self:GetNW2Int("Type")
     local num = self.WagonNumber
+    self.Battery:TriggerInput("CarType",1)
+    self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
+    self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
     math.randomseed(num+817171)
     local kvr=false
     local passtex = "Def_717SPBWhite"
@@ -365,8 +369,8 @@ function ENT:Think()
     self:SetPackedRatio("TLPressure", Pneumatic.TrainLinePressure/16.0)
     self:SetPackedRatio("BCPressure", Pneumatic.BrakeCylinderPressure/6.0)
 
-    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*self.Battery.Voltage/150.0)
-    self:SetPackedRatio("BatteryCurrent",Panel["V1"]*math.Clamp((self.Battery.Voltage-75)*0.01,-0.01,1))
+    self:SetPackedRatio("BatteryVoltage",(self.eds_eq)/150.0)
+    self:SetPackedRatio("BatteryCurrent",self.BattCurrent/1000)
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)

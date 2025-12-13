@@ -1207,6 +1207,7 @@ Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.1      = @[Common.Spawn
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.2      = @[Common.Spawner.SpawnMode.Deadlock]
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.3      = @[Common.Spawner.SpawnMode.NightDeadlock]
 Entities.gmod_subway_81-717_mvm_custom.Spawner.SpawnMode.4      = @[Common.Spawner.SpawnMode.Depot]
+Entities.gmod_subway_81-717_mvm_custom.Spawner.BattCharge.Name  = @[Common.Spawner.Chargeable]
 
 #Spawner:
 Entities.gmod_subway_81-717_lvz.Spawner.Texture.Name        = @[Common.Spawner.Texture]

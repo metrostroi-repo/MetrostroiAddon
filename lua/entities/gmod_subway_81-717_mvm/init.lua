@@ -27,6 +27,7 @@ ENT.SyncFunctions = {
     ""
 }
 function ENT:Initialize()
+    self.consLogged = 0
     self.Plombs = {
         VAH = true,
         VP = true,
@@ -223,6 +224,8 @@ function ENT:Initialize()
     self.PassengerDoor = false
     self.OtsekDoor1 = false
     self.OtsekDoor2 = false
+    --self.BattCurrent = 0
+    --self.eds_eq = 0
 
     self.Lamps = {
         broken = {},
@@ -381,6 +384,9 @@ function ENT:TrainSpawnerUpdate()
     --
     local num = self.WagonNumber
     self:SetNW2Bool("Custom",self.CustomSettings)
+    self.Battery:TriggerInput("CarType",1)
+    --self.Battery:TriggerInput("InitialVoltage",math.random(62,75))
+    self.Battery:TriggerInput("Dischargeable",self:GetNW2Bool("BattCharge"))
     math.randomseed(num+817171)
     if self.CustomSettings then
     --{"Type","Spawner.717.Type","List",{"Spawner.717.Type.717","Spawner.717.Type.7175"}},
@@ -555,16 +561,15 @@ end
 --------------------------------------------------------------------------------
 function ENT:Think()
     self.RetVal = self.BaseClass.Think(self)
-
     local Panel = self.Panel
     local Pneumatic = self.Pneumatic
     local power = Panel.V1 > -1.5
-    local brightness = math.min(1,Panel.Headlights1)*0.60 +
-                        math.min(1,Panel.Headlights2)*0.40
+    --local brightness = math.min(1,Panel.Headlights1)*0.60 +
+                        --math.min(1,Panel.Headlights2)*0.40
     --local T = {}
 
-    self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
-    self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
+    self:SetPackedRatio("Headlights1",Panel.Headlights1*math.max(0,(self.Battery.eds_eq-50)/30))
+    self:SetPackedRatio("Headlights2",Panel.Headlights2*math.max(0,(self.Battery.eds_eq-50)/30))
     self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
     self:SetPackedBool("CabLights",Panel.CabLights>0)
     self:SetPackedBool("EqLights",Panel.EqLights>0)
@@ -588,7 +593,9 @@ function ENT:Think()
             self:SetPackedBool("lightsActive"..i,false)
         end
     end
-	
+    self.Battery.Consumers["SalonLights"] = {Panel.MainLights+Panel.EmergencyLights,(Panel.MainLights*36^-1 + Panel.EmergencyLights*74^-1)^-1,0}
+    self.Battery.Consumers["HeadLights"] = {Panel.Headlights1*(1+Panel.Headlights2),(Panel.Headlights1*22^-1*(1 + Panel.Headlights2))^-1,0}
+
     if self:ReadTrainWire(4)*self:ReadTrainWire(5)*self:ReadTrainWire(10) > 0 then
         self.A54:TriggerInput("Set",0)
     end
@@ -676,25 +683,11 @@ function ENT:Think()
     self:SetPackedRatio("EnginesCurrent2",  0.5 + 0.5*(self.Electric.I13/500.0))
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
-----------------------------------*****************************--------------------------------
-    --10th wire voltage readout imitation depending on the BPSNs and EKK state, not on the wagon battery switch state
-    -- PC  power converter; CC  control circuits
-    local hvcounter = 0
-    local hvcar = nil
-    local vdrop = 1.125*(#self.WagonList)
-    for k,v in ipairs(self.WagonList) do
-	if v.PowerSupply.X2_2 > 0 and v.A24.Value > 0 then
-            hvcounter = hvcounter + 1
-            hvcar = hvcar or v
-            vdrop = vdrop - 1.125
-        else
-            vdrop = vdrop - ((v.A56.Value == 0 and 0.4 or (v.VB.Value == 0 and 0.4 or 0)) + (v.LK4.Value == 0 and 0.725 or 0))
-        end
-    end
-    local PCV_o = hvcounter > 0 and math.Clamp(76+(hvcar.Electric.Aux750V - 600)*8/375, 76, 84) - vdrop or self.WagonList[1].Battery.Voltage
+--[[-------************* This stupid shit is not needed any more. Overload protection is now implemented correctly inside BPSN system *************---------
+
     --imitating converter overload protection only when control circuits are energized and at least one PC on the train is off; pretty useless btw (but fun)
-    local pcloadratio = #self.WagonList/(hvcounter > 0 and hvcounter or 0.5)
-    local _A = 25*(6 - 6/(5.01))                                            --assuming one PC on 6 cars can work for 25 secs while the cars' CCs are energized
+    local pcloadratio = #self.WagonList/(self.Battery.hvcounter > 0 and self.Battery.hvcounter or 0.5)
+    local _A = 90*(6 - 6/(5.01))                                            --assuming one PC on 6 cars can work for 90 secs while the cars' CCs are energized
     if pcloadratio > 1 and pcloadratio <= #self.WagonList and self.LK4.Value > 0 and self.PowerSupply.X2_2 > 0 and not self.pcrlxtimer then
         self.pcprotimer = self.pcprotimer or CurTime()
         --hyperbolic function of PC operating time depending on load coeff
@@ -713,9 +706,9 @@ function ENT:Think()
         end
     end
     self.PowerSupply:TriggerInput("3x2",self.pcrlxtimer and 1 or 0)     --BPSN overheat protection in case of RZP button is being pressed constantly
-----------------------------------*****************************--------------------------------
+----------------------------------*****************************--------------------------------]]
 
-    self:SetPackedRatio("BatteryVoltage",Panel["V1"]*PCV_o/150.0)
+    self:SetPackedRatio("BatteryVoltage",(self.Battery.eds_eq)/150.0)
     
     self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)
     self:SetPackedBool("Buzzer",Panel.Ring >= 1)

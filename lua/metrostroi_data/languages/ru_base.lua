@@ -228,6 +228,7 @@ Common.Spawner.Old                      = Старые
 Common.Spawner.New                      = Новые
 Common.Spawner.Type                     = Тип
 Common.Spawner.SchemeInvert             = Инвертировать наддверные схемы
+Common.Spawner.Chargeable               = Разряжаемые аккумуляторы
 
 #Coupler common
 Common.Couple.Title         = Меню сцепки
