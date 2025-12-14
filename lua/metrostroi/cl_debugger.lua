@@ -7,13 +7,16 @@ To lower net usage, an array to map variable names to indexes is send to the cli
 the length of the table changes. Regular data packages only contain a nameless list of data.
 -]]
 
-local Debugger = {}	
-Debugger.DisplayGroups = {}
-Debugger.EntData = {}
-Debugger.EntDataTime = {}
-Debugger.EntNameMap = {}
+local C_DebugDataTimeout = CreateClientConVar("metrostroi_debugger_data_timeout",2,true,false)
 
+Metrostroi.Debugger = {}
 
+Metrostroi.Debugger.DisplayGroups = {}
+Metrostroi.Debugger.EntData = {}
+Metrostroi.Debugger.EntDataTime = {}
+Metrostroi.Debugger.EntNameMap = {}
+
+local Debugger = Metrostroi.Debugger
 local Colors = {
 	{120,255,255},
 	{255,255,0},
@@ -589,7 +592,7 @@ end
 
 --Checks if we haven't gotten data from entid in a while
 local function isTimedOut(id)
-	local timeout = GetConVar("metrostroi_debugger_data_timeout"):GetFloat()
+	local timeout = C_DebugDataTimeout:GetFloat()
 	return timeout ~= nil and timeout > 0 and CurTime() - Debugger.EntDataTime[id] > timeout
 end
 

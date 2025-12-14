@@ -1,7 +1,12 @@
-local Debugger = {}
-Debugger.Clients = {}
-Debugger.NameMap = {}
-Debugger.EntVarCounts = {}
+local C_DebugEnabled = CreateConVar("metrostroi_debugger_enabled",0,FCVAR_ARCHIVE,"Enable train systems debugger")
+local C_DebugUpdateInterval = CreateConVar("metrostroi_debugger_update_interval",1,FCVAR_ARCHIVE,"Seconds between debugger data messages")
+
+Metrostroi.Debugger = {}
+Metrostroi.Debugger.Clients = {}
+Metrostroi.Debugger.NameMap = {}
+Metrostroi.Debugger.EntVarCounts = {}
+local Debugger = Metrostroi.Debugger
+
 
 util.AddNetworkString("metrostroi-debugger-dataupdate")
 util.AddNetworkString("metrostroi-debugger-entremoved")
@@ -9,10 +14,8 @@ util.AddNetworkString("metrostroi-debugger-entnamemap")
 
 
 if game.SinglePlayer() then
-	RunConsoleCommand("metrostroi_debugger_update_interval",0)
-end --[[else --Lets not reset it every time on dedicated servers
-	RunConsoleCommand("metrostroi_debugger_update_interval",0.5)
-end--]]
+	C_DebugUpdateInterval:SetFloat(0.0)
+end
 
 local function SendNameMap(ply,ent)
 	net.Start("metrostroi-debugger-entnamemap")
@@ -51,6 +54,7 @@ end
 
 --Handler for adding new ents to listen to
 local function cmdinithandler(ply,cmd,args,fullstring)
+	if not C_DebugEnabled:GetBool() then return end
 	local ent = ply:GetEyeTrace().Entity
 	if not IsValid(ent) or not ent.GetDebugVars then return end
 
@@ -69,7 +73,7 @@ end
 local nextthink = 0
 local function think()
 	if CurTime() < nextthink then return end
-	nextthink = CurTime() + GetConVar("metrostroi_debugger_update_interval"):GetFloat()
+	nextthink = CurTime() + C_DebugUpdateInterval:GetFloat()
 	--Loop over clients and their ents and send the collected data
 
 	--Check for new entity variables
@@ -101,9 +105,7 @@ local function think()
 			end
 		net.Send(ply)
 	end
-
 end
-hook.Add("Think","metrostroi-debugger-think",think)
 
 local function OnEntRemove(ent)
 	RemoveEnt(nil,ent)	
@@ -116,3 +118,21 @@ end
 
 hook.Add("EntityRemoved","metrostroi-debugger-cleanup",OnEntRemove)
 hook.Add("PlayerDisconnected","metrstroi-debugger-plycleanup",RemoveEnt)
+
+-- Start/stop debugger think
+if C_DebugEnabled:GetBool() then
+	hook.Add("Think","metrostroi-debugger-think",think)
+end
+
+cvars.AddChangeCallback("metrostroi_debugger_enabled", function(convar, oldValue, newValue)
+	if C_DebugEnabled:GetBool() then
+		nextthink = 0
+		hook.Add("Think","metrostroi-debugger-think",think)
+	else
+		hook.Remove("Think","metrostroi-debugger-think")
+	end
+end,"sv_debugger")
+
+cvars.AddChangeCallback("metrostroi_debugger_update_interval", function(convar, oldValue, newValue)
+	nextthink = CurTime() + C_DebugUpdateInterval:GetFloat()
+end,"sv_debugger")

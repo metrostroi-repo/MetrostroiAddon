@@ -5,7 +5,6 @@ end
 
 --Not sure about the quirks related to shared convars like this
 CreateConVar("metrostroi_train_requirethirdrail",1,FCVAR_ARCHIVE,"Whether or not Metrostroi trains require power from the third rail")
-CreateConVar("metrostroi_debugger_update_interval",1,FCVAR_ARCHIVE,"Seconds between debugger data messages")
 
 CreateConVar("metrostroi_arsmode",1,FCVAR_ARCHIVE)
 CreateConVar("metrostroi_arsmode_nogreen",0,FCVAR_ARCHIVE)
@@ -97,7 +96,6 @@ CreateClientConVar("metrostroi_cabz",0,true)
 CreateClientConVar("metrostroi_disablecamaccel",0,true)
 CreateClientConVar("metrostroi_disablehovertext",0,true)
 CreateClientConVar("metrostroi_disablehovertextpos",0,true)
-CreateClientConVar("metrostroi_debugger_data_timeout",2,true,false)
 
 CreateClientConVar("metrostroi_disablehud",0,true)
 CreateClientConVar("metrostroi_renderdistance",1024,true)
