@@ -414,8 +414,7 @@ ENT.ButtonMap["DVR_87"] = {
     width = 187,
     height = 80,
     scale = 0.0625,
-    hide=0.8,
-    screenHide = true,
+    hide=0.04,
 
     buttons = {
         {ID = "DVRDisconnectToggle", x=0, y=0, w=187, h=80, tooltip="",var="DVRDisconnect",states={"Train.Buttons.Opened","Train.Buttons.Closed"},
