@@ -411,11 +411,12 @@ function TRAIN_SYSTEM:Think(dT)
         Train.Panel.UAVACOpened = (1-Train.UAVAC.Value)*((CurTime()-CurTime()%0.5)%1)
     end
 
-    if not Train.CarCount and (Train:GetClass():match("81%-71[74]_mvm") or Train:GetClass():match("81%-71[74]_lvz")) then
-        if Train.IgnoreEngine == false then
+    if not Train.CarCount and Train.IgnoreEngine == false then
+        if (Train:GetClass():match("81%-71[74]_mvm") or Train:GetClass():match("81%-71[74]_lvz")) then
             self:TriggerInput("NewPneumatics",1)
-            Train.CarCount = #Train.WagonList
         end
+        Train.CarCount = #Train.WagonList
+        Train.InitIsoCountNeeded = true
         --if self.NewPneumatics == 1 then print(Format("Forein train new pneumatics installed for [%s] train class",Train:GetClass())) end
     end
 
@@ -1080,7 +1081,7 @@ function TRAIN_SYSTEM:Think(dT)
     ----------------------------------------------------------------------------
     -- Simulate compressor operation and train line depletion
     self.Compressor = Train.KK.Value * (Train.Electric.Aux750V > 550 and 1 or 0)
-    self.TrainLinePressure = self.TrainLinePressure - (Train.AirConsumeRatio or 1)*trainLineConsumption_dPdT*dT
+    self.TrainLinePressure = self.TrainLinePressure - (Train.AirConsumeRatio or 0.1)*trainLineConsumption_dPdT*dT
     if self.Compressor == 1 then self:equalizePressure(dT,"TrainLinePressure", 10.0, Train.CompressorEfficiency or 0.04) end
     self:equalizePressure(dT,"TrainLinePressure", 0,Train.AirLeakRatio or 0.003)
     -- Overpressure
@@ -1100,7 +1101,7 @@ function TRAIN_SYSTEM:Think(dT)
     Train.AK:TriggerInput( "Close",self.TrainLinePressure < 6.3)
     Train.BPT:TriggerInput("Set",  (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.3)
     Train.DKPT:TriggerInput("Set", self.BrakeCylinderPressure > 0.3)
-    if self.HeadCarPneumatic and self.HeadCarPneumatic == 1 or not self.NewPneumatics then
+    if self.HeadCarPneumatic and self.HeadCarPneumatic == 1 or self.NewPneumatics ~= 1 then
         Train.AVU:TriggerInput("Open", self.BrakeLinePressure < 2.7)
         Train.AVU:TriggerInput("Close",self.BrakeLinePressure > 3.5)
         Train.SOT:TriggerInput("Open", self.EPKPressure < 1.3)
