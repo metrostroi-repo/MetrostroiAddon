@@ -2397,7 +2397,7 @@ ENT.ClientProps["cran_dooropen_head"] = {
     model = "models/metrostroi_train/door_crans/cran_dooropen_head.mdl",
     pos = Vector(5,0.15,1),
     ang = Angle(0,-90,0),
-    hide = 1,
+    hide = 2,
 }
 
 ENT.ClientProps["parking_brake"] = {
@@ -2429,8 +2429,8 @@ ENT.ButtonMap["AutostopValve"] = {
     width = 130,
     height = 40,
     scale = 0.1,
-    hideseat=0.1,
-    hide=true,
+    --hideseat=0.1,
+    hide=0.05,
     screenHide = true,
 
     buttons = {
@@ -2444,7 +2444,7 @@ ENT.ButtonMap["DVR_87"] = {
     width = 187,
     height = 80,
     scale = 0.0625,
-    hide=0.04,
+    hide=0.06,
 
     buttons = {
         {ID = "DVRDisconnectToggle", x=0, y=0, w=187, h=80, tooltip="",var="DVRDisconnect",states={"Train.Buttons.Opened","Train.Buttons.Closed"}},   
@@ -2895,12 +2895,12 @@ for i = 0,11 do
 end
 
 ENT.ButtonMap["DoorsRight7_8"] = {
-    pos = Vector(-386,-62,-50),
+    pos = Vector(-386,-64,-50),
     ang = Angle(0,0,-90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=1,
 
@@ -2915,7 +2915,7 @@ ENT.ButtonMap["BlockDoorsRight7_8"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=1,
 
@@ -2930,12 +2930,12 @@ ENT.ButtonMap["BlockDoorsRight7_8"] = {
 
 
 ENT.ButtonMap["DoorsRight5_6"] = {
-    pos = Vector(-157,-62,-50),
+    pos = Vector(-157,-64,-50),
     ang = Angle(0,0,-90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=1,
 
@@ -2950,7 +2950,7 @@ ENT.ButtonMap["BlockDoorsRight5_6"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=1,
 
@@ -2965,12 +2965,12 @@ ENT.ButtonMap["BlockDoorsRight5_6"] = {
 
 
 ENT.ButtonMap["DoorsRight3_4"] = {
-    pos = Vector(73,-62,-50),
+    pos = Vector(73,-64,-50),
     ang = Angle(0,0,-90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=1,
 
@@ -2985,7 +2985,7 @@ ENT.ButtonMap["BlockDoorsRight3_4"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3000,12 +3000,12 @@ ENT.ButtonMap["BlockDoorsRight3_4"] = {
 
 
 ENT.ButtonMap["DoorsRight1_2"] = {
-    pos = Vector(300,-62,-50),
+    pos = Vector(300,-64,-50),
     ang = Angle(0,0,-90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3015,17 +3015,17 @@ ENT.ButtonMap["DoorsRight1_2"] = {
     }
 }
 ENT.ButtonMap["DoorsOutRight1_2"] = {
-    pos = Vector(332.5,-66,47),
+    pos = Vector(332.5,-66.8,47),
     ang = Angle(0,0,90),
     width = 120,
     height = 952,
     scale = 0.1,
-    hide=0.05,
-    screenHide = true,
+    hide=0.1,
+    --screenHide = true,
     --hideseat=0.005,
 
     buttons = {
-        {ID = "OpenOutDoor1Set",x=10,y=0,w= 100,h = 952,tooltip=""},
+        {ID = "OpenOutDoor1Set",x=0,y=0,w=120,h=952,tooltip=""},
     }
 }
 ENT.ButtonMap["BlockDoorsRight1_2"] = {
@@ -3034,7 +3034,7 @@ ENT.ButtonMap["BlockDoorsRight1_2"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3048,12 +3048,12 @@ ENT.ButtonMap["BlockDoorsRight1_2"] = {
 }
 
 ENT.ButtonMap["DoorsLeft7_8"] = {
-    pos = Vector(-386,62,50),
+    pos = Vector(-386,64,50),
     ang = Angle(0,0,90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3068,7 +3068,7 @@ ENT.ButtonMap["BlockDoorsLeft7_8"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3083,12 +3083,12 @@ ENT.ButtonMap["BlockDoorsLeft7_8"] = {
 
 
 ENT.ButtonMap["DoorsLeft5_6"] = {
-    pos = Vector(-158,62.8,50),
+    pos = Vector(-158,64,50),
     ang = Angle(0,0,90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3103,7 +3103,7 @@ ENT.ButtonMap["BlockDoorsLeft5_6"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3118,12 +3118,12 @@ ENT.ButtonMap["BlockDoorsLeft5_6"] = {
 
 
 ENT.ButtonMap["DoorsLeft3_4"] = {
-    pos = Vector(74,62,50),
+    pos = Vector(74,64,50),
     ang = Angle(0,0,90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3138,7 +3138,7 @@ ENT.ButtonMap["BlockDoorsLeft3_4"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3153,12 +3153,12 @@ ENT.ButtonMap["BlockDoorsLeft3_4"] = {
 
 
 ENT.ButtonMap["DoorsLeft1_2"] = {
-    pos = Vector(303,62,50),
+    pos = Vector(303,64,50),
     ang = Angle(0,0,90),
     width = 520,
     height = 1000,
     scale = 0.1,
-    hide=0.05,
+    hide=0.08,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3173,7 +3173,7 @@ ENT.ButtonMap["BlockDoorsLeft1_2"] = {
     width = 20,
     height = 450,
     scale = 0.1,
-    hide=0.05,
+    hide=0.09,
     screenHide = true,
     --hideseat=0.005,
 
@@ -3192,7 +3192,7 @@ ENT.ButtonMap["DoorReleaseExtra"] = {
     width = 100,
     height = 160,
     scale = 0.1,
-    hide=0.05,
+    hide=0.1,
     screenHide = true,
     --hideseat=0.1,
 
@@ -3208,8 +3208,7 @@ ENT.ClientProps["doorsmanual_e"] = {
     model = "models/metrostroi_train/81-717/stop_mvm.mdl",
     pos = Vector(281,-62.3,12.3),
     ang = Angle(0,180,0),
-    hide=true,
-    --screenHide = true,
+    hide=2,
     hideseat=0.2,
 }
 ENT.ClientSounds["DoorReleaseExtra"] = {{"doorsmanual_e",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
@@ -3221,7 +3220,7 @@ ENT.ButtonMap["DoorReleaseRight"] = {
     width = 100,
     height = 160,
     scale = 0.1,
-    hide=0.05,
+    hide=0.1,
     screenHide = true,
     --hideseat=0.1,
 
@@ -3237,8 +3236,7 @@ ENT.ClientProps["doorsmanual_r"] = {
     model = "models/metrostroi_train/81-717/stop_mvm.mdl",
     pos = Vector(-296,-62.13,12.5),
     ang = Angle(0,180,0),
-    hide=true,
-    --screenHide = true,
+    hide=2,
     hideseat=0.2,
 }
 ENT.ClientSounds["DoorReleaseRight"] = {{"doorsmanual_r",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,0,0)}}
@@ -3250,7 +3248,7 @@ ENT.ButtonMap["DoorReleaseLeft"] = {
     width = 100,
     height = 160,
     scale = 0.1,
-    hide=0.05,
+    hide=0.1,
     screenHide = true,
     --hideseat=0.1,
 
@@ -3266,8 +3264,7 @@ ENT.ClientProps["doorsmanual_l"] = {
     model = "models/metrostroi_train/81-717/stop_mvm.mdl",
     pos = Vector(-295.9,62.5,13.59),
     ang = Angle(180,0,0),
-    hide=true,
-    --screenHide = true,
+    hide=2,
     hideseat=0.2,
 }
 ENT.ClientSounds["DoorReleaseLeft"] = {{"doorsmanual_l",function() return "disconnect_valve" end,1,1,50,1e3,Angle(-90,90,0)}}
