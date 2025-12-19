@@ -971,15 +971,11 @@ function TRAIN_SYSTEM:Think(dT)
 	    local n = "CloseDoor"
         for i=1,4 do
 	    	rlocked = Train[v..i].Value > 0
-	    	llocked = Train[v..tostring(9-i)].Value > 0
+	    	llocked = Train[v..(9-i)].Value > 0
 	    	rmOpen = Train[m..i].Value > 0 or Train["OpenOutDoor"..i] and Train["OpenOutDoor"..i].Value > 0
-	    	lmOpen = Train[m..tostring(9-i)].Value > 0
+	    	lmOpen = Train[m..(9-i)].Value > 0
 	    	rmClose = Train[n..i].Value > 0
-	    	lmClose = Train[n..tostring(9-i)].Value > 0
-            --self.LeftDoorState[i] = math.Clamp(self.LeftDoorState[i] + (not llocked and ((lmOpen and 1.5 or lmClose and -1.5 or 0) +
-            --    (self.DoorLinePressure > 1.0 and (math.Round(self.LeftDoorOpenCylPressure - self.LeftDoorCloseCylPressure,1))*0.36*(not (lmOpen or lmClose) and self.LeftDoorSpeed[i] or 1) or 0))*dT or 0),self.LeftDoorStuck[i] and 0.3 or 0,1)
-            --self.RightDoorState[i] = math.Clamp(self.RightDoorState[i] + (not rlocked and ((rmOpen and 1.5 or rmClose and -1.5 or 0) +
-            --    (self.DoorLinePressure > 1.0 and (math.Round(self.RightDoorOpenCylPressure - (i == 1 and self._1stRightDoorCloseCylPressure or self.RightDoorCloseCylPressure),1))*0.36*(not (rmOpen or rmClose) and self.RightDoorSpeed[i] or 1) or 0))*dT or 0),self.RightDoorStuck[i] and 0.3 or 0,1)
+	    	lmClose = Train[n..(9-i)].Value > 0
 
             self.LeftDoorState[i] = math.Clamp(self.LeftDoorState[i] + (not llocked and ((lmOpen and 1.5 or lmClose and -1.5 or 0) +
                 (self.DoorLinePressure > 1.4 and (self.LeftDoorOpenCylPressure - self.LeftDoorCloseCylPressure)*0.36*(not (lmOpen or lmClose) and self.LeftDoorSpeed[i] or 1) or 0))*dT or 0),self.LeftDoorStuck[i] and 0.3 or 0,1)
