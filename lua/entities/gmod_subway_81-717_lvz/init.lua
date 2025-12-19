@@ -17,7 +17,7 @@ ENT.SyncTable = {
     "A58","A59","A61","A15","A66",
     "RC1","VB","VRD","PB", "UAVA","UAVAC",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","DriverValveDisconnect","ParkingBrake","EPK",
-    "VUD2","VDL","VOPD","Wiper", "GV", "RC2","VAU",
+    "VUD2","VDL","VOPD","Wiper", "GV", "RC2","VAU", "DoorLock1","DoorLock2","DoorLock3","DoorLock4","DoorLock5","DoorLock6","DoorLock7","DoorLock8","DVRDisconnect","DoorReleaseLeft","DoorReleaseRight","DoorReleaseExtra",
     "KH","VAV","KSZD","VZP","VSOSD",
     "PAM7","PAM8","PAM9","PAMLeft","PAMRight","PAM4","PAM5","PAM6","PAMUp","PAM1","PAM2","PAM3","PAMDown","PAM0","PAMEnter","PAMEsc","PAMF","PAMM","PAMP",
 }
@@ -224,6 +224,10 @@ function ENT:Initialize()
             ID = "AirDistributorDisconnectToggle",
             Pos = Vector(-177, -66, -50), Radius = 20,
         },
+        {
+            ID = "AutostopValveToggle",
+            Pos = Vector(377, -66, -50), Radius = 20,
+        },
     }
 
     -- Cross connections in train wires
@@ -244,8 +248,24 @@ function ENT:Initialize()
     self.OtsekDoor1 = false
     self.OtsekDoor2 = false
 
+    self.OldPedestrianCount = 0
+
     self.Lamps = {
         broken = {},
+    }
+    self.d_slow_speeds = {
+        {0.4, 0.8},
+        --{0.3, 0.4},
+        --{0.2, 0.3},
+        --{0.3, 0.4},
+        --{0.2, 0.3},
+    }
+    self.d_fast_speeds = {
+        {1.2, 1.8},
+        --{1.7, 1.8},
+        --{1.8, 1.9},
+        --{1.7, 1.8},
+        --{2.1, 2.2},
     }
     local rand = math.random() > 0.95 and 1 or math.random(0.95,0.99)
     for i = 1,12 do
@@ -342,6 +362,22 @@ function ENT:TrainSpawnerUpdate()
     local cabtex = "Def_PUAV"
     local ring,puring = math.ceil(math.random()*4)
     self:SetNW2Int("RingType",ring)
+
+    local offs = math.random(1,3)
+    if self:GetNW2Int("RetainerLoad",1) == 5 then self:SetNW2Int("RetainerLoad",math.random(1,4)) end
+    self.Pneumatic:TriggerInput("KM013offset",5.0 + 0.1*(offs-1))
+    self.Pneumatic:TriggerInput("KM013Over",math.random()>0.92)
+    self.Pneumatic:TriggerInput("VZ1Offset",0.9)
+    self.Pneumatic:TriggerInput("VZ2Offset",2.5)
+    self.Pneumatic:TriggerInput("VZ1ReleaseRate",math.Rand(1.1,1.3))
+    self.Pneumatic:TriggerInput("VZ2ReleaseRate",math.Rand(1.1,1.3))
+    self.CompressorEfficiency = math.random()*0.05 + 0.02
+    self.AirConsumeRatio = math.random()*0.04 + 0.06
+    self.AirLeakRatio = math.random()*0.002 + 0.001
+    self.DVRLag = math.random()*0.5
+    self.DVRHiss = math.random(2,5)
+    self.d_speeds = nil
+
     if typ == 1 then --PAKSDM
         self.Electric:TriggerInput("X2PS",0)
         self.Electric:TriggerInput("Type",self.Electric.LVZ_4)
@@ -436,6 +472,8 @@ function ENT:TrainSpawnerUpdate()
         self:SetNW2Bool("NewSeats",self:GetNW2Int("SeatType") == 4 or self:GetNW2Int("SeatType") == 3 or self:GetNW2Int("SeatType") == 1 and math.random()>0.5)--(kvr or seats))
         self:SetNW2Bool("NewSeatsBlue",self:GetNW2Int("SeatType") == 4 or self:GetNW2Bool("NewSeats") and self:GetNW2Int("SeatType") == 1 and math.random()>0.5)
     end
+    self.StuckSet = nil
+    self.DoorSpeedsDone = false
     self.Pneumatic.ValveType = self:GetNW2Int("Crane",1)+1
     self.Announcer.AnnouncerType = self:GetNW2Int("Announcer",1)
     self:UpdateTextures()
@@ -507,6 +545,7 @@ function ENT:Think()
     self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
     self:SetPackedBool("CabLights",Panel.CabLights>0)
     self:SetPackedBool("EqLights",Panel.EqLights>0)
+    self:SetPackedBool("ShowDVR",self.OtsekDoor1)
 
     self:SetPackedBool("PanelLights",Panel.PanelLights > 0.5)
     --[[if not self.KEKTimer or CurTime()-self.KEKTimer > 3 then
@@ -588,6 +627,35 @@ function ENT:Think()
         (self.Pneumatic.RightDoorState[3] > 0.5) or
         (self.Pneumatic.RightDoorState[4] > 0.5)
 
+    if #self.WagonList == self.CarCount and not self.d_speeds then
+        local d_spd_type = math.random()
+        for k,v in ipairs(self.WagonList) do
+            v.d_speeds = d_spd_type < 0.5 and v.d_fast_speeds or v.d_slow_speeds
+        end
+    end
+
+    if self.Speed > 1 and not self.LeftDoorsOpen and not self.RightDoorsOpen and not self.PedChecked then
+        self.OldPedestrianCount = self:GetNW2Float("PassengerCount")
+        self.PedChecked = true
+        self.left_side = nil
+        self.StuckSet = false
+    end
+    if not self.StuckSet then
+        local passenger_count = self:GetNW2Float("PassengerCount")
+        if self.Speed < 1 and math.abs(self.OldPedestrianCount - passenger_count) >= 1 and self.left_side == nil then
+            self.OldPedestrianCount = self:GetNW2Float("PassengerCount")
+            self.left_side = self.Pneumatic.DoorLeft or false
+        end
+        if self.left_side ~= nil then
+            if not (self.Pneumatic.DoorLeft or self.Pneumatic.DoorRight) then
+                local luava = math.random()
+                self["CanStuckPassenger"..(self.left_side and "Left" or "Right")] = (1-passenger_count/200)*0.8 < luava and luava < 1 and 1--0.912 < luava and luava < 0.987
+                self.StuckSet = true
+                --if self.CanStuckPassengerLeft or self.CanStuckPassengerRight then print(self,"passenger to be caught! :D") end
+            end
+        end
+    end
+    
     -- DIP/power
     self:SetPackedBool("LUDS",Panel.LUDS > 0.5)
 

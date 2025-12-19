@@ -209,6 +209,8 @@ net.Receive("metrostroi-coupler-menu",function(_,ply)
                     ftrain.FrontBrakeLineIsolation:TriggerInput("Set",state and 0 or 1)
                     ftrain.FrontTrainLineIsolation:TriggerInput("Set",state and 0 or 1)
                 end
+                train.RepeatIsoUpdate = true
+                ftrain.RepeatIsoUpdate = true
             end
         elseif not isfront and train.RearBrakeLineIsolation and train.RearTrainLineIsolation then
             local state = train.RearBrakeLineIsolation.Value>0 or train.RearTrainLineIsolation.Value>0
@@ -223,6 +225,8 @@ net.Receive("metrostroi-coupler-menu",function(_,ply)
                     rtrain.FrontBrakeLineIsolation:TriggerInput("Set",state and 0 or 1)
                     rtrain.FrontTrainLineIsolation:TriggerInput("Set",state and 0 or 1)
                 end
+                train.RepeatIsoUpdate = true
+                rtrain.RepeatIsoUpdate = true
             end
         end
     end

@@ -206,7 +206,7 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
     if (name == "Block") then
         self.Blocked = value
     elseif (name == "Close") and (value > self.trigger_level) and (self.Value ~= 1.0 or self.TargetValue ~= 1.0) then --(self.TargetValue ~= 1.0 and self.rpb))
-        if self.pneumatic  and self.Train.Pneumatic.TrainLinePressure < 3 then return end
+        if self.pneumatic  and self.Train.Pneumatic.ExtendedTrainLinePressure < 3 then return end
         if (not self.ChangeTime) or (self.TargetValue ~= 1.0) then
             self.ChangeTime = self.Time + FailSim.Value(self,"CloseTime")
         end
@@ -234,7 +234,7 @@ function TRAIN_SYSTEM:TriggerInput(name,value)
         if self.ChangeTime==self.Time and self.Train.DeltaTime then self:Think(self.Train.DeltaTime) end
 
     elseif name == "Set" then
-        if self.pneumatic and value > 0 and self.Train.Pneumatic.TrainLinePressure < 3 then return end
+        if self.pneumatic and value > 0 and self.Train.Pneumatic.ExtendedTrainLinePressure < 3 then return end
         if self.maxvalue then
             if not self.ChangeTime then
                 self.ChangeTime = self.Time + FailSim.Value(self,"OpenTime")

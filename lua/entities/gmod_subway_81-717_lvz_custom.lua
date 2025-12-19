@@ -46,6 +46,16 @@ ENT.Spawner = {
             train.NumberRangesID = typ
         end
     end,
+    postfunc = function(cartable,wagnum)
+        for k,v in ipairs(cartable) do
+            local val = v._Settings.SpawnMode
+            v.CarCount = wagnum
+            v.InitIsoCountNeeded = true
+            v.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+            v.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
+            v.Pneumatic.BrakeLinePressure = val==4 and 5.2 or 2.3
+        end
+    end,
     {"Type","Spawner.717.Type","List",{"Spawner.717.Type.Line2","Spawner.717.Type.Line4","Spawner.717.Type.Line5"}},
     {"Scheme","Spawner.717.Schemes","List",function()
         local Schemes = {}
@@ -59,11 +69,20 @@ ENT.Spawner = {
     {},
     {"SeatType","Spawner.717.SeatType","List",{"Spawner.717.Common.Random","Spawner.717.Common.Old","Spawner.717.Common.New","Spawner.717.Common.NewBlue"}},
     {},
+    {"RetainerLoad","Spawner.717.RetainerLoad","List",{"Spawner.717.RetainerLoad.1","Spawner.717.RetainerLoad.2","Spawner.717.RetainerLoad.3","Spawner.717.RetainerLoad.4","Spawner.717.Common.Random"}},    
     {"SpawnMode","Spawner.717.SpawnMode","List",{"Spawner.717.SpawnMode.Full","Spawner.717.SpawnMode.Deadlock","Spawner.717.SpawnMode.NightDeadlock","Spawner.717.SpawnMode.Depot"}, nil,function(ent,val,rot,i,wagnum,rclk)
         if rclk then return end
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
+            ent.Pneumatic.LeftDoorState = val == 4 and {1,1,1,1} or {0,0,0,0}
+            ent.Pneumatic.RightDoorState = val == 4 and {1,1,1,1} or {0,0,0,0}
+            for i = 1,4 do
+                ent:SetPackedRatio("DoorL"..i,ent.Pneumatic.LeftDoorState[i])
+                ent:SetPackedRatio("DoorR"..i,ent.Pneumatic.RightDoorState[i])
+            end
+            ent.Pneumatic.DoorLeft = val == 4 and true or false
+            ent.Pneumatic.DoorRight = val == 4 and true or false
             if ent.AR63  then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.OhrSig:TriggerInput("Set",val<4 and 1 or 0)
@@ -107,7 +126,18 @@ ENT.Spawner = {
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
+        --------------------------------------
+        if ent.Pneumatic.NewSystem == 1 then
+            ent.DoorLinePressure = val == 3 and math.random()*3.6 or 3.6
+	        ent.LeftDoorCloseCylPressure = val == 4 and 0.0 or 3.6
+	        ent.LeftDoorOpenCylPressure = val == 4 and 3.6 or 0.0
+	        ent.RightDoorCloseCylPressure = val == 4 and 0.0 or 3.6
+	        ent.RightDoorOpenCylPressure = val == 4 and 3.6 or 0.0
+            if ent.AR63 then ent._1stRightDoorCloseCylPressure = 0.0 end
+        end
+        --------------------------------------
         ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
-        if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end
+        ent.Pneumatic.BrakeLinePressure = val == 4 and 5.2 or val == 1 and 2.3 or math.min(ent.Pneumatic.TrainLinePressure+0.25,math.random()*4)
+        ent.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
     end},
 }

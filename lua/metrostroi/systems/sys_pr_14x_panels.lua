@@ -31,7 +31,7 @@ function TRAIN_SYSTEM:Initialize()
     -- Реле-повторитель провода 8 (РП8)
     self.Train:LoadSystem("Rp8","Relay","REV-811T",{open_time = 0.2,bass = true })
     -- Контактор дверей (КД)
-    self.Train:LoadSystem("KD","Relay","REV-811T",{ bass = true })
+    self.Train:LoadSystem("KD","Relay","REV-811T",{ bass = true, close_time = 0.3 })
     -- Реле остановки (РО)
     self.Train:LoadSystem("RO","Relay","KPD-110E",{ bass = true, close_time = 0--[[ , close_time = 0.1--]] })
 end

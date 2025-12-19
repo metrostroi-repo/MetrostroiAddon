@@ -405,6 +405,17 @@ function ENT:InitializeSounds()
     self.SoundNames["release2"] = {loop=true,"subway_trains/common/pneumatic/release_low.wav"}
     self.SoundPositions["release2"] = {350,1e9,Vector(-183,0,-70),0.4}
 
+    self.SoundNames["releasedl"] = {loop=true,"subway_trains/717/door_cyl/vdo_on.mp3"}
+    self.SoundPositions["releasedl"] = {150,20,Vector(282,62,12.5),1.5}
+    self.SoundNames["releasedr"] = {loop=true,"subway_trains/717/door_cyl/vdo2_on.mp3"}
+    self.SoundPositions["releasedr"] = {150,20,Vector(281,-62,12.8),1.5}
+    self.SoundNames["releasede"] = {loop=true,"subway_trains/717/door_cyl/vdo3_on.mp3"}
+    self.SoundPositions["releasede"] = {150,20,Vector(278,-62,-2),1.5}
+
+    self.SoundNames["dcyl_op_exh"] = "subway_trains/common/pneumatic/parking_brake_stop2.mp3"
+    self.SoundNames["dcyl_cl_exh"] = self.SoundNames["dcyl_op_exh"]
+    self.SoundPositions["dcyl_op_exh"] = {480,1e9,Vector(-420,45,-30),0.4}
+    self.SoundPositions["dcyl_cl_exh"] = {480,1e9,Vector(-420,45,-30),1.2}
     self.SoundNames["parking_brake"] = {loop=true,"subway_trains/common/pneumatic/parking_brake.wav"}
     self.SoundNames["parking_brake_en"] = "subway_trains/common/pneumatic/parking_brake_stop.mp3"
     self.SoundNames["parking_brake_rel"] = "subway_trains/common/pneumatic/parking_brake_stop2.mp3"
@@ -790,7 +801,10 @@ function ENT:PostInitializeSystems()
         self.PUAV:TriggerInput("CommandDoorsLeft",1)
         self.PUAV:TriggerInput("CommandDoorsRight",1)
     end
+    self.Pneumatic:TriggerInput("NewPneumatics",1)
+    self.Pneumatic:TriggerInput("HeadCarPneumatic",1)
 end
+
 function ENT:InitializeSystems()
     -- Электросистема 81-710
     self:LoadSystem("Electric","81_717_Electric")
@@ -831,10 +845,10 @@ function ENT:InitializeSystems()
     self:LoadSystem("YARD_2")
     self:LoadSystem("PR_14X_Panels")
 
-    -- Пневмосистема 81-710
-    self:LoadSystem("Pneumatic","81_717_Pneumatic")
     -- Панель управления 81-710
     self:LoadSystem("Panel","81_717LVZ_Panel")
+    -- Пневмосистема 81-710
+    self:LoadSystem("Pneumatic","81_717_Pneumatic",{pneumatics = 1, headcar = true})
     -- Everything else
     self:LoadSystem("Battery")
     self:LoadSystem("PowerSupply","BPSN")
@@ -970,6 +984,16 @@ ENT.Spawner = {
             train.NumberRangesID = typ
         end
     end,
+    postfunc = function(cartable,wagnum)
+        for k,v in ipairs(cartable) do
+            local val = v._Settings.SpawnMode
+            v.CarCount = wagnum
+            v.InitIsoCountNeeded = true
+            v.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+            v.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
+            v.Pneumatic.BrakeLinePressure = val==4 and 5.2 or 2.3
+        end
+    end,
     wagfunc = function(ent,i,num)
     end,
     --Metrostroi.Skins.GetTable("Texture","Spawner.Texture",false,"train"),
@@ -992,6 +1016,14 @@ ENT.Spawner = {
         if ent._SpawnerStarted~=val then
             ent.VB:TriggerInput("Set",val<=2 and 1 or 0)
             ent.ParkingBrake:TriggerInput("Set",val==3 and 1 or 0)
+            ent.Pneumatic.LeftDoorState = val == 4 and {1,1,1,1} or {0,0,0,0}
+            ent.Pneumatic.RightDoorState = val == 4 and {1,1,1,1} or {0,0,0,0}
+            for i = 1,4 do
+                ent:SetPackedRatio("DoorL"..i,ent.Pneumatic.LeftDoorState[i])
+                ent:SetPackedRatio("DoorR"..i,ent.Pneumatic.RightDoorState[i])
+            end
+            ent.Pneumatic.DoorLeft = val == 4 and true or false
+            ent.Pneumatic.DoorRight = val == 4 and true or false
             if ent.AR63  then
                 local first = i==1 or _LastSpawner~=CurTime()
                 ent.OhrSig:TriggerInput("Set",val<4 and 1 or 0)
@@ -1035,7 +1067,18 @@ ENT.Spawner = {
             ent.GV:TriggerInput("Set",val<4 and 1 or 0)
             ent._SpawnerStarted = val
         end
+        --------------------------------------
+        if ent.Pneumatic.NewPneumatics == 1 then
+            ent.DoorLinePressure = val == 3 and math.random()*3.6 or 3.6
+	        ent.LeftDoorCloseCylPressure = val == 4 and 0.0 or 3.6
+	        ent.LeftDoorOpenCylPressure = val == 4 and 3.6 or 0.0
+	        ent.RightDoorCloseCylPressure = val == 4 and 0.0 or 3.6
+	        ent.RightDoorOpenCylPressure = val == 4 and 3.6 or 0.0
+            if ent.AR63 then ent._1stRightDoorCloseCylPressure = 0.0 end
+        end
+        --------------------------------------
         ent.Pneumatic.TrainLinePressure = val==3 and math.random()*4 or val==2 and 4.5+math.random()*3 or 7.6+math.random()*0.6
+        ent.Pneumatic.WorkingChamberPressure = val==3 and math.random()*1.0 or val==2 and 4.0+math.random()*1.0 or 5.2
         if val==4 then ent.Pneumatic.BrakeLinePressure = 5.2 end
     end},
 }
