@@ -154,31 +154,27 @@ function ENT:Use(ply)
         net.WriteEntity(self)
         net.WriteBool(not self.CPPICanUse or self:CPPICanUse(ply))
         net.WriteBool(self.CoupledEnt ~= nil)
+
+        local isolPresent = false
+        local isolated = false
+        local noEKK = false
         if IsValid(train) then
             if isfront and train.FrontBrakeLineIsolation and train.FrontTrainLineIsolation then
-                net.WriteBool(true)
-                net.WriteBool(train.FrontBrakeLineIsolation.Value>0 and train.FrontTrainLineIsolation.Value>0)
+                isolPresent = true
+                isolated = train.FrontBrakeLineIsolation.Value>0 and train.FrontTrainLineIsolation.Value>0
             elseif not isfront and train.RearBrakeLineIsolation and train.RearTrainLineIsolation then
-                net.WriteBool(true)
-                net.WriteBool(train.RearBrakeLineIsolation.Value>0 and train.RearTrainLineIsolation.Value>0)
-            else
-                net.WriteBool(false)
-                net.WriteBool(false)
+                isolPresent = true
+                isolated = train.RearBrakeLineIsolation.Value>0 and train.RearTrainLineIsolation.Value>0
             end
-        else
-            net.WriteBool(false)
-            net.WriteBool(false)
+
+            noEKK = isfront and train.SubwayTrain and train.SubwayTrain.NoFrontEKK
         end
-        net.WriteBool(self.CoupleType=="722")
+
+        net.WriteBool(isolPresent) 
+        net.WriteBool(isolated)
+        net.WriteBool(noEKK)
         net.WriteBool(self.EKKDisconnected)
     net.Send(ply)
-    --[[ if self.CoupledEnt ~= nil then
-        local tr = ply:GetEyeTrace()
-        if not tr.Hit then return end
-        if self:LocalToWorld(self.CouplingPointOffset):Distance(tr.HitPos) < 25 then
-            self:Decouple()
-        end
-    end--]]
 end
 
 function ENT:ElectricDisconnected()
