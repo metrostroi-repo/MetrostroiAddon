@@ -217,6 +217,7 @@ function Metrostroi.RerailTrain(train)
 	--Safety checks
 	if not IsValid(train) or train.SubwayTrain == nil then return false end
 	if train.NoPhysics or not IsValid(train:GetPhysicsObject()) then return false end
+	if not IsValid(train.FrontBogey) or not IsValid(train.RearBogey) then return false end
 	if timer.Exists("metrostroi_rerailer_solid_reset_"..train:EntIndex()) then return false end
 	--[[
 	--Trace down to get the track
