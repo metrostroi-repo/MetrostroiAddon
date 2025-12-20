@@ -961,7 +961,8 @@ function ENT:OnDecouple(isfront)
     else
         self.RearCoupledBogey = nil
     end
-
+    
+    hook.Run("MetrostroiDecoupled",self)
     self:OnConnectDisconnect()
     if self.OnDecoupled then self:OnDecoupled() end
     --[[GRAVHULL
