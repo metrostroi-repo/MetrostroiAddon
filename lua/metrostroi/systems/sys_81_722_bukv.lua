@@ -75,7 +75,6 @@ function TRAIN_SYSTEM:Think()
     self.CurTime = CurTime()
 
     local Train = self.Train
-    local wagcount = #Train.WagonList
     self.Power = Train.Electric.Power
     self.State = self.Power > 0 and Train.SF51.Value > 0.5
     self.TrainIndex = Train:GetWagonNumber()

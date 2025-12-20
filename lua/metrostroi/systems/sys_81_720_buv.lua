@@ -120,7 +120,6 @@ function TRAIN_SYSTEM:Think()
     self.CurTime = CurTime()
 
     local Train = self.Train
-    local wagcount = #Train.WagonList
 
     self.Power = Train.Electric.Battery80V > 62 and 1 or 0
     self.State = self.Power > 0 and Train.SFV2.Value > 0.5

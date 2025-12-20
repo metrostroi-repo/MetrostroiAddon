@@ -247,7 +247,7 @@ function ENT:Think()
 
     local TW18 = 0
     if Panel.SSN > 0 then
-        local wags = #self.WagonList
+        local wags = self.WagonCount
         for _,v in ipairs(self.WagonList) do
             TW18 = TW18+(v.Panel.TW18 or 0)/wags
         end
@@ -265,13 +265,6 @@ function ENT:Think()
     self:SetPackedBool("GRP",Panel.GreenRP > 0)
     self:SetPackedBool("BrY",Panel.BrY > 0)
     self:SetPackedBool("DoorsWC",Panel.DoorsWC > 0)
-    local TW18 = 0
-    if Panel.SSN > 0 then
-        local wags = #self.WagonList
-        for _,v in ipairs(self.WagonList) do
-            TW18 = TW18+(v.Panel.TW18 or 0)/wags
-        end
-    end
     self:SetPackedRatio("RRP",math.Clamp(TW18^1.2,0,1))
 
     self.TrueBrakeAngle = self.TrueBrakeAngle or 0

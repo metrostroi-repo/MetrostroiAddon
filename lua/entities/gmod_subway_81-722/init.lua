@@ -217,14 +217,14 @@ function ENT:Think()
     --[[
     if self:GetWagonNumber() == 22010 or self:EntIndex()==1560 then --DEBUG
         local accel = 0
-        for i=1,#self.WagonList do
+        for i=1,self.WagonCount do
             accel=accel+self.WagonList[i].Acceleration
         end
         local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
         if math.abs(accel) > 0.1 then
             for k,v in pairs(drivers) do
                 if IsValid(v) and IsValid(v:GetDriver()) then
-                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,0 or (self.Electric.I13+self.Electric.I24)/2,0 or self.RheostatController.SelectedPosition or 0,accel/#self.WagonList))--(accel/#self.WagonList)))
+                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,0 or (self.Electric.I13+self.Electric.I24)/2,0 or self.RheostatController.SelectedPosition or 0,accel/self.WagonCount))--(accel/self.WagonCount)))
                 end
             end
         end

@@ -511,7 +511,7 @@ function ENT:Think()
     self:SetPackedBool("HL25",Panel.HL25 > 0)
     local TW28 = 0
     if Panel.HL6 > 0 then
-        local wags = #self.WagonList
+        local wags = self.WagonCount
         for i,v in ipairs(self.WagonList) do
             TW28 = TW28+(v.Panel.TW28 or 0)/wags
         end

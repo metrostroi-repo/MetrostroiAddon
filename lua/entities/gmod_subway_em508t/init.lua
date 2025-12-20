@@ -238,7 +238,7 @@ function ENT:Think()
 
     local TW18 = 0
     if Panel.RRP > 0 then
-        local wags = #self.WagonList
+        local wags = self.WagonCount
         for _,v in ipairs(self.WagonList) do
             TW18 = TW18+(v.Panel.TW18 or 0)/wags
         end

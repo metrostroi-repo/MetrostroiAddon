@@ -350,7 +350,7 @@ function TRAIN_SYSTEM:Think(dT)
     local leak = 0]]--[[
     local count = 0
     local command = 0
-    for i=1,#Train.WagonList do
+    for i=1,Train.WagonCount do
         local train = Train.WagonList[i]
         if train.BUKP then
             if train.BUKP.Loop == 0 then

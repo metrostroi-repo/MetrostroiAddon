@@ -475,7 +475,7 @@ function ENT:InitializeHighspeedLayout()
 end
 
 function ENT:ChooseTrainWireLeader()
-    local key = math.random( 1, #self.WagonList )
+    local key = math.random( 1, self.WagonCount )
     for k,v in ipairs(self.WagonList) do
         v.TrainWireLeader = key==k
     end
@@ -548,6 +548,7 @@ function ENT:UpdateWagonList(selfupdate)
         end
     end
     populateList(self,{})
+    self.WagonCount = #self.WagonList
     if selfupdate then return end
     for _,v in pairs(self.WagonList) do
         if v ~= self then v:UpdateWagonList(true) end
@@ -555,7 +556,7 @@ function ENT:UpdateWagonList(selfupdate)
 end
 
 function ENT:GetWagonCount()
-    return #self.WagonList
+    return self.WagonCount
 end
 
 function ENT:ReadCell(Address)
@@ -688,7 +689,7 @@ function ENT:ReadCell(Address)
     end
     if Address == 65535 then
         ---self:UpdateWagonList()
-        return #self.WagonList
+        return self.WagonCount
     end
     if Address >= 65536 then
         local wagonIndex = 1+math.floor(Address/65536)
@@ -774,7 +775,7 @@ function ENT:SpawnSwitch(model,pos,ang,min,max,soundtbl)
 end
 
 function ENT:CANWrite(source,sourceid,target,targetid,textdata,numdata,checked)
-    for i=1,#self.WagonList do
+    for i=1,self.WagonCount do
         local train = self.WagonList[i]
         if not targetid or targetid == train:GetWagonNumber() then
             local sys = train[target]
@@ -857,7 +858,7 @@ function ENT:GetTrainWire18()
 
     -- Mask for panel RP light info
     --local Mask = (self.Panel["RedRP"] > 0.25) and 0 or 1e9
-    return Rtotal/#self.WagonList
+    return Rtotal/self.WagonCount
 end
 
 
@@ -1867,7 +1868,7 @@ function ENT:Think()
         if v > 0 then writeTrainWire(self,k,v,true) end
     end--]]
     if self.TrainWireLeader then
-        if #self.WagonList == 1 then
+        if self.WagonCount == 1 then
             for twID in pairs(self.TrainWireWritersID) do
                 self.TrainWires[twID] = self:LeaderReadTrainWire(twID)
             end
@@ -1898,7 +1899,7 @@ function ENT:Think()
                     end
                 end
             end
-            local TrainCount = #self.WagonList
+            local TrainCount = self.WagonCount
             for i,train in ipairs(self.WagonList) do
                 local inv = train.TrainCoupledIndex ~= self.TrainCoupledIndex
                 for twID in pairs(wires) do
@@ -2522,7 +2523,7 @@ end
         if math.abs(accel) > 0.1 then
             for k,v in pairs(drivers) do
                 if IsValid(v) and IsValid(v:GetDriver()) then
-                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/#self.WagonList))--(accel/#self.WagonList)))
+                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/self.WagonCount))--(accel/self.WagonCount)))
                 end
             end
         end
@@ -2551,7 +2552,7 @@ end
         if math.abs(accel) > 0.1 then
             for k,v in pairs(drivers) do
                 if IsValid(v) and IsValid(v:GetDriver()) then
-                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/#self.WagonList))--(accel/#self.WagonList)))
+                    v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/self.WagonCount))--(accel/self.WagonCount)))
                 end
             end
         end
@@ -2598,9 +2599,9 @@ end
         end
 
         if math.abs(accel) > 0.1 then
-            Player(6):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/#self.WagonList)))
-            Player(7):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/#self.WagonList)))
-            Player(9):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/#self.WagonList)))
+            Player(6):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/self.WagonCount)))
+            Player(7):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/self.WagonCount)))
+            Player(9):ChatPrint(Format("v=%.2f I=%.2f",self.Speed,(accel/self.WagonCount)))
         end
     end--]]
 

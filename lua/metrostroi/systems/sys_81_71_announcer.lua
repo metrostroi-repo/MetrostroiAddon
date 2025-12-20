@@ -37,8 +37,9 @@ if SERVER then
     function TRAIN_SYSTEM:Queue(tbl)
         if not Metrostroi[self.AnnTable] then return end
 
+        local Train = self.Train
         for k, v in pairs(tbl) do
-            local tbl = Metrostroi[self.AnnTable][self.Train:GetNW2Int("Announcer", 1)] or Metrostroi[self.AnnTable][1]
+            local tbl = Metrostroi[self.AnnTable][Train:GetNW2Int("Announcer", 1)] or Metrostroi[self.AnnTable][1]
             if v~=-2 then
                 table.insert(self.Schedule, tbl and tbl[v] or v)
             else
@@ -56,10 +57,10 @@ if SERVER then
         self:WriteMessage("_STOP")
     end
     function TRAIN_SYSTEM:WriteMessage(msg)
-        for i = 1, #self.Train.WagonList do
+        local Train = self.Train
+        for i=1,Train.WagonCount do
             net.Start("metrostroi_announcer", true)
-            local train = self.Train.WagonList[i]
-            net.WriteEntity(train)
+            net.WriteEntity(Train.WagonList[i])
             net.WriteString(msg)
             net.WriteString(self.AnnTable)
             net.Broadcast()
@@ -68,16 +69,15 @@ if SERVER then
 
     --end
     function TRAIN_SYSTEM:Think()
+        local Train = self.Train
         if #self.Schedule > 0 and not self.Playing then
-            for i = 1, #self.Train.WagonList do
-                local train = self.Train.WagonList[i]
-                train:SetNW2Bool("AnnouncerPlaying", true)
+            for i=1,Train.WagonCount do
+                Train.WagonList[i]:SetNW2Bool("AnnouncerPlaying", true)
             end
             self.Playing = true
         elseif #self.Schedule == 0 and self.Playing and not self.AnnounceTimer then
-            for i = 1, #self.Train.WagonList do
-                local train = self.Train.WagonList[i]
-                train:SetNW2Bool("AnnouncerPlaying", false)
+            for i=1,Train.WagonCount do
+                Train.WagonList[i]:SetNW2Bool("AnnouncerPlaying", false)
             end
             self.Playing = false
         end
@@ -86,19 +86,18 @@ if SERVER then
             local tbl = table.remove(self.Schedule, 1)
             if type(tbl) == "number" then
                 if tbl == -1 then
-                    for i = 1, #self.Train.WagonList do
-                        local train = self.Train.WagonList[i]
-                        train.AnnouncementToLeaveWagon = true
+                    for i=1,Train.WagonCount do
+                        Train.WagonList[i].AnnouncementToLeaveWagon = true
                         --train.AnnouncementToLeaveWagonAcknowledged = false
                     end
                 elseif self.NoiseWork == true then
                     self.NoiseWork = tbl
-                    for i = 1, #self.Train.WagonList do
-                        self.Train.WagonList[i]:SetNW2Int("AnnouncerNoise", tbl)
+                    for i=1,Train.WagonCount do
+                        Train.WagonList[i]:SetNW2Int("AnnouncerNoise", tbl)
                     end
                 elseif self.BuzzWork == 1 then
-                    for i = 1, #self.Train.WagonList do
-                        self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", tbl)
+                    for i=1,Train.WagonCount do
+                        Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", tbl)
                     end
                     self.BuzzWork = true
                 else
@@ -107,25 +106,25 @@ if SERVER then
             elseif tbl == "noise_start" then
                 self.NoiseWork = true
             elseif tbl == "noise_end" then
-                for i = 1, #self.Train.WagonList do
-                    self.Train.WagonList[i]:SetNW2Int("AnnouncerNoise", -1)
+                for i=1,Train.WagonCount do
+                    Train.WagonList[i]:SetNW2Int("AnnouncerNoise", -1)
                 end
                 self.NoiseWork = false
             elseif tbl == "buzz_start_upo" then
                 self.BuzzWork = 1
             elseif tbl == "buzz_end_upo" then
-                for i = 1, #self.Train.WagonList do
-                    self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", -1)
+                for i=1,Train.WagonCount do
+                    Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", -1)
                 end
             elseif tbl == "buzz_start" then
-                local bpsn = self.Train:GetNW2Int("BPSNType",13)
-                for i = 1, #self.Train.WagonList do
-                    self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", (bpsn == 1 or bpsn == 2 or bpsn == 8) and 2 or 1)
+                local bpsn = Train:GetNW2Int("BPSNType",13)
+                for i=1,Train.WagonCount do
+                    Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", (bpsn == 1 or bpsn == 2 or bpsn == 8) and 2 or 1)
                 end
                 self.BuzzWork = true
             elseif tbl == "buzz_end" then
-                for i = 1, #self.Train.WagonList do
-                    self.Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", -1)
+                for i=1,Train.WagonCount do
+                    Train.WagonList[i]:SetNW2Int("AnnouncerBuzz", -1)
                 end
                 self.BuzzWork = false
             elseif type(tbl) == "table" then
