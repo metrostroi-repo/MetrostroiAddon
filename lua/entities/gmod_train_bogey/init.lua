@@ -151,16 +151,17 @@ function ENT:InitializeWheels()
     end
 
     -- Assign ownership
+    local train = self:GetNW2Entity("TrainEntity")
     if IsValid(self:GetPlayer()) then
         wheels:SetPlayer(self:GetPlayer())
-    elseif IsValid(self:GetNW2Entity("TrainEntity"):GetPlayer()) then
-        wheels:SetPlayer(self:GetNW2Entity("TrainEntity"):GetPlayer())
+    elseif IsValid(train) and IsValid(train:GetPlayer()) then
+        wheels:SetPlayer(train:GetPlayer())
     end
 
     if CPPI and IsValid(self:CPPIGetOwner()) then
         wheels:CPPISetOwner(self:CPPIGetOwner())
-    elseif CPPI and IsValid(self:GetNW2Entity("TrainEntity"):CPPIGetOwner()) then
-        wheels:CPPISetOwner(self:GetNW2Entity("TrainEntity"):CPPIGetOwner())
+    elseif CPPI and IsValid(train) and IsValid(train:CPPIGetOwner()) then
+        wheels:CPPISetOwner(train:CPPIGetOwner())
     end
     
     wheels:SetNW2Entity("TrainBogey",self)
