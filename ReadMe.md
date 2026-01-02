@@ -1,4 +1,4 @@
-Metrostroi Subway Simulator 2025
+Metrostroi Subway Simulator 2026
 ================================================================================
 
 ## Working branches:
