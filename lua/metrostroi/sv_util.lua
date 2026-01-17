@@ -496,10 +496,12 @@ local function consumeFromFeeder(inCurrent, inFeeder)
     end
 end
 
-local prevTime
+local C_Voltage = GetConVar("metrostroi_voltage")
+local C_CurrentLimit = GetConVar("metrostroi_current_limit")
+
+local prevTime = CurTime()
 hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     -- Change in time
-    prevTime = prevTime or CurTime()
     local deltaTime = (CurTime() - prevTime)
     prevTime = CurTime()
 
@@ -507,46 +509,56 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     Metrostroi.TotalRateWatts = 0
     Metrostroi.Current = 0
     for k,v in pairs(Metrostroi.Currents) do Metrostroi.Currents[k] = 0 end
-    local bogeys = ents.FindByClass("gmod_train_bogey")
-    for _,bogey in pairs(bogeys) do
-        if bogey.Feeder then
-            Metrostroi.Currents[bogey.Feeder] = Metrostroi.Currents[bogey.Feeder] + bogey.DropByPeople
-        else
-            Metrostroi.Current = Metrostroi.Current + bogey.DropByPeople
+    for train in pairs(Metrostroi.SpawnedTrains) do
+        if not train.Electric then continue end
+        
+        local fB = IsValid(train.FrontBogey) and train.FrontBogey
+        if fB then
+            if fB.Feeder then
+                Metrostroi.Currents[fB.Feeder] = Metrostroi.Currents[fB.Feeder] + fB.DropByPeople
+            else
+                Metrostroi.Current = Metrostroi.Current + fB.DropByPeople
+            end
+        end
+
+        local rB = IsValid(train.RearBogey) and train.RearBogey
+        if rB then
+            if rB.Feeder then
+                Metrostroi.Currents[rB.Feeder] = Metrostroi.Currents[rB.Feeder] + rB.DropByPeople
+            else
+                Metrostroi.Current = Metrostroi.Current + rB.DropByPeople
+            end
         end
     end
-    for _,class in pairs(Metrostroi.TrainClasses) do
-        local trains = ents.FindByClass(class)
-        for _,train in pairs(trains) do
-            if train.Electric then
-                if train.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, train.Electric.EnergyChange) end
-                local current = math.max(0, train.Electric.Itotal or 0) -  math.max(0, train.Electric.Iexit or 0)
+    for train in pairs(Metrostroi.SpawnedTrains) do
+        if train.Electric then
+            if train.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, train.Electric.EnergyChange) end
+            local current = math.max(0, train.Electric.Itotal or 0) -  math.max(0, train.Electric.Iexit or 0)
 
-                local fB = IsValid(train.FrontBogey) and train.FrontBogey
-                local rB = IsValid(train.RearBogey) and train.RearBogey
-                if fB and (not fB.ContactStates or (not fB.ContactStates[1] and not fB.ContactStates[2])) then fB = nil end -- Don't have contact with TR
-                if rB and (not rB.ContactStates or (not rB.ContactStates[1] and not rB.ContactStates[2])) then rB = nil end -- Don't have contact with TR
+            local fB = IsValid(train.FrontBogey) and train.FrontBogey
+            local rB = IsValid(train.RearBogey) and train.RearBogey
+            if fB and (not fB.ContactStates or (not fB.ContactStates[1] and not fB.ContactStates[2])) then fB = nil end -- Don't have contact with TR
+            if rB and (not rB.ContactStates or (not rB.ContactStates[1] and not rB.ContactStates[2])) then rB = nil end -- Don't have contact with TR
 
-                local fBfeeder = fB and fB.Feeder
-                local rBfeeder = rB and rB.Feeder
+            local fBfeeder = fB and fB.Feeder
+            local rBfeeder = rB and rB.Feeder
 
-                if fBfeeder then
-                    if not rBfeeder or fBfeeder == rBfeeder then
-                        consumeFromFeeder(current, fBfeeder) -- Feeders are same
-                    else
-                        consumeFromFeeder(current * 0.5, fBfeeder) -- Feeders are different
-                    end
+            if fBfeeder then
+                if not rBfeeder or fBfeeder == rBfeeder then
+                    consumeFromFeeder(current, fBfeeder) -- Feeders are same
+                else
+                    consumeFromFeeder(current * 0.5, fBfeeder) -- Feeders are different
                 end
-
-                if rBfeeder then
-                    if not fBfeeder then
-                        consumeFromFeeder(current, rBfeeder) -- Feeders are same
-                    elseif fBfeeder ~= rBfeeder  then
-                        consumeFromFeeder(current * 0.5, rBfeeder) -- Feeders are different
-                    end
-                end
-                if not rBfeeder and not fBfeeder then consumeFromFeeder(current) end
             end
+
+            if rBfeeder then
+                if not fBfeeder then
+                    consumeFromFeeder(current, rBfeeder) -- Feeders are same
+                elseif fBfeeder ~= rBfeeder  then
+                    consumeFromFeeder(current * 0.5, rBfeeder) -- Feeders are different
+                end
+            end
+            if not rBfeeder and not fBfeeder then consumeFromFeeder(current) end
         end
     end
     -- Ignore invalid values
@@ -561,12 +573,12 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     --Metrostroi.Current = Metrostroi.Current + Iperson
 
     -- Check if exceeded global maximum current
-    if Metrostroi.Current > GetConVar("metrostroi_current_limit"):GetInt() then
+    if Metrostroi.Current > C_CurrentLimit:GetInt() then
         Metrostroi.VoltageRestoreTimer = CurTime() + 7.0
         print(Format("[!] Power feed protection tripped: current peaked at %.1f A",Metrostroi.Current))
     end
 
-    local voltage = math.max(0,GetConVar("metrostroi_voltage"):GetInt())
+    local voltage = math.max(0,C_Voltage:GetInt())
 
     -- Calculate new voltage
     local Rfeed = 0.03 --25
