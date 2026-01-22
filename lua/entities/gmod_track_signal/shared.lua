@@ -206,11 +206,12 @@ ENT.TrafficLightModels[0] = {
 				}},
 
 	M = { 24, "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	MOffset =  Vector(0.3,0,-2)
 }
 
 
 --------------------------------------------------------------------------------
--- Outside
+-- Outside big
 --------------------------------------------------------------------------------
 ENT.RenderOffset[1] = Vector(0,0,200)
 ENT.TrafficLightModels[1] = {
@@ -243,10 +244,19 @@ ENT.TrafficLightModels[1] = {
 				}},
 	M = { 40, "models/metrostroi/signals/mus/light_pathindicator3.mdl",  Vector(7,11, 25), 3.6, 3.4, 5},
 	noleft = true,
+	first_lenses_group_offset = {
+		M = Vector(0,0,15),
+		[1] = Vector(0,0,25),
+		[2] = Vector(0,0,8)
+	}
 }
+ENT.TrafficLightModels[1].G = ENT.TrafficLightModels[1].W
+ENT.TrafficLightModels[1].Y = ENT.TrafficLightModels[1].W
+ENT.TrafficLightModels[1].B = ENT.TrafficLightModels[1].W
+ENT.TrafficLightModels[1].R = ENT.TrafficLightModels[1].W
 
 --------------------------------------------------------------------------------
--- Outside box
+-- Outside small
 --------------------------------------------------------------------------------
 ENT.RenderOffset[2] = Vector(0,0.,112)
 ENT.TrafficLightModels[2] = {
@@ -286,7 +296,35 @@ ENT.TrafficLightModels[2] = {
 				}},
 
 	M = { 24, "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.8,2, 22.8), 1.8, 2.1, 4},
+    
+    LOffset = Vector(-0.3,0.5,0),
+    MOffset =  Vector(-2,0.5,0),
+	first_lenses_group_offset = {M = Vector(0,0,1)}
 }
+
+
+--взял с минска
+--------------------------------------------------------------------------------
+-- Dwarf
+--------------------------------------------------------------------------------
+ENT.RenderOffset[3] = Vector(0,0,0)
+ENT.TrafficLightModels[3] = {
+	--["name"]	= Vector(-3-10,2.5+6,0),
+	name_one	= Vector(10.07-10,0.3+6,42.5),
+	[1]	= { 42, "models/metrostroi/signals/mus/fixed_outside_2.mdl", {
+				[0] = Vector(10.07-10,-29.7+2.5,27.55+38.7),
+				[1] = Vector(10.07-10,-29.7+2.5,16+38.7),
+				["glass"]	= {
+					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,27.55+38.7)},
+					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,16+38.7)},
+				}
+				}},
+	every_letter_offset = Vector(0,0.3,0),
+	noleft = true,
+}
+
+
+
 ENT.SignalConverter = {
 	R = 1,
 	Y = 2,
@@ -296,7 +334,7 @@ ENT.SignalConverter = {
 }
 
 
-for i = 0,2 do
+for i = 0,3 do
 	--SERVER
 	ENT.TrafficLightModels[i].ArsBox = {model = "models/metrostroi/signals/mus/ars_box.mdl"}
 	ENT.TrafficLightModels[i].ArsBoxMittor = {model = "models/metrostroi/signals/mus/ars_box_mittor.mdl"}

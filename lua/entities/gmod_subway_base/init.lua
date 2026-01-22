@@ -116,6 +116,9 @@ function ENT:Initialize()
     self.Seats = {}
     -- List of headlights, dynamic lights, sprite lights
     self.Lights = {}
+    
+    self.AutostopsForw = {}
+    
     -- Load sounds
     self:InitializeSounds()
     if self.NoTrain then return end

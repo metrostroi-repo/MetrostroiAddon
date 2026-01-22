@@ -22,6 +22,8 @@ if not Metrostroi.Paths then
     Metrostroi.GetARSJointCache = {}
     -- List of stations/platforms
     Metrostroi.Stations = {}
+    -- List of autostops for every node in every direction in forward and back
+    Metrostroi.AutostopsForNode = {}
 
     -- List of ARS subsections
     Metrostroi.ARSSubSections = {}
@@ -37,7 +39,7 @@ if not Metrostroi.Paths then
 
     Metrostroi.OldUpdateTime = 0
 end
-Metrostroi.SignalVersion = 1.2
+Metrostroi.SignalVersion = 1.3
 
 
 --------------------------------------------------------------------------------
@@ -278,6 +280,68 @@ function Metrostroi.UpdateSignalEntities()
         v:PreInitalize()
     end
     print(Format("Metrostroi: Total signals: %u (normal: %u, repeaters: %u)", count, count-repeater, repeater))
+    
+    
+    --исопльзование UpdateSignalEntities написано очень неудобно, и если я добавлю новую, то будет много гемора (там надо будет в таймеры прописовать и хз куда еще)
+    --поэтому привязку автостопов пишу сюда
+    Metrostroi.LinkAutostopToNodes()
+
+end
+
+function Metrostroi.LinkAutostopToNodes()
+    --пре-привязка к ноудам
+    local tbl = {}
+    for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
+        if not IsValid(v) then continue end
+        local pos = Metrostroi.GetPositionOnTrack(v:GetPos(),v:GetAngles() - Angle(0,90,0),options)[1]
+        if not pos then continue end
+        local pos2 = Metrostroi.GetPositionOnTrack(v:LocalToWorld(Vector(0,10,0)), v:GetAngles() - Angle(0,90,0),options)[1]
+        local dir = true
+        if pos2 then dir = (pos2.x - pos.x) < 0 end
+        v.TrackDir = dir
+        v.TrackNode = pos.node1
+        v.TrackX = pos.x
+        tbl[pos.node1] = tbl[pos.node1] or {}
+        table.insert(tbl[pos.node1], v)
+    end   
+
+    --привязка к ноудам
+    Metrostroi.AutostopsForNode = {}
+    for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
+        if not IsValid(v) or not v.TrackNode then continue end
+        local curnode = v.TrackNode
+        Metrostroi.AutostopsForNode[curnode] = Metrostroi.AutostopsForNode[curnode] or {}
+        Metrostroi.AutostopsForNode[curnode][v.TrackDir] = Metrostroi.AutostopsForNode[curnode][v.TrackDir] or {}
+        Metrostroi.AutostopsForNode[curnode][v.TrackDir][true] = Metrostroi.AutostopsForNode[curnode][v.TrackDir][true] or {}
+        table.insert(Metrostroi.AutostopsForNode[curnode][v.TrackDir][true], v)
+        Metrostroi.AutostopsForNode[curnode][v.TrackDir][false] = Metrostroi.AutostopsForNode[curnode][v.TrackDir][false] or {}
+        table.insert(Metrostroi.AutostopsForNode[curnode][v.TrackDir][false], v)
+        for i = 0,1 do
+            local dirstr = i == 1 and "next" or "prev"
+            curnode = v.TrackNode[dirstr]
+            --alreadyhasautostop проверяется на следующий цикл после определения чтобы записать автостоп еще на следующий ноуд
+            --(это для защиты от слишком быстрого проезда двух автостопов на соседних ноудах)
+            local alreadyhasautostop
+            while curnode do
+                Metrostroi.AutostopsForNode[curnode] = Metrostroi.AutostopsForNode[curnode] or {}
+                Metrostroi.AutostopsForNode[curnode][v.TrackDir] = Metrostroi.AutostopsForNode[curnode][v.TrackDir] or {}
+                Metrostroi.AutostopsForNode[curnode][v.TrackDir][not(v.TrackDir == (i == 1))] = Metrostroi.AutostopsForNode[curnode][v.TrackDir][not(v.TrackDir == (i == 1))] or {}
+                table.insert(Metrostroi.AutostopsForNode[curnode][v.TrackDir][not(v.TrackDir == (i == 1))], v)
+                if alreadyhasautostop then break end
+                for _,autostop in pairs(tbl[curnode] or empty_table)do
+                    if autostop.TrackDir ~= v.TrackDir then continue end
+                    alreadyhasautostop = true
+                    break
+                end
+                curnode = curnode[dirstr]
+            end
+        end
+    end
+
+    --обновление привязки к сигналу
+    for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
+        if IsValid(v) then v:LinkToSignal() end
+    end
 end
 
 function Metrostroi.PostSignalInitialize()
@@ -1143,7 +1207,7 @@ local function loadSigns(name,keep)
         signs.Version = nil
     end
     local TwoToSix = false
-    if version ~= 1.2 then
+    if version ~= 1.2 and version ~= 1.3 then
         print(Format("Metrostroi: !!Converting from version %.1f!! signals converted to %s.",version,TwoToSix and "2/6" or "1/5"))
         if game.GetMap():find("gm_mus_loop") then
             TwoToSix = true
@@ -1170,6 +1234,12 @@ local function loadSigns(name,keep)
                 ent.Name = v.Name
                 ent.RouteNumberSetup = v.RouteNumberSetup
                 ent.LensesStr = v.LensesStr
+				--для старых версий сигналок в качестве пригласительного берется последний белый
+				if 1.3 ~= version and ent.LensesStr then
+					for i = #ent.LensesStr, 1, -1 do
+						if ent.LensesStr[i] == "W" then ent.LensesStr = ent.LensesStr:sub(0,i-1).."P"..ent.LensesStr:sub(i+1) break end
+					end
+				end
                 ent.Lenses = string.Explode("-",v.LensesStr)
                 ent.RouteNumber = v.RouteNumber
                 ent.IsolateSwitches = v.IsolateSwitches
@@ -1193,7 +1263,7 @@ local function loadSigns(name,keep)
                     print(Format("Metrostroi: !!Converting from version %.1f!! signal %s rotated.",version,ent.Name))
                     ent:SetAngles(ent:LocalToWorldAngles(ent:WorldToLocalAngles(ent:GetAngles())+Angle(0,180,0)))
                 end
-                if version ~= 1.2 then ent.TwoToSix = TwoToSix end
+                if version ~= 1.2 and version ~= 1.3 then ent.TwoToSix = TwoToSix end
                 ent:Spawn()
             elseif v.Class == "gmod_track_signs" then
                 ent.SignType = v.SignType
@@ -1305,6 +1375,28 @@ local function loadPAData(name)
     Metrostroi.PARebuildStations()
 end
 
+function Metrostroi.SpawnAutostop(pos,ang,siglink,maxspeed)
+    local ent = ents.Create("gmod_track_autostop")
+    if not IsValid(ent) then return end
+    ent:SetPos(pos)
+    ent:SetAngles(ang)
+    ent.SignalLink = siglink
+    ent.MaxSpeed = maxspeed
+    ent:Spawn()
+    return ent
+end
+
+function Metrostroi.LoadAutostops(name,keep)
+    if keep then return end
+    for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
+        SafeRemoveEntity(v)
+    end
+    local autostops = getFile("metrostroi_data/autostops_%s",name,"Autostops")
+    for k,v in pairs(autostops or empty_table)do
+        Metrostroi.SpawnAutostop(v[1],v[2],v[3],v[4])
+    end
+end
+
 function Metrostroi.Load(name,keep_signs)
     name = name or game.GetMap()
 
@@ -1319,6 +1411,7 @@ function Metrostroi.Load(name,keep_signs)
     Metrostroi.IgnoreEntityUpdates = true
     loadSigns(name,keep_signs)
     loadAutoSigns(name,keep_signs)
+    Metrostroi.LoadAutostops(name,keep_signs)
 
     local pa_ents = ents.FindByClass("gmod_track_pa_marker")
     for _,v in pairs(pa_ents) do SafeRemoveEntity(v) end
@@ -1489,6 +1582,15 @@ function Metrostroi.Save(name)
         file.Write(string.format("metrostroi_data/pa_%s.txt",name),data)
         print(Format("Saved to metrostroi_data/pa_%s.txt",name))
     end
+    
+    local autostops = {}
+    for k,v in pairs(ents.FindByClass("gmod_track_autostop"))do
+        if not IsValid(v) then continue end
+        table.insert(autostops,{[1] = v:GetPos(), [2] = v:GetAngles(), [3] = v.SignalLink, [4] = v.MaxSpeed})
+    end
+    local data = util.TableToJSON(autostops,true)
+    file.Write(string.format("metrostroi_data/autostops_%s.txt",name),data)
+    print(Format("Saved to metrostroi_data/autostops_%s.txt",name))
 end
 
 

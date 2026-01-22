@@ -5,14 +5,15 @@ TOOL.ConfigName = ""
 TOOL.ClientConVar["signaldata"] = ""
 TOOL.ClientConVar["signdata"] = ""
 TOOL.ClientConVar["autodata"] = ""
+TOOL.ClientConVar["autostopdata"] = ""
 TOOL.ClientConVar["type"] = 1
 TOOL.ClientConVar["routetype"] = 1
 
 if SERVER then util.AddNetworkString "metrostroi-stool-signalling" end
 
 
-local Types = {"Signal","Sign","Autodrive",[0] = "Choose Type"}
-local TypesOfSignal = {"Inside","Outside big","Outside small"}
+local Types = {"Signal","Sign","Autodrive",[0] = "Choose Type","Autostop"}
+local TypesOfSignal = {"Inside","Outside big","Outside small","Dwarf"}
 local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street","STOP Street","Dangerous","Deadlock",
     "Stop marker","!(stop)","X","T Start","T End","T Sbor(engage)","Engines off","Engines on","C(horn)","T stop emer","Shod",
     "Left doors","Phone▲","Phone▼","1up","STOP Street cyka","NF outside","35 outside","40 outside","60 outside","70 outside","80 outside",
@@ -72,6 +73,63 @@ if CLIENT then
     language.Add("Tool.signalling.desc", "Adds and modifies signalling equipment (ARS/ALS) or signs")
     language.Add("Tool.signalling.0", "Primary: Spawn/update selected signalling entity (point at the inner side of rail)\nReload: Copy ARS/light settings\nSecondary: Remove")
     --language.Add("Undone_signalling", "Undone ARS/signalling equipment")
+end
+
+function TOOL:SpawnAutoStop(ply,trace,param)
+    self.AutoStop = self.AutoStop or {}
+    local tr = Metrostroi.RerailGetTrackData(trace.HitPos,ply:GetAimVector())
+    if not tr then return end
+	local ang = (-tr.right):Angle()
+	local pos = tr.centerpos - tr.up * 9.5
+    local siglink = self.Autostop.SignalLink
+    if not siglink or siglink == "" then siglink = nil end
+    
+    if param == 2 then
+		local mindist,ent
+		for k,v in pairs(ents.FindInSphere(trace.HitPos,64)) do
+			if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" then continue end
+			local dist = v:GetPos():DistToSqr(trace.HitPos)
+			if not mindist or mindist < dist then
+				mindist = dist
+				ent = v
+			end
+		end
+		if not ent then return true end
+		self.AutoStop.SignalLink = ent.SignalLink
+        self.AutoStop.MaxSpeed = ent.MaxSpeed
+        net.Start("metrostroi-stool-signalling")
+            net.WriteUInt(3,8)
+            net.WriteTable(self.AutoStop)
+        net.Send(self:GetOwner())
+        return ent
+    end
+	
+	--если рядом есть автостоп линкующийся к тому же сигналу и он стоит в том же направлении (разница углов < 45), то просто подвинуть его
+	local ent, mindist
+	for k,v in pairs(ents.FindInSphere(trace.HitPos,64)) do
+		if not IsValid(v) or v:GetClass() ~= "gmod_track_autostop" or v.SignalLink ~= siglink or math.abs(v:GetAngles()[2] - ang[2]) > 45 then continue end
+		local dist = v:GetPos():DistToSqr(trace.HitPos)
+		if not mindist or dist < mindist then
+			mindist = dist
+			ent = v
+		end
+	end
+	
+	if ent then
+		ent:SetPos(pos)
+		ent:SetAngles(ang)
+		ent.MaxSpeed = self.Autostop.MaxSpeed
+	else
+		ent = Metrostroi.SpawnAutostop(
+			pos,
+			ang, 
+			siglink,
+			self.Autostop.MaxSpeed
+		)
+	end
+    Metrostroi.UpdateSignalEntities()
+	
+    return ent
 end
 
 function TOOL:SpawnSignal(ply,trace,param)
@@ -287,9 +345,9 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
 
                 ent.PlateType = self.Auto.Type
                 local center = (tr.centerpos - tr.up * 9.5)
-                if self.Auto.Type == METROSTROI_ACOIL_DRIVE then
+                if (self.Auto.Type or 1) == METROSTROI_ACOIL_DRIVE then
                     local dist = 50
-                    if self.Auto.Dist == 1 then
+                    if (self.Auto.Dist or 1) == 1 then
                         ent.Model = "models/metrostroi/signals/autodrive/doska5.mdl"
                         dist = 5
                     elseif self.Auto.Dist == 2 then
@@ -310,7 +368,7 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
                         ent.StationPath = nil
                     end
 
-                    if self.Auto.Mode < 3 or self.Auto.Mode == 5 or 6 < self.Auto.Mode then ent.Power = true end
+                    if (self.Auto.Mode or 1) < 3 or self.Auto.Mode == 5 or 6 < self.Auto.Mode then ent.Power = true end
                     if ent.Right then
                         ent:SetPos(center + (tr.forward*(-(dist)/0.01905)+tr.right*-66+tr.up*5))
                     else
@@ -448,6 +506,8 @@ function TOOL:LeftClick(trace)
         ent = self:SpawnSign(ply,trace)
     elseif self.Type == 3 then
         ent = self:SpawnAutoPlate(ply,trace)
+    elseif self.Type == 4 then
+        ent = self:SpawnAutoStop(ply,trace)
     end
 
     return true
@@ -481,7 +541,11 @@ function TOOL:RightClick(trace)
         if v:GetClass() == "gmod_track_pa_marker" and self.Type == 3 and self.Auto.Type == 5 then
             if IsValid(v) then SafeRemoveEntity(v) end
         end
+        if v:GetClass() == "gmod_track_autostop" and self.Type == 4 then
+            if IsValid(v) then SafeRemoveEntity(v) end
+        end
     end
+    
     return true
 end
 
@@ -494,15 +558,20 @@ function TOOL:Reload(trace)
     if not trace then return false end
     if trace.Entity and trace.Entity:IsPlayer() then return false end
     local ent
+
     if self.Type == 1 then
         ent = self:SpawnSignal(ply,trace,2)
     elseif self.Type == 2 then
         ent = self:SpawnSign(ply,trace,2)
     elseif self.Type == 3 then
         ent = self:SpawnAutoPlate(ply,trace,2)
+    elseif self.Type == 4 then
+        ent = self:SpawnAutoStop(ply,trace,2)
     end
     return true
 end
+
+
 
 function TOOL:SendSettings()
     if self.Type == 1 then
@@ -530,6 +599,14 @@ function TOOL:SendSettings()
             --net.WriteEntity(self)
             net.WriteTable(self.Auto)
         net.SendToServer()
+    elseif self.Type == 4 then
+        if not self.Autostop then return end
+        RunConsoleCommand("signalling_autostopdata",util.TableToJSON(self.Autostop))
+        net.Start "metrostroi-stool-signalling"
+            net.WriteUInt(3,8)
+            --net.WriteEntity(self)
+            net.WriteTable(self.Autostop)
+        net.SendToServer()
     end
 end
 
@@ -552,6 +629,12 @@ net.Receive("metrostroi-stool-signalling", function(_, ply)
         TOOL.Signal = net.ReadTable()
         if CLIENT then
             RunConsoleCommand("signalling_signaldata",util.TableToJSON(TOOL.Signal))
+            NeedUpdate = true
+        end
+    elseif typ == 3 then
+        TOOL.Autostop = net.ReadTable()
+        if CLIENT then
+            RunConsoleCommand("signalling_autostopdata",util.TableToJSON(TOOL.Autostop))
             NeedUpdate = true
         end
     end
@@ -593,6 +676,7 @@ function TOOL:BuildCPanelCustom()
                 VSType:SetValue(name)
                 tool.Signal.Type = index
                 tool:SendSettings()
+				tool:BuildCPanelCustom()
             end
         CPanel:AddItem(VSType)
         local VNameT,VNameN = CPanel:TextEntry("Name:")
@@ -615,14 +699,50 @@ function TOOL:BuildCPanelCustom()
                 end
         if not tool.Signal.ARSOnly then
             local VLensT,VLensN = CPanel:TextEntry("Lenses:")
-                VLensT:SetTooltip("G - Green, Y - Yellow, R - Red,  B - Blue, W - White, M - Routing Pointer\nExample: GYG-RW-M")
+                VLensT:SetTooltip("G - Green, Y - Yellow, R - Red,  B - Blue, W - White, P - Invation, M - Routing Pointer\nExample: GYG-RW-M")
                 VLensT:SetValue(tool.Signal.Lenses or "")
                 VLensT:SetEnterAllowed(false)
                 function VLensT:OnChange()
                     local NewValue = ""
                     for i = 1,#self:GetValue() do
-                        NewValue = NewValue..((self:GetValue()[i] or ""):upper():match("[RYGWBM-]") or "")
+                        NewValue = NewValue..((self:GetValue()[i] or ""):upper():match("[RYGWBMP-]") or "")
                     end
+					
+					local Mpos = NewValue:find("M")
+					if Mpos then
+						--маршрутный указатель всегда отделяется минусами
+						if NewValue[Mpos - 1] ~= "" and NewValue[Mpos - 1] ~= "-" then NewValue = NewValue:sub(0,Mpos-1).."-"..NewValue:sub(Mpos)end
+						Mpos = NewValue:find("M")
+						if NewValue[Mpos + 1] ~= "" and NewValue[Mpos + 1] ~= "-" then NewValue = NewValue:sub(0,Mpos).."-"..NewValue:sub(Mpos+1)end
+						Mpos = NewValue:find("M")
+						
+						--маршрутный указатель может быть только один
+						local anotherMpos = NewValue:find("M",Mpos + 1)
+						while anotherMpos do
+							NewValue = NewValue:sub(0,Mpos)..NewValue:sub(Mpos + 1):gsub("M","")
+							anotherMpos = NewValue:find("M",Mpos + 1)
+						end
+						
+						--после маршрутного указателя может быть только пригласительный на мачтовом светофоре
+						
+					end
+					
+					-- запрет установки больше чем одного пригласиельного
+					-- local Ppos = NewValue:find("P")
+					-- if Ppos then
+						-- local anotherPpos = NewValue:find("P",Ppos + 1)
+						-- while anotherPpos do
+							-- NewValue = NewValue:sub(0,Ppos)..NewValue:sub(Ppos + 1):gsub("P","")
+							-- anotherPpos = NewValue:find("P",Ppos + 1)
+						-- end
+					-- end
+					
+					local twoMinuses = NewValue:find("--",0,true)
+					while twoMinuses do
+						NewValue = NewValue:sub(0,twoMinuses)..NewValue:sub(twoMinuses+2)
+						twoMinuses = NewValue:find("--",0,true)
+					end
+					
                     local NewValueT = string.Explode("-",NewValue)
                     local maxval = tool.Signal.Type == 3 and 4 or 3
                     for id,text in ipairs(NewValueT) do
@@ -632,20 +752,8 @@ function TOOL:BuildCPanelCustom()
                             end
                             break
                         end
-                        if text:find("M") then
-                            if text[1] == "M" then
-                                NewValueT[id] = "M"
-                            else
-                                NewValueT[id] = text:gsub("M","")
-                                id = id + 1
-                                NewValueT[id] = "M"
-                            end
-                            for i = id+1,#NewValueT do
-                                table.remove(NewValueT, i)
-                            end
-                            break
-                        end
-                        text = text:match("[RYGWB]+") or ""
+						
+                        text = text:match("[RYGWBMP]+") or ""
                         --[[local WFind = id==3 and text:find("W") or nil
                         --print(MFind,id)
                         if WFind then
@@ -669,10 +777,20 @@ function TOOL:BuildCPanelCustom()
                         end]]
                     end
                     local NewValue = table.concat(NewValueT,"-")
+                    --у карликового светофора запрещен маршрутный указатель и разрешена только одна группа линз и максимум две линзы
+                    if tool.Signal.Type == 4 then
+                        NewValue = NewValue:gsub("[M-]","")
+                        NewValue = NewValue:sub(1,2)
+                    end
                     self:SetText(NewValue)
                     self:SetCaretPos(#NewValue)
                 end
                 function VLensT:OnLoseFocus()
+                    --вначале и в конце убираю минусы если они есть
+                    local NewValue = self:GetValue()
+					while NewValue[1] == "-" do NewValue = NewValue:sub(2) end
+					while NewValue[#NewValue] == "-" do NewValue = NewValue:sub(1,-2) end
+                    self:SetText(NewValue)
                     tool.Signal.Lenses = self:GetValue()
                     tool:SendSettings()
                 end
@@ -690,7 +808,7 @@ function TOOL:BuildCPanelCustom()
                     end
                     local oldpos = self:GetCaretPos()
                     self:SetText(NewValue:sub(1,5))
-                    self:SetCaretPos(math.min(5,oldpos))
+                    self:SetCaretPos(#self:GetValue())
                 end
                 function VRoutT:OnLoseFocus()
                     tool.Signal.RouteNumberSetup = self:GetValue()
@@ -944,6 +1062,7 @@ function TOOL:BuildCPanelCustom()
             tool:SendSettings()
             tool:BuildCPanelCustom()
         end
+        tool.Auto.Type = tool.Auto.Type or 1
         if tool.Auto.Type == METROSTROI_ACOIL_DOOR then
             local VRightOC = CPanel:CheckBox("Right doors")
             VRightOC:SetTooltip("Right doors")
@@ -1491,6 +1610,42 @@ function TOOL:BuildCPanelCustom()
                 tool:SendSettings()
             end
         end
+    elseif tool.Type == 4 then
+          local es = ""
+    
+          local VSNameT = CPanel:TextEntry("LinkToSignal:")
+                VSNameT:SetTooltip("Name of the Signal")
+                VSNameT:SetValue(tool.Autostop.SignalLink or es)
+                VSNameT:SetEnterAllowed(false)
+                function VSNameT:OnChange()
+                    local val = self:GetValue():upper()
+                    self:SetText(val)
+                    self:SetCaretPos(#val)
+                end
+                function VSNameT:OnLoseFocus()
+					tool.Autostop.SignalLink = self:GetValue()
+                    tool:SendSettings()
+                end
+          
+          local VMSpeedT = CPanel:TextEntry("MaxSpeed:")
+                -- VMSpeedT:SetTooltip("Name. Letters or digits!\nFor example:IND2")
+                VMSpeedT:SetValue(tool.Autostop.MaxSpeed or es)
+                VMSpeedT:SetEnterAllowed(false)
+                function VMSpeedT:OnChange()
+                    local val = self:GetValue():upper()
+                    local numval = tonumber(val)
+                    if not numval then 
+                        self:SetText(es)
+                    else
+                    
+                        self:SetText(val)
+                    end
+                    self:SetCaretPos(string.len(self:GetValue()))
+                end
+                function VMSpeedT:OnLoseFocus()
+					tool.Autostop.MaxSpeed = self:GetValue()
+                    tool:SendSettings()
+                end
     end
 end
 
@@ -1500,6 +1655,7 @@ function TOOL:Think()
         self.Signal = self.Signal or util.JSONToTable(string.Replace(GetConVar("signalling_signaldata"):GetString(),"'","\"")) or {}
         self.Sign = self.Sign or util.JSONToTable(string.Replace(GetConVar("signalling_signdata"):GetString(),"'","\"")) or {}
         self.Auto = self.Auto or util.JSONToTable(string.Replace(GetConVar("signalling_autodata"):GetString(),"'","\"")) or {}
+        self.Autostop = self.Autostop or util.JSONToTable(string.Replace(GetConVar("signalling_autostopdata"):GetString(),"'","\"")) or {}
         self:SendSettings()
         self:BuildCPanelCustom()
         self.NotBuilt = nil
