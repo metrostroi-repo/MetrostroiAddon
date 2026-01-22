@@ -1498,9 +1498,6 @@ end
 hook.Add("Initialize", "Metrostroi_MapInitialize", function()
     timer.Simple(2.0,Metrostroi.Load)
 end)
-hook.Add("Initialize", "Metrostroi_MapInitialize", function()
-    timer.Simple(2.0,Metrostroi.Load)
-end)
 
 hook.Add("PreCleanupMap", "Metrostroi_PreCleanupMap", function()
     Metrostroi.IgnoreEntityUpdates = true
