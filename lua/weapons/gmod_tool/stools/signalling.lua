@@ -56,6 +56,7 @@ local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street",
     "Ted On 722 90%",
     "Ted On 722 100%",
     "Ted On Outside",
+    "Custom"
     }
 local RouteTypes = {"Auto", "Manual","Repeater","Emerg"}
 
@@ -185,6 +186,7 @@ function TOOL:SpawnSign(ply,trace,param)
         self.Sign.YOffset = ent.YOffset
         self.Sign.ZOffset = ent.ZOffset
         self.Sign.Left = ent.Left
+        self.Sign.CustomModel = ent:GetNWString("CustomModel",nil)
         net.Start("metrostroi-stool-signalling")
             net.WriteUInt(1,8)
             net.WriteTable(self.Sign)
@@ -208,6 +210,7 @@ function TOOL:SpawnSign(ply,trace,param)
             ent.YOffset = self.Sign.YOffset
             ent.ZOffset = self.Sign.ZOffset
             ent.Left = self.Sign.Left
+            ent:SetNWString("CustomModel",self.Sign.CustomModel)
             ent:SendUpdate()
         end
         return ent
@@ -908,27 +911,44 @@ function TOOL:BuildCPanelCustom()
                 VSType:SetValue(name)
                 tool.Sign.Type = index
                 tool:SendSettings()
+                self:BuildCPanelCustom()
             end
         CPanel:AddItem(VSType)
-        local VYOffT = CPanel:NumSlider("Y Offset:",nil,-100,100,0)
+        if tool.Sign.Type == #TypesOfSign then
+            local VNameT = CPanel:TextEntry("ModelPath")
+            VNameT:SetTooltip("example: models/metrostroi/re_sign/t_och_r.mdl\nMax length 199")
+            VNameT:SetValue(tool.Sign.CustomModel or "")
+            VNameT:SetEnterAllowed(false)
+            function VNameT:OnLoseFocus()
+                local val = self:GetValue():gsub("\\","/")
+                self:SetText(val)
+                tool.Sign.CustomModel = val
+                tool:SendSettings()
+            end
+        else
+            tool.Sign.CustomModel = nil
+        end
+        local VYOffT = CPanel:NumSlider("Y Offset:",nil,-500,500,0)
             VYOffT:SetValue(tool.Sign.YOffset or 0)
             VYOffT.OnValueChanged = function(num)
                 tool.Sign.YOffset = VYOffT:GetValue()
                 tool:SendSettings()
             end
-        local VZOffT = CPanel:NumSlider("Z Offset:",nil,-50,50,0)
+        local VZOffT = CPanel:NumSlider("Z Offset:",nil,-100,100,0)
             VZOffT:SetValue(tool.Sign.ZOffset or 0)
             VZOffT.OnValueChanged = function(num)
                 tool.Sign.ZOffset = VZOffT:GetValue()
                 tool:SendSettings()
             end
-        local VLeftOC = CPanel:CheckBox("Left side(if can be left-side)")
-                VLeftOC:SetTooltip("Left side")
-                VLeftOC:SetValue(tool.Sign.Left or false)
-                function VLeftOC:OnChange()
-                    tool.Sign.Left = self:GetChecked()
-                    tool:SendSettings()
-                end
+        if tool.Sign.Type ~= #TypesOfSign then
+            local VLeftOC = CPanel:CheckBox("Left side(if can be left-side)")
+                    VLeftOC:SetTooltip("Left side")
+                    VLeftOC:SetValue(tool.Sign.Left or false)
+                    function VLeftOC:OnChange()
+                        tool.Sign.Left = self:GetChecked()
+                        tool:SendSettings()
+                    end
+        end
     elseif tool.Type == 3 then
         --local VNotF = vgui.Create("DLabel") VNotF:SetText("Not Finished yet!!")
         local VAType = vgui.Create("DComboBox")

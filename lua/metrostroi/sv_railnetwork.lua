@@ -1200,6 +1200,7 @@ local function loadSigns(name,keep)
                 ent.YOffset = v.YOffset
                 ent.ZOffset = v.ZOffset
                 ent.Left = v.Left,
+                ent:SetNWString("CustomModel",v.CustomModel)
                 ent:Spawn()
                 ent:SendUpdate()
             elseif v.Class == "gmod_track_signal" then ent:Remove() end
@@ -1405,6 +1406,9 @@ function Metrostroi.Save(name)
     end
     local signs_ents = ents.FindByClass("gmod_track_signs")
     for k,v in pairs(signs_ents) do
+        local CustomModel
+        if IsValid(v) then CustomModel = v:GetNWString("CustomModel","")end
+        if CustomModel == "" then CustomModel = nil end
         table.insert(signs,{
             Class = "gmod_track_signs",
             Pos = v:GetPos(),
@@ -1413,6 +1417,7 @@ function Metrostroi.Save(name)
             YOffset = v.YOffset,
             ZOffset = v.ZOffset,
             Left = v.Left,
+            CustomModel = CustomModel
         })
     end
     signs.Version = Metrostroi.SignalVersion
