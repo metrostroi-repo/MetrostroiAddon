@@ -496,8 +496,8 @@ local function consumeFromFeeder(inCurrent, inFeeder)
     end
 end
 
-local C_Voltage = GetConVar("metrostroi_voltage")
-local C_CurrentLimit = GetConVar("metrostroi_current_limit")
+local C_Voltage = CreateConVar("metrostroi_voltage",750,FCVAR_ARCHIVE)
+local C_CurrentLimit = CreateConVar("metrostroi_current_limit",4000,FCVAR_ARCHIVE)
 
 local prevTime = CurTime()
 hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
