@@ -511,55 +511,46 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     for k,v in pairs(Metrostroi.Currents) do Metrostroi.Currents[k] = 0 end
     for train in pairs(Metrostroi.SpawnedTrains) do
         if not train.Electric then continue end
-        
+
+        if train.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, train.Electric.EnergyChange) end
+        local current = math.max(0, train.Electric.Itotal or 0) -  math.max(0, train.Electric.Iexit or 0)
+
         local fB = IsValid(train.FrontBogey) and train.FrontBogey
-        if fB then
-            if fB.Feeder then
-                Metrostroi.Currents[fB.Feeder] = Metrostroi.Currents[fB.Feeder] + fB.DropByPeople
-            else
-                Metrostroi.Current = Metrostroi.Current + fB.DropByPeople
-            end
-        end
-
         local rB = IsValid(train.RearBogey) and train.RearBogey
-        if rB then
-            if rB.Feeder then
-                Metrostroi.Currents[rB.Feeder] = Metrostroi.Currents[rB.Feeder] + rB.DropByPeople
+
+        local fBDropByPeople = fb and fB.DropByPeople or 0
+        local rBDropByPeople = rb and rB.DropByPeople or 0
+
+        if fB and (not fB.ContactStates or (not fB.ContactStates[1] and not fB.ContactStates[2])) then fB = nil end -- Don't have contact with TR
+        if rB and (not rB.ContactStates or (not rB.ContactStates[1] and not rB.ContactStates[2])) then rB = nil end -- Don't have contact with TR
+
+        local fBfeeder = fB and fB.Feeder
+        local rBfeeder = rB and rB.Feeder
+
+        if fBfeeder then
+            Metrostroi.Currents[fBfeeder] = Metrostroi.Currents[fBfeeder] + fBDropByPeople
+            
+            if not rBfeeder or fBfeeder == rBfeeder then
+                consumeFromFeeder(current, fBfeeder) -- Feeders are same
             else
-                Metrostroi.Current = Metrostroi.Current + rB.DropByPeople
+                consumeFromFeeder(current * 0.5, fBfeeder) -- Feeders are different
             end
+        else
+            Metrostroi.Current = Metrostroi.Current + fBDropByPeople
         end
-    end
-    for train in pairs(Metrostroi.SpawnedTrains) do
-        if train.Electric then
-            if train.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, train.Electric.EnergyChange) end
-            local current = math.max(0, train.Electric.Itotal or 0) -  math.max(0, train.Electric.Iexit or 0)
 
-            local fB = IsValid(train.FrontBogey) and train.FrontBogey
-            local rB = IsValid(train.RearBogey) and train.RearBogey
-            if fB and (not fB.ContactStates or (not fB.ContactStates[1] and not fB.ContactStates[2])) then fB = nil end -- Don't have contact with TR
-            if rB and (not rB.ContactStates or (not rB.ContactStates[1] and not rB.ContactStates[2])) then rB = nil end -- Don't have contact with TR
+        if rBfeeder then
+            Metrostroi.Currents[rBfeeder] = Metrostroi.Currents[rBfeeder] + rBDropByPeople
 
-            local fBfeeder = fB and fB.Feeder
-            local rBfeeder = rB and rB.Feeder
-
-            if fBfeeder then
-                if not rBfeeder or fBfeeder == rBfeeder then
-                    consumeFromFeeder(current, fBfeeder) -- Feeders are same
-                else
-                    consumeFromFeeder(current * 0.5, fBfeeder) -- Feeders are different
-                end
+            if not fBfeeder then
+                consumeFromFeeder(current, rBfeeder) -- Feeders are same
+            elseif fBfeeder ~= rBfeeder  then
+                consumeFromFeeder(current * 0.5, rBfeeder) -- Feeders are different
             end
-
-            if rBfeeder then
-                if not fBfeeder then
-                    consumeFromFeeder(current, rBfeeder) -- Feeders are same
-                elseif fBfeeder ~= rBfeeder  then
-                    consumeFromFeeder(current * 0.5, rBfeeder) -- Feeders are different
-                end
-            end
-            if not rBfeeder and not fBfeeder then consumeFromFeeder(current) end
+        else
+            Metrostroi.Current = Metrostroi.Current + rBDropByPeople
         end
+        if not rBfeeder and not fBfeeder then consumeFromFeeder(current) end
     end
     -- Ignore invalid values
     if Metrostroi.TotalRateWatts > 1e8 then Metrostroi.TotalRateWatts = 0 end
