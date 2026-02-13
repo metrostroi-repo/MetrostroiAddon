@@ -236,7 +236,7 @@ end
 
 ENT.TESTTEST = false
 local dT = 0.25
-local trains  = {}
+local trains = Metrostroi.SpawnedTrains
 function ENT:Think()
     if not Metrostroi.Stations[self.StationIndex] then return end
     -- Send update to client
@@ -266,9 +266,8 @@ function ENT:Think()
     local boarding = false
 
     local BoardTime = 8+7*self.HorliftStation
-    for k,v in pairs(ents.FindByClass("gmod_subway_*")) do
-        if v.Base ~= "gmod_subway_base" and v:GetClass() ~= "gmod_subway_base" then continue end
-        if not IsValid(v) or v:GetPos():DistToSqr(self:GetPos()) > self.PlatformStart:DistToSqr(self.PlatformEnd) then continue end
+    for v in pairs(trains) do
+        if v:GetPos():DistToSqr(self:GetPos()) > self.PlatformStart:DistToSqr(self.PlatformEnd) then continue end
 
         local platform_distance = ((self.PlatformStart-v:GetPos()) - ((self.PlatformStart-v:GetPos()):Dot(self.PlatformNorm))*self.PlatformNorm):Length()
         local vertical_distance = math.abs(v:GetPos().z - self.PlatformStart.z)
