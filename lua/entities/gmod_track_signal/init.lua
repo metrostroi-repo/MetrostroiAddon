@@ -77,14 +77,29 @@ function ENT:CloseRoute(route)
 	end
 end
 
+local cmds = {
+	["!sactiv"] = {1,9},
+	["!sdeactiv"] = {2,11},
+	["!sclose"] = {3,9},
+	["!sopen"] = {4,8},
+	["!sopps"] = {5,8},
+	["!sclps"] = {6,8},
+	["!senao"] = {7,8},
+	["!sdisao"] = {8,9}
+}
+
 function MSignalSayHook(ply, comm, fromULX)
 	if ulx and not fromULX then return end
-	for i,sig in pairs(ents.FindByClass("gmod_track_signal")) do
-		local comm = comm
-		if comm:sub(1,8) == "!sactiv " then
-			comm = comm:sub(9,-1):upper()
+	local argv = string.Explode(" ",comm)
+	local cmdInfo = cmds[argv[1]]
 
-			comm = string.Explode(":",comm)
+	if not cmdInfo or #argv < 2 then return end
+
+	local cmd = cmdInfo[1]
+	local comm = string.Explode(":",comm:sub(cmdInfo[2],-1):upper())
+
+	for sig in pairs(Metrostroi.SignalEntityPositions) do
+		if cmd == 1 then -- !sactiv
 			if sig.Routes then
 				for k,v in pairs(sig.Routes) do
 					if (v.RouteName and v.RouteName:upper() == comm[1] or comm[1] == "*") and v.Emer then
@@ -94,10 +109,7 @@ function MSignalSayHook(ply, comm, fromULX)
 					end
 				end
 			end
-		elseif comm:sub(1,10) == "!sdeactiv " then
-			comm = comm:sub(11,-1):upper()
-
-			comm = string.Explode(":",comm)
+		elseif cmd == 2 then -- !sdeactiv
 			if sig.Routes then
 				for k,v in pairs(sig.Routes) do
 					if (v.RouteName and v.RouteName:upper() == comm[1] or comm[1] == "*") and v.Emer then
@@ -106,10 +118,7 @@ function MSignalSayHook(ply, comm, fromULX)
 					end
 				end
 			end
-		elseif comm:sub(1,8) == "!sclose " then
-			comm = comm:sub(9,-1):upper()
-
-			comm = string.Explode(":",comm)
+		elseif cmd == 3 then -- !sclose
 			if comm[1] == sig.Name then
 				if sig.Routes[1] and sig.Routes[1].Manual then
 					sig:CloseRoute(1)
@@ -134,9 +143,7 @@ function MSignalSayHook(ply, comm, fromULX)
 					end
 				end
 			end
-		elseif comm:sub(1,7) == "!sopen " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
+		elseif cmd == 4 then -- !sopen
 			if comm[1] == sig.Name then
 				if comm[2] then
 					if sig.NextSignals[comm[2]] then
@@ -161,27 +168,19 @@ function MSignalSayHook(ply, comm, fromULX)
 					end
 				end
 			end
-		elseif comm:sub(1,7) == "!sopps " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
+		elseif cmd == 5 then -- !sopps
 			if comm[1] == sig.Name then
 				sig.InvationSignal = true
 			end
-		elseif comm:sub(1,7) == "!sclps " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
+		elseif cmd == 6 then -- !sclps
 			if comm[1] == sig.Name then
 				sig.InvationSignal = false
 			end
-		elseif comm:sub(1,7) == "!senao " then
-			comm = comm:sub(8,-1):upper()
-			comm = string.Explode(":",comm)
+		elseif cmd == 7 then -- !senao
 			if comm[1] == sig.Name then
 				if sig.AODisabled then sig.AODisabled = false end
 			end
-		elseif comm:sub(1,8) == "!sdisao " then
-			comm = comm:sub(9,-1):upper()
-			comm = string.Explode(":",comm)
+		elseif cmd == 8 then -- !sdisao
 			if comm[1] == sig.Name then
 				if sig.ARSSpeedLimit == 2 then sig.AODisabled = true end
 			end
