@@ -39,6 +39,9 @@ if not Metrostroi.Paths then
 end
 Metrostroi.SignalVersion = 1.2
 
+local vector_origin = vector_origin
+local vector_up = vector_up
+local angle_zero = angle_zero
 
 --------------------------------------------------------------------------------
 -- Size of spatial cells into which all the 3D space is divided
@@ -46,10 +49,11 @@ local SPATIAL_CELL_WIDTH = 1024
 local SPATIAL_CELL_HEIGHT = 256
 
 -- Return spatial cell indexes for given XYZ
+local floor = math.floor
 local function spatialPosition(pos)
-    return math.floor(pos.x/SPATIAL_CELL_WIDTH),
-           math.floor(pos.y/SPATIAL_CELL_WIDTH),
-           math.floor(pos.z/SPATIAL_CELL_HEIGHT)
+    return floor(pos.x/SPATIAL_CELL_WIDTH),
+           floor(pos.y/SPATIAL_CELL_WIDTH),
+           floor(pos.z/SPATIAL_CELL_HEIGHT)
 end
 
 local function addLookup(node)
@@ -111,7 +115,7 @@ function Metrostroi.GetPositionOnTrack(pos,ang,opts)
     if not opts then opts = empty_table end
 
     -- Angle can be specified to determine if facing forward or backward
-    ang = ang or Angle(0,0,0)
+    ang = ang or angle_zero
 
     -- Size of box which envelopes region of space that counts as being on track
     local X_PAD = 0
@@ -123,14 +127,13 @@ function Metrostroi.GetPositionOnTrack(pos,ang,opts)
     for nodeID,node in Metrostroi.NearestNodes(pos) do
         -- Get local coordinate system of a section
         local forward = node.dir
-        local up = Vector(0,0,1)
-        local right = forward:Cross(up)
+        local right = forward:Cross(vector_up)
 
         -- Transform position into local coordinates
         local local_pos = pos - node.pos
         local local_x = local_pos:Dot(forward)
         local local_y = local_pos:Dot(right)
-        local local_z = local_pos:Dot(up)
+        local local_z = local_pos:Dot(vector_up)
         local yz_delta = math.sqrt(local_y^2 + local_z^2)
 
         -- Determine if facing forward or backward
@@ -509,40 +512,42 @@ function Metrostroi.ScanTrack(itype,node,func,x,dir,checked)
     local isolateBackward = false   -- Should scanning continue backward along track
     if Metrostroi.SignalEntitiesForNode[node] then
         for k,v in pairs(Metrostroi.SignalEntitiesForNode[node]) do
+            if not IsValid(v) then continue end
+            local v = v:GetTable()
+            local trackX = v.TrackX
+            local routeTbl = v.Routes[v.Route or 1]
+
             local isolating = false
-            if IsValid(v) then
-                if light then
-                    isolating = ((v.TrackDir == dir and not v.Routes[v.Route or 1].Repeater) or (v.TrackDir == dir and v.Routes[v.Route or 1].Repeater and tonumber(v.RouteNumber) == 9) or (tonumber(v.RouteNumber) ~= nil and v.Routes[v.Route or 1].Repeater)) and (not v.PassOcc or v.TrackX == x)
-                end
-                if ars then
-                    isolating = v.TrackDir == dir and (not v.PassOcc or v.TrackX == x)
-                end
-                if switch then
-                    isolating = v.IsolateSwitches
-                end
-                --if itype == "ars" then isolating = true end
+            if light then
+                isolating = ((v.TrackDir == dir and not routeTbl.Repeater) or (v.TrackDir == dir and routeTbl.Repeater and v.iRouteNumber == 9) or (v.iRouteNumber ~= nil and routeTbl.Repeater)) and (not v.PassOcc or trackX == x)
+            elseif ars then
+                isolating = v.TrackDir == dir and (not v.PassOcc or trackX == x)
+            elseif switch then
+                isolating = v.IsolateSwitches
             end
+            --if itype == "ars" then isolating = true end
+
             if isolating then
                 -- If scanning forward, and there's a joint IN FRONT of current X
-                if dir and (v.TrackX > x) then
-                    max_x = math.min(max_x,v.TrackX)
+                if dir and (trackX > x) then
+                    max_x = math.min(max_x,trackX)
                     isolateForward = true
                 end
                 -- If scanning forward, and there's a joint in current X
                 -- This is triggered when traffic light searches for next light from its own X (then
                 --  scan direction is defined by dir)
-                if dir and (v.TrackX == x) then
-                    min_x = math.max(min_x,v.TrackX)
+                if dir and (trackX == x) then
+                    min_x = math.max(min_x,trackX)
                     isolateBackward = true
                 end
                 -- if scanning backward, and there's a joint BEHIND current X
-                if (not dir) and (v.TrackX < x) then
-                    min_x = math.max(min_x,v.TrackX)
+                if (not dir) and (trackX < x) then
+                    min_x = math.max(min_x,trackX)
                     isolateBackward = true
                 end
                 -- If scanning backward starting from current X, use dir for guiding scan
-                if (not dir) and (v.TrackX == x) then
-                    max_x = math.min(max_x,v.TrackX)
+                if (not dir) and (trackX == x) then
+                    max_x = math.min(max_x,trackX)
                     isolateForward = true
                 end
             end
@@ -566,7 +571,7 @@ function Metrostroi.ScanTrack(itype,node,func,x,dir,checked)
     end
     -- First check all the branches, whose positions fall within min_x..max_x
     if node.branches and not ars then
-        for k,v in pairs(node.branches) do
+        for k,v in ipairs(node.branches) do
             if (v[1] >= min_x) and (v[1] <= max_x) then
                 -- FIXME: somehow define direction and X!
                 local results = {Metrostroi.ScanTrack(itype,v[2],func,v[1],true,checked)}
@@ -858,6 +863,8 @@ function Metrostroi.PredictTrainPositions()
         train.OldPos = pos.x+train.PosX
     end
 end
+local vector_p25 = Vector(25,0,0)
+local vector_m25 = Vector(-25,0,0)
 function Metrostroi.UpdateTrainPositions()
     Metrostroi.TrainPositions = {}
     Metrostroi.TrainDirections = {}
@@ -868,13 +875,14 @@ function Metrostroi.UpdateTrainPositions()
         if train.ALS_ARS and train.ALS_ARS.IgnoreThisARS or train.NoTrain then continue end
         train.PosX = 0--(train:GetVelocity():Dot(train:GetAngles():Forward()) * 0.01905)*FrameTime()
         local pos1e = IsValid(train.FrontBogey) and train.FrontBogey or train
-        local positions = Metrostroi.GetPositionOnTrack(pos1e:GetPos(),train:GetAngles())
+        local trainAng = train:GetAngles()
+        local positions = Metrostroi.GetPositionOnTrack(pos1e:GetPos(),trainAng)
         local positions2
         if not positions or not positions[1] then
-            positions =  Metrostroi.GetPositionOnTrack(train:LocalToWorld(Vector(0,0,0)),train:GetAngles())
-            positions2 = Metrostroi.GetPositionOnTrack(train:LocalToWorld(Vector(25,0,0)), train:GetAngles())
+            positions =  Metrostroi.GetPositionOnTrack(train:GetPos(),trainAng)
+            positions2 = Metrostroi.GetPositionOnTrack(train:LocalToWorld(vector_p25), trainAng)
         else
-            positions2 = Metrostroi.GetPositionOnTrack(pos1e:LocalToWorld(Vector(-25,0,0)), train:GetAngles())
+            positions2 = Metrostroi.GetPositionOnTrack(pos1e:LocalToWorld(vector_m25), trainAng)
         end
         Metrostroi.TrainPositions[train] = {}
         Metrostroi.TrainDirections[train] = true
@@ -1081,8 +1089,8 @@ local function loadTracks(name)
 
         if prevNode then
             prevNode.next = nil
-            prevNode.dir = Vector(0,0,0)
-            prevNode.vec = Vector(0,0,0)
+            prevNode.dir = vector_origin
+            prevNode.vec = vector_origin
             prevNode.length = 0
         end
     end
@@ -1172,6 +1180,7 @@ local function loadSigns(name,keep)
                 ent.LensesStr = v.LensesStr
                 ent.Lenses = string.Explode("-",v.LensesStr)
                 ent.RouteNumber = v.RouteNumber
+                ent.iRouteNumber = tonumber(v.RouteNumber)
                 ent.IsolateSwitches = v.IsolateSwitches
                 ent.Routes = v.Routes
                 ent.ARSOnly = v.ARSOnly
