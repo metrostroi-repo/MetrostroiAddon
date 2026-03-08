@@ -18,7 +18,7 @@ Train.714.Shunt     = shunTirebis konsoLi, krani
 Spawner.717.Line2   = maTarebiLi МПЛ-dan
 Spawner.717.Line4   = maTarebiLi ПБЛ-dan
 Spawner.717.Line5   = maTarebiLi ФПЛ-dan
-Spawner.717.NewBlue = @[Common.Spawner.New] (Синие) # FIXME
+Spawner.717.NewBlue = @[Common.Spawner.New] (Lurji)
 
 Spawner.717.Type        = maTarebiLis varianTi
 Spawner.717.BodyType    = karkasis varianTi
