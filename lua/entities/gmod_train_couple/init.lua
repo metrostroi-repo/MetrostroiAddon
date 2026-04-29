@@ -315,8 +315,7 @@ end
 
 local vector_zero = Vector(0, 0, 0)
 function ENT:Think()
-    local train = self:GetNW2Entity("TrainEntity")
-    if IsValid(train) and train.OnCoupled and not IsValid(self.Coupled) then
+    if self.TrainSpawnerCoupleFix then
         -- Fixing crazy physics on spawn
         local phy = self:GetPhysicsObject()
         if IsValid(phy) then

@@ -327,6 +327,12 @@ function TOOL:SpawnWagon(trace)
         ent:UpdateTextures()
         ent.FrontAutoCouple = i > 1 and i < self.Settings.WagNum
         ent.RearAutoCouple = self.Settings.WagNum > 1
+        if IsValid(ent.FrontCouple) then
+            ent.FrontCouple.TrainSpawnerCoupleFix = ent.FrontAutoCouple
+        end
+        if IsValid(ent.RearCouple) then
+            ent.RearCouple.TrainSpawnerCoupleFix = ent.RearAutoCouple
+        end
         LastEnt = ent
     end
     undo.SetPlayer(ply)
@@ -342,6 +348,8 @@ function TOOL:SpawnWagon(trace)
                 train.RearBogey.BrakeCylinderPressure = 3
                 train.FrontBogey.MotorPower = 0
                 train.RearBogey.MotorPower = 0
+                train.FrontCouple.TrainSpawnerCoupleFix = nil
+                train.RearCouple.TrainSpawnerCoupleFix = nil
                 train.OnCoupled = nil
             end
             timer.Simple(1,function() for i,train in ipairs(trains) do train.IgnoreEngine = false end end)
