@@ -313,7 +313,17 @@ function ENT:OnDecouple()
     end
 end
 
+local vector_zero = Vector(0, 0, 0)
 function ENT:Think()
-    self:NextThink(CurTime()+1)
+    if self.TrainSpawnerCoupleFix then
+        -- Fixing crazy physics on spawn
+        local phy = self:GetPhysicsObject()
+        if IsValid(phy) then
+            phy:SetAngleVelocityInstantaneous(vector_zero)
+        end
+        self:NextThink(CurTime())
+    else
+        self:NextThink(CurTime() + 1)
+    end
     return true
 end
