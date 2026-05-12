@@ -244,6 +244,7 @@ function Metrostroi.UpdateSignalEntities()
     local entities = ents.FindByClass("gmod_track_signal")
     print("Metrostroi: PreInitialize signals")
     for k,v in pairs(entities) do
+        v._nodes = nil -- Clear cache of nodes
         local pos = Metrostroi.GetPositionOnTrack(v:GetPos(),v:GetAngles() - Angle(0,90,0),options)[1]
         local pos2 = Metrostroi.GetPositionOnTrack(v:LocalToWorld(Vector(0,10,0)), v:GetAngles() - Angle(0,90,0),options)
         if pos then -- FIXME make it select proper path
@@ -509,15 +510,18 @@ function Metrostroi.ScanTrack(itype, start_node, func, start_x, start_dir)
         if node and not checked[node] then
             checked[node] = true
 
+            -- Try to use entire node length by default
             local min_x = node.x
             local max_x = min_x + (node.length or 0)
+
+            -- Get range of node which can be actually sensed
             local isolateForward = false    -- Should scanning continue forward along track
             local isolateBackward = false   -- Should scanning continue backward along track
 
             local signals = sigEntsForNode[node]
             if signals then
                 for _,v_ent in pairs(signals) do
-                    if not IsValid(v_ent) then return end
+                    -- if not IsValid(v_ent) then continue end
                     local v = v_ent:GetTable()
                     local trackX = v.TrackX
                     local routeTbl = v.Routes and v.Routes[v.Route or 1]
@@ -533,17 +537,23 @@ function Metrostroi.ScanTrack(itype, start_node, func, start_x, start_dir)
 
                     if isolating then
                         if dir then
+                            -- If scanning forward, and there's a joint IN FRONT of current X
                             if trackX > x then
                                 if trackX < max_x then max_x = trackX end
                                 isolateForward = true
+                            -- If scanning forward, and there's a joint in current X
+                            -- This is triggered when traffic light searches for next light from its own X (then
+                            -- scan direction is defined by dir)
                             elseif trackX == x then
                                 if trackX > min_x then min_x = trackX end
                                 isolateBackward = true
                             end
                         else
+                            -- if scanning backward, and there's a joint BEHIND current X
                             if trackX < x then
                                 if trackX > min_x then min_x = trackX end
                                 isolateBackward = true
+                            -- If scanning backward starting from current X, use dir for guiding scan
                             elseif trackX == x then
                                 if trackX < max_x then max_x = trackX end
                                 isolateForward = true
@@ -553,6 +563,7 @@ function Metrostroi.ScanTrack(itype, start_node, func, start_x, start_dir)
                 end
             end
 
+            -- Call function for the determined portion of the node
             local res = func(node, min_x, max_x)
             if res ~= nil then return res end
 
@@ -810,21 +821,24 @@ end
 --------------------------------------------------------------------------------
 function Metrostroi.IsTrackOccupied(src_node,x,dir,t,ent)
     local entTbl = ent:GetTable()
-    if not entTbl._nodes then
-        local tbl = {}
+
+    -- Cache nodes for scan
+    local entNodes = entTbl._nodes
+    if not entNodes then
+        entNodes = {}
         Metrostroi.ScanTrack(t or "light", src_node, function(node, min_x, max_x)
-            tbl[#tbl+1] = {node, min_x, max_x}
+            entNodes[#entNodes+1] = {node, min_x, max_x}
         end, x, dir)
-        entTbl._nodes = tbl
+        entTbl._nodes = entNodes
     end
 
+    -- Scan trains on entity's nodes
     local first_train, last_train
     local trainsForNode = Metrostroi.TrainsForNode
     local trainPositions = Metrostroi.TrainPositions
-    for k,v in ipairs(entTbl._nodes) do
-        local node = v[1]
-        local min_x = v[2]
-        local max_x = v[3]
+    for i=1,#entNodes do
+        local item = entNodes[i]
+        local node = item[1]
         local nodeTrains = trainsForNode[node]
 
         -- If there are no trains in node, keep scanning
@@ -832,6 +846,7 @@ function Metrostroi.IsTrackOccupied(src_node,x,dir,t,ent)
             continue
         end
 
+        local min_x, max_x = item[2], item[3]
         for k,v in ipairs(nodeTrains) do
             local pos = trainPositions[v]
             for k2,v2 in pairs(pos) do
@@ -868,8 +883,7 @@ function Metrostroi.PredictTrainPositions()
         train.OldPos = pos.x+train.PosX
     end
 end
-local vector_p25 = Vector(25,0,0)
-local vector_m25 = Vector(-25,0,0)
+
 function Metrostroi.UpdateTrainPositions()
     local trainPositions = {}
     local trainDirections = {}
