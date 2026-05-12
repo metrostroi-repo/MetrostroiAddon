@@ -94,6 +94,7 @@ local C_MaxTrainsOnPly = GetConVar("metrostroi_maxtrains_onplayer")
 function ENT:Initialize()
     self.Joints = {}
     self.JointPositions = {}
+    self.BogeyPositions = {}
     if self:GetModel() == "models/error.mdl" then
         self:SetModel("models/props_lab/reciever01a.mdl")
     end
@@ -1034,6 +1035,7 @@ function ENT:CreateBogey(pos,ang,forward,typ)
     bogey.BogeyType = typ
     bogey.NoPhysics = self.NoPhysics
     bogey:Spawn()
+    table.insert(self.BogeyPositions, pos)
 
     -- Assign ownership
     if IsValid(self:GetPlayer()) then bogey:SetPlayer(self:GetPlayer()) end

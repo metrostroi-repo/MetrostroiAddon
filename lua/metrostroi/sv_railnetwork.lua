@@ -871,44 +871,62 @@ end
 local vector_p25 = Vector(25,0,0)
 local vector_m25 = Vector(-25,0,0)
 function Metrostroi.UpdateTrainPositions()
-    Metrostroi.TrainPositions = {}
-    Metrostroi.TrainDirections = {}
-    Metrostroi.TrainsForNode = {}
-    -- Query all train types
+    local trainPositions = {}
+    local trainDirections = {}
+    local trainsForNode = {}
+
+    -- Query all trains
     for train in pairs(Metrostroi.SpawnedTrains) do
         if not IsValid(train) then continue end
-        if train.ALS_ARS and train.ALS_ARS.IgnoreThisARS or train.NoTrain then continue end
-        train.PosX = 0--(train:GetVelocity():Dot(train:GetAngles():Forward()) * 0.01905)*FrameTime()
-        -- TODO: Calculate both bogeys
-        local pos1e = IsValid(train.FrontBogey) and train.FrontBogey or train
-        local trainAng = train:GetAngles()
-        local positions = Metrostroi.GetPositionOnTrack(pos1e:GetPos(),trainAng)
-        local positions2
-        if not positions or not positions[1] then
-            positions =  Metrostroi.GetPositionOnTrack(train:GetPos(),trainAng)
-            positions2 = Metrostroi.GetPositionOnTrack(train:LocalToWorld(vector_p25), trainAng)
+        local tbl = train:GetTable()
+        if tbl.ALS_ARS and tbl.ALS_ARS.IgnoreThisARS or tbl.NoTrain then continue end
+        tbl.PosX = 0
+
+        trainPositions[train] = {}
+        trainDirections[train] = true
+
+        local bogeysPos = tbl.BogeyPositions
+        local localPosFb = bogeysPos[1]
+        local localPosRb = bogeysPos and #bogeysPos > 1 and bogeysPos[#bogeysPos]
+        
+        if (localPosFb and localPosRb) then
+            local posFb = train:LocalToWorld(localPosFb)
+            local posRb = train:LocalToWorld(localPosRb)
+            local ang = train:GetAngles()
+
+            local trackPosFb = Metrostroi.GetPositionOnTrack(posFb,ang)
+            local trackPosRb = Metrostroi.GetPositionOnTrack(posRb,-ang)
+
+            if (trackPosFb and trackPosFb[1]) then
+                table.insert(trainPositions[train], trackPosFb[1])
+                trainDirections[train] = trackPosFb[1].forward
+            end
+
+            if (trackPosRb and trackPosRb[1]) then
+                table.insert(trainPositions[train], trackPosRb[1])
+            end
         else
-            positions2 = Metrostroi.GetPositionOnTrack(pos1e:LocalToWorld(vector_m25), trainAng)
-        end
-        Metrostroi.TrainPositions[train] = {}
-        Metrostroi.TrainDirections[train] = true
-        if positions and positions[1] then
-            Metrostroi.TrainPositions[train][1] = positions[1]
-            if positions2 and positions2[1] then
-                Metrostroi.TrainDirections[train] = (positions2[1].x - positions[1].x) > 0
+            local trackPos = Metrostroi.GetPositionOnTrack(train:GetPos(),train:GetAngles())
+            if (trackPos and trackPos[1]) then
+                trainPositions[train][1] = trackPos[1]
+                trainDirections[train] = trackPos[1].forward
             end
         end
 
-        --print("TRAIN",train,positions[1].path.id,positions2[1].path.id)
-        --for k,v in pairs(Metrostroi.TrainPositions[train]) do
-            --print(Format("\t[%d] Path #%d: (%.2f x %.2f x %.2f) m  Facing %s",k,v.path.id,v.x,v.y,v.z,v.forward and "forward" or "backward"))
-        --end
+        -- print("TRAIN: ")
+        -- for k,v in pairs(trainPositions[train]) do
+        --     print("\t",k,v.path.id,v.node1.id,trainDirections[train])
+        -- end
 
-        for _,pos in pairs(Metrostroi.TrainPositions[train]) do
-            Metrostroi.TrainsForNode[pos.node1] = Metrostroi.TrainsForNode[pos.node1] or {}
-            table.insert(Metrostroi.TrainsForNode[pos.node1],train)
+        for _,pos in pairs(trainPositions[train]) do
+            trainsForNode[pos.node1] = trainsForNode[pos.node1] or {}
+            table.insert(trainsForNode[pos.node1],train)
         end
     end
+
+    Metrostroi.TrainPositions = trainPositions
+    Metrostroi.TrainDirections = trainDirections
+    Metrostroi.TrainsForNode = trainsForNode
 end
 local PervTimerIter = CurTime()
 hook.Add( "Think", "Metrostroi_TrainPositionTimer",function()
