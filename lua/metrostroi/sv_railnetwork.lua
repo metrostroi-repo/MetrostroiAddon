@@ -1598,7 +1598,8 @@ concommand.Add("metrostroi_pos_info", function(ply, _, args)
 
     -- Draw nearest nodes
     timer.Simple(0.05,function()
-        for k,v in Metrostroi.NearestNodes(ply:GetPos()) do
+        local nodes = Metrostroi.NearestNodes(ply:GetPos())
+        for k,v in ipairs(nodes) do
             debugoverlay.Cross(v.pos,10,10,Color(0,0,255),true)
             debugoverlay.Line(v.pos,ply:GetPos(),10,Color(0,0,255),true)
         end
@@ -1612,9 +1613,9 @@ concommand.Add("metrostroi_pos_info", function(ply, _, args)
 
     -- Info about local track
     if results[1] then
-        print(Format("Track status: %s",
-            Metrostroi.IsTrackOccupied(results[1].node1) and "occupied" or "free"
-        ))
+        local occupied = Metrostroi.IsTrackOccupied(results[1].node1, nil, nil, nil, ply)
+        print(Format("Track status: %s",occupied and "occupied" or "free"))
+        ply._nodes = nil -- Clear cache of nodes
     end
 end)
 
