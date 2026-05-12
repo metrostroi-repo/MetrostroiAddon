@@ -64,6 +64,7 @@ local function addLookup(node)
     Metrostroi.SpatialLookup[kz][kx][ky] = Metrostroi.SpatialLookup[kz][kx][ky] or {}
     table.insert(Metrostroi.SpatialLookup[kz][kx][ky],node)
 end
+
 -- Return list of nodes in spatial cell kx,ky,kz
 local empty_table = {}
 local function spatialNodes(kx,ky,kz)
@@ -78,32 +79,21 @@ local function spatialNodes(kx,ky,kz)
     end
 end
 
-
 --------------------------------------------------------------------------------
--- for nodeID,node in Metrostroi.NearestNodes(pos) do ... end
---
--- This is used for iterating through nodes around given position
+-- Return list of nodes near given position
 --------------------------------------------------------------------------------
 function Metrostroi.NearestNodes(pos)
+    local nodes = {}
     local kx,ky,kz = spatialPosition(pos)
-    local t = {}
+    
     for x=-1,1 do for y=-1,1 do for z=-1,1 do
-        table.insert(t,spatialNodes(kx+x,ky+y,kz+z))
-    end end end
-
-    local i,j = 0,1
-    return function ()
-        -- Find next set of nodes that's not empty
-        while (j <= #t) and (i >= #t[j]) do
-            j = j + 1; i = 0
+        local nodes_xyz = spatialNodes(kx+x, ky+y, kz+z)
+        for i=1, #nodes_xyz do
+            nodes[#nodes+1] = nodes_xyz[i]
         end
-        -- Should iterator end
-        if j > #t then return nil end
-
-        -- Iterate table like normal
-        i = i + 1
-        if i <= #t[j] then return t[j][i].id,t[j][i] end
-    end
+    end end end
+    
+    return nodes
 end
 
 --------------------------------------------------------------------------------
@@ -111,6 +101,9 @@ end
 --
 -- Simply checks every line between two nodes, for all ndoes around position
 --------------------------------------------------------------------------------
+local math_sqrt = math.sqrt
+local math_acos = math.acos
+local math_deg = math.deg
 function Metrostroi.GetPositionOnTrack(pos,ang,opts)
     if not opts then opts = empty_table end
 
@@ -119,48 +112,53 @@ function Metrostroi.GetPositionOnTrack(pos,ang,opts)
 
     -- Size of box which envelopes region of space that counts as being on track
     local X_PAD = 0
-    local Y_PAD = opts.y_pad or opts.radius or 384/2
-    local Z_PAD = opts.z_pad or 256/2
+    local Y_PAD = opts.y_pad or opts.radius or 192
+    local Z_PAD = opts.z_pad or 128
 
     -- Find position on any track
     local results = {}
-    for nodeID,node in Metrostroi.NearestNodes(pos) do
+    local local_dir = ang:Forward()
+    
+    local nodes = Metrostroi.NearestNodes(pos)
+    for i,node in ipairs(nodes) do
+        if node.path == opts.ignore_path then continue end
+
         -- Get local coordinate system of a section
         local forward = node.dir
-        local right = forward:Cross(vector_up)
+        local right = node.right
 
         -- Transform position into local coordinates
         local local_pos = pos - node.pos
         local local_x = local_pos:Dot(forward)
-        local local_y = local_pos:Dot(right)
-        local local_z = local_pos:Dot(vector_up)
-        local yz_delta = math.sqrt(local_y^2 + local_z^2)
+        if local_x <= -X_PAD or local_x >= node.vecl + X_PAD then continue end
 
-        -- Determine if facing forward or backward
-        local local_dir = ang:Forward()
-        local dir_delta = local_dir:Dot(forward)
-        local dir_forward = dir_delta > 0
-        local dir_angle = 90-math.deg(math.acos(dir_delta))
+        local local_y = local_pos:Dot(right)
+        if local_y <= -Y_PAD or local_y >= Y_PAD then continue end
+
+        local local_z = local_pos:Dot(vector_up)
+        if local_z <= -Z_PAD or local_z >= Z_PAD then continue end
 
         -- If this position resides on track, add it to results
-        if ((local_x > -X_PAD) and (local_x < node.vec:Length()+X_PAD) and
-            (local_y > -Y_PAD) and (local_y < Y_PAD) and
-            (local_z > -Z_PAD) and (local_z < Z_PAD)) and (node.path ~= opts.ignore_path) then
+        local yz_delta = math_sqrt(local_y^2 + local_z^2)
 
-            table.insert(results,{
-                node1 = node,
-                node2 = node.next,
-                path = node.path,
+        -- Determine if facing forward or backward
+        local dir_delta = local_dir:Dot(forward)
+        local dir_forward = dir_delta > 0
+        local dir_angle = 90-math_deg(math_acos(dir_delta))
 
-                angle = dir_angle,              -- Angle between forward vector and axis of track
-                forward = dir_forward,          -- Is facing forward relative to track
-                x = local_x*0.01905 + node.x,   -- Local coordinates in track curvilinear coordinates
-                y = local_y*0.01905,            --
-                z = local_z*0.01905,            --
+        table.insert(results,{
+            node1 = node,
+            node2 = node.next,
+            path = node.path,
 
-                distance = yz_delta,            -- Distance to path axis
-            })
-        end
+            angle = dir_angle,              -- Angle between forward vector and axis of track
+            forward = dir_forward,          -- Is facing forward relative to track
+            x = local_x*0.01905 + node.x,   -- Local coordinates in track curvilinear coordinates
+            y = local_y*0.01905,            --
+            z = local_z*0.01905,            --
+
+            distance = yz_delta,            -- Distance to path axis
+        })
     end
 
     -- Sort results by distance
@@ -490,106 +488,104 @@ end
 --------------------------------------------------------------------------------
 -- Scans an isolated track segment and for every useable segment calls func
 --------------------------------------------------------------------------------
-local check_table = {}
-function Metrostroi.ScanTrack(itype,node,func,x,dir,checked)
-    local light,ars,switch = itype == "light",itype == "ars",itype == "switch"
-    -- Check if this node was already scanned
-    if not node then return end
-    if not checked then
-        for k,v in pairs(check_table) do
-            check_table[k] = nil
-        end
-        checked = check_table
-    end
-    if checked[node] then return end
-    checked[node] = true
-    -- Try to use entire node length by default
-    local min_x = node.x
-    local max_x = min_x + node.length
+function Metrostroi.ScanTrack(itype, start_node, func, start_x, start_dir)
+    if not start_node then return end
 
-    -- Get range of node which can be actually sensed
-    local isolateForward = false    -- Should scanning continue forward along track
-    local isolateBackward = false   -- Should scanning continue backward along track
-    if Metrostroi.SignalEntitiesForNode[node] then
-        for k,v in pairs(Metrostroi.SignalEntitiesForNode[node]) do
-            if not IsValid(v) then continue end
-            local v = v:GetTable()
-            local trackX = v.TrackX
-            local routeTbl = v.Routes[v.Route or 1]
+    local checked = {}
+    local stack = {start_node, start_x, start_dir}
+    local stack_ptr = 3
+    
+    local is_light  = itype == "light"
+    local is_ars    = itype == "ars"
+    local is_switch = itype == "switch"
 
-            local isolating = false
-            if light then
-                isolating = ((v.TrackDir == dir and not routeTbl.Repeater) or (v.TrackDir == dir and routeTbl.Repeater and v.iRouteNumber == 9) or (v.iRouteNumber ~= nil and routeTbl.Repeater)) and (not v.PassOcc or trackX == x)
-            elseif ars then
-                isolating = v.TrackDir == dir and (not v.PassOcc or trackX == x)
-            elseif switch then
-                isolating = v.IsolateSwitches
-            end
-            --if itype == "ars" then isolating = true end
+    local sigEntsForNode = Metrostroi.SignalEntitiesForNode
+    while (stack_ptr > 0) do
+        local node = stack[stack_ptr-2];
+        local x    = stack[stack_ptr-1];
+        local dir  = stack[stack_ptr];
+        stack_ptr = stack_ptr - 3
 
-            if isolating then
-                -- If scanning forward, and there's a joint IN FRONT of current X
-                if dir and (trackX > x) then
-                    max_x = math.min(max_x,trackX)
-                    isolateForward = true
+        if node and not checked[node] then
+            checked[node] = true
+
+            local min_x = node.x
+            local max_x = min_x + (node.length or 0)
+            local isolateForward = false    -- Should scanning continue forward along track
+            local isolateBackward = false   -- Should scanning continue backward along track
+
+            local signals = sigEntsForNode[node]
+            if signals then
+                for _,v_ent in pairs(signals) do
+                    if not IsValid(v_ent) then return end
+                    local v = v_ent:GetTable()
+                    local trackX = v.TrackX
+                    local routeTbl = v.Routes and v.Routes[v.Route or 1]
+
+                    local isolating = false
+                    if is_light then
+                        isolating = ((v.TrackDir == dir and not routeTbl.Repeater) or (v.TrackDir == dir and routeTbl.Repeater and v.iRouteNumber == 9) or (v.iRouteNumber ~= nil and routeTbl.Repeater)) and (not v.PassOcc or trackX == x)
+                    elseif is_ars then
+                        isolating = v.TrackDir == dir and (not v.PassOcc or trackX == x)
+                    elseif is_switch then
+                        isolating = v.IsolateSwitches
+                    end
+
+                    if isolating then
+                        if dir then
+                            if trackX > x then
+                                if trackX < max_x then max_x = trackX end
+                                isolateForward = true
+                            elseif trackX == x then
+                                if trackX > min_x then min_x = trackX end
+                                isolateBackward = true
+                            end
+                        else
+                            if trackX < x then
+                                if trackX > min_x then min_x = trackX end
+                                isolateBackward = true
+                            elseif trackX == x then
+                                if trackX < max_x then max_x = trackX end
+                                isolateForward = true
+                            end
+                        end
+                    end
                 end
-                -- If scanning forward, and there's a joint in current X
-                -- This is triggered when traffic light searches for next light from its own X (then
-                --  scan direction is defined by dir)
-                if dir and (trackX == x) then
-                    min_x = math.max(min_x,trackX)
-                    isolateBackward = true
-                end
-                -- if scanning backward, and there's a joint BEHIND current X
-                if (not dir) and (trackX < x) then
-                    min_x = math.max(min_x,trackX)
-                    isolateBackward = true
-                end
-                -- If scanning backward starting from current X, use dir for guiding scan
-                if (not dir) and (trackX == x) then
-                    max_x = math.min(max_x,trackX)
-                    isolateForward = true
-                end
             end
-        end
-    end
 
-    -- Show the scanned path
-    --[[if GetConVar("metrostroi_drawdebug"):GetInt() == 1 then
-        local T = CurTime()
-        timer.Simple(0.05 + math.random()*0.05,function()
-            if node.next then
-                debugoverlay.Line(node.pos,node.next.pos,3,Color((T*1234)%255,(T*12345)%255,(T*12346)%255),true)
-            end
-        end)
-    end]]--
+            local res = func(node, min_x, max_x)
+            if res ~= nil then return res end
 
-    -- Call function for the determined portion of the node
-    local results = {func(node,min_x,max_x)}
-    if results[1] ~= nil then
-        return unpack(results)
-    end
-    -- First check all the branches, whose positions fall within min_x..max_x
-    if node.branches and not ars then
-        for k,v in ipairs(node.branches) do
-            if (v[1] >= min_x) and (v[1] <= max_x) then
-                -- FIXME: somehow define direction and X!
-                local results = {Metrostroi.ScanTrack(itype,v[2],func,v[1],true,checked)}
-                if results[1] ~= nil then return unpack(results) end
+            -- First check all the branches, whose positions fall within min_x..max_x
+            if node.branches and not is_ars then
+                local branches = node.branches
+                for i = 1, #branches do
+                    local b = branches[i]
+                    if b[2] and b[1] >= min_x and b[1] <= max_x then
+                        stack[stack_ptr + 1] = b[2]
+                        stack[stack_ptr + 2] = b[1]
+                        stack[stack_ptr + 3] = true
+                        stack_ptr = stack_ptr + 3
+                    end
+                end
+            end
+
+            -- If not isolated, continue scanning forward from the front end of node
+            if (dir or is_switch) and (not isolateForward) and node.next then
+                stack[stack_ptr + 1] = node.next
+                stack[stack_ptr + 2] = max_x
+                stack[stack_ptr + 3] = true
+                stack_ptr = stack_ptr + 3
+            end
+
+            -- If not isolated, continue scanning backward from the rear end of node
+            if (not dir or is_switch) and (not isolateBackward) and node.prev then
+                stack[stack_ptr + 1] = node.prev
+                stack[stack_ptr + 2] = min_x
+                stack[stack_ptr + 3] = false
+                stack_ptr = stack_ptr + 3
             end
         end
-    end
-    -- If not isolated, continue scanning forward from the front end of node
-    if (dir or switch)and (not isolateForward) then
-        local results = {Metrostroi.ScanTrack(itype,node.next,func,max_x,true,checked)}
-        if results[1] ~= nil then
-            return unpack(results)
-        end
-    end
-    -- If not isolated, continue scanning backward from the rear end of node
-    if (not dir or switch) and (not isolateBackward) then
-        local results = {Metrostroi.ScanTrack(itype,node.prev,func,min_x,false,checked)}
-        if results[1] ~= nil then return unpack(results) end
     end
 end
 
@@ -812,40 +808,49 @@ end
 -- Check if there is a train somewhere in the local isolated section. This
 -- ignores ARS subsections (if they are unisolated), accounts for traffic lights
 --------------------------------------------------------------------------------
-function Metrostroi.IsTrackOccupied(src_node,x,dir,t)
-    local Trains = {}
-    Metrostroi.ScanTrack(t or "light",src_node,function(node,min_x,max_x)
+function Metrostroi.IsTrackOccupied(src_node,x,dir,t,ent)
+    local entTbl = ent:GetTable()
+    if not entTbl._nodes then
+        local tbl = {}
+        Metrostroi.ScanTrack(t or "light", src_node, function(node, min_x, max_x)
+            tbl[#tbl+1] = {node, min_x, max_x}
+        end, x, dir)
+        entTbl._nodes = tbl
+    end
+
+    local first_train, last_train
+    local trainsForNode = Metrostroi.TrainsForNode
+    local trainPositions = Metrostroi.TrainPositions
+    for k,v in ipairs(entTbl._nodes) do
+        local node = v[1]
+        local min_x = v[2]
+        local max_x = v[3]
+        local nodeTrains = trainsForNode[node]
+
         -- If there are no trains in node, keep scanning
-        if (not Metrostroi.TrainsForNode[node]) or (#Metrostroi.TrainsForNode[node] == 0) then
-            return
+        if (not nodeTrains) or (#nodeTrains == 0) then
+            continue
         end
 
-        -- For every train in node, for every path it rests on, check if it's in range
-        --print("SCAN TRACK",node.id,min_x,max_x)
-        for k,v in pairs(Metrostroi.TrainsForNode[node]) do
-            local pos = Metrostroi.TrainPositions[v]
+        for k,v in ipairs(nodeTrains) do
+            local pos = trainPositions[v]
             for k2,v2 in pairs(pos) do
                 if v2.path == node.path then
-                    --local pos1 = Metrostroi.GetPositionOnTrack(v:LocalToWorld(Vector(0,1,0)), v:GetAngles())
-                    --if pos1 then pos1 = pos1[1] end
-                    --if pos1 and (((pos1.x - v2.x) < 0 and not dir)  or ((pos1.x - v2.x) > 0 and dir)) then continue end
-                    --local TrackX = v2.TrackX
-                    --local x1 = v2.x-1100*0.5
-                    --local x2 = v2.x+1100*0.5
-                    --print(x1,x2)
                     local x1,x2 = v2.x,v2.x
                     if ((x1 >= min_x) and (x1 <= max_x)) or
                        ((x2 >= min_x) and (x2 <= max_x)) or
                        ((x1 <= min_x) and (x2 >= max_x)) then
-                        table.insert(Trains,v)--return true,v
+                        first_train = first_train or v
+                        last_train = v
                     end
                 end
             end
         end
-    end,x,dir)
+    end
 
-    return #Trains > 0,Trains[#Trains],Trains[1]
+    return first_train ~= nil, last_train, first_train
 end
+
 --------------------------------------------------------------------------------
 -- Update train positions
 --------------------------------------------------------------------------------
@@ -874,6 +879,7 @@ function Metrostroi.UpdateTrainPositions()
         if not IsValid(train) then continue end
         if train.ALS_ARS and train.ALS_ARS.IgnoreThisARS or train.NoTrain then continue end
         train.PosX = 0--(train:GetVelocity():Dot(train:GetAngles():Forward()) * 0.01905)*FrameTime()
+        -- TODO: Calculate both bogeys
         local pos1e = IsValid(train.FrontBogey) and train.FrontBogey or train
         local trainAng = train:GetAngles()
         local positions = Metrostroi.GetPositionOnTrack(pos1e:GetPos(),trainAng)
@@ -1077,7 +1083,9 @@ local function loadTracks(name)
             if prevNode then
                 prevNode.next = currentPath[nodeID]
                 prevNode.dir = (nodePos - prevNode.pos):GetNormalized()
+                prevNode.right = prevNode.dir:Cross(vector_up)
                 prevNode.vec = nodePos - prevNode.pos
+                prevNode.vecl = prevNode.vec:Length()
                 prevNode.length = distance
             end
 
@@ -1090,7 +1098,9 @@ local function loadTracks(name)
         if prevNode then
             prevNode.next = nil
             prevNode.dir = vector_origin
+            prevNode.right = prevNode.dir:Cross(vector_up)
             prevNode.vec = vector_origin
+            prevNode.vecl = 0
             prevNode.length = 0
         end
     end
