@@ -69,6 +69,8 @@ function ENT:SwitchTo(index)
 end
 
 function ENT:Think()
+	local ent = self; self = ent:GetTable()
+
 	-- Reset
 	self.InhibitSwitching = false
 
@@ -82,13 +84,14 @@ function ENT:Think()
 		self.AlternateTrack = false
 		self.MainTrack = false
 		for k,v in pairs(self.TrackSwitches) do
-			self.AlternateTrack = self.AlternateTrack or not self.Invertred and v:GetSaveTable().m_eDoorState == 2 or self.Invertred and v:GetSaveTable().m_eDoorState == 0
-			self.MainTrack = self.MainTrack or not self.Invertred and v:GetSaveTable().m_eDoorState == 0 or self.Invertred and v:GetSaveTable().m_eDoorState == 2
+			local eDoorState = v:GetSaveTable().m_eDoorState
+			self.AlternateTrack = self.AlternateTrack or not self.Invertred and eDoorState == 2 or self.Invertred and eDoorState == 0
+			self.MainTrack = self.MainTrack or not self.Invertred and eDoorState == 0 or self.Invertred and eDoorState == 2
 		end
 	else
 		local pos = self.TrackPosition
 		if pos and self.AlternateTrack then
-			local trackOccupied = Metrostroi.IsTrackOccupied(pos.node1,pos.x,pos.forward,"switch", self)
+			local trackOccupied = Metrostroi.IsTrackOccupied(pos.node1,pos.x,pos.forward,"switch", ent)
 			if trackOccupied then -- Prevent track switches from working when there's a train on segment
 				self.InhibitSwitching = true
 			end
@@ -110,15 +113,15 @@ function ENT:Think()
 	end
 	if self.AlternateTrack ~= self.OldAlternateTrack then
 		self.OldAlternateTrack = self.AlternateTrack
-		hook.Run("MetrostroiChangedSwitch",self,self.AlternateTrack)
+		hook.Run("MetrostroiChangedSwitch",ent,self.AlternateTrack)
 	end
 	-- Process logic
-	self:NextThink(CurTime() + 1.0)
+	ent:NextThink(CurTime() + math.random() + 1)
 	if self.Name and self.Name ~= "" then
-		self:SetNW2String("ID",self.Name)
+		ent:SetNW2String("ID",self.Name)
 	elseif self.TrackPosition then
 		--PrintTable(self.TrackPosition.node1)
-		self:SetNW2String("ID",self.TrackPosition.path.id.."/"..self.TrackPosition.node1.id)
+		ent:SetNW2String("ID",self.TrackPosition.path.id.."/"..self.TrackPosition.node1.id)
 	end
 	return true
 end

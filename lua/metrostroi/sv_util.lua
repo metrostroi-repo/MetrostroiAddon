@@ -476,7 +476,7 @@ end)
 -- Electric consumption stats
 --------------------------------------------------------------------------------
 -- Load total kWh
-timer.Create("Metrostroi_TotalkWhTimer",5.00,0,function()
+timer.Create("Metrostroi_TotalkWhTimer",240,0,function()
     file.Write("metrostroi_data/total_kwh.txt",Metrostroi.TotalkWh or 0)
 end)
 Metrostroi.TotalkWh = Metrostroi.TotalkWh or tonumber(file.Read("metrostroi_data/total_kwh.txt") or "") or 0
@@ -621,14 +621,11 @@ timer.Create("Metrostroi_ElectricConsumptionTimer",0.5,0,function()
     if CPPI then
         local U = {}
         local D = {}
-        for _,class in pairs(Metrostroi.TrainClasses) do
-            local trains = ents.FindByClass(class)
-            for _,train in pairs(trains) do
-                local owner = train:CPPIGetOwner()
-                if owner and (train.Electric) then
-                    U[owner] = (U[owner] or 0) + train.Electric.ElectricEnergyUsed
-                    D[owner] = (D[owner] or 0) + train.Electric.ElectricEnergyDissipated
-                end
+        for i,train in ipairs(Metrostroi.SpawnedTrains) do
+            local owner = train:CPPIGetOwner()
+            if owner and (train.Electric) then
+                U[owner] = (U[owner] or 0) + train.Electric.ElectricEnergyUsed
+                D[owner] = (D[owner] or 0) + train.Electric.ElectricEnergyDissipated
             end
         end
         for player,_ in pairs(U) do
