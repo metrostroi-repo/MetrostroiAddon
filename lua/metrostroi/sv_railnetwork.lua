@@ -900,7 +900,7 @@ function Metrostroi.UpdateTrainPositions()
         trainDirections[train] = true
 
         local bogeysPos = tbl.BogeyPositions
-        local localPosFb = bogeysPos[1]
+        local localPosFb = bogeysPos and bogeysPos[1]
         local localPosRb = bogeysPos and #bogeysPos > 1 and bogeysPos[#bogeysPos]
         
         if (localPosFb and localPosRb) then
