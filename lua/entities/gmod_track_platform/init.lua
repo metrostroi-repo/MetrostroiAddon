@@ -619,3 +619,5 @@ function ENT:Think()
     ent:NextThink(CurTime() + dT)
     return true
 end
+
+Metrostroi.OptimisationPatch()

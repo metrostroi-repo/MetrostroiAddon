@@ -100,3 +100,5 @@ function ENT:AcceptInput( input, activator, called, data )
     end
   end
 end
+
+Metrostroi.OptimisationPatch()

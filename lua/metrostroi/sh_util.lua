@@ -55,91 +55,64 @@ function Metrostroi.SortInSpawner(ent,id,name)
     return retID,#spawnerLine[4]
 end
 
+-- Data storage for Metrostroi entities
+MSCEnt = MSCEnt or {}
+local cache = MSCEnt
+local meta = FindMetaTable("MSTrain")
 
+if not meta then
+    print("Metrostroi: Registering metatable...")
 
---CHECK ME
-Metrostroi.PatchedENTCache = Metrostroi.PatchedENTCache or {}
-local MetrostroiENTCache = Metrostroi.PatchedENTCache
+    meta = table.Copy(FindMetaTable("Entity"))
 
-local function updateMeta()
-    local meta = table.Copy(FindMetaTable("Entity"))
-    function meta:__index( key )
-        --__index function patch, because builtin function have shit with :GetTable,
-        --which is slow, so i precache GetTable's result and use cached version of it
-        local val = meta[ key ]
+    meta.MetaID = nil
+    meta.MetaName = nil
+
+    function meta:__index(key)
+        local val = meta[key]
         if val ~= nil then return val end
-        if not MetrostroiENTCache[self] then return end --FIXME какова хуя сука, почему оно становится невалидным :AAAA:
-        val = MetrostroiENTCache[self][key]
+        val = cache[self][key]
         if val ~= nil then return val end
         if key == "Owner" then return meta.GetOwner(self) end
     end
-    Metrostroi.PatchedMetatable = meta
+
+    RegisterMetaTable("MSTrain", meta)
 end
-hook.Add("OnGamemodeLoaded","MetrostroiOptimisationPatch",updateMeta)
-updateMeta()
 
-timer.Create("MetrostroiCacheWatchdog", 1, 0, function()
-    for ent in pairs(MetrostroiENTCache) do
-        if not IsValid(ent) then
-            MetrostroiENTCache[ent] = nil
-            print("Cleared cache",ent)
-        end
-    end
-end)
-
-function Metrostroi.OptimisationPatch(ent)
-    if true or ent then
-        --[[MetrostroiENTCache[ent] = ent:GetTable()
-        debug.setmetatable(ent,Metrostroi.PatchedMetatable)
-        print(tostring(ent).." patched...")]]
-        return
-    end
+local C_EntityPatch = CreateConVar("metrostroi_entity_patch", "1", FCVAR_ARCHIVE, 
+                    "Performance patch for metrostroi entities. Reload server/client for apply this. (0 - disabled, 1 - auto, 2 - enabled)")
+function Metrostroi.OptimisationPatch()
+    local entPatch = C_EntityPatch:GetInt()
+    if entPatch == 0 or (entPatch == 1 and jit.version_num == 20100) then return end -- On x64 branch this patch is laggy
     if not ENT then error("This function must be runned at the end of entity initialisation") end
     if not ENT.Initialize then error("Can't get ENT.Initialize. Maybe you running function too early?") end
-    print(ENT.Folder.." added to patched entities...")
+    MsgC(Color(0,255,0,255), Format("Metrostroi: %s applied performance patch\n", ENT.Folder))
 
+    ENT.OptInit = ENT.OptInit or ENT.Initialize
+    local oInit = ENT.OptInit or (function() end)
+    function ENT:Initialize(...)
+        cache[self] = self:GetTable()
+        debug.setmetatable(self,meta)
+        oInit(self,...)
+    end
 
-    ENT.MetrostroiUnPatchedInitialize = ENT.Initialize
-    ENT.Initialize = function(self,...)
-        --[[local jitEnabled = jit.status()
-        print(jitEnabled and "JIT was enabled" or "JIT was disabled")
-        jit.on()
-        local x
-        local arr = self:GetTable()
-        for i=1,1000000 do
-            arr["i1"..i] = i*2
-            arr["i2"..i] = i*2
-            arr["i3"..i] = i*2
+    ENT.OptRemove = ENT.OptRemove or ENT.OnRemove
+    local oRemove = ENT.OptRemove or (function() end)
+    if SERVER then
+        function ENT:OnRemove(...)
+            self:SetTable(cache[self])
+            debug.setmetatable(self,FindMetaTable("Entity"))
+            cache[self] = {}
+            oRemove(self,...)
         end
-        local time = SysTime()
-        for i=1,1000000 do
-            x = self["i3"..i]--*self["i3"..i]/self["i3"..i]^self["i3"..i]
+    else
+        function ENT:OnRemove(fullUpdate,...)
+            if fullUpdate == false then
+                self:SetTable(cache[self])
+                debug.setmetatable(self,FindMetaTable("Entity"))
+                cache[self] = {}
+            end
+            oRemove(self,fullUpdate,...)
         end
-        local elapsed1 = SysTime()-time
-        print("Before patch:"..elapsed1)
-
-        local time = SysTime()
-        for i=1,1000000 do
-            x = arr["i2"..i]--*arr["i3"..i]/self["i3"..i]^self["i3"..i]
-        end
-        local elapsed3 = SysTime()-time
-        print("Direct access:"..elapsed3)
-
-        __MetrostroiENTCache[self] = self:GetTable()
-        debug.setmetatable(self,Metrostroi.PatchedMetatable)
-        local time = SysTime()
-        for i=1,1000000 do
-            x = self["i1"..i]--*self["i3"..i]/self["i3"..i]^self["i3"..i]
-        end
-        local elapsed2 = SysTime()-time
-        print("After patch:"..elapsed2)
-
-        print(Format("Patch is faster by %d%%\nPatch is faster than direct access by %d%%",elapsed1/elapsed2*100,elapsed3/elapsed2*100))
-        print("BASE",getmetatable(self))
-        jit.on()]]
-        MetrostroiENTCache[self] = self:GetTable()
-        debug.setmetatable(self,Metrostroi.PatchedMetatable)
-
-        return self:MetrostroiUnPatchedInitialize(...)
     end
 end

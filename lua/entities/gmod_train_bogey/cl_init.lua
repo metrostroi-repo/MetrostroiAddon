@@ -469,3 +469,5 @@ net.Receive("metrostroi_bogey_contact",function()
     SafeRemoveEntityDelayed(light,0.1)
     sound.Play("subway_trains/bogey/spark.mp3",effectdata:GetOrigin(),75,math.random(100,150),volume)
 end)
+
+Metrostroi.OptimisationPatch()

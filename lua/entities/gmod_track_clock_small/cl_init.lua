@@ -96,3 +96,5 @@ end
 function ENT:Draw()
 	self:DrawModel()
 end
+
+Metrostroi.OptimisationPatch()

@@ -698,3 +698,5 @@ function ENT:AcceptInput(inputName, activator, called, data)
         self.Feeder = nil
     end
 end
+
+Metrostroi.OptimisationPatch()

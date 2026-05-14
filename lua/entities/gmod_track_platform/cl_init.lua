@@ -434,3 +434,5 @@ cvars.AddChangeCallback("metrostroi_drawsignaldebug", function()
         ent:SetNoDraw(noDraw)
     end
 end)
+
+Metrostroi.OptimisationPatch()
