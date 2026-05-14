@@ -241,11 +241,12 @@ function ENT:PreInitalize()
 	end
 end
 function ENT:PostInitalize()
+	local ent = self; self = ent:GetTable() 
 	if not self.Routes or #self.Routes == 0 then print(self, "NEED SETUP") return end
 	for k,v in ipairs(self.Routes) do
 		if v.NextSignal == "*" and self.TrackPosition then
 			local sig
-			local cursig = self
+			local cursig = ent
 			while true do
 				cursig = Metrostroi.GetARSJoint(cursig.TrackPosition.node1,cursig.TrackPosition.x,cursig.TrackDir,false)
 				if not IsValid(cursig) then break end
@@ -318,9 +319,9 @@ function ENT:PostInitalize()
 		self.GoodInvationSignal = -1
 	end
 	if self.Left then
-		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBoxMittor.model)
+		ent:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBoxMittor.model)
 	else
-		self:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBox.model)
+		ent:SetModel(self.TrafficLightModels[self.SignalType or 0].ArsBox.model)
 	end
 	self.PostInitalized = false
 
@@ -373,12 +374,12 @@ function ENT:GetMaxARSNext()
 	return tonumber(ARSCodes[#ARSCodes]) or 1
 end
 
-function ENT:CheckOccupation()
+function ENT:CheckOccupation(ent)
 	--print(self.FoundedAll)
 	--if not self.FoundedAll then return end
 	if not self.Close and not self.KGU then --not self.OverrideTrackOccupied and
 		if self.Node and  self.TrackPosition then
-			self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", self)
+			self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", ent)
 		end
 		if self.Routes[self.Route] and self.Routes[self.Route].Manual then
 			self.Occupied = self.Occupied or not self.Routes[self.Route].IsOpened
@@ -393,13 +394,13 @@ function ENT:CheckOccupation()
 		self.Occupied = self.Close or self.KGU --self.OverrideTrackOccupied or
 	end
 end
-function ENT:ARSLogic(tim)
+function ENT:ARSLogic(tim, ent)
 	--print(self.FoundedAll)
 	--if not self.FoundedAll then return end
 	if not self.Routes or not self.NextSignals then return end
 	-- Check track occuping
 	if not self.Routes[self.Route or 1].Repeater  then
-		self:CheckOccupation()
+		self:CheckOccupation(ent)
 		if self.Occupied then
 			if self.Routes[self.Route or 1].Manual then self.Routes[self.Route or 1].IsOpened = false end
 		end
@@ -411,7 +412,7 @@ function ENT:ARSLogic(tim)
 		if self.FreeBS - (self.OldBSState or self.FreeBS) > 1 then
 			local Free = self.FreeBS
 			timer.Simple(tim+0.1,function()
-				if not IsValid(self) then return end
+				if not IsValid(ent) then return end
 				if self.NextSignalLink and self.NextSignalLink.FreeBS + 1 - self.OldBSState > 1 then
 					self.FreeBS = Free
 					self.OldBSState = Free
@@ -421,7 +422,7 @@ function ENT:ARSLogic(tim)
 		end
 		self.OldBSState = self.FreeBS
 		if self.FreeBS == 1 then
-			self.OccupiedBy = self
+			self.OccupiedBy = ent
 		elseif self.FreeBS > 1 then
 			self.AutostopEnt = nil
 		end
@@ -467,25 +468,27 @@ function ENT:ARSLogic(tim)
 	end
 	if self.NextSignalLink == nil then
 		if self.Occupied then
-			self.NextSignalLink = self
+			self.NextSignalLink = ent
 			self.FreeBS = 0
 			--self.Route = 1
 		end
 	end
 	if self.Routes[self.Route] then
-		if self.Routes[self.Route or 1].Repeater then
-			self.RealName = IsValid(self.NextSignalLink) and self.NextSignalLink.RealName or self.Name
+		local nextSignalLinkValid = IsValid(self.NextSignalLink)
+		if nextSignalLinkValid then self.NextSignalLink = self.NextSignalLink:GetTable() end
+		if self.Routes[self.Route or 1].Repeater and nextSignalLinkValid then
+			self.RealName = self.NextSignalLink.RealName or self.Name
 		else
 			self.RealName = self.Name
 		end
-		if self.Routes[self.Route or 1].Repeater then
-			self.RealName = IsValid(self.NextSignalLink) and self.NextSignalLink.Name or self.Name
-			self.ARSSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSSpeedLimit or 1
-			self.ARSNextSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSNextSpeedLimit or 1
-			self.FreeBS = IsValid(self.NextSignalLink) and self.NextSignalLink.FreeBS or 0
+		if self.Routes[self.Route or 1].Repeater and nextSignalLinkValid then
+			self.RealName = self.NextSignalLink.Name or self.Name
+			self.ARSSpeedLimit = self.NextSignalLink.ARSSpeedLimit or 1
+			self.ARSNextSpeedLimit = self.NextSignalLink.ARSNextSpeedLimit or 1
+			self.FreeBS = self.NextSignalLink.FreeBS or 0
 		elseif self.Routes[self.Route].ARSCodes then
 			local ARSCodes = self.Routes[self.Route].ARSCodes
-			self.ARSNextSpeedLimit = IsValid(self.NextSignalLink) and self.NextSignalLink.ARSSpeedLimit or tonumber(ARSCodes[1])
+			self.ARSNextSpeedLimit = nextSignalLinkValid and self.NextSignalLink.ARSSpeedLimit or tonumber(ARSCodes[1])
 			self.ARSSpeedLimit = tonumber(ARSCodes[math.min(#ARSCodes, self.FreeBS+1)]) or 0
 			if self.AODisabled and self.ARSSpeedLimit ~= 2 then self.AODisabled = false end
 			if (self.InvationSignal or self.AODisabled) and self.ARSSpeedLimit == 2 then self.ARSSpeedLimit = 1 end
@@ -497,61 +500,62 @@ function ENT:ARSLogic(tim)
 end
 
 function ENT:Think()
+	local ent = self; self = ent:GetTable()
 	if self.PostInitalized then return end
 	--DEBUG
 	if Metrostroi.SignalDebugCV:GetBool() then
-		self:SetNW2Bool("Debug",true)
+		ent:SetNW2Bool("Debug",true)
 		local next = self.NextSignalLink
 		local pos = self.TrackPosition
 		local prev = self.PrevSig
 		if next then
-			next.PrevSig = self
+			next.PrevSig = ent
 			local nextpos = self.NextSignalLink.TrackPosition
-			self:SetNW2String("NextSignalName",next.Name)
+			ent:SetNW2String("NextSignalName",next.Name)
 			if pos and nextpos then
-				self:SetNW2Float("DistanceToNext",nextpos.x - pos.x)
+				ent:SetNW2Float("DistanceToNext",nextpos.x - pos.x)
 			else
-				self:SetNW2Float("DistanceToNext",0)
+				ent:SetNW2Float("DistanceToNext",0)
 			end
-			self:SetNW2Int("NextPosID",nextpos and nextpos.path and nextpos.path.id or 0)
-			self:SetNW2Float("NextPos",nextpos and nextpos.x or 0)
+			ent:SetNW2Int("NextPosID",nextpos and nextpos.path and nextpos.path.id or 0)
+			ent:SetNW2Float("NextPos",nextpos and nextpos.x or 0)
 		else
-			self:SetNW2String("NextSignalName","N/A")
-			self:SetNW2Float("DistanceToNext",0)
-			self:SetNW2Float("NextPos",0)
-			self:SetNW2Float("NextPosID",0)
+			ent:SetNW2String("NextSignalName","N/A")
+			ent:SetNW2Float("DistanceToNext",0)
+			ent:SetNW2Float("NextPos",0)
+			ent:SetNW2Float("NextPosID",0)
 		end
 		if prev then
 			local prevpos = prev.TrackPosition
 			if pos and prevpos then
-				self:SetNW2Float("DistanceToPrev",-prevpos.x + pos.x)
+				ent:SetNW2Float("DistanceToPrev",-prevpos.x + pos.x)
 			else
-				self:SetNW2Float("DistanceToPrev",0)
+				ent:SetNW2Float("DistanceToPrev",0)
 			end
-			self:SetNW2String("PrevSignalName",self.PrevSig.Name)
-			self:SetNW2Int("PrevPosID",prevpos and prevpos.path and prevpos.path.id or 0)
-			self:SetNW2Float("PrevPos",prevpos and prevpos.x or 0)
+			ent:SetNW2String("PrevSignalName",self.PrevSig.Name)
+			ent:SetNW2Int("PrevPosID",prevpos and prevpos.path and prevpos.path.id or 0)
+			ent:SetNW2Float("PrevPos",prevpos and prevpos.x or 0)
 		else
-			self:SetNW2String("PrevSignalName","N/A")
-			self:SetNW2Int("PrevPosID",0)
-			self:SetNW2Float("PrevPos",0)
+			ent:SetNW2String("PrevSignalName","N/A")
+			ent:SetNW2Int("PrevPosID",0)
+			ent:SetNW2Float("PrevPos",0)
 		end
-		self:SetNW2Float("Pos",pos and pos.x or 0)
-		self:SetNW2Int("PosID",pos and pos.path and pos.path.id or 0)
+		ent:SetNW2Float("Pos",pos and pos.x or 0)
+		ent:SetNW2Int("PosID",pos and pos.path and pos.path.id or 0)
 
-		self:SetNW2Bool("CurrentRoute",self.Route or -1)
-		self:SetNW2Bool("Occupied",self.Occupied)
-		self:SetNW2Bool("2/6",self.TwoToSix)
-		self:SetNW2Int("FreeBS",self.FreeBS)
-		self:SetNW2Bool("LinkedToController",self.Controllers ~= nil)
-		self:SetNW2Int("ControllersNumber",self.Controllers ~= nil and #self.Controllers or -1)
-		self:SetNW2Bool("BlockedByController",self.ControllerLogic)
+		ent:SetNW2Bool("CurrentRoute",self.Route or -1)
+		ent:SetNW2Bool("Occupied",self.Occupied)
+		ent:SetNW2Bool("2/6",self.TwoToSix)
+		ent:SetNW2Int("FreeBS",self.FreeBS)
+		ent:SetNW2Bool("LinkedToController",self.Controllers ~= nil)
+		ent:SetNW2Int("ControllersNumber",self.Controllers ~= nil and #self.Controllers or -1)
+		ent:SetNW2Bool("BlockedByController",self.ControllerLogic)
 		for i=0,8 do
 			if i==3 or i==5 then continue end
-			self:SetNW2Bool("CurrentARS"..i,self:GetARS(i))
+			ent:SetNW2Bool("CurrentARS"..i,self:GetARS(i))
 		end
-		self:SetNW2Bool("CurrentARS325",self:GetRS())
-		self:SetNW2Bool("CurrentARS325_2",self:Get325HzAproove0())
+		ent:SetNW2Bool("CurrentARS325",self:GetRS())
+		ent:SetNW2Bool("CurrentARS325_2",self:Get325HzAproove0())
 	end
 	if not self.ControllerLogic then
 		if not self.Routes or #self.Routes == 0 then
@@ -566,7 +570,7 @@ function ENT:Think()
 		self.PrevTime = self.PrevTime or 0
 		if (CurTime() - self.PrevTime) > 1.0 then
 			self.PrevTime = CurTime()+math.random(0.5,1.5)
-			self:ARSLogic(self.PrevTime - CurTime())
+			self:ARSLogic(self.PrevTime - CurTime(), ent)
 		end
 		self.RouteNumberOverrite = nil
 		local number = ""
@@ -595,10 +599,10 @@ function ENT:Think()
 			number = number.."W"
 		end
 		if self.KGU then number = number.."K" end
-		if number then self:SetNW2String("Number",number) end
+		if number then ent:SetNW2String("Number",number) end
 
 		if self.Occupied ~= self.OccupiedOld then
-			hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
+			hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, ent)
 			self.OccupiedOld = self.Occupied
 		end	
 
@@ -612,7 +616,7 @@ function ENT:Think()
 					self.Sprites = nil
 				end
 			end
-			self:SetNW2String("Signal","")
+			ent:SetNW2String("Signal","")
 			self.AutoEnabled = not self.ARSOnly
 			return
 		end
@@ -626,7 +630,7 @@ function ENT:Think()
 		self.Sig = ""
 		self.Colors = ""
 		for k,v in ipairs(self.Lenses) do
-			if self.Routes[self.Route or 1].Repeater and IsValid(self.NextSignalLink) and (not self.Routes[self.Route or 1].Lights or self.Routes[self.Route or 1].Lights == "") then
+			if self.Routes[self.Route or 1].Repeater and (not self.Routes[self.Route or 1].Lights or self.Routes[self.Route or 1].Lights == "") then
 				break
 			end
 			if v ~= "M" then
@@ -635,7 +639,7 @@ function ENT:Think()
 				if not data then continue end
 				for i = 1,#v do
 					--Get the LightID and check, is this light must light up
-					local LightID = IsValid(self.NextSignalLink) and math.min(#Route.LightsExploded,self.FreeBS+1) or 1
+					local LightID = math.min(#Route.LightsExploded,self.FreeBS+1) or 1
 					local AverageState = Route.LightsExploded[LightID]:find(tostring(index)) or ((v[i] == "W" and self.InvationSignal and self.GoodInvationSignal == index) and 1 or 0)
 					local MustBlink = (v[i] == "W" and self.InvationSignal and self.GoodInvationSignal == index) or (AverageState > 0 and Route.LightsExploded[LightID][AverageState+1] == "b") --Blinking, when next is "b" (or it's invasion signal')
 					self.Sig = self.Sig..(AverageState > 0 and (MustBlink and 2 or 1) or 0)
@@ -662,7 +666,7 @@ function ENT:Think()
 				end
 			end
 			if self.Occupied ~= self.OccupiedOld then
-				hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, self)
+				hook.Run("Metrostroi.Signaling.ChangeRCState", self.Name, self.Occupied, ent)
 				self.OccupiedOld = self.Occupied
 			end
 		
@@ -691,7 +695,7 @@ function ENT:Think()
 			number = number.."W"
 		end
 		if self.KGU then number = number.."K" end
-		if number then self:SetNW2String("Number",number) end
+		if number then ent:SetNW2String("Number",number) end
 		local index = 1
 		self.Colors = ""
 		for k,v in ipairs(self.Lenses) do
@@ -711,7 +715,7 @@ function ENT:Think()
 		for k,v in pairs(self.Controllers) do
 			if self.Sig ~= v.Sig then
 				local Route = self.Routes[self.Route or 1]
-				local LightID = IsValid(self.NextSignalLink) and math.min(#Route.LightsExploded,self.FreeBS+1) or 1
+				local LightID = math.min(#Route.LightsExploded,self.FreeBS+1) or 1
 				local lights = Route.LightsExploded[LightID]
 				v:TriggerOutput("LenseEnabled",self,Route.LightsExploded[LightID])
 				v.Sig = self.Sig
@@ -726,10 +730,10 @@ function ENT:Think()
 			end
 		end
 	end
-	self:SetNW2String("Signal",self.Sig)
-	if not self.AutostopPresent then self:SetNW2Bool("Autostop",self.AutoEnabled) end
+	ent:SetNW2String("Signal",self.Sig)
+	if not self.AutostopPresent then ent:SetNW2Bool("Autostop",self.AutoEnabled) end
 
-	self:NextThink(CurTime() + 0.25)
+	ent:NextThink(CurTime() + 0.25)
 	return true
 end
 
