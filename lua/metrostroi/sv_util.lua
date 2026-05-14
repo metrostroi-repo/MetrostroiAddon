@@ -621,7 +621,7 @@ timer.Create("Metrostroi_ElectricConsumptionTimer",0.5,0,function()
     if CPPI then
         local U = {}
         local D = {}
-        for i,train in ipairs(Metrostroi.SpawnedTrains) do
+        for train in pairs(Metrostroi.SpawnedTrains) do
             local owner = train:CPPIGetOwner()
             if owner and (train.Electric) then
                 U[owner] = (U[owner] or 0) + train.Electric.ElectricEnergyUsed
