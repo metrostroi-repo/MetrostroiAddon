@@ -269,7 +269,7 @@ function ENT:Think()
     local boarding = false
 
     local BoardTime = 8+7*self.HorliftStation
-    for train in pairs(trains) do
+    for train,trainTbl in pairs(trains) do
         local tPos = train:GetPos()
         if tPos:DistToSqr(self.Pos) > self.PlatformStart:DistToSqr(self.PlatformEnd) then continue end
 
@@ -277,7 +277,6 @@ function ENT:Think()
         local vertical_distance = math.abs(tPos.z - self.PlatformStart.z)
         if vertical_distance >= 192 or platform_distance >= 256 then continue end
 
-        local trainTbl = train:GetTable()
         local minb,maxb = train:LocalToWorld(Vector(-480,0,0)),train:LocalToWorld(Vector(480,0,0)) --FIXME
         --[[
         local minb,maxb = train:WorldSpaceAABB() --FIXME

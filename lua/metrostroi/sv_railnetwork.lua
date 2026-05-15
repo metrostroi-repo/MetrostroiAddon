@@ -870,17 +870,16 @@ end
 -- Update train positions
 --------------------------------------------------------------------------------
 function Metrostroi.PredictTrainPositions()
-    for train in pairs(Metrostroi.SpawnedTrains) do
-        if not IsValid(train) then Metrostroi.SpawnedTrains[train] = nil return end
+    for train,tbl in pairs(Metrostroi.SpawnedTrains) do
         local localSpeed = train:GetVelocity():Dot(train:GetAngles():Forward()) * 0.01905
         local pos = Metrostroi.TrainPositions[train];pos = pos and pos[1]
         if not pos then continue end
         if Metrostroi.TrainDirections[train] then
-            train.PosX = train.PosX + localSpeed*FrameTime()
+            tbl.PosX = tbl.PosX + localSpeed*FrameTime()
         else
-            train.PosX = train.PosX - localSpeed*FrameTime()
+            tbl.PosX = tbl.PosX - localSpeed*FrameTime()
         end
-        train.OldPos = pos.x+train.PosX
+        tbl.OldPos = pos.x+tbl.PosX
     end
 end
 
@@ -890,9 +889,7 @@ function Metrostroi.UpdateTrainPositions()
     local trainsForNode = {}
 
     -- Query all trains
-    for train in pairs(Metrostroi.SpawnedTrains) do
-        if not IsValid(train) then continue end
-        local tbl = train:GetTable()
+    for train,tbl in pairs(Metrostroi.SpawnedTrains) do
         if tbl.ALS_ARS and tbl.ALS_ARS.IgnoreThisARS or tbl.NoTrain then continue end
         tbl.PosX = 0
 

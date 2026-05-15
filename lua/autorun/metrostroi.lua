@@ -75,7 +75,7 @@ end
 Metrostroi.SpawnedTrains = {}
 for k,ent in pairs(ents.GetAll()) do
     if ent.Base == "gmod_subway_base" or ent:GetClass() == "gmod_subway_base" then
-        Metrostroi.SpawnedTrains[ent] = true
+        Metrostroi.SpawnedTrains[ent] = ent:GetTable()
     end
 end
 
@@ -87,13 +87,13 @@ end)
 if SERVER then
     hook.Add("OnEntityCreated","MetrostroiTrains",function(ent)
         if ent.Base == "gmod_subway_base" or  ent:GetClass() == "gmod_subway_base" then
-            Metrostroi.SpawnedTrains[ent] = true
+            Metrostroi.SpawnedTrains[ent] = ent:GetTable()
         end
     end)
 else
     hook.Add("OnEntityCreated","MetrostroiTrains",function(ent)
         if ent:GetClass() == "gmod_subway_base" or scripted_ents.IsBasedOn(ent:GetClass(), "gmod_subway_base") then
-            Metrostroi.SpawnedTrains[ent] = true
+            Metrostroi.SpawnedTrains[ent] = ent:GetTable()
         end
     end)
 end

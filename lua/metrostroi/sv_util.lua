@@ -509,14 +509,14 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
     Metrostroi.TotalRateWatts = 0
     Metrostroi.Current = 0
     for k,v in pairs(Metrostroi.Currents) do Metrostroi.Currents[k] = 0 end
-    for train in pairs(Metrostroi.SpawnedTrains) do
-        if not train.Electric then continue end
+    for train,tbl in pairs(Metrostroi.SpawnedTrains) do
+        if not tbl.Electric then continue end
 
-        if train.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, train.Electric.EnergyChange) end
-        local current = math.max(0, train.Electric.Itotal or 0) -  math.max(0, train.Electric.Iexit or 0)
+        if tbl.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, tbl.Electric.EnergyChange) end
+        local current = math.max(0, tbl.Electric.Itotal or 0) -  math.max(0, tbl.Electric.Iexit or 0)
 
-        local fB = IsValid(train.FrontBogey) and train.FrontBogey
-        local rB = IsValid(train.RearBogey) and train.RearBogey
+        local fB = IsValid(tbl.FrontBogey) and tbl.FrontBogey:GetTable()
+        local rB = IsValid(tbl.RearBogey) and tbl.RearBogey:GetTable()
 
         local fBDropByPeople = fb and fB.DropByPeople or 0
         local rBDropByPeople = rb and rB.DropByPeople or 0
