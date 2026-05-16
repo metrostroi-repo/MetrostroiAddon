@@ -120,7 +120,8 @@ function Metrostroi.GetPositionOnTrack(pos,ang,opts)
     local local_dir = ang:Forward()
     
     local nodes = Metrostroi.NearestNodes(pos)
-    for i,node in ipairs(nodes) do
+    for i=1,#nodes do
+        local node = nodes[i]
         if node.path == opts.ignore_path then continue end
 
         -- Get local coordinate system of a section
