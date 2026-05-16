@@ -316,15 +316,21 @@ local function Save(args,ply)
 end
 
 local function Load(args,ply)
-	local tbl = GetFile()
-	if tbl == nil then
-		print("JSON Parse error reading from "..FilePath)
+	if #Metrostroi.TrackEditor.Paths > 0 then
+		print("Loaded from RailNetwork")
+		SendClientMsg(ply,"Loaded from RailNetwork")
 	else
+		local tbl = GetFile()
+		if tbl == nil then
+			print("JSON Parse error reading from "..FilePath)
+			SendClientMsg(ply,"JSON Parse error reading")
+			return
+		end
 		Metrostroi.TrackEditor.Paths = tbl -- Maybe requires hardcopy?
 		print("Loaded from "..FilePath)
 		SendClientMsg(ply,"Loaded from file")
-		SendClientUpdate(ply)
 	end
+	SendClientUpdate(ply)
 end
 
 

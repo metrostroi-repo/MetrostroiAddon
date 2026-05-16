@@ -6,6 +6,7 @@ local SelectedPath
 
 local SelectedColor = Color(255,0,0)
 local DeSelectedColor = color_white
+local BranchColor = Color(200,255,255)
 
 local function RemovePath(pathid)
 	RunConsoleCommand("metrostroi_trackeditor_removepath",pathid)
@@ -175,13 +176,23 @@ hook.Add("PostDrawTranslucentRenderables","metrostroi_trackeditor_draw",function
 		
 			local lastnode = nil
 			local col = Either(k==SelectedPath,SelectedColor,DeSelectedColor)
+			local colb = Either(k==SelectedPath,SelectedColor,BranchColor)
 			
-			for k2,node in pairs(path) do
+			for k2,node in ipairs(path) do
 				if lastnode then
 					render.DrawLine(node,lastnode,col,true)
 				end
 				render.DrawWireframeSphere(node,10,2,2,col,true)
 				lastnode = node
+			end
+
+			if path.Branches then
+				for k,v in ipairs(path.Branches) do
+					if v[1] and v[2] then
+						render.DrawLine(v[1],v[2],colb,true)
+						render.DrawWireframeSphere(v[2],10,2,2,colb,true)
+					end
+				end
 			end
 		end
 	end

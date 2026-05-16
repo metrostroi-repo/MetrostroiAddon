@@ -1052,7 +1052,7 @@ end
 -- Load track definition and sign definitions
 --------------------------------------------------------------------------------
 
-local function getFile(path,name,id)
+function Metrostroi.GetDefinitionFile(path,name,id)
     local data,found
     if file.Exists(Format(path..".txt",name),"DATA") then
         print(Format("Metrostroi: Loading %s definition...",id))
@@ -1065,21 +1065,21 @@ local function getFile(path,name,id)
         found = true
     end
     if not found then
-        print(Format("%s definition file not found: %s",id,Format(path,name)))
+        print(Format("Metrostroi: %s definition file not found: %s",id,Format(path,name)))
         return
     elseif not data then
-        print(Format("Parse error in %s %s definition JSON",id,Format(path,name)))
+        print(Format("Metrostroi: Parse error in %s %s definition JSON",id,Format(path,name)))
         return
     end
     return data
 end
 
-local function loadTracks(name)
-    local track = getFile("metrostroi_data/track_%s",name,"Track") or {}
+function Metrostroi.LoadTracks(name)
+    local track = Metrostroi.GetDefinitionFile("metrostroi_data/track_%s",name,"Track") or {}
+
     -- Quick small hack to load tracks as well
-    if Metrostroi.TrackEditor then
-        Metrostroi.TrackEditor.Paths = track
-    end
+    Metrostroi.TrackEditor = {}
+    Metrostroi.TrackEditor.Paths = track
 
     -- Prepare spatial lookup table
     Metrostroi.SpatialLookup = {}
@@ -1152,25 +1152,38 @@ local function loadTracks(name)
         if pos1[1] then join1 = pos1[1].node1 end
         if pos2[1] then join2 = pos2[1].node1 end
 
+        -- Init info for track editor
+        local trackEditorBranches = {}
+
         -- Record it
         if join1 then
             join1.branches = join1.branches or {}
             table.insert(join1.branches,{ pos1[1].x, node1 })
             node1.branches = node1.branches or {}
             table.insert(node1.branches,{ node1.x, join1 })
+
+            local posT1 = Metrostroi.GetTrackPosition(join1.path, pos1[1].x)
+            table.insert(trackEditorBranches, {node1.pos, posT1})
         end
         if join2 then
             join2.branches = join2.branches or {}
             table.insert(join2.branches,{ pos2[1].x, node2 })
             node2.branches = node2.branches or {}
             table.insert(node2.branches,{ node2.x, join2 })
+
+            local posT2 = Metrostroi.GetTrackPosition(join2.path, pos2[1].x)
+            table.insert(trackEditorBranches, {node2.pos, posT2})
         end
+
+        Metrostroi.TrackEditor.Paths[pathID].Branches = trackEditorBranches
     end
+
+    return track
 end
-local function loadSigns(name,keep)
+function Metrostroi.LoadSigns(name,keep)
     if keep then return end
     print("Metrostroi: Loading signs, signals, switches...")
-    local signs = getFile("metrostroi_data/signs_%s",name,"Signal")
+    local signs = Metrostroi.GetDefinitionFile("metrostroi_data/signs_%s",name,"Signal")
 
     if not signs then print("Metrostroi: Loading canceled, no file found") return end
 
@@ -1254,10 +1267,12 @@ local function loadSigns(name,keep)
             elseif v.Class == "gmod_track_signal" then ent:Remove() end
         end
     end
+
+    return signs
 end
-local function loadAutoSigns(name,keep)
+function Metrostroi.LoadAutoSigns(name,keep)
     if keep then return end
-    local auto = getFile("metrostroi_data/auto_%s",name,"Autodrive")
+    local auto = Metrostroi.GetDefinitionFile("metrostroi_data/auto_%s",name,"Autodrive")
 
     if not auto then return end
     local auto_ents = ents.FindByClass("gmod_track_autodrive_plate")
@@ -1307,9 +1322,12 @@ local function loadAutoSigns(name,keep)
             end
         end
     end
+
+    return auto
 end
-local function loadPAData(name)
-    local pa = getFile("metrostroi_data/pa_%s",name,"PAData")
+
+function Metrostroi.LoadPAData(name)
+    local pa = Metrostroi.GetDefinitionFile("metrostroi_data/pa_%s",name,"PAData")
 
     if not pa then return end
     Metrostroi.PAMConfTest = pa
@@ -1352,12 +1370,14 @@ local function loadPAData(name)
         end
     end
     Metrostroi.PARebuildStations()
+
+    return pa
 end
 
 function Metrostroi.Load(name,keep_signs)
     name = name or game.GetMap()
 
-    loadTracks(name)
+    Metrostroi.LoadTracks(name)
 
     -- Initialize stations list
     Metrostroi.UpdateStations()
@@ -1366,12 +1386,12 @@ function Metrostroi.Load(name,keep_signs)
 
     -- Ignore updates to prevent created/removed switches from constantly updating table of positions
     Metrostroi.IgnoreEntityUpdates = true
-    loadSigns(name,keep_signs)
-    loadAutoSigns(name,keep_signs)
+    Metrostroi.LoadSigns(name,keep_signs)
+    Metrostroi.LoadAutoSigns(name,keep_signs)
 
     local pa_ents = ents.FindByClass("gmod_track_pa_marker")
     for _,v in pairs(pa_ents) do SafeRemoveEntity(v) end
-    loadPAData(name)
+    Metrostroi.LoadPAData(name)
     timer.Simple(0.05,function()
         -- No more ignoring updates
         Metrostroi.IgnoreEntityUpdates = false
@@ -1384,7 +1404,7 @@ function Metrostroi.Load(name,keep_signs)
     end)
 
     -- Load schedules data
-    local sched_data = getFile("metrostroi_data/sched_%s",name,"schedules")
+    local sched_data = Metrostroi.GetDefinitionFile("metrostroi_data/sched_%s",name,"schedules")
     if sched_data then
         Metrostroi.LoadSchedulesData(sched_data)
     else
