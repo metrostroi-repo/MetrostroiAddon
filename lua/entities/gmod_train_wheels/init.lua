@@ -47,3 +47,5 @@ function ENT:PhysicsCollide(data,physobj)
 		end
 	end
 end
+
+Metrostroi.OptimisationPatch()

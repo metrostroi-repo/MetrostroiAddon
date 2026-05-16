@@ -83,7 +83,9 @@ function ENT:Initialize()
 
     -- Set proper parameters for the bogey
     if IsValid(self:GetPhysicsObject()) then
-        self:GetPhysicsObject():SetMass(5000)
+        self.PhysObj = self:GetPhysicsObject()
+        self.Mass = 5000
+        self.PhysObj:SetMass(self.Mass)
     end
 
     -- Store coupling point offset
@@ -163,6 +165,11 @@ function ENT:InitializeWheels()
     elseif CPPI and IsValid(train) and IsValid(train:CPPIGetOwner()) then
         wheels:CPPISetOwner(train:CPPIGetOwner())
     end
+
+    if (IsValid(wheels:GetPhysicsObject())) then
+        wheels.PhysObj = wheels:GetPhysicsObject()
+    end
+    
     
     wheels:SetNW2Entity("TrainBogey",self)
     self.Wheels = wheels
@@ -383,22 +390,64 @@ function ENT:OnDecouple()
     end
 end
 
-function ENT:CheckContact(pos,dir,id,cpos)
-    local result = util.TraceHull({
-        start = self:LocalToWorld(pos),
-        endpos = self:LocalToWorld(pos + dir*10),
-        mask = -1,
-        filter = { self:GetNW2Entity("TrainEntity"), self },
-        mins = Vector( -2, -2, -2 ),
-        maxs = Vector( 2, 2, 2 )
-    })
+local traceResultTbl = {
+    AllSolid    = false,
+    Contents    = 0,
+    DispFlags   = 0,
+    Entity      = Entity(0),
+    Fraction    = 1,
+    FractionLeftSolid = 0,
+    Hit         = false,
+    HitBox      = 0,
+    HitGroup    = 0,
+    HitNoDraw   = false,
+    HitNonWorld = false,
+    HitNormal   = Vector(0,0,0),
+    HitPos      = Vector(0,0,0),
+    HitSky      = false,
+    HitTexture  = "**empty**",
+    HitWorld    = false,
+    MatType     = 0,
+    Normal      = Vector(0,0,0),
+    PhysicsBone = 0,
+    StartPos    = Vector(0,0,0),
+    StartSolid  = false,
+    SurfaceFlags = 0,
+    SurfaceProps = 0,
+}
 
-    if not result.Hit then return end
+local traceDataTbl = {
+    start = Vector(0,0,0),
+    endpos = Vector(0,0,0),
+    mask = MASK_SOLID,
+    collisiongroup = COLLISION_GROUP_NONE,
+    ignoreworld = false,
+    whitelist = true,
+    filter = { "player", "gmod_track_udochka" },
+    output = traceResultTbl
+}
+
+function ENT:CheckContact(pos,dir,id,cpos)
+    traceDataTbl.start = self:LocalToWorld(pos + dir)
+    traceDataTbl.endpos = self:LocalToWorld(cpos + Vector(0,0,-10))
+    local result = util.TraceLine(traceDataTbl)
+
+    -- Draw traceline
+    -- debugoverlay.Text(traceDataTbl.start, "START", 0.25, false)
+    -- debugoverlay.Text(traceDataTbl.endpos, "END", 0.25, false)
+    -- debugoverlay.Line(traceDataTbl.start, traceDataTbl.endpos, 0.25, Color(255,127,0), true)
+    -- if (result.Hit) then
+    --     debugoverlay.Text(result.HitPos, Format("HIT (f:%0.2f)", result.Fraction), 0.25, false)
+    --     debugoverlay.Sphere(result.HitPos, 0.5, 0.25, Color(0,255,0), true)
+    -- end
+
+    if not result.Hit then return false end
     if result.HitWorld then return true end
 
     local traceEnt = result.Entity
-    if not self.Connectors[id] and traceEnt:GetClass() == "gmod_track_udochka" then
-        if not traceEnt.Timer and traceEnt.CoupledWith ~= self then
+    local entClass = traceEnt:GetClass()
+    if entClass == "gmod_track_udochka" then
+        if not self.Connectors[id] and not traceEnt.Timer and traceEnt.CoupledWith ~= self then
             --local vec = Vector(pos.y < 0 and 1 or 1.1,pos.y < 0 and -1 or 1.05, 1)
             traceEnt:SetPos(self:LocalToWorld(cpos))
             traceEnt:SetAngles(self:GetAngles())
@@ -413,18 +462,21 @@ function ENT:CheckContact(pos,dir,id,cpos)
             end
         end
         return false
-    elseif traceEnt:GetClass() == "player" and self.Voltage > 40 then
-        local pPos = traceEnt:GetPos()
-        self.VoltageDropByTouch = (self.VoltageDropByTouch or 0) + 1
-        util.BlastDamage(traceEnt,traceEnt,pPos,64,3.0*self.Voltage)
+    elseif entClass == "player" then
+        if self.Voltage > 40 then
+            local pPos = traceEnt:GetPos()
+            self.VoltageDropByTouch = (self.VoltageDropByTouch or 0) + 1
+            util.BlastDamage(traceEnt,traceEnt,pPos,64,3.0*self.Voltage)
 
-        local effectdata = EffectData()
-        effectdata:SetOrigin(pPos + Vector(0,0,-16+math.random()*(40+0)))
-        util.Effect("cball_explode",effectdata,true,true)
-        sound.Play("ambient/energy/zap"..math.random(1,3)..".wav",pPos,75,math.random(100,150),1.0)
-        return
+            local effectdata = EffectData()
+            effectdata:SetOrigin(pPos + Vector(0,0,-16+math.random()*(40+0)))
+            util.Effect("cball_explode",effectdata,true,true)
+            sound.Play("ambient/energy/zap"..math.random(1,3)..".wav",pPos,75,math.random(100,150),1.0)
+        end
+        return false
     end
-    return result.Hit
+
+    return true
 end
 
 local C_Require3rdRail = GetConVar("metrostroi_train_requirethirdrail")
@@ -448,8 +500,8 @@ function ENT:CheckVoltage(dT)
     end
 
     self.VoltageDropByTouch = 0
-    self.NextStates[1] = contacts and self:CheckContact(self.PantLPos,Vector(0,-1,0),1,self.PantLCPos)
-    self.NextStates[2] = contacts and self:CheckContact(self.PantRPos,Vector(0, 1,0),2,self.PantRCPos)
+    self.NextStates[1] = contacts and self:CheckContact(self.PantLPos,Vector(0,-10,0),1,self.PantLCPos)
+    self.NextStates[2] = contacts and self:CheckContact(self.PantRPos,Vector(0, 10,0),2,self.PantRCPos)
 
     -- Detect changes in contact states
     for i=1,2 do
@@ -507,15 +559,21 @@ function ENT:Think()
     self:CheckVoltage(self.DeltaTime)
 
     -- Skip physics related stuff
-    if self.NoPhysics or not self.Wheels:GetPhysicsObject():IsValid() then
+    if self.NoPhysics or not self.Wheels.PhysObj:IsValid() then
         self:SetMotorPower(self.MotorPower or 0)
         self:SetSpeed(self.Speed or 0)
         self:NextThink(CurTime())
         return true
     end
 
+    local physObj = self.PhysObj
+    local ang = self:GetAngles()
+    local angForward = ang:Forward()
+    local angRight = ang:Right()
+    local vel = self:GetVelocity()
+
     -- Get speed of bogey in km/h
-    local localSpeed = -self:GetVelocity():Dot(self:GetAngles():Forward()) * 0.06858
+    local localSpeed = -vel:Dot(angForward) * 0.06858
     local absSpeed = math.abs(localSpeed)
     if self.Reversed then localSpeed = -localSpeed end
 
@@ -541,7 +599,7 @@ function ENT:Think()
     end
     -- Increace forces on slopes
     local slopemul = 1
-    local pitch = self:GetAngles().pitch*sign
+    local pitch = ang.pitch*sign
     if motorPower < 0 and pitch > 3 then
         slopemul = slopemul + math.Clamp((math.abs(pitch)-3)/3,0,1)
     else
@@ -553,9 +611,9 @@ function ENT:Think()
     local pB = not self.DisableParking and self.ParkingBrakePressure or 0
     local BrakeCP = (((self.BrakeCylinderPressure/2.7+pB/1.6)^pneumaticPow)*2.7)/4.5-- + (self.ParkingBrake and 1 or 0)
     if (BrakeCP*4.5 > 1.5-math.Clamp(math.abs(pitch)/1,0,1)) and (absSpeed < 1) then
-        self.Wheels:GetPhysicsObject():SetMaterial("gmod_silent")
+        self.Wheels.PhysObj:SetMaterial("gmod_silent")
     else
-        self.Wheels:GetPhysicsObject():SetMaterial("gmod_ice")
+        self.Wheels.PhysObj:SetMaterial("gmod_ice")
     end
 
     -- Calculate forces
@@ -572,11 +630,11 @@ function ENT:Think()
 
     -- Compensate forward friction
     local compensateA = self.Speed / 86
-    local compensateF = sign * self:GetPhysicsObject():GetMass() * compensateA
+    local compensateF = sign * self.Mass * compensateA
     -- Apply sideways friction
-    local sideSpeed = -self:GetVelocity():Dot(self:GetAngles():Right()) * 0.06858
+    local sideSpeed = -vel:Dot(angRight) * 0.06858
     if sideSpeed < 0.5 then sideSpeed = 0 end
-    local sideForce = sideSpeed * 0.5 * self:GetPhysicsObject():GetMass()
+    local sideForce = sideSpeed * 0.5 * self.Mass
 
     -- Apply force
     local dt_scale = 66.6/(1/self.DeltaTime)
@@ -586,16 +644,16 @@ function ENT:Think()
     local side_force = dt_scale*(sideForce)
 
     if self.Reversed then
-        self:GetPhysicsObject():ApplyForceCenter( self:GetAngles():Forward()*force + self:GetAngles():Right()*side_force)
+        physObj:ApplyForceCenter( angForward*force + angRight*side_force)
     else
-        self:GetPhysicsObject():ApplyForceCenter(-self:GetAngles():Forward()*force + self:GetAngles():Right()*side_force)
+        physObj:ApplyForceCenter(-angForward*force + angRight*side_force)
     end
 
     -- Apply Z axis damping
-    local avel = self:GetPhysicsObject():GetAngleVelocity()
+    local avel = physObj:GetAngleVelocity()
     local avelz = math.min(20,math.max(-20,avel.z))
     local damping = Vector(0,0,-avelz) * 0.75 * dt_scale
-    self:GetPhysicsObject():AddAngleVelocity(damping)
+    physObj:AddAngleVelocity(damping)
 
     -- Calculate brake squeal
     self.SquealSensitivity = 1
@@ -621,7 +679,6 @@ function ENT:Think()
     if self.DisableSound < 3 then
         self:SetSpeed(absSpeed)
     end
-    self:NextThink(CurTime())
 
     -- Trigger outputs
     if Wire_TriggerOutput then
@@ -629,6 +686,8 @@ function ENT:Think()
         Wire_TriggerOutput(self, "Voltage", self.Voltage)
         Wire_TriggerOutput(self, "BrakeCylinderPressure", self.BrakeCylinderPressure)
     end
+    
+    self:NextThink(CurTime())
     return true
 end
 
