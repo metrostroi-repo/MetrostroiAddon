@@ -524,6 +524,7 @@ function Metrostroi.ScanTrack(itype, start_node, func, start_x, start_dir)
                 for _,v_ent in pairs(signals) do
                     -- if not IsValid(v_ent) then continue end
                     local v = v_ent:GetTable()
+                    if not v then continue end
                     local trackX = v.TrackX
                     local routeTbl = v.Routes and v.Routes[v.Route or 1]
 
@@ -820,25 +821,23 @@ end
 -- Check if there is a train somewhere in the local isolated section. This
 -- ignores ARS subsections (if they are unisolated), accounts for traffic lights
 --------------------------------------------------------------------------------
-function Metrostroi.IsTrackOccupied(src_node,x,dir,t,ent)
-    local entTbl = ent:GetTable()
-
+function Metrostroi.IsTrackOccupied(src_node,x,dir,t,cacheTbl)
     -- Cache nodes for scan
-    local entNodes = entTbl._nodes
-    if not entNodes then
-        entNodes = {}
+    local cacheNodes = cacheTbl._nodes
+    if not cacheNodes then
+        cacheNodes = {}
         Metrostroi.ScanTrack(t or "light", src_node, function(node, min_x, max_x)
-            entNodes[#entNodes+1] = {node, min_x, max_x}
+            cacheNodes[#cacheNodes+1] = {node, min_x, max_x}
         end, x, dir)
-        entTbl._nodes = entNodes
+        cacheTbl._nodes = cacheNodes
     end
 
     -- Scan trains on entity's nodes
     local first_train, last_train
     local trainsForNode = Metrostroi.TrainsForNode
     local trainPositions = Metrostroi.TrainPositions
-    for i=1,#entNodes do
-        local item = entNodes[i]
+    for i=1,#cacheNodes do
+        local item = cacheNodes[i]
         local node = item[1]
         local nodeTrains = trainsForNode[node]
 
@@ -1663,9 +1662,9 @@ concommand.Add("metrostroi_pos_info", function(ply, _, args)
 
     -- Info about local track
     if results[1] then
-        local occupied = Metrostroi.IsTrackOccupied(results[1].node1, nil, nil, nil, ply)
+        local cache = {}
+        local occupied = Metrostroi.IsTrackOccupied(results[1].node1, nil, nil, nil, cache)
         print(Format("Track status: %s",occupied and "occupied" or "free"))
-        ply._nodes = nil -- Clear cache of nodes
     end
 end)
 

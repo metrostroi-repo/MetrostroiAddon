@@ -91,7 +91,7 @@ function ENT:Think()
 	else
 		local pos = self.TrackPosition
 		if pos and self.AlternateTrack then
-			local trackOccupied = Metrostroi.IsTrackOccupied(pos.node1,pos.x,pos.forward,"switch", ent)
+			local trackOccupied = Metrostroi.IsTrackOccupied(pos.node1,pos.x,pos.forward,"switch", self)
 			if trackOccupied then -- Prevent track switches from working when there's a train on segment
 				self.InhibitSwitching = true
 			end

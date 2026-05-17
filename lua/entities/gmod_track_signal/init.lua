@@ -374,12 +374,12 @@ function ENT:GetMaxARSNext()
 	return tonumber(ARSCodes[#ARSCodes]) or 1
 end
 
-function ENT:CheckOccupation(ent)
+function ENT:CheckOccupation()
 	--print(self.FoundedAll)
 	--if not self.FoundedAll then return end
 	if not self.Close and not self.KGU then --not self.OverrideTrackOccupied and
 		if self.Node and  self.TrackPosition then
-			self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", ent)
+			self.Occupied,self.OccupiedBy,self.OccupiedByNow = Metrostroi.IsTrackOccupied(self.Node, self.TrackPosition.x,self.TrackPosition.forward,self.ARSOnly and "ars" or "light", self)
 		end
 		if self.Routes[self.Route] and self.Routes[self.Route].Manual then
 			self.Occupied = self.Occupied or not self.Routes[self.Route].IsOpened
@@ -400,7 +400,7 @@ function ENT:ARSLogic(tim, ent)
 	if not self.Routes or not self.NextSignals then return end
 	-- Check track occuping
 	if not self.Routes[self.Route or 1].Repeater  then
-		self:CheckOccupation(ent)
+		self:CheckOccupation()
 		if self.Occupied then
 			if self.Routes[self.Route or 1].Manual then self.Routes[self.Route or 1].IsOpened = false end
 		end
