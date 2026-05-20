@@ -63,42 +63,28 @@ local function AreCoupled(ent1,ent2)
     return coupled
 end
 
--- Adv ballsockets ents by their CouplingPointOffset
+-- constraint.Weld ents by their CouplingPointOffset
 function ENT:Couple(ent)
-    local strain = self:GetNW2Entity("TrainEntity")
-    local etrain = ent:GetNW2Entity("TrainEntity")
-    if IsValid(strain) then
-        --self:SetPos(strain:LocalToWorld(self.SpawnPos))
-        self:SetAngles(strain:LocalToWorldAngles(self.SpawnAng))
-    end
-    if IsValid(etrain) then
-        --ent:SetPos(etrain:LocalToWorld(ent.SpawnPos))
-        ent:SetAngles(etrain:LocalToWorldAngles(ent.SpawnAng))
-    end
-    ent:SetPos(self:LocalToWorld(self.CouplingPointOffset*Vector(2,-1,-1)))
+    -- local strain = self:GetNW2Entity("TrainEntity")
+    -- local etrain = ent:GetNW2Entity("TrainEntity")
+    -- if not IsValid(strain) or not IsValid(etrain) then return end
+
+    -- self:SetPos(strain:LocalToWorld(self.SpawnPos))
+    -- self:SetAngles(strain:LocalToWorldAngles(self.SpawnAng))
+    -- ent:SetPos(etrain:LocalToWorld(ent.SpawnPos))
+    -- ent:SetAngles(etrain:LocalToWorldAngles(ent.SpawnAng))
+
+    ent:SetPos(self:LocalToWorld(self.CouplingPointOffset+ent.CouplingPointOffset*Vector(1,-1,-1)))
     ent:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
-    self:SetPos(ent:LocalToWorld(ent.CouplingPointOffset*Vector(2,-1,-1)))
+    self:SetPos(ent:LocalToWorld(ent.CouplingPointOffset+self.CouplingPointOffset*Vector(1,-1,-1)))
     self:SetAngles(ent:LocalToWorldAngles(Angle(0,180,0)))
+
     if IsValid(constraint.Weld(
-        self,
-        ent,
-        0, --bone
-        0, --bone
-        --self.CouplingPointOffset,
-        --ent.CouplingPointOffset,
+        self, --ent1
+        ent, --ent2
+        0, --bone1
+        0, --bone2
         0 --forcelimit
-        ----0, --torquelimit
-        ---25, --xmin
-        ---10, --ymin
-        ---25, --zmin
-        --25, --xmax
-        --10, --ymax
-        --25, --zmax
-        --0, --xfric
-        --0, --yfric
-        --0, --zfric
-        --0, --rotonly
-        --1 --nocollide
     )) then
         sound.Play("subway_trains/bogey/couple.mp3",(self:GetPos()+ent:GetPos())/2,70,100,1)
 
