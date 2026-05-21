@@ -2001,7 +2001,7 @@ function ENT:Think()
     -- Send SyncTable data
     local syncTbl = self._SyncData
     local syncNames = self._SyncTableNames
-    for i=1,#syncTbl do
+    for i=1,self.SyncVars do
         self:SetNW2Int(syncNames[i], syncTbl[i])
     end
 
@@ -2012,8 +2012,7 @@ end
 function ENT:TriggerTurbostroiInput(sys,name,val)
     if name == "Value" then
         -- Autosend values to client
-        local idx = self.iSyncTable[sys]
-        if idx then self:SetSyncValue(idx, val > 0) end
+        self:SetSyncValue(sys, val > 0)
     end
 end
 

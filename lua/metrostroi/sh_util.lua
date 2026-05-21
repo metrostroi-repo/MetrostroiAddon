@@ -63,6 +63,7 @@ function Metrostroi.BuildSyncTable()
     for i,v in ipairs(ENT.SyncTable) do
         ENT.iSyncTable[v] = i
     end
+    ENT.SyncVars = math.ceil(#ENT.SyncTable / 32)
 end 
 
 -- Data storage for Metrostroi entities

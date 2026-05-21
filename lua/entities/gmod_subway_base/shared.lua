@@ -646,7 +646,9 @@ local function getBitValue(value, offset)
     return bit.band(bit.rshift(value, offset), 1)
 end
 
-function ENT:SetSyncValue(idx, value)
+function ENT:SetSyncValue(name, value)
+	local idx = self.iSyncTable[name]
+	if not idx then return end
 	local nByte = math_floor(idx / 32)+1
 	local netTbl = self._SyncData
 
@@ -658,16 +660,16 @@ function ENT:SetSyncValue(idx, value)
 	netTbl[nByte] = setBitValue(netTbl[nByte], value and 1 or 0, idx % 32)
 end
 
-function ENT:GetSyncValue(idx)
-	local idxData = self.iSyncTable[idx]
-	-- if not idxData then print(idx) return end
+function ENT:GetSyncValue(name)
+	local idx = self.iSyncTable[name]
+	-- if not idx then print(name) return end
 
 	-- don't remove code below
-	-- local nByte = math_floor(idxData / 32)+1
+	-- local nByte = math_floor(idx / 32)+1
 	-- local nw2Val = self._SyncData[nByte]
-	-- return getBitValue(nw2Val, idxData % 32) > 0
+	-- return getBitValue(nw2Val, idx % 32) > 0
 
-	return bit.band(bit.rshift(self._SyncData[math_floor(idxData / 32)+1], idxData % 32), 1) > 0
+	return bit.band(bit.rshift(self._SyncData[math_floor(idx / 32)+1], idx % 32), 1) > 0
 end
 
 

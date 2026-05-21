@@ -1426,7 +1426,7 @@ function ENT:Think()
     -- Cache SyncTable data
     local syncTbl = self._SyncData
     local syncNames = self._SyncTableNames
-    for i=1,#syncTbl do
+    for i=1,self.SyncVars do
         syncTbl[i] = self:GetNW2Int(syncNames[i])
     end
 end
