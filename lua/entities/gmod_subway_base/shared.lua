@@ -660,7 +660,7 @@ end
 
 function ENT:GetSyncValue(idx)
 	local idxData = self.iSyncTable[idx]
-	if not idxData then return self:GetNW2Bool(idx) end
+	-- if not idxData then print(idx) return end
 
 	-- don't remove code below
 	-- local nByte = math_floor(idxData / 32)+1

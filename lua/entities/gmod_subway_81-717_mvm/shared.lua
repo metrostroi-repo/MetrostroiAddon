@@ -30,7 +30,8 @@ ENT.SyncTable = {
     "VUD2","VDL","Wiper", "GV",
     "R_ASNPMenu","R_ASNPUp","R_ASNPDown","R_ASNPOn"
     , "ALSFreq","Ring","VBD",
-    "V11","V12","V13","UPPS_On","SAB1"
+    "V11","V12","V13","UPPS_On","SAB1",
+    "IGLA1", "IGLA2", "IGLA3", "IGLA4",
 }
 Metrostroi.BuildSyncTable()
 
