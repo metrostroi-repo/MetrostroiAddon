@@ -584,13 +584,26 @@ end
 
 function ENT:SetupDataTables()
 	self._NetData = {{},{}}
+	self._SyncData = { -- Preallocate 16*32 booleans
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	}
+end
+ENT._SyncTableNames = {}
+for i=1,16 do
+	ENT._SyncTableNames[i] = "_SyncData"..i
 end
 ---------------------------------------------------------------------------------------
 -- Sends and get float via NWVars
 ---------------------------------------------------------------------------------------
+local math_floor = math.floor
 function ENT:SetPackedRatio(idx,value)
-	--local idx = type(idx) == "number" and 999-idx or idx
-	if self._NetData[2][idx] ~= nil and self._NetData[2][idx] == math.floor(value*1000+0.5) then return end
+	-- local value = math.floor(value*1000+0.5)
+	-- local netTbl = self._NetData[1]
+	-- if value ~= netTbl[idx] then
+	-- 	self:SetNW2Int(idx,value)
+	-- 	netTbl[idx] = value
+	-- end
+
 	self:SetNW2Int(idx,math.floor(value*1000+0.5))
 end
 
@@ -602,12 +615,59 @@ end
 -- Sends and get bool via NWVars
 --------------------------------------------------------------------------------
 function ENT:SetPackedBool(idx,value)
-	if self._NetData[1][idx] ~= nil and self._NetData[1][idx] == value then return end
+	-- TODO: Use bit masks
+	-- local netTbl = self._NetData[2]
+	-- if value ~= netTbl[idx] then
+	-- 	self:SetNW2Bool(idx,value)
+	-- 	netTbl[idx] = value
+	-- end
+
 	self:SetNW2Bool(idx,value)
 end
 
 function ENT:GetPackedBool(idx)
 	return self:GetNW2Bool(idx)
+end
+
+--------------------------------------------------------------------------------
+-- Sends and get synced values via NWVars
+--------------------------------------------------------------------------------
+local band = bit.band
+local bnot = bit.bnot
+local lshift = bit.lshift
+local bor = bit.bor
+local function setBitValue(targetVar, value, offset)
+    targetVar = band(targetVar, bnot(lshift(1, offset)))
+    value = lshift(band(value, 1), offset)
+    return bor(targetVar, value)
+end
+
+local function getBitValue(value, offset)
+    return bit.band(bit.rshift(value, offset), 1)
+end
+
+function ENT:SetSyncValue(idx, value)
+	local nByte = math_floor(idx / 32)+1
+	local netTbl = self._SyncData
+
+	-- local nBit = idx % 32
+	-- local oldValue = netTbl[nByte]
+	-- local newValue = setBitValue(oldValue, value and 1 or 0, nBit)
+	-- print(Format("SetSyncValue(): idx=%d, value=%d, NW2VarName=%s, bit=%s, 0x%s=>0x%s",idx, value, self._SyncTableNames[nByte], nBit, bit.tohex(oldValue), bit.tohex(newValue)))
+
+	netTbl[nByte] = setBitValue(netTbl[nByte], value and 1 or 0, idx % 32)
+end
+
+function ENT:GetSyncValue(idx)
+	local idxData = self.iSyncTable[idx]
+	if not idxData then return self:GetNW2Bool(idx) end
+
+	-- don't remove code below
+	-- local nByte = math_floor(idxData / 32)+1
+	-- local nw2Val = self._SyncData[nByte]
+	-- return getBitValue(nw2Val, idxData % 32) > 0
+
+	return bit.band(bit.rshift(self._SyncData[math_floor(idxData / 32)+1], idxData % 32), 1) > 0
 end
 
 

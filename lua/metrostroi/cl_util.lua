@@ -204,7 +204,7 @@ function Metrostroi.GenerateClientProps()
                     st2 = buttons.states[2]
                 end
                 buttons.tooltipState = function(ent)
-                    return Format("\n[%s]",Metrostroi.GetPhrase(ent:GetPackedBool(var) and st2 or st1):gsub("\n","]\n["))
+                    return Format("\n[%s]",Metrostroi.GetPhrase(ent:GetSyncValue(var) and st2 or st1):gsub("\n","]\n["))
                 end
             end
             if buttons.model then
@@ -239,7 +239,7 @@ function Metrostroi.GenerateClientProps()
                         st2 = config.states[2]
                     end
                     buttons.tooltipState = function(ent)
-                        return Format("\n[%s]",Metrostroi.GetPhrase(ent:GetPackedBool(var) and st2 or st1))
+                        return Format("\n[%s]",Metrostroi.GetPhrase(ent:GetSyncValue(var) and st2 or st1))
                     end
                 end
                 if config.model then
@@ -281,7 +281,7 @@ function Metrostroi.GenerateClientProps()
                             st2 = config.states[2]
                         end
                         buttons.tooltipState = function(ent)
-                            return Format("\n[%s|%s]",Metrostroi.GetPhrase(st1),Metrostroi.GetPhrase(st2)),ent:GetPackedBool(var) and st1 or st2
+                            return Format("\n[%s|%s]",Metrostroi.GetPhrase(st1),Metrostroi.GetPhrase(st2)),ent:GetSyncValue(var) and st1 or st2
                         end
                     end]]
                     if config.var then
@@ -295,22 +295,22 @@ function Metrostroi.GenerateClientProps()
                             if config.disable then
                                 i = table.insert(self.AutoAnims, function(ent)
                                     ent:Animate(name,func(ent,vmin,vmax,var),min,max,speed,damping,stickyness)
-                                    ent:HideButton(config.disable,ent:GetPackedBool(var))
+                                    ent:HideButton(config.disable,ent:GetSyncValue(var))
                                 end)
                             elseif config.disableinv then
                                 i = table.insert(self.AutoAnims, function(ent)
                                     ent:Animate(name,func(ent,vmin,vmax,var),min,max,speed,damping,stickyness)
-                                    ent:HideButton(config.disableinv,not ent:GetPackedBool(var))
+                                    ent:HideButton(config.disableinv,not ent:GetSyncValue(var))
                                 end)
                             elseif config.disableoff and config.disableon then
                                 i = table.insert(self.AutoAnims, function(ent)
                                     ent:Animate(name,func(ent,vmin,vmax,var),min,max,speed,damping,stickyness)
-                                    ent:HideButton(config.disableoff,ent:GetPackedBool(var))
-                                    ent:HideButton(config.disableon,not ent:GetPackedBool(var))
+                                    ent:HideButton(config.disableoff,ent:GetSyncValue(var))
+                                    ent:HideButton(config.disableon,not ent:GetSyncValue(var))
                                 end)
                             elseif config.disablevar then
                                 i = table.insert(self.AutoAnims, function(ent)
-                                    ent:HideButton(name,ent:GetPackedBool(config.disablevar))
+                                    ent:HideButton(name,ent:GetSyncValue(config.disablevar))
                                     ent:Animate(name,func(ent,vmin,vmax,var),min,max,speed,damping,stickyness)
                                 end)
                             else
@@ -319,27 +319,27 @@ function Metrostroi.GenerateClientProps()
                         else
                             if config.disable then
                                 i = table.insert(self.AutoAnims, function(ent)
-                                    ent:Animate(name,ent:GetPackedBool(var) and vmax or vmin,min,max,speed,damping,stickyness)
-                                    ent:HideButton(config.disable,ent:GetPackedBool(var))
+                                    ent:Animate(name,ent:GetSyncValue(var) and vmax or vmin,min,max,speed,damping,stickyness)
+                                    ent:HideButton(config.disable,ent:GetSyncValue(var))
                                 end)
                             elseif config.disableinv then
                                 i = table.insert(self.AutoAnims, function(ent)
-                                    ent:Animate(name,ent:GetPackedBool(var) and vmax or vmin,min,max,speed,damping,stickyness)
-                                    ent:HideButton(config.disableinv,not ent:GetPackedBool(var))
+                                    ent:Animate(name,ent:GetSyncValue(var) and vmax or vmin,min,max,speed,damping,stickyness)
+                                    ent:HideButton(config.disableinv,not ent:GetSyncValue(var))
                                 end)
                             elseif config.disableoff and config.disableon then
                                 i = table.insert(self.AutoAnims, function(ent)
-                                    ent:Animate(name,ent:GetPackedBool(var) and vmax or vmin,min,max,speed,damping,stickyness)
-                                    ent:HideButton(config.disableoff,ent:GetPackedBool(var))
-                                    ent:HideButton(config.disableon,not ent:GetPackedBool(var))
+                                    ent:Animate(name,ent:GetSyncValue(var) and vmax or vmin,min,max,speed,damping,stickyness)
+                                    ent:HideButton(config.disableoff,ent:GetSyncValue(var))
+                                    ent:HideButton(config.disableon,not ent:GetSyncValue(var))
                                 end)
                             elseif config.disablevar then
                                 i = table.insert(self.AutoAnims, function(ent)
-                                    ent:HideButton(name,ent:GetPackedBool(config.disablevar))
-                                    ent:Animate(name,ent:GetPackedBool(var) and vmax or vmin,min,max,speed,damping,stickyness)
+                                    ent:HideButton(name,ent:GetSyncValue(config.disablevar))
+                                    ent:Animate(name,ent:GetSyncValue(var) and vmax or vmin,min,max,speed,damping,stickyness)
                                 end)
                             else
-                                i = table.insert(self.AutoAnims, function(ent) ent:Animate(name,ent:GetPackedBool(var) and vmax or vmin,min,max,speed,damping,stickyness) end)
+                                i = table.insert(self.AutoAnims, function(ent) ent:Animate(name,ent:GetSyncValue(var) and vmax or vmin,min,max,speed,damping,stickyness) end)
                             end
                         end
                         self.AutoAnimNames[i] = name
