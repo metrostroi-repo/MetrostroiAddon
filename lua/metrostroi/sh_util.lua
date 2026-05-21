@@ -55,6 +55,16 @@ function Metrostroi.SortInSpawner(ent,id,name)
     return retID,#spawnerLine[4]
 end
 
+-- Build sync table for entity network booleans
+function Metrostroi.BuildSyncTable()
+    if not ENT or not ENT.SyncTable then error("Metrostroi.BuildSyncTable() must be runned after ENT.SyncTable declaration") end
+
+    ENT.iSyncTable = {}
+    for i,v in ipairs(ENT.SyncTable) do
+        ENT.iSyncTable[v] = i
+    end
+end 
+
 -- Data storage for Metrostroi entities
 MSCEnt = MSCEnt or {}
 local cache = MSCEnt

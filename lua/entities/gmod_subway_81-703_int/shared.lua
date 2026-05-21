@@ -22,6 +22,7 @@ ENT.SyncTable = {
     "GV",
     "R_Program1","R_Program2","UAVA","UAVAC",
 }
+Metrostroi.BuildSyncTable()
 
 function ENT:PassengerCapacity()
     return 300

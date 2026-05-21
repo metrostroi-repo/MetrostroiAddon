@@ -32,6 +32,7 @@ ENT.SyncTable = {
     , "ALSFreq","Ring","VBD",
     "V11","V12","V13","UPPS_On","SAB1"
 }
+Metrostroi.BuildSyncTable()
 
 function ENT:PassengerCapacity()
     return 300

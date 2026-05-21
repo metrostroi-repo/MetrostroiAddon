@@ -21,6 +21,7 @@ ENT.SyncTable = {
     "R_Program1","R_Program2",
     "DriverValveBLDisconnect","DriverValveTLDisconnect",
 }
+Metrostroi.BuildSyncTable()
 
 function ENT:PassengerCapacity()
     return 300

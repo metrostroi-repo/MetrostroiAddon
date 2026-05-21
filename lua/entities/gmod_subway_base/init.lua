@@ -1997,6 +1997,14 @@ function ENT:Think()
     self.OldSpeed = (self.Speed or 0)*(self.SpeedSign or 0)
 
     for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
+
+    -- Send SyncTable data
+    local syncTbl = self._SyncData
+    local syncNames = self._SyncTableNames
+    for i=1,#syncTbl do
+        self:SetNW2Int(syncNames[i], syncTbl[i])
+    end
+
     self:NextThink(CurTime()+0.05)
     return true
 end
@@ -2004,9 +2012,8 @@ end
 function ENT:TriggerTurbostroiInput(sys,name,val)
     if name == "Value" then
         -- Autosend values to client
-        if self.SyncTable and table.HasValue(self.SyncTable,sys) then
-            self:SetPackedBool(sys,val > 0)
-        end
+        local idx = self.iSyncTable[sys]
+        if idx then self:SetSyncValue(idx, val > 0) end
     end
 end
 

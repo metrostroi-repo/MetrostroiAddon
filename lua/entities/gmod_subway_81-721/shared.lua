@@ -20,6 +20,7 @@ ENT.SyncTable = {
     "FrontBrakeLineIsolation","FrontTrainLineIsolation","Battery",
     "GV",
 }
+Metrostroi.BuildSyncTable()
 
 function ENT:PassengerCapacity()
     return 300

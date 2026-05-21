@@ -1422,6 +1422,13 @@ function ENT:Think()
         end
     end
     for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
+    
+    -- Cache SyncTable data
+    local syncTbl = self._SyncData
+    local syncNames = self._SyncTableNames
+    for i=1,#syncTbl do
+        syncTbl[i] = self:GetNW2Int(syncNames[i])
+    end
 end
 function ENT:BlockInput(block)
     if IsValid(LocalPlayer().InMetrostroiTrain) then
