@@ -2,13 +2,6 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-ENT.BogeyDistance = 650 -- Needed for gm trainspawner
-ENT.SyncTable = {
-    "SF31","SF32","SF33","SF34","SF35","SF36","SF37","SF38","SF41","SF42","SF43","SF44","SF45","SF46","SF47","SF48","SF49","SF51","SF52","SF53","SF54","SF55","SF56","SF57","SF58","SF59",
-
-    "FrontBrakeLineIsolation","FrontTrainLineIsolation",
-    "RearBrakeLineIsolation","RearTrainLineIsolation",
-}
 --------------------------------------------------------------------------------
 function ENT:Initialize()
     -- Set model and initialize

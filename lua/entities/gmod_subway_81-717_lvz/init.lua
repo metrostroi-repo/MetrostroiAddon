@@ -2,28 +2,6 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-ENT.BogeyDistance = 650 -- Needed for gm trainspawner
-
---"DURASelectMain","DURASelectAlternate","DURAToggleChannel","DURAPowerToggle",
-ENT.SyncTable = {
-    "R_UNch","R_ZS","R_G","R_UPO","KVT",
-    "VZ1","VUD1","KDL","KDLR","KDLK","KDLRK","KDP","KDPK","DoorSelect",
-    "KRZD","R_VPR","VozvratRP","AVU","KVP","ConverterProtection","RZP",--"SP","GreenRP",
-    "VPAOn","VPAOff",
-    "KSN","Ring","ARS","ALS","OtklAVU","TormAT","L_1","L_2","L_3","OhrSig",
-    "VMK","BPSNon","RezMK","ARS13","Radio13","L_4","VUS","VAH","VAD","KRP","OVT",
-    "EmergencyBrakeValve",
-    "AIS","AV3","AV1","A53","A55","A56","A54","A17","A44","A39","A70","A14","A74","A26","AR63","AS1","A13","A21","A31","A32","A16","A12","A24","A49","A27","A72","A50","AV3","AV6","A29","A46","A47","A71","A7","A9","A84","A8","A52","A19","A48","A10","A22","A30","A1","A2","A3","A4","A5","A6","A18","A73","A20","A25","A11","A37","A45","A38","A51","A65","A42","A43","A41","A40","A75","A76","A60","A57","A28",
-    "A58","A59","A61","A15","A66",
-    "RC1","VB","VRD","PB", "UAVA","UAVAC",
-    "DriverValveBLDisconnect","DriverValveTLDisconnect","DriverValveDisconnect","ParkingBrake","EPK",
-    "VUD2","VDL","VOPD","Wiper", "GV", "RC2","VAU",
-    "KH","VAV","KSZD","VZP","VSOSD",
-    "PAM7","PAM8","PAM9","PAMLeft","PAMRight","PAM4","PAM5","PAM6","PAMUp","PAM1","PAM2","PAM3","PAMDown","PAM0","PAMEnter","PAMEsc","PAMF","PAMM","PAMP",
-}
-ENT.SyncFunctions = {
-    ""
-}
 function ENT:Initialize()
     self.Plombs = {
         VAH = true,

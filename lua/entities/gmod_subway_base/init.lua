@@ -1725,18 +1725,6 @@ function ENT:Think()
         if not Metrostroi.MapHasFullSupport("ars") and self.NonSupportTrigger then self:NonSupportTrigger() end
     end
 
-    -- Calculate turn information, unused right now
-    --[[if self.FrontBogey and self.RearBogey then
-        self.BogeyDistance = self.BogeyDistance or self.FrontBogey:GetPos():Distance(self.RearBogey:GetPos())
-        local a = math.AngleDifference(self.FrontBogey:GetAngles().y,self.RearBogey:GetAngles().y+180)
-        self.TurnRadius = (self.BogeyDistance/2)/math.sin(math.rad(a/2))
-
-        -- If we're pretty much going straight, correct massive values
-        if math.abs(self.TurnRadius) > 1e4 then
-            self.TurnRadius = 0
-        end
-    end]]--
-
     -- Process the keymap for modifiers
     -- TODO: Need a neat way of calling this once after self.KeyMap is populated
     if not self.KeyMods and self.KeyMap then

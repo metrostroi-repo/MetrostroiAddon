@@ -12,6 +12,7 @@ ENT.AdminSpawnable  = false
 
 ENT.CustomThinks = ENT.CustomThinks or {}
 ENT.CustomSpawnerUpdates = ENT.CustomSpawnerUpdates or {}
+ENT.SyncTable = ENT.SyncTable or {}
 
 local function destroySound(snd,nogc)
 	if IsValid(snd) then snd:Stop() end

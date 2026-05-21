@@ -12,6 +12,20 @@ ENT.Model = "models/metrostroi_train/81-718/81-718.mdl"
 ENT.Spawnable       = true
 ENT.AdminSpawnable  = false
 ENT.DontAccelerateSimulation = false
+
+ENT.SyncTable = {
+    "SA5","SB3","SA7","SB1","SB2","SA8","SB4","SB5","SA9","SA13","SA14","SA15","SA2","SB6","SB7","SB8","SB10","SB9","SB11","SA16","SB12","SB13","SB14","SB15","SB16",
+    "SB6K","SB7K",
+    "SA1/1","SA2/1","SA4/1","SA5/1",
+    "SBR14","SBR15","SBR16",
+    "SA6","SA24","SB20","SB21",
+    "SF56","SF51","SF52","SF53","SF60","SF61","SF77","SF78","SF40","SF41","SF8","SF11","SF10","SF7","SF50","SF76","SF73","SF3","SF71","SF63","SF54","SF65","SF55","SF9","SF6","SF5","SF2",
+    "SF4","SF27","SF46","SF12","SF13","SF45","SF16","SF44","SF43","SF14","SF15","SF25","SF72","SF29","SF26","SF42","SF18","SF20","SF17","SF19","SF21","SF22","SF34","SF35","SF23","SF24",
+    "RC","VB","VTPR",
+    "DriverValveDisconnect","EPK","ParkingBrake","UAVA","UAVAC","PB","EmergencyBrakeValve","GV",
+    "SAP8","SAP13","SAP36","SAP12","SAP11","SAP23","SAP9","SAP10","SAP3","SAP39","SBP22","SBP6","SBP4","SAP14","SAP26","SAP24","SAB1",
+}
+
 function ENT:PassengerCapacity()
     return 300
 end

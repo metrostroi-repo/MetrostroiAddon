@@ -13,6 +13,33 @@ ENT.Spawnable       = true
 ENT.AdminSpawnable  = true
 ENT.DontAccelerateSimulation = false
 
+ENT.SyncTable = {
+    "EnableBVEmer","Ticker","KAH","KAHk","ALS","ALSk","FDepot","PassScheme","EnableBV","DisableBV","Ring","R_Program2","R_Announcer","R_Line","R_Emer","R_Program1",
+    "DoorSelectL","DoorSelectR","DoorBlock",
+    "EmerBrakeAdd","EmerBrakeRelease","EmerBrake","DoorClose","AttentionMessage","Attention","AttentionBrake","EmergencyBrake",
+    "SF1","SF2","SF3","SF4","SF5","SF6","SF7","SF8","SF9","SF10","SF11","SF12",
+    "SF13","SF14","SF15","SF16","SF17","SF18","SF19","SF20","SF21","SF22",
+
+    "SFV1","SFV2","SFV3","SFV4","SFV5","SFV6","SFV7","SFV8","SFV9","SFV10","SFV11",
+    "SFV12","SFV13","SFV14","SFV15","SFV16","SFV17","SFV18","SFV19","SFV20","SFV21","SFV22",
+    "SFV23","SFV24","SFV25","SFV26","SFV27","SFV28","SFV29","SFV30","SFV31","SFV32","SFV33",
+
+    "Stand","EmergencyCompressor","EmergencyControls","Wiper","DoorLeft","AccelRate","HornB","DoorRight",
+
+    "Pant1","Pant2","Vent1","Vent2","Vent","PassLight","CabLight","Headlights1","Headlights2",
+    "ParkingBrake","TorecDoors","BBER","BBE","Compressor","CabLightStrength","AppLights1","AppLights2",
+    "Battery", "ALSFreq",
+    "VityazF1", "VityazF2", "VityazF3", "VityazF4", "Vityaz1",  "Vityaz4",  "Vityaz7",  "Vityaz2",  "Vityaz5",  "Vityaz8",  "Vityaz0",  "Vityaz3",  "Vityaz6",  "Vityaz9",  "VityazF5", "VityazF6", "VityazF7", "VityazF8", "VityazF9",
+    "K29", "UAVA",
+    "EmerX1","EmerX2","EmerCloseDoors","EmergencyDoors",
+    "R_ASNPMenu","R_ASNPUp","R_ASNPDown","R_ASNPOn",
+    "VentHeatMode",
+
+    "RearBrakeLineIsolation","RearTrainLineIsolation",
+    "FrontBrakeLineIsolation","FrontTrainLineIsolation",
+    "PB",   "GV",
+}
+
 function ENT:PassengerCapacity()
     return 300
 end

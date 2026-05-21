@@ -2,21 +2,6 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-ENT.BogeyDistance = 650 -- Needed for gm trainspawner
-
---"DURASelectMain","DURASelectAlternate","DURAToggleChannel","DURAPowerToggle",
-ENT.SyncTable = {
-    "KU12","KU11","KU9","KU8","V2","V1","V4","V5","KU15","KU7","V10",
-    "VU","AV","VB",
-    "VU3","VU2","VU1","VU14",
-    "V6", "V3",
-    "DriverValveBLDisconnect","DriverValveTLDisconnect",
-    "RearBrakeLineIsolation","RearTrainLineIsolation",
-    "FrontBrakeLineIsolation","FrontTrainLineIsolation",
-    "EmergencyBrakeValve",
-    "GV",
-}
-
 function ENT:Initialize()
     self.Plombs = {
         VU = true,

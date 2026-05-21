@@ -13,6 +13,17 @@ ENT.Spawnable       = true
 ENT.AdminSpawnable  = false
 ENT.DontAccelerateSimulation = false
 
+ENT.SyncTable = {
+    "A53","A56","A54","A24","A39","A23","A14","A13","A31","A32",
+    "A16","A12","A49","A15","A27","A50","A8","A52","A19","A10",
+    "A22","A30","A1","A2","A3","A4","A5","A6","A72","A38","A20",
+    "A25","A37","A55","A45","A66","A51","A65","A28","A70","AV2",
+    "AV3","AV4","AV5","A81","AV6","A80","A18",
+    "VB","GV",
+    "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake",
+    "A84","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP","EmergencyBrakeValve"
+}
+
 function ENT:PassengerCapacity()
     return 300
 end
