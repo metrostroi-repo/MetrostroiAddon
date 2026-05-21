@@ -21,7 +21,18 @@ ENT.SyncTable = {
     "AV3","AV4","AV5","A81","AV6","A80","A18",
     "VB","GV",
     "DriverValveBLDisconnect","DriverValveTLDisconnect","ParkingBrake",
-    "A84","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP","EmergencyBrakeValve"
+    "A84","A84Pl","BPSNon","ConverterProtection","L_1","OtklBV","Start","VozvratRP","EmergencyBrakeValve",
+
+    "lightsActive1","lightsActive2","lightsActive3","lightsActive4","lightsActive5","lightsActive6","lightsActive7","lightsActive8","lightsActive9","lightsActive10",
+    "lightsActive11","lightsActive12","lightsActive13","lightsActive14","lightsActive15","lightsActive16","lightsActive17","lightsActive18","lightsActive19","lightsActive20",
+    "lightsActive21","lightsActive22","lightsActive23","lightsActive24","lightsActive25","lightsActive26","lightsActive27",
+    "DoorsW","GRP","BrW",
+    "M1_3","M4_7",
+    "Compressor","RK","BPSN","RZP",
+    "FrontDoor","RearDoor","CouchCap",
+    "AnnBuzz","AnnPlay",
+
+    "Crane013","DoorR","DoorL",
 }
 Metrostroi.BuildSyncTable()
 

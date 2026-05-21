@@ -275,7 +275,7 @@ function ENT:TrainSpawnerUpdate()
     self.Announcer.AnnouncerType = self:GetNW2Int("Announcer",1)
 
     self.WorkingLights = 6
-    self:SetPackedBool("Crane013",self.Pneumatic.ValveType == 2)
+    self:SetSyncValue("Crane013",self.Pneumatic.ValveType == 2)
     self:UpdateTextures()
     self:UpdateLampsColors()
 
@@ -309,18 +309,18 @@ function ENT:Think()
             self.Lamps[i] = nil
         end
         if (self.Lamps[i] and CurTime() - self.Lamps[i] > 0) then
-            self:SetPackedBool("lightsActive"..i,true)
+            self:SetSyncValue("lightsActive"..i,true)
         else
-            self:SetPackedBool("lightsActive"..i,false)
+            self:SetSyncValue("lightsActive"..i,false)
         end
     end
 
-    self:SetPackedBool("DoorsW",Panel.DoorsW > 0)
-    self:SetPackedBool("GRP",Panel.GreenRP > 0)
-    self:SetPackedBool("BrW",Panel.BrW > 0)
+    self:SetSyncValue("DoorsW",Panel.DoorsW > 0)
+    self:SetSyncValue("GRP",Panel.GreenRP > 0)
+    self:SetSyncValue("BrW",Panel.BrW > 0)
 
-    self:SetPackedBool("M1_3",Panel.M1_3 > 0)
-    self:SetPackedBool("M4_7",Panel.M4_7 > 0)
+    self:SetSyncValue("M1_3",Panel.M1_3 > 0)
+    self:SetSyncValue("M4_7",Panel.M4_7 > 0)
 
     -- Signal if doors are open or no to platform simulation
     self.LeftDoorsOpen =
@@ -386,20 +386,20 @@ function ENT:Think()
     self:SetPackedRatio("BatteryCurrent",Panel["V1"]*math.Clamp((self.Battery.Voltage-75)*0.01,-0.01,1))
     self:SetPackedRatio("EnginesCurrent", 0.5 + 0.5*(self.Electric.I24/500.0))
 
-    self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)
-    self:SetPackedBool("RK",self.RheostatController.Velocity ~= 0.0)
-    self:SetPackedBool("BPSN",self.PowerSupply.X2_2 > 0)
+    self:SetSyncValue("Compressor",Pneumatic.Compressor > 0)
+    self:SetSyncValue("RK",self.RheostatController.Velocity ~= 0.0)
+    self:SetSyncValue("BPSN",self.PowerSupply.X2_2 > 0)
     self:SetPackedRatio("RV",self.RV.Value/2)
     self:SetPackedRatio("CranePosition", Pneumatic.RealDriverValvePosition)
-    self:SetPackedBool("RZP",Panel.RZP > 0)
+    self:SetSyncValue("RZP",Panel.RZP > 0)
 
 
-    self:SetPackedBool("FrontDoor",self.FrontDoor)
-    self:SetPackedBool("RearDoor",self.RearDoor)
-    self:SetPackedBool("CouchCap",self.CouchCap)
+    self:SetSyncValue("FrontDoor",self.FrontDoor)
+    self:SetSyncValue("RearDoor",self.RearDoor)
+    self:SetSyncValue("CouchCap",self.CouchCap)
 
-    self:SetPackedBool("AnnBuzz",Panel.AnnouncerBuzz > 0)
-    self:SetPackedBool("AnnPlay",Panel.AnnouncerPlaying > 0)
+    self:SetSyncValue("AnnBuzz",Panel.AnnouncerBuzz > 0)
+    self:SetSyncValue("AnnPlay",Panel.AnnouncerPlaying > 0)
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
     if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then

@@ -383,14 +383,14 @@ function Metrostroi.GenerateClientProps()
                         local var = pconfig.var
                         if pconfig.model then
                             local i = table.insert(self.AutoAnims, function(ent)
-                                ent:SetCSBodygroup(pname,1,ent:GetPackedBool(var) and 0 or 1)
+                                ent:SetCSBodygroup(pname,1,ent:GetSyncValue(var) and 0 or 1)
                             end)
                             self.AutoAnimNames[i] = pname
                         end
                         local id,tooltip = buttons.ID,buttons.tooltip
                         local pid,ptooltip = pconfig.ID,pconfig.tooltip
                         buttons.plombed = function(ent)
-                            if ent:GetPackedBool(var) then
+                            if ent:GetSyncValue(var) then
                                 return Format("%s\n%s",buttons.tooltip,Metrostroi.GetPhrase("Train.Buttons.Sealed") or "Plombed"),pid,Color(255,150,150),true
                             else
                                 return buttons.tooltip,id,false
@@ -457,7 +457,7 @@ function Metrostroi.GenerateClientProps()
                         else
                             local i = table.insert(self.AutoAnims, function(ent)
                                 --print(lname,ent.SmoothHide[lname])
-                                local val = ent:Animate(animvar,ent:GetPackedBool(var) and max or min,0,1,speed,false)
+                                local val = ent:Animate(animvar,ent:GetSyncValue(var) and max or min,0,1,speed,false)
                                 ent:ShowHideSmooth(lname,val)
                                 if light then ent:SetLightPower(lname,val>0,val) end
                             end)
@@ -497,7 +497,7 @@ function Metrostroi.GenerateClientProps()
                             else
                                 table.insert(self.AutoAnims, function(ent)
                                     --print(lname,ent.SmoothHide[lname])
-                                    local val = ent:Animate(animvar,ent:GetPackedBool(var) and max or min,0,1,speed,false)
+                                    local val = ent:Animate(animvar,ent:GetSyncValue(var) and max or min,0,1,speed,false)
                                     ent:ShowHideSmooth(lname,val)
                                 end)
                             end
@@ -530,7 +530,7 @@ function Metrostroi.GenerateClientProps()
                         local var,animvar = sconfig.var,name.."_sanim"
                         local speed = sconfig.speed or 10
                         i = table.insert(self.AutoAnims, function(ent)
-                            local val = ent:Animate(animvar,ent:GetPackedBool(var) and 1 or 0,0,1,speed,false)
+                            local val = ent:Animate(animvar,ent:GetSyncValue(var) and 1 or 0,0,1,speed,false)
                             ent:SetLightPower(name,val>0,val)
                         end)
                     elseif sconfig.lamp then

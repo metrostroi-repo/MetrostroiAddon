@@ -1941,9 +1941,9 @@ function ENT:Think()
                 self[k]:TriggerInput("Block",true)
             end
             if type(v) == "table" then
-                self:SetPackedBool(k.."Pl",v[1])
+                self:SetSyncValue(k.."Pl",v[1])
             else
-                self:SetPackedBool(k.."Pl",v)
+                self:SetSyncValue(k.."Pl",v)
             end
         end
         self.Plombs.Init = nil
@@ -2012,7 +2012,7 @@ end
 function ENT:TriggerTurbostroiInput(sys,name,val)
     if name == "Value" then
         -- Autosend values to client
-        self:SetSyncValue(sys, val > 0)
+        self:SetSyncValue(sys, val > 0, true)
     end
 end
 
@@ -2352,7 +2352,7 @@ function ENT:BrokePlomb(but,ply,nosnd)
     end
     self[but]:TriggerInput("Block",false)
     self.Plombs[but] = false
-    self:SetPackedBool(but.."Pl",false)
+    self:SetSyncValue(but.."Pl",false)
 end
 
 

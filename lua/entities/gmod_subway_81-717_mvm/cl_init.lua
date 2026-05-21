@@ -400,7 +400,7 @@ ENT.ButtonMap["Block5_6"] = {
         }},
         {ID = "!R_ProgramToggle",x=155,y=40,radius=0,model = {
             model = "models/metrostroi_train/81-502/buttons/tumbler_b_a.mdl",ang = 90,z=-3,
-            getfunc = function(ent) return ent:GetPackedBool("R_Program1") and 0 or (ent:GetPackedBool("R_Program2") and 1 or 0.5) end,
+            getfunc = function(ent) return ent:GetSyncValue("R_Program1") and 0 or (ent:GetSyncValue("R_Program2") and 1 or 0.5) end,
             var="R_Program",speed=16
         }},
         {ID = "R_Program1Set",x=155-20,y=40-10,w=20,h=20,tooltip="",model = {
@@ -563,7 +563,7 @@ ENT.ButtonMap["Block5_6"] = {
             model = "models/metrostroi_train/81/krishka.mdl",ang = 0,z = -1,
             var="OtklBVK",speed=8,min=0.378,max=0.685,disable="OtklBVSet",
             plomb = {model = "models/metrostroi_train/81/plomb.mdl",ang=135,x=-17,y=-45,z=-0,var="OtklBVPl",ID="OtklBVPl",},
-            getfunc = function(ent) return ent:GetPackedBool("OtklBVK") and 1 or ent.Anims.ARSRToggle and math.max(0,(ent.Anims.ARSRToggle.val-0.5)*2 or 0)^0.2*0.08 or 0 end,
+            getfunc = function(ent) return ent:GetSyncValue("OtklBVK") and 1 or ent.Anims.ARSRToggle and math.max(0,(ent.Anims.ARSRToggle.val-0.5)*2 or 0)^0.2*0.08 or 0 end,
             sndvol = 1,snd = function(val) return val and "kr_close" or "kr_open" end,
             sndmin = 90,sndmax = 1e3,sndang = Angle(-90,0,0),
             noTooltip = true,
@@ -589,7 +589,7 @@ ENT.ButtonMap["Block5_6"] = {
                 lcolor=Color(255,130,40),lz = 8,lfov=145,lfar=16,lnear=8,lshadows=0},
             sprite = {bright=0.2,size=.5,scale=0.1,z=6,color=Color(255,130,40)},
             sndvol = 0.07,snd = function(val) return val and "button3_on" or "button3_off" end,sndmin = 60,sndmax = 1e3/3,sndang = Angle(-90,0,0),
-            tooltipFunc = function(ent) return ent:GetPackedBool("RZP") and Metrostroi.GetPhrase("Train.Buttons.RZP") end
+            tooltipFunc = function(ent) return ent:GetSyncValue("RZP") and Metrostroi.GetPhrase("Train.Buttons.RZP") end
         }},
         {ID = "KSNSet",x=377,y=133,radius=20,tooltip="",model = {
             model = "models/metrostroi_train/81-710/ezh3_button_black.mdl",z = -3,
@@ -882,7 +882,7 @@ ENT.ButtonMap["Block2_2"] = {
             name="SSpeed2",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
             tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
-                if not ent:GetPackedBool("LUDS") then return 0 end
+                if not ent:GetSyncValue("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*10)%10]
             end},
         }},
@@ -890,7 +890,7 @@ ENT.ButtonMap["Block2_2"] = {
             name="SSpeed1",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
             tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
-                if not ent:GetPackedBool("LUDS") then return 0 end
+                if not ent:GetSyncValue("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*100)%10]
             end},
         }},
@@ -1001,30 +1001,30 @@ ENT.ButtonMap["Block2_3"] = {
         }},
         {ID = "!LOch",x=42.5,y=16+17.9*1,w = 35,h = 15,tooltip="",model = {
             lamps = {
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l0.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR0") and not ent:GetPackedBool("AR04")) and 1 or 0 end,var="AR04"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l04.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR04") and not ent:GetPackedBool("AR0")) and 1 or 0 end,var="AR0"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l0_l04.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR0") and ent:GetPackedBool("AR04")) and 1 or 0 end,var="AR04"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l0.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR0") and not ent:GetSyncValue("AR04")) and 1 or 0 end,var="AR04"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l04.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR04") and not ent:GetSyncValue("AR0")) and 1 or 0 end,var="AR0"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l0_l04.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR0") and ent:GetSyncValue("AR04")) and 1 or 0 end,var="AR04"},
             }
         }},
         {ID = "!LN",x=42.5,y=16+17.9*2,w = 35,h = 15,tooltip="",model = {
             lamps = {
-                {model = "models/metrostroi_train/81-717/lamps/oldars_ln.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("LN") and not ent:GetPackedBool("AR40")) and 1 or 0 end,var="AR40"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l40.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR40") and not ent:GetPackedBool("LN")) and 1 or 0 end,var="LN"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_ln_l40.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("LN") and ent:GetPackedBool("AR40")) and 1 or 0 end,var="AR40"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_ln.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("LN") and not ent:GetSyncValue("AR40")) and 1 or 0 end,var="AR40"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l40.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR40") and not ent:GetSyncValue("LN")) and 1 or 0 end,var="LN"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_ln_l40.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("LN") and ent:GetSyncValue("AR40")) and 1 or 0 end,var="AR40"},
             }
         }},
         {ID = "!60",x=42.5,y=16+17.9*3,w = 35,h = 15,tooltip="",model = {
             lamps = {
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l60.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR60") and not ent:GetPackedBool("AR80")) and 1 or 0 end,var="AR80"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l80.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR80") and not ent:GetPackedBool("AR60")) and 1 or 0 end,var="AR60"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l60_l80.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR60") and ent:GetPackedBool("AR80")) and 1 or 0 end,var="AR80"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l60.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR60") and not ent:GetSyncValue("AR80")) and 1 or 0 end,var="AR80"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l80.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR80") and not ent:GetSyncValue("AR60")) and 1 or 0 end,var="AR60"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l60_l80.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR60") and ent:GetSyncValue("AR80")) and 1 or 0 end,var="AR80"},
             }
         }},
         {ID = "!70",x=42.5,y=16+17.9*4,w = 35,h = 15,tooltip="",model = {
             lamps = {
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l70.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR70") and not ent:GetPackedBool("HRK")) and 1 or 0 end,var="HRK"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_lrk.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("HRK") and not ent:GetPackedBool("AR70")) and 1 or 0 end,var="AR70"},
-                {model = "models/metrostroi_train/81-717/lamps/oldars_l70_lrk.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetPackedBool("AR70") and ent:GetPackedBool("HRK")) and 1 or 0 end,var="HRK"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l70.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR70") and not ent:GetSyncValue("HRK")) and 1 or 0 end,var="HRK"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_lrk.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("HRK") and not ent:GetSyncValue("AR70")) and 1 or 0 end,var="AR70"},
+                {model = "models/metrostroi_train/81-717/lamps/oldars_l70_lrk.mdl",z=6,ang=90,speed=6,getfunc=function(ent) return (ent:GetSyncValue("AR70") and ent:GetSyncValue("HRK")) and 1 or 0 end,var="HRK"},
             }
         }},
 
@@ -1093,7 +1093,7 @@ ENT.ButtonMap["Block2_1"] = {
             name="RSpeed2",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
             tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
-                if not ent:GetPackedBool("LUDS") then return 0 end
+                if not ent:GetSyncValue("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*10)%10]
             end},
         }},
@@ -1101,7 +1101,7 @@ ENT.ButtonMap["Block2_1"] = {
             name="RSpeed1",model = "models/metrostroi_train/81-717/segments/segment_mvm.mdl",color=Color(175,250,20),skin=0,z=-2,ang=Angle(0,0,-90),
             tooltipFunc = function(ent) return Format(Metrostroi.GetPhrase("Train.Buttons.Speed"),math.floor(ent:GetPackedRatio("Speed")*100)) end,
             sprite = {bright=0.1,size=.5,scale=0.02,vscale=0.025,z=1,color=Color(225,250,20),getfunc= function(ent)
-                if not ent:GetPackedBool("LUDS") then return 0 end
+                if not ent:GetSyncValue("LUDS") then return 0 end
                 return strength[math.floor(ent:GetPackedRatio("Speed")*100)%10]
             end},
         }},
@@ -2714,33 +2714,33 @@ function ENT:Think()
         self.PassSchemesDone = true
     end
 
-    self:SetLightPower(40,self:GetPackedBool("PanelLights"))
-    self:SetLightPower(41,self:GetPackedBool("PanelLights"))
-    self:SetLightPower(42,self:GetPackedBool("PanelLights"))
+    self:SetLightPower(40,self:GetSyncValue("PanelLights"))
+    self:SetLightPower(41,self:GetSyncValue("PanelLights"))
+    self:SetLightPower(42,self:GetSyncValue("PanelLights"))
 
-    self:SetLightPower(44,self:GetPackedBool("PanelLights"))
-    self:SetLightPower(45,self:GetPackedBool("PanelLights"))
+    self:SetLightPower(44,self:GetSyncValue("PanelLights"))
+    self:SetLightPower(45,self:GetSyncValue("PanelLights"))
 
     local mask = self:GetNW2Int("MaskType",1)--self:GetNW2Bool("Mask")
-    local HL1 = self:Animate("Headlights1",self:GetPackedBool("Headlights1") and 1 or 0,0,1,6,false)
-    local HL2 = self:Animate("Headlights2",self:GetPackedBool("Headlights2") and 1 or 0,0,1,6,false)
-    local RL = self:Animate("RedLights_a",self:GetPackedBool("RedLights") and 1 or 0,0,1,6,false)
+    local HL1 = self:Animate("Headlights1",self:GetSyncValue("Headlights1") and 1 or 0,0,1,6,false)
+    local HL2 = self:Animate("Headlights2",self:GetSyncValue("Headlights2") and 1 or 0,0,1,6,false)
+    local RL = self:Animate("RedLights_a",self:GetSyncValue("RedLights") and 1 or 0,0,1,6,false)
     self:ShowHideSmooth("RedLights",RL)
     self:SetLightPower(8,RL > 0,RL)
     self:SetLightPower(9,RL > 0,RL)
 
     local headlight = HL1*0.6+HL2*0.4
     self:SetLightPower(1,headlight>0,headlight)
-    self:SetLightPower(2,self:GetPackedBool("RedLights"),RL)
+    self:SetLightPower(2,self:GetSyncValue("RedLights"),RL)
 
     self:SetLightPower(30,headlight > 0,headlight)
     self:SetLightPower(31,headlight > 0,headlight)
     self:SetLightPower(32,headlight > 0 and mask > 4,headlight)
 
     local newBortlamps = self:GetNW2Bool("NewBortlamps")
-    local Bortlamp_w = self:Animate("Bortlamp_w",self:GetPackedBool("DoorsW") and 1 or 0,0,1,16,false)
-    local Bortlamp_g = self:Animate("Bortlamp_g",self:GetPackedBool("GRP") and 1 or 0,0,1,16,false)
-    local Bortlamp_y = self:Animate("Bortlamp_y",self:GetPackedBool("BrW") and 1 or 0,0,1,16,false)
+    local Bortlamp_w = self:Animate("Bortlamp_w",self:GetSyncValue("DoorsW") and 1 or 0,0,1,16,false)
+    local Bortlamp_g = self:Animate("Bortlamp_g",self:GetSyncValue("GRP") and 1 or 0,0,1,16,false)
+    local Bortlamp_y = self:Animate("Bortlamp_y",self:GetSyncValue("BrW") and 1 or 0,0,1,16,false)
     if newBortlamps then
         self:ShowHide("bortlamps1",true)
         self:ShowHide("bortlamps2",true)
@@ -2796,19 +2796,19 @@ function ENT:Think()
     self:ShowHide("reverser",self:GetNW2Int("WrenchMode",0)==1)
     self:ShowHide("krureverser",self:GetNW2Int("WrenchMode",0)==2)
 
-    self:ShowHide("brake013",self:GetPackedBool("Crane013"))
-    self:ShowHide("brake_valve_013",self:GetPackedBool("Crane013"))
-    self:ShowHide("valve_disconnect",self:GetPackedBool("Crane013"))
-    self:ShowHide("EPV_disconnect",self:GetPackedBool("Crane013"))
-    self:HidePanel("DriverValveDisconnect",not self:GetPackedBool("Crane013"))
+    self:ShowHide("brake013",self:GetSyncValue("Crane013"))
+    self:ShowHide("brake_valve_013",self:GetSyncValue("Crane013"))
+    self:ShowHide("valve_disconnect",self:GetSyncValue("Crane013"))
+    self:ShowHide("EPV_disconnect",self:GetSyncValue("Crane013"))
+    self:HidePanel("DriverValveDisconnect",not self:GetSyncValue("Crane013"))
 
-    self:ShowHide("brake334",not self:GetPackedBool("Crane013"))
-    self:ShowHide("brake_valve_334",not self:GetPackedBool("Crane013"))
-    self:ShowHide("brake_disconnect",not self:GetPackedBool("Crane013"))
-    self:ShowHide("EPK_disconnect",not self:GetPackedBool("Crane013"))
-    self:ShowHide("train_disconnect",not self:GetPackedBool("Crane013"))
-    self:HidePanel("DriverValveBLDisconnect",self:GetPackedBool("Crane013"))
-    self:HidePanel("DriverValveTLDisconnect",self:GetPackedBool("Crane013"))
+    self:ShowHide("brake334",not self:GetSyncValue("Crane013"))
+    self:ShowHide("brake_valve_334",not self:GetSyncValue("Crane013"))
+    self:ShowHide("brake_disconnect",not self:GetSyncValue("Crane013"))
+    self:ShowHide("EPK_disconnect",not self:GetSyncValue("Crane013"))
+    self:ShowHide("train_disconnect",not self:GetSyncValue("Crane013"))
+    self:HidePanel("DriverValveBLDisconnect",self:GetSyncValue("Crane013"))
+    self:HidePanel("DriverValveTLDisconnect",self:GetSyncValue("Crane013"))
 
     self:Animate("brake334",self:GetPackedRatio("CranePosition")/5,0.35,0.65,256,24)
     self:Animate("brake013",        Cpos[self:GetPackedRatio("CranePosition")] or 0, 0.03, 0.458,  256,24)
@@ -2829,13 +2829,13 @@ function ENT:Think()
     self:HidePanel("Block2_2",ARSType~=1)
     self:HidePanel("Block2_1",ARSType~=2 and ARSType~=3)
     self:HidePanel("Block2_3",ARSType~=4 and ARSType~=5)
-    self:ShowHide("SSpeed1",self:GetPackedBool("LUDS"))
-    self:ShowHide("SSpeed2",self:GetPackedBool("LUDS"))
-    self:ShowHide("RSpeed1",self:GetPackedBool("LUDS"))
-    self:ShowHide("RSpeed2",self:GetPackedBool("LUDS"))
-    self:SetLightPower(43,(ARSType==4 or ARSType==5) and self:GetPackedBool("PanelLights"))
+    self:ShowHide("SSpeed1",self:GetSyncValue("LUDS"))
+    self:ShowHide("SSpeed2",self:GetSyncValue("LUDS"))
+    self:ShowHide("RSpeed1",self:GetSyncValue("LUDS"))
+    self:ShowHide("RSpeed2",self:GetSyncValue("LUDS"))
+    self:SetLightPower(43,(ARSType==4 or ARSType==5) and self:GetSyncValue("PanelLights"))
     local speed = self:GetPackedRatio("Speed")*100.0
-    if self:GetPackedBool("LUDS") then
+    if self:GetSyncValue("LUDS") then
         if ARSType == 1 and IsValid(self.ClientEnts["SSpeed1"])then self.ClientEnts["SSpeed1"]:SetSkin(math.floor(speed)%10) end
         if ARSType == 1 and IsValid(self.ClientEnts["SSpeed2"])then self.ClientEnts["SSpeed2"]:SetSkin(math.floor(speed/10)%10) end
         if (ARSType == 2 or ARSType == 3) and IsValid(self.ClientEnts["RSpeed1"])then self.ClientEnts["RSpeed1"]:SetSkin(math.floor(speed)%10) end
@@ -2869,8 +2869,8 @@ function ENT:Think()
     self:ShowHide("handrails_new",dot5)
     self.LastStation.EntityName = dot5 and "destination1" or "destination"
 
-    local lamps_cab2 = self:Animate("lamps_cab2",self:GetPackedBool("EqLights") and 1 or 0,0,1,5,false)
-    local lamps_cab1 = self:Animate("lamps_cab1",self:GetPackedBool("CabLights") and 1 or 0,0,1,5,false)
+    local lamps_cab2 = self:Animate("lamps_cab2",self:GetSyncValue("EqLights") and 1 or 0,0,1,5,false)
+    local lamps_cab1 = self:Animate("lamps_cab1",self:GetSyncValue("CabLights") and 1 or 0,0,1,5,false)
     self:ShowHideSmooth("Lamps_cab2",dot5 and 0 or lamps_cab2)
     self:ShowHideSmooth("Lamps_cab1",dot5 and 0 or lamps_cab1)
     self:ShowHideSmooth("Lamps2_cab2",dot5 and lamps_cab2 or 0)
@@ -2882,7 +2882,7 @@ function ENT:Think()
     local cabStrength = (lamps_cab1*0.3+lamps_cab2*0.7)^1.5
     self:SetLightPower(10,cabStrength > 0, cabStrength)
 
-    local lamps_rtm = self:Animate("lamps_rtm",self:GetPackedBool("VPR") and 1 or 0,0,1,8,false)
+    local lamps_rtm = self:Animate("lamps_rtm",self:GetSyncValue("VPR") and 1 or 0,0,1,8,false)
     self:SetSoundState("vpr",lamps_rtm>0 and 1 or 0,1)
 
     self:ShowHideSmooth("Lamp_RTM1",not dot5 and lamps_rtm or 0)
@@ -2935,15 +2935,15 @@ function ENT:Think()
     self:ShowHide("seats_old_cap",seats==1)
     self:ShowHide("seats_new",seats==2)
     self:ShowHide("seats_new_cap",seats==2)
-    self:Animate("PB",self:GetPackedBool("PB") and 1 or 0,0,0.2,  12,false)
-    self:Animate("UAVALever",   self:GetPackedBool("UAVA") and 1 or 0,     0,0.6, 128,  3,false)
-    self:Animate("parking_brake",   self:GetPackedBool("ParkingBrake") and 1 or 0,0.25,0,  4,false)
-    self:Animate("EPK_disconnect",   self:GetPackedBool("EPK") and 1 or 0,0.25,0,  4,false)
-    self:Animate("EPV_disconnect",   self:GetPackedBool("EPK") and 1 or 0,0.25,0,  4,false)
-    self:Animate("brake_disconnect",self:GetPackedBool("DriverValveBLDisconnect") and 1 or 0,0.25,0,  4,false)
-    self:Animate("train_disconnect",self:GetPackedBool("DriverValveTLDisconnect") and 1 or 0,0.25,0,  4,false)
-    self:Animate("valve_disconnect",self:GetPackedBool("DriverValveDisconnect") and 1 or 0,0.25,0,  4,false)
-    self:Animate("stopkran",   self:GetPackedBool("EmergencyBrakeValve") and 0 or 1,     0.25,0, 128,  3,false)
+    self:Animate("PB",self:GetSyncValue("PB") and 1 or 0,0,0.2,  12,false)
+    self:Animate("UAVALever",   self:GetSyncValue("UAVA") and 1 or 0,     0,0.6, 128,  3,false)
+    self:Animate("parking_brake",   self:GetSyncValue("ParkingBrake") and 1 or 0,0.25,0,  4,false)
+    self:Animate("EPK_disconnect",   self:GetSyncValue("EPK") and 1 or 0,0.25,0,  4,false)
+    self:Animate("EPV_disconnect",   self:GetSyncValue("EPK") and 1 or 0,0.25,0,  4,false)
+    self:Animate("brake_disconnect",self:GetSyncValue("DriverValveBLDisconnect") and 1 or 0,0.25,0,  4,false)
+    self:Animate("train_disconnect",self:GetSyncValue("DriverValveTLDisconnect") and 1 or 0,0.25,0,  4,false)
+    self:Animate("valve_disconnect",self:GetSyncValue("DriverValveDisconnect") and 1 or 0,0.25,0,  4,false)
+    self:Animate("stopkran",   self:GetSyncValue("EmergencyBrakeValve") and 0 or 1,     0.25,0, 128,  3,false)
 
     local c013 = self:GetNW2Int("Crane",1)==2
     self:ShowHide("brake_valve_334",not c013)
@@ -2969,12 +2969,12 @@ function ENT:Think()
     self:Animate("volt1",self:GetPackedRatio("BatteryVoltage"),0.625,0.376,256,0.2,false)
     self:Animate("ampermeter",self:GetPackedRatio("EnginesCurrent"),0.39,0.655,256,0.2,false)
 
-    local otsek1 = self:Animate("door_otsek1",self:GetPackedBool("OtsekDoor1") and 1 or 0,0,0.25,4,0.5)
-    local otsek2 = self:Animate("door_otsek2",self:GetPackedBool("OtsekDoor2") and 1 or 0,0,0.25,4,0.5)
+    local otsek1 = self:Animate("door_otsek1",self:GetSyncValue("OtsekDoor1") and 1 or 0,0,0.25,4,0.5)
+    local otsek2 = self:Animate("door_otsek2",self:GetSyncValue("OtsekDoor2") and 1 or 0,0,0.25,4,0.5)
     self:HidePanel("AV_S",not dot5 or otsek2<=0)
-    local door1 = self:Animate("door1",self:GetPackedBool("RearDoor") and 1 or 0,0,0.25,4,0.5)
-    local door2 = self:Animate("door2",self:GetPackedBool("PassengerDoor") and 1 or 0,1,0.8,4,0.5)
-    local door3 = self:Animate("door3",self:GetPackedBool("CabinDoor") and 1 or 0,0,0.25,4,0.5)
+    local door1 = self:Animate("door1",self:GetSyncValue("RearDoor") and 1 or 0,0,0.25,4,0.5)
+    local door2 = self:Animate("door2",self:GetSyncValue("PassengerDoor") and 1 or 0,1,0.8,4,0.5)
+    local door3 = self:Animate("door3",self:GetSyncValue("CabinDoor") and 1 or 0,0,0.25,4,0.5)
     if self.Door1 ~= (door1 > 0) then
         self.Door1 = door1 > 0
         self:PlayOnce("door1","bass",self.Door1 and 1 or 0)
@@ -2999,8 +2999,8 @@ function ENT:Think()
             self:PlayOnce("door_otsek2","bass",1)
         end
     end
-    self:SetLightPower(3,self.Otsek1 and self:GetPackedBool("EqLights"))
-    self:SetLightPower(4,self.Otsek2 and self:GetPackedBool("EqLights"))
+    self:SetLightPower(3,self.Otsek1 and self:GetSyncValue("EqLights"))
+    self:SetLightPower(4,self.Otsek2 and self:GetSyncValue("EqLights"))
 
     local typ = self:GetNW2Int("LampType",1)
     if self.LampType ~= typ then
@@ -3020,7 +3020,7 @@ function ENT:Think()
         for i = 1,12 do
             local colV = self:GetNW2Vector("lamp"..i)
             local col = Color(colV.x,colV.y,colV.z)
-            local state = self:Animate("Lamp1_"..i,self:GetPackedBool("lightsActive"..i) and 1 or 0,0,1,6,false)
+            local state = self:Animate("Lamp1_"..i,self:GetSyncValue("lightsActive"..i) and 1 or 0,0,1,6,false)
             self:ShowHideSmooth("lamp1_"..i,state,col)
             activeLights = activeLights + state
         end
@@ -3029,7 +3029,7 @@ function ENT:Think()
         for i = 1,25 do
             local colV = self:GetNW2Vector("lamp"..i)
             local col = Color(colV.x,colV.y,colV.z)
-            local state = self:Animate("Lamp2_"..i,self:GetPackedBool("lightsActive"..i) and 1 or 0,0,1,6,false)
+            local state = self:Animate("Lamp2_"..i,self:GetSyncValue("lightsActive"..i) and 1 or 0,0,1,6,false)
             self:ShowHideSmooth("lamp2_"..i,state,col)
             activeLights = activeLights + state
         end
@@ -3052,9 +3052,9 @@ function ENT:Think()
     self:Animate("RearTrain",   self:GetNW2Bool("RtI") and 1 or 0,0,1, 3, false)
 
     -- Main switch
-    if self.LastGVValue ~= self:GetPackedBool("GV") then
+    if self.LastGVValue ~= self:GetSyncValue("GV") then
         self.ResetTime = CurTime()+1.5
-        self.LastGVValue = self:GetPackedBool("GV")
+        self.LastGVValue = self:GetSyncValue("GV")
     end
     self:Animate("gv_wrench",self.LastGVValue and 1 or 0,0.5,0.9,128,1,false)
     self:ShowHideSmooth("gv_wrench",    CurTime() < self.ResetTime and 1 or 0.1)
@@ -3229,13 +3229,13 @@ function ENT:Think()
     --self:SetSoundState("emer_brake",self.EmergencyValveRamp*0.8,1)
     --self:SetSoundState("emer_brake",self.EmergencyValveRamp*0.8,1)
     -- Compressor
-    self:SetSoundState("compressor",self:GetPackedBool("Compressor") and 0.6 or 0,1)
-    self:SetSoundState("compressor2",self:GetPackedBool("Compressor") and 0.8 or 0,1)
+    self:SetSoundState("compressor",self:GetSyncValue("Compressor") and 0.6 or 0,1)
+    self:SetSoundState("compressor2",self:GetSyncValue("Compressor") and 0.8 or 0,1)
 
 
 
-    local v1state = self:GetPackedBool("M1_3") and 1 or 0
-    local v2state = self:GetPackedBool("M4_7") and 1 or 0
+    local v1state = self:GetSyncValue("M1_3") and 1 or 0
+    local v2state = self:GetSyncValue("M4_7") and 1 or 0
     local vCstate = self:GetPackedRatio("M8")/2
     if self.VentCab < vCstate then
         self.VentCab = math.min(1,self.VentCab + dT/2.7)
@@ -3255,7 +3255,7 @@ function ENT:Think()
         end
     end
     
-    self:SetSoundState("IST", self:GetPackedBool("IST") and 1 or 0, 0.95)
+    self:SetSoundState("IST", self:GetSyncValue("IST") and 1 or 0, 0.95)
     
     if self.RingType ~= self:GetNW2Int("RingType",1) then
         self.RingType = self:GetNW2Int("RingType",1)
@@ -3292,14 +3292,14 @@ function ENT:Think()
     end
     -- ARS/ringer alert
     local bzos = self.RingName=="ring" or self.RingName=="ring6" or self.RingName=="ring3" and RealTime()%0.8<0.35 or self.RingName~="ring3" and RealTime()%0.5>0.25
-    local ringstate = (self:GetPackedBool("Buzzer") or self:GetPackedBool("BuzzerBZOS") and bzos) and 1 or 0
+    local ringstate = (self:GetSyncValue("Buzzer") or self:GetSyncValue("BuzzerBZOS") and bzos) and 1 or 0
     if 6< self.RingType and self.RingType < 9 then
-        self.RingFade = math.Clamp(self.RingFade+(ringstate-self.RingFade)*dT*(self:GetPackedBool("BuzzerBZOS") and 50 or 25),0,1)
+        self.RingFade = math.Clamp(self.RingFade+(ringstate-self.RingFade)*dT*(self:GetSyncValue("BuzzerBZOS") and 50 or 25),0,1)
         self:SetSoundState(self.RingName,self.RingFade*self.RingVolume,self.RingPitch)
     else
         self:SetSoundState(self.RingName,ringstate*self.RingVolume,self.RingPitch)
     end
-    if self:GetPackedBool("RK") then self.RKTimer = CurTime() end
+    if self:GetSyncValue("RK") then self.RKTimer = CurTime() end
     self:SetSoundState("rk",(self.RKTimer and (CurTime() - self.RKTimer) < 0.2) and 0.7 or 0,1)
 
     -- BPSN sound
@@ -3312,12 +3312,12 @@ function ENT:Think()
     end
     self.OldBPSNType = self.BPSNType
     if self.BPSNType<13 then
-        self:SetSoundState("bpsn"..self.BPSNType,self:GetPackedBool("BPSN") and 1 or 0,1) --FIXME громкость по другому
+        self:SetSoundState("bpsn"..self.BPSNType,self:GetSyncValue("BPSN") and 1 or 0,1) --FIXME громкость по другому
     end
 
-    local cabspeaker = self:GetPackedBool("AnnCab")
-    local work = self:GetPackedBool("AnnPlay")
-    local buzz = self:GetPackedBool("AnnBuzz") and self:GetNW2Int("AnnouncerBuzz",-1) > 0
+    local cabspeaker = self:GetSyncValue("AnnCab")
+    local work = self:GetSyncValue("AnnPlay")
+    local buzz = self:GetSyncValue("AnnBuzz") and self:GetNW2Int("AnnouncerBuzz",-1) > 0
     local buzz_old = self:GetNW2Int("AnnouncerBuzz",-1) == 2
     for k in ipairs(self.AnnouncerPositions) do
         self:SetSoundState("announcer_buzz"..k,(buzz and not buzz_old and (k ~= 1 and work or k==1 and cabspeaker)) and 1 or 0,1)
@@ -3331,8 +3331,8 @@ function ENT:Think()
 end
 
 function ENT:OnAnnouncer(volume,id)
-    local cabspeaker = self:GetPackedBool("AnnCab")
-    local work = self:GetPackedBool("AnnPlay")
+    local cabspeaker = self:GetSyncValue("AnnCab")
+    local work = self:GetSyncValue("AnnPlay")
     return (id ~= 1 and work or id == 1 and cabspeaker) and volume  or 0
 end
 

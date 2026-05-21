@@ -646,9 +646,13 @@ local function getBitValue(value, offset)
     return bit.band(bit.rshift(value, offset), 1)
 end
 
-function ENT:SetSyncValue(name, value)
+function ENT:SetSyncValue(name, value, turbostroi)
 	local idx = self.iSyncTable[name]
-	if not idx then return end
+	if not idx then
+		-- if not turbostroi then ErrorNoHaltWithStack("SetSyncValue(): "..(tostring(name)).." not in ENT.SyncTable\n") end
+		return
+	end
+
 	local nByte = math_floor(idx / 32)+1
 	local netTbl = self._SyncData
 
@@ -662,7 +666,10 @@ end
 
 function ENT:GetSyncValue(name)
 	local idx = self.iSyncTable[name]
-	-- if not idx then print(name) return end
+	if not idx then
+		-- ErrorNoHalt("SetSyncValue(): "..(tostring(name)).." not in ENT.SyncTable\n")
+		return false
+	end
 
 	-- don't remove code below
 	-- local nByte = math_floor(idx / 32)+1

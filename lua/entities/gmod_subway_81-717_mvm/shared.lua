@@ -32,6 +32,22 @@ ENT.SyncTable = {
     , "ALSFreq","Ring","VBD",
     "V11","V12","V13","UPPS_On","SAB1",
     "IGLA1", "IGLA2", "IGLA3", "IGLA4",
+    "IGLA:ButtonL1","IGLA:ButtonL2","IGLA:ButtonL3","IGLA:ButtonL4","IGLA:Fire","IGLA:Error",
+
+    "VAHPl","KAHPl","RC1Pl","UOSPl","UAVAPl","OtklAVUPl","OtklBVPl","ALSPl","OVTPl","VPPl","VBDPl","UPPS_OnPl",
+    "Headlights1","Headlights2","RedLights","CabLights","EqLights","PanelLights",
+    "lightsActive1","lightsActive2","lightsActive3","lightsActive4","lightsActive5","lightsActive6","lightsActive7","lightsActive8","lightsActive9","lightsActive10",
+    "lightsActive11","lightsActive12","lightsActive13","lightsActive14","lightsActive15","lightsActive16","lightsActive17","lightsActive18","lightsActive19","lightsActive20",
+    "lightsActive21","lightsActive22","lightsActive23","lightsActive24","lightsActive25",
+    "DoorsLeftL","DoorsRightL","DoorsW","GRP","BrW","VH1","VH2",
+    "GreenRP","AVU","LKVP","LSP","RZP","KUP","PN","VPR","LUDS",
+    "RP","SN","RPR","SD","AR04","AR0","AR40","AR60","AR70","AR80",
+    "GLIB","LEKK","LN","ST","VD","KVD","RS","OneFreq","HRK","KVC","KT",
+    "L1","M1_3","M4_7","IST","ISTLamp","ReverserPresent",
+    "Compressor","Buzzer","BuzzerBZOS","RK","BPSN",
+    "RearDoor","PassengerDoor","CabinDoor","OtsekDoor1","OtsekDoor2",
+    "AnnBuzz","AnnPlay","AnnCab",
+    "Crane013","DoorR","DoorL"
 }
 Metrostroi.BuildSyncTable()
 

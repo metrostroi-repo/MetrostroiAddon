@@ -483,7 +483,7 @@ function ENT:TrainSpawnerUpdate()
     self.Announcer.AnnouncerType = self:GetNW2Int("Announcer",1)
     self.LampType = self:GetNW2Int("LampType",1)
     self.Pneumatic.ValveType = self:GetNW2Int("Crane",1)
-    self:SetPackedBool("Crane013",self.Pneumatic.ValveType == 2)
+    self:SetSyncValue("Crane013",self.Pneumatic.ValveType == 2)
     self:SetNW2Float("Crane013Loud",(self.Pneumatic.ValveType == 2 and math.random()>0.9) and 1.1+math.random()*0.3 or 0)
     self:UpdateLampsColors()
     self:UpdateTextures()
@@ -539,13 +539,13 @@ function ENT:Think()
                         math.min(1,Panel.Headlights2)*0.40
     --local T = {}
 
-    self:SetPackedBool("Headlights1",Panel.Headlights1 > 0)
-    self:SetPackedBool("Headlights2",Panel.Headlights2 > 0)
-    self:SetPackedBool("RedLights",Panel.RedLight2 > 0)
-    self:SetPackedBool("CabLights",Panel.CabLights>0)
-    self:SetPackedBool("EqLights",Panel.EqLights>0)
+    self:SetSyncValue("Headlights1",Panel.Headlights1 > 0)
+    self:SetSyncValue("Headlights2",Panel.Headlights2 > 0)
+    self:SetSyncValue("RedLights",Panel.RedLight2 > 0)
+    self:SetSyncValue("CabLights",Panel.CabLights>0)
+    self:SetSyncValue("EqLights",Panel.EqLights>0)
 
-    self:SetPackedBool("PanelLights",Panel.PanelLights > 0.5)
+    self:SetSyncValue("PanelLights",Panel.PanelLights > 0.5)
 
     local lightsActive1 = Panel.EmergencyLights > 0
     local lightsActive2 = Panel.MainLights > 0.0
@@ -559,9 +559,9 @@ function ENT:Think()
             self.Lamps[i] = nil
         end
         if (self.Lamps[i] and CurTime() - self.Lamps[i] > 0) then
-            self:SetPackedBool("lightsActive"..i,true)
+            self:SetSyncValue("lightsActive"..i,true)
         else
-            self:SetPackedBool("lightsActive"..i,false)
+            self:SetSyncValue("lightsActive"..i,false)
         end
     end
 	
@@ -570,29 +570,29 @@ function ENT:Think()
     end
 
     -- Door button lights
-    self:SetPackedBool("DoorsLeftL",Panel.DoorsLeft > 0.5)
-    self:SetPackedBool("DoorsRightL",Panel.DoorsRight > 0.5)
-    self:SetPackedBool("DoorsW",Panel.DoorsW > 0)
-    self:SetPackedBool("GRP",Panel.GreenRP > 0)
-    self:SetPackedBool("BrW",Panel.BrW > 0)
-    self:SetPackedBool("VH1",self.BZOS.VH1 > 0)
-    self:SetPackedBool("VH2",self.BZOS.VH2 > 0)
+    self:SetSyncValue("DoorsLeftL",Panel.DoorsLeft > 0.5)
+    self:SetSyncValue("DoorsRightL",Panel.DoorsRight > 0.5)
+    self:SetSyncValue("DoorsW",Panel.DoorsW > 0)
+    self:SetSyncValue("GRP",Panel.GreenRP > 0)
+    self:SetSyncValue("BrW",Panel.BrW > 0)
+    self:SetSyncValue("VH1",self.BZOS.VH1 > 0)
+    self:SetSyncValue("VH2",self.BZOS.VH2 > 0)
 
     -- Switch and button states
-    self:SetPackedBool("GreenRP",Panel.GreenRP > 0.5)
-    self:SetPackedBool("AVU",Panel.AVU > 0.5)
-    self:SetPackedBool("LKVP",Panel.LKVP > 0)
-    self:SetPackedBool("RZP",Panel.RZP > 0)
-    self:SetPackedBool("KUP",Panel.KUP > 0.5)
-    self:SetPackedBool("PN", Panel.BrT > 0.5)
-    self:SetPackedBool("VPR",Panel.VPR > 0)
+    self:SetSyncValue("GreenRP",Panel.GreenRP > 0.5)
+    self:SetSyncValue("AVU",Panel.AVU > 0.5)
+    self:SetSyncValue("LKVP",Panel.LKVP > 0)
+    self:SetSyncValue("RZP",Panel.RZP > 0)
+    self:SetSyncValue("KUP",Panel.KUP > 0.5)
+    self:SetSyncValue("PN", Panel.BrT > 0.5)
+    self:SetSyncValue("VPR",Panel.VPR > 0)
 
     -- Signal if doors are open or no to platform simulation
     self.LeftDoorsOpen =  (Pneumatic.LeftDoorState[1] > 0.5)  or (Pneumatic.LeftDoorState[2] > 0.5)  or (Pneumatic.LeftDoorState[3] > 0.5)  or (Pneumatic.LeftDoorState[4] > 0.5)
     self.RightDoorsOpen = (Pneumatic.RightDoorState[1] > 0.5) or (Pneumatic.RightDoorState[2] > 0.5) or (Pneumatic.RightDoorState[3] > 0.5) or (Pneumatic.RightDoorState[4] > 0.5)
 
     -- DIP/power
-    self:SetPackedBool("LUDS",Panel.LUDS > 0.5)
+    self:SetSyncValue("LUDS",Panel.LUDS > 0.5)
 
     -- Red RP
     local TW18 = 0
@@ -602,40 +602,40 @@ function ENT:Think()
             TW18 = TW18+(v.Panel.TW18 or 0)/wags
         end
     end
-    self:SetPackedBool("RP",TW18 > 0.5)
-    self:SetPackedBool("SN",TW18 > 0)
+    self:SetSyncValue("RP",TW18 > 0.5)
+    self:SetSyncValue("SN",TW18 > 0)
     self:SetPackedRatio("RPR",math.Clamp(TW18^0.7,0,1))
 
-    self:SetPackedBool("SD",Panel.SD > 0.5)
+    self:SetSyncValue("SD",Panel.SD > 0.5)
 
-    self:SetPackedBool("AR04",Panel.AR04 > 0)
-    self:SetPackedBool("AR0",Panel.AR0 > 0)
-    self:SetPackedBool("AR40",Panel.AR40 > 0)
-    self:SetPackedBool("AR60",Panel.AR60 > 0)
-    self:SetPackedBool("AR70",Panel.AR70 > 0)
-    self:SetPackedBool("AR80",Panel.AR80 > 0)
+    self:SetSyncValue("AR04",Panel.AR04 > 0)
+    self:SetSyncValue("AR0",Panel.AR0 > 0)
+    self:SetSyncValue("AR40",Panel.AR40 > 0)
+    self:SetSyncValue("AR60",Panel.AR60 > 0)
+    self:SetSyncValue("AR70",Panel.AR70 > 0)
+    self:SetSyncValue("AR80",Panel.AR80 > 0)
     --]]
     local drv = self:GetDriver()
-    self:SetPackedBool("GLIB",power and IsValid(drv) and drv:SteamID() == "STEAM_0:1:31566374")
-    self:SetPackedBool("LEKK",Panel.LEKK > 0)
-    self:SetPackedBool("LN",Panel.LN > 0)
-    self:SetPackedBool("ST",Panel.LST > 0)
-    self:SetPackedBool("VD",Panel.LVD > 0)
-    self:SetPackedBool("KVD",Panel.LKVD > 0)
-    self:SetPackedBool("RS",Panel.RS > 0)
-    self:SetPackedBool("OneFreq",Panel.OneFreq > 0)
-    self:SetPackedBool("HRK",Panel.LhRK > 0)
-    self:SetPackedBool("KVC",Panel.KVC > 0)
-    self:SetPackedBool("KT",Panel.KT>0)
+    self:SetSyncValue("GLIB",power and IsValid(drv) and drv:SteamID() == "STEAM_0:1:31566374")
+    self:SetSyncValue("LEKK",Panel.LEKK > 0)
+    self:SetSyncValue("LN",Panel.LN > 0)
+    self:SetSyncValue("ST",Panel.LST > 0)
+    self:SetSyncValue("VD",Panel.LVD > 0)
+    self:SetSyncValue("KVD",Panel.LKVD > 0)
+    self:SetSyncValue("RS",Panel.RS > 0)
+    self:SetSyncValue("OneFreq",Panel.OneFreq > 0)
+    self:SetSyncValue("HRK",Panel.LhRK > 0)
+    self:SetSyncValue("KVC",Panel.KVC > 0)
+    self:SetSyncValue("KT",Panel.KT>0)
     self:SetPackedRatio("PVK",self.PVK.Value/2)
-    self:SetPackedBool("L1",Panel.L1 > 0)
-    self:SetPackedBool("M1_3",Panel.M1_3 > 0)
-    self:SetPackedBool("M4_7",Panel.M4_7 > 0)
+    self:SetSyncValue("L1",Panel.L1 > 0)
+    self:SetSyncValue("M1_3",Panel.M1_3 > 0)
+    self:SetSyncValue("M4_7",Panel.M4_7 > 0)
     self:SetPackedRatio("M8",Panel.M8)
-    self:SetPackedBool("IST",Panel.IST > 0)
-    self:SetPackedBool("ISTLamp",Panel.IST > 0 and CurTime() % 0.333 > 0.166)
+    self:SetSyncValue("IST",Panel.IST > 0)
+    self:SetSyncValue("ISTLamp",Panel.IST > 0 and CurTime() % 0.333 > 0.166)
     self:SetNW2Int("WrenchMode",self.KVWrenchMode)
-    self:SetPackedBool("ReverserPresent",self.KVWrenchMode and self.KVWrenchMode>0)
+    self:SetSyncValue("ReverserPresent",self.KVWrenchMode and self.KVWrenchMode>0)
     self:SetPackedRatio("CranePosition", Pneumatic.RealDriverValvePosition)
     self:SetPackedRatio("ControllerPosition", (self.KV.ControllerPosition+3)/7)
     self:SetNW2Int("ReverserPosition", (self.KV.ReverserPosition+1))
@@ -693,22 +693,29 @@ function ENT:Think()
 
     self:SetPackedRatio("BatteryVoltage",Panel["V1"]*PCV_o/150.0)
     
-    self:SetPackedBool("Compressor",Pneumatic.Compressor > 0)
-    self:SetPackedBool("Buzzer",Panel.Ring >= 1)
-    self:SetPackedBool("BuzzerBZOS",Panel.Ring>0 and Panel.Ring<1)
-    self:SetPackedBool("RK",self.RheostatController.Velocity ~= 0.0)
+    self:SetSyncValue("Compressor",Pneumatic.Compressor > 0)
+    self:SetSyncValue("Buzzer",Panel.Ring >= 1)
+    self:SetSyncValue("BuzzerBZOS",Panel.Ring>0 and Panel.Ring<1)
+    self:SetSyncValue("RK",self.RheostatController.Velocity ~= 0.0)
 
-    self:SetPackedBool("BPSN",self.PowerSupply.X2_2 > 0)
+    self:SetSyncValue("BPSN",self.PowerSupply.X2_2 > 0)
 
-    self:SetPackedBool("RearDoor",self.RearDoor)
-    self:SetPackedBool("PassengerDoor",self.PassengerDoor)
-    self:SetPackedBool("CabinDoor",self.CabinDoor)
-    self:SetPackedBool("OtsekDoor1",self.OtsekDoor1)
-    self:SetPackedBool("OtsekDoor2",self.OtsekDoor2)
+    self:SetSyncValue("RearDoor",self.RearDoor)
+    self:SetSyncValue("PassengerDoor",self.PassengerDoor)
+    self:SetSyncValue("CabinDoor",self.CabinDoor)
+    self:SetSyncValue("OtsekDoor1",self.OtsekDoor1)
+    self:SetSyncValue("OtsekDoor2",self.OtsekDoor2)
 
-    self:SetPackedBool("AnnBuzz",Panel.AnnouncerBuzz > 0)
-    self:SetPackedBool("AnnPlay",Panel.AnnouncerPlaying > 0)
-    self:SetPackedBool("AnnCab",self.ASNP_VV.CabinSpeakerPower > 0)
+    self:SetSyncValue("AnnBuzz",Panel.AnnouncerBuzz > 0)
+    self:SetSyncValue("AnnPlay",Panel.AnnouncerPlaying > 0)
+    self:SetSyncValue("AnnCab",self.ASNP_VV.CabinSpeakerPower > 0)
+
+    self:SetSyncValue("IGLA:ButtonL1",self.IGLA_CBKI.ButtonL1)
+    self:SetSyncValue("IGLA:ButtonL2",self.IGLA_CBKI.ButtonL2)
+    self:SetSyncValue("IGLA:ButtonL3",self.IGLA_CBKI.ButtonL3)
+    self:SetSyncValue("IGLA:ButtonL4",self.IGLA_CBKI.ButtonL4)
+    self:SetSyncValue("IGLA:Fire",self.IGLA_CBKI.Fire)
+    self:SetSyncValue("IGLA:Error",self.IGLA_CBKI.Error)
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
     self:SetPackedRatio("Speed", self.Speed/100 or 0.5 or 0.85-(((CurTime()%36/36)^0.8)*8.5)/10 or self.Speed/100)

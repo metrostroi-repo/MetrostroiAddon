@@ -938,9 +938,9 @@ function ENT:Think()
         self.PassSchemesDone = true
     end
 
-    local Bortlamp_w = self:Animate("Bortlamp_w",self:GetPackedBool("DoorsW") and 1 or 0,0,1,16,false)
-    local Bortlamp_g = self:Animate("Bortlamp_g",self:GetPackedBool("GRP") and 1 or 0,0,1,16,false)
-    local Bortlamp_y = self:Animate("Bortlamp_y",self:GetPackedBool("BrW") and 1 or 0,0,1,16,false)
+    local Bortlamp_w = self:Animate("Bortlamp_w",self:GetSyncValue("DoorsW") and 1 or 0,0,1,16,false)
+    local Bortlamp_g = self:Animate("Bortlamp_g",self:GetSyncValue("GRP") and 1 or 0,0,1,16,false)
+    local Bortlamp_y = self:Animate("Bortlamp_y",self:GetSyncValue("BrW") and 1 or 0,0,1,16,false)
     self:ShowHideSmooth("bortlamp1_w",Bortlamp_w)
     self:ShowHideSmooth("bortlamp1_g",Bortlamp_g)
     self:ShowHideSmooth("bortlamp1_y",Bortlamp_y)
@@ -969,8 +969,8 @@ function ENT:Think()
     self:ShowHide("seats_old",not newSeats)
     self:ShowHide("seats_new",newSeats)
 
-    local capOpened = self:GetPackedBool("CouchCap")
-    local c013 = self:GetPackedBool("Crane013")
+    local capOpened = self:GetSyncValue("CouchCap")
+    local c013 = self:GetSyncValue("Crane013")
     self:ShowHide("seats_old_cap_o",capOpened and not newSeats)
     self:ShowHide("seats_old_cap",not capOpened and not newSeats)
     self:ShowHide("seats_new_cap_o",capOpened and newSeats)
@@ -989,8 +989,8 @@ function ENT:Think()
     self:HidePanel("Shunt",not capOpened)
     self:HidePanel("VU",not capOpened)
 
-    self:Animate("brake_disconnect",self:GetPackedBool("DriverValveBLDisconnect") and 1 or 0,0.25,0,  4,false)
-    self:Animate("train_disconnect",self:GetPackedBool("DriverValveTLDisconnect") and 1 or 0,0.25,0,  4,false)
+    self:Animate("brake_disconnect",self:GetSyncValue("DriverValveBLDisconnect") and 1 or 0,0.25,0,  4,false)
+    self:Animate("train_disconnect",self:GetSyncValue("DriverValveTLDisconnect") and 1 or 0,0.25,0,  4,false)
     self:Animate("brake334",self:GetPackedRatio("CranePosition")/5,0.35,0.65,256,24)
     self:Animate("brake013",Cpos[self:GetPackedRatio("CranePosition")] or 0, 0.03, 0.458,  256,24)
 
@@ -1018,7 +1018,7 @@ function ENT:Think()
         for i = 1,13 do
             local colV = self:GetNW2Vector("lamp"..i)
             local col = Color(colV.x,colV.y,colV.z)
-            local state = self:Animate("Lamp1_"..i,self:GetPackedBool("lightsActive"..i) and 1 or 0,0,1,6,false)
+            local state = self:Animate("Lamp1_"..i,self:GetSyncValue("lightsActive"..i) and 1 or 0,0,1,6,false)
             self:ShowHideSmooth("lamp1_"..i,state,col)
             activeLights = activeLights + state
         end
@@ -1027,7 +1027,7 @@ function ENT:Think()
         for i = 1,27 do
             local colV = self:GetNW2Vector("lamp"..i)
             local col = Color(colV.x,colV.y,colV.z)
-            local state = self:Animate("Lamp2_"..i,self:GetPackedBool("lightsActive"..i) and 1 or 0,0,1,6,false)
+            local state = self:Animate("Lamp2_"..i,self:GetSyncValue("lightsActive"..i) and 1 or 0,0,1,6,false)
             self:ShowHideSmooth("lamp2_"..i,state,col)
             activeLights = activeLights + state
         end
@@ -1044,8 +1044,8 @@ function ENT:Think()
         end
     end
 
-    local door1 = self:Animate("door1", self:GetPackedBool("FrontDoor") and 0.99 or 0,0,0.25, 4, 0.5)
-    local door2 = self:Animate("door2", self:GetPackedBool("RearDoor") and (capOpened and 0.25 or 0.99) or 0,0,0.25, 4, 0.5)
+    local door1 = self:Animate("door1", self:GetSyncValue("FrontDoor") and 0.99 or 0,0,0.25, 4, 0.5)
+    local door2 = self:Animate("door2", self:GetSyncValue("RearDoor") and (capOpened and 0.25 or 0.99) or 0,0,0.25, 4, 0.5)
 
     if self.Door1 ~= (door1 > 0) then
         self.Door1 = door1 > 0
@@ -1062,12 +1062,12 @@ function ENT:Think()
     self:Animate("FrontTrain",  self:GetNW2Bool("FtI") and 1 or 0,0,1, 3, false)
     self:Animate("RearBrake",   self:GetNW2Bool("RbI") and 0 or 1,0,1, 3, false)
     self:Animate("RearTrain",   self:GetNW2Bool("RtI") and 1 or 0,0,1, 3, false)
-    self:Animate("ParkingBrake",    self:GetPackedBool("ParkingBrake") and 1 or 0,1,0, 3, false)
+    self:Animate("ParkingBrake",    self:GetSyncValue("ParkingBrake") and 1 or 0,1,0, 3, false)
 
     -- Main switch
-    if self.LastGVValue ~= self:GetPackedBool("GV") then
+    if self.LastGVValue ~= self:GetSyncValue("GV") then
         self.ResetTime = CurTime()+1.5
-        self.LastGVValue = self:GetPackedBool("GV")
+        self.LastGVValue = self:GetSyncValue("GV")
     end
     self:Animate("gv_wrench",self.LastGVValue and 1 or 0,0.5,0.9,128,1,false)
     self:ShowHideSmooth("gv_wrench",    CurTime() < self.ResetTime and 1 or 0.1)
@@ -1214,11 +1214,11 @@ function ENT:Think()
     self:SetSoundState("valve_brake",self.EmergencyBrakeValveRamp,0.8+math.min(0.4,self.EmergencyBrakeValveRamp*0.8))
 
     -- Compressor
-    self:SetSoundState("compressor",self:GetPackedBool("Compressor") and 0.6 or 0,1)
-    self:SetSoundState("compressor2",self:GetPackedBool("Compressor") and 0.8 or 0,1)
+    self:SetSoundState("compressor",self:GetSyncValue("Compressor") and 0.6 or 0,1)
+    self:SetSoundState("compressor2",self:GetSyncValue("Compressor") and 0.8 or 0,1)
 
-    local v1state = self:GetPackedBool("M1_3") and 1 or 0
-    local v2state = self:GetPackedBool("M4_7") and 1 or 0
+    local v1state = self:GetSyncValue("M1_3") and 1 or 0
+    local v2state = self:GetSyncValue("M4_7") and 1 or 0
     self.VentG1 = math.Clamp(self.VentG1 + dT/2.7*(v1state*2-1),0,1)
     self.VentG2 = math.Clamp(self.VentG2 + dT/2.7*(v2state*2-1),0,1)
 
@@ -1231,7 +1231,7 @@ function ENT:Think()
     end
 
     -- RK rotation
-    if self:GetPackedBool("RK") then self.RKTimer = CurTime() end
+    if self:GetSyncValue("RK") then self.RKTimer = CurTime() end
     self:SetSoundState("rk",(self.RKTimer and (CurTime() - self.RKTimer) < 0.2) and 0.7 or 0,1)
 
     -- BPSN sound
@@ -1244,11 +1244,11 @@ function ENT:Think()
     end
     self.OldBPSNType = self.BPSNType
     if self.BPSNType<13 then
-        self:SetSoundState("bpsn"..self.BPSNType,self:GetPackedBool("BPSN") and 1 or 0,1) --FIXME громкость по другому
+        self:SetSoundState("bpsn"..self.BPSNType,self:GetSyncValue("BPSN") and 1 or 0,1) --FIXME громкость по другому
     end
 
-    local work = self:GetPackedBool("AnnPlay")
-    local buzz = self:GetPackedBool("AnnBuzz") and self:GetNW2Int("AnnouncerBuzz",-1) > 0
+    local work = self:GetSyncValue("AnnPlay")
+    local buzz = self:GetSyncValue("AnnBuzz") and self:GetNW2Int("AnnouncerBuzz",-1) > 0
     local buzz_old = self:GetNW2Int("AnnouncerBuzz",-1) == 2
     for k in ipairs(self.AnnouncerPositions) do
         self:SetSoundState("announcer_buzz"..k,(buzz and work and not buzz_old) and 1 or 0,1)
@@ -1262,7 +1262,7 @@ function ENT:Think()
 end
 
 function ENT:OnAnnouncer(volume)
-    return self:GetPackedBool("AnnPlay") and volume  or 0
+    return self:GetSyncValue("AnnPlay") and volume  or 0
 end
 
 function ENT:Draw()
