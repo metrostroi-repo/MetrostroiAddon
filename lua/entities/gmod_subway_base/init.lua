@@ -1066,7 +1066,7 @@ function ENT:CreateBogey(pos,ang,forward,typ)
         if forward and IsValid(self.FrontCouple) then
             constraint.NoCollide(bogey,self.FrontCouple,0,0)
         elseif not forward and IsValid(self.RearCouple) then
-            constraint.NoCollide(bogeyself.RearCouple,0,0)
+            constraint.NoCollide(bogey,self.RearCouple,0,0)
         end
     end
 
