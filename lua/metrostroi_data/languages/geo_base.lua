@@ -28,6 +28,7 @@ StationList.NamePos         = pozcia
 StationList.Select          = airchiet sadguri
 StationList.Teleport        = telepertireba!
 StationList.NoConfig        = es mapi ar aris configurebuli
+StationList.NoULX           = ULX not installed #NEW
 
 #Client settings
 Panel.Admin             = admini

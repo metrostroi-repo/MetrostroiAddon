@@ -19,6 +19,16 @@ Workshop.ErrorGithub        = Rilevato versione GitHub di Metrostroi. La seguent
 Workshop.ErrorLegacy        = Rilevata versione legacy di Metrostroi. La versione corrente di Metrostroi non è compatibile e non funziona con la versione legacy di Metrostroi.
 Workshop.ErrorEnhancers     = Questo addon contiene un potenziatore grafico che potrebbe interferire con l'esperienza di gioco.
 Workshop.Error1             = Questo addon contiene un vecchio codice script di Metrostroi che è in conflitto con la versione corrente. Può causare "scriptscript" e l'instabilità dell'addon.
+Workshop.ErrorOld           = Old models detected (81-702 and 81-717 old models). Check and remove old metrostroi content files, remove "cache", "download" and "downloads" folders from "garrysmod" folder. #NEW
+
+#Station list GUI
+StationList.Title           = Station list #NEW
+StationList.Name            = Name #NEW
+StationList.NamePos         = Position #NEW
+StationList.Select          = Select station #NEW
+StationList.Teleport        = Teleport #NEW
+StationList.NoConfig        = This map is not configured #NEW
+StationList.NoULX           = ULX not installed #NEW
 
 #Client settings
 Panel.Admin             = Admin
@@ -36,7 +46,10 @@ Panel.ScreenshotMode    = Modalità screenshot (FPS Bassi)
 Panel.ShadowsHeadlight  = Abilita ombre faro
 Panel.RedLights         = Abilita le luci dinamiche\ndelle luci rosse
 Panel.ShadowsOther      = Abilita le ombre dagli altri\nlight sources
+Panel.PanelSprites      = Enable sprites from control\npanel lamps
 Panel.MinimizedShow     = Non scaricare nessun elemento\nwhen minimizzato
+Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
+Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = FOV
 Panel.Z                 = Altezza della videocamera
 Panel.RenderDistance    = Distanza di rendering
@@ -54,6 +67,8 @@ Panel.SoftReloadLang    = Non ricaricare uno spawnmenu
 
 
 #Common train
+
+#Cameras
 Train.Common.Camera0        = Sedia del macchinista
 Train.Common.RouteNumber    = Numero itinerario
 Train.Common.LastStation    = Ultima stazione
@@ -63,7 +78,57 @@ Train.Common.PneumoPanels   = Valvola pneumatica
 Train.Common.Voltmeters     = Voltometro e amperometro
 Train.Common.CouplerCamera  = Accoppiamento
 Common.ARM.Monitor1         = Monitor 1 Armato
+
 Train.Buttons.Sealed        = Sigillato
+Train.Buttons.Active        = Active #NEW
+Train.Buttons.Auto          = Auto #NEW
+Train.Buttons.On            = On #NEW
+Train.Buttons.Off           = Off #NEW
+Train.Buttons.Closed        = Closed #NEW
+Train.Buttons.Opened        = Opened #NEW
+Train.Buttons.Disconnected  = Disconnected #NEW
+Train.Buttons.Connected     = Connected #NEW
+Train.Buttons.UAVAOff       = Control circuits is open #NEW (OFF)
+Train.Buttons.UAVAOn        = Control circuits is closed #NEW (ON)
+Train.Buttons.Freq1/5       = 1/5 autoblocking #NEW
+Train.Buttons.Freq2/6       = 2/6 ALS-ARS #NEW
+Train.Buttons.Left          = Left #NEW
+Train.Buttons.Right         = Right #NEW
+Train.Buttons.Low           = Low #NEW
+Train.Buttons.High          = High #NEW #FIXME
+Train.Buttons.LFar          = Bright #NEW #FIXME (headlights)
+Train.Buttons.LNear         = Dim #NEW #FIXME (headlights)
+Train.Buttons.0             = 0 #NEW
+Train.Buttons.1             = 1 #NEW
+Train.Buttons.2             = 2 #NEW
+Train.Buttons.3             = 3 #NEW
+Train.Buttons.4             = 4 #NEW
+Train.Buttons.Forward       = Forward #NEW
+Train.Buttons.Back          = Backward #NEW
+Train.Buttons.VentHalf      = 1/2 of speed #NEW (of ventilation)
+Train.Buttons.VentFull      = Full speed #NEW (of ventilation)
+Train.Buttons.VTRF          = Forward oriented wagons #NEW
+Train.Buttons.VTRB          = Back oriented wagons #NEW
+Train.Buttons.VTR1          = Even wagons #NEW
+Train.Buttons.VTR2          = Odd wagons #NEW
+Train.Buttons.VTRH1         = First half of train #NEW
+Train.Buttons.VTRH2         = Second half of train #NEW
+Train.Buttons.VTRAll        = All wagons #NEW
+
+Train.Buttons.BatteryVoltage = %d V #NEW
+Train.Buttons.HighVoltage    = %d V #NEW
+Train.Buttons.BatteryCurrent = %d A #NEW
+Train.Buttons.EnginesCurrent = %d A #NEW
+Train.Buttons.Speed          = %d km/h #NEW
+Train.Buttons.SpeedAll       = %d km/h\nSpeed limit: %s km/h #NEW #FIXME
+Train.Buttons.SpeedLimit     = %s km/h #NEW
+Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
+Train.Buttons.04             = NF #NEW (no frequency)
+Train.Buttons.BCPressure     = %.1f kgf/cm²
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL: %.1f kgf/cm² #NEW (TL: Train line, BL: Brake line acronyms)
+Train.Buttons.Locked         = Locked #NEW
+Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Metropolitana base
@@ -295,6 +360,7 @@ Common.ARS.VRD                              = VRD: Consenti il movimento(quando 
 Common.ARS.KB                               = KB: Pulsante di attenzione
 Common.ARS.KVT                              = KVT: Pulsante di percezione del freno
 Common.ARS.KVTR                             = KVT: Pulsante di percezione freno ARS-R 
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OCh: Nessuna frequenza ARS
 Common.ARS.N4                               = NCh: Nessuna frequenza ARS (same as OCh but NCh)
 Common.ARS.0                                = 0: ARS Segnale di stop
@@ -362,6 +428,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menu
 Common.ASNP.ASNPUp          = ASNP: Su
 Common.ASNP.ASNPDown        = ASNP: Giù
 Common.ASNP.ASNPOn          = ASNP: Accenzione
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = Diminuisci potenza ventilazione cabina

@@ -21,6 +21,15 @@ Workshop.ErrorEnhancers     = 이 애드온에는 원활한 게임 플레이를 
 Workshop.Error1             = 이 애드온은 현재 버전과 충돌을 일으킬 수 있는 Metrostroi의 구식 스크립트를 포함하고 있습니다. 스크립트 에러나 작동이 불안정할 가능성이 있습니다.
 Workshop.ErrorOld           = 이전 버전의 모델이 감지되었습니다 (81-702, 81-717 의 옛날 모델). 이전 버전의 Metrostroi 컨텐츠가 남아 있는지 확인 후 삭제하고, 게리모드 폴더에 있는 "cache","download","downloads" 폴더를 삭제해주세요.
 
+#Station list GUI
+StationList.Title           = Station list #NEW
+StationList.Name            = Name #NEW
+StationList.NamePos         = Position #NEW
+StationList.Select          = Select station #NEW
+StationList.Teleport        = Teleport #NEW
+StationList.NoConfig        = This map is not configured #NEW
+StationList.NoULX           = ULX not installed #NEW
+
 #Client settings
 Panel.Admin             = 관리자
 Panel.RequireThirdRail  = 3궤조 필요 여부
@@ -37,7 +46,10 @@ Panel.ScreenshotMode    = 스크린샷 모드 (낮은 FPS)
 Panel.ShadowsHeadlight  = 전조등 그림자 활성
 Panel.RedLights         = 적색등의 다이나믹 라이트 사용
 Panel.ShadowsOther      = 기타 광원 그림자 활성
+Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
 Panel.MinimizedShow     = 창 최소화시 구성요소 언로드 하지 않기
+Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
+Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = 시야각(FOV)
 Panel.Z                 = 시점 높이
 Panel.RenderDistance    = 렌더링 거리
@@ -55,6 +67,8 @@ Panel.SoftReloadLang    = 스폰 메뉴 다시 불러오지 않기
 
 
 #Common train
+
+#Cameras
 Train.Common.Camera0        = 운전석
 Train.Common.RouteNumber    = 경로 번호
 Train.Common.LastStation    = 종착역
@@ -64,7 +78,57 @@ Train.Common.PneumoPanels   = 공압 밸브
 Train.Common.Voltmeters     = 전압계, 전류계
 Train.Common.CouplerCamera  = 연결기
 Common.ARM.Monitor1         = ARM 모니터 1
+
 Train.Buttons.Sealed        = 봉인 됨
+Train.Buttons.Active        = Active #NEW
+Train.Buttons.Auto          = Auto #NEW
+Train.Buttons.On            = On #NEW
+Train.Buttons.Off           = Off #NEW
+Train.Buttons.Closed        = Closed #NEW
+Train.Buttons.Opened        = Opened #NEW
+Train.Buttons.Disconnected  = Disconnected #NEW
+Train.Buttons.Connected     = Connected #NEW
+Train.Buttons.UAVAOff       = Control circuits is open #NEW (OFF)
+Train.Buttons.UAVAOn        = Control circuits is closed #NEW (ON)
+Train.Buttons.Freq1/5       = 1/5 autoblocking #NEW
+Train.Buttons.Freq2/6       = 2/6 ALS-ARS #NEW
+Train.Buttons.Left          = Left #NEW
+Train.Buttons.Right         = Right #NEW
+Train.Buttons.Low           = Low #NEW
+Train.Buttons.High          = High #NEW #FIXME
+Train.Buttons.LFar          = Bright #NEW #FIXME (headlights)
+Train.Buttons.LNear         = Dim #NEW #FIXME (headlights)
+Train.Buttons.0             = 0 #NEW
+Train.Buttons.1             = 1 #NEW
+Train.Buttons.2             = 2 #NEW
+Train.Buttons.3             = 3 #NEW
+Train.Buttons.4             = 4 #NEW
+Train.Buttons.Forward       = Forward #NEW
+Train.Buttons.Back          = Backward #NEW
+Train.Buttons.VentHalf      = 1/2 of speed #NEW (of ventilation)
+Train.Buttons.VentFull      = Full speed #NEW (of ventilation)
+Train.Buttons.VTRF          = Forward oriented wagons #NEW
+Train.Buttons.VTRB          = Back oriented wagons #NEW
+Train.Buttons.VTR1          = Even wagons #NEW
+Train.Buttons.VTR2          = Odd wagons #NEW
+Train.Buttons.VTRH1         = First half of train #NEW
+Train.Buttons.VTRH2         = Second half of train #NEW
+Train.Buttons.VTRAll        = All wagons #NEW
+
+Train.Buttons.BatteryVoltage = %d V #NEW
+Train.Buttons.HighVoltage    = %d V #NEW
+Train.Buttons.BatteryCurrent = %d A #NEW
+Train.Buttons.EnginesCurrent = %d A #NEW
+Train.Buttons.Speed          = %d km/h #NEW
+Train.Buttons.SpeedAll       = %d km/h\nSpeed limit: %s km/h #NEW #FIXME
+Train.Buttons.SpeedLimit     = %s km/h #NEW
+Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
+Train.Buttons.04             = NF #NEW (no frequency)
+Train.Buttons.BCPressure     = %.1f kgf/cm²
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL: %.1f kgf/cm² #NEW (TL: Train line, BL: Brake line acronyms)
+Train.Buttons.Locked         = Locked #NEW
+Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Subway base
@@ -296,6 +360,7 @@ Common.ARS.VRD                              = VRD: 주행 허용 (ALS 신호 0 �
 Common.ARS.KB                               = KB: 확인 버튼
 Common.ARS.KVT                              = KVT: 제동 확인 버튼
 Common.ARS.KVTR                             = KVT: ARS-R 제동 확인 버튼
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OCh: ARS 신호 없음
 Common.ARS.N4                               = NCh: ARS 신호 없음
 Common.ARS.0                                = 0: ARS 정지 신호
@@ -363,6 +428,7 @@ Common.ASNP.ASNPMenu        = ASNP: 메뉴
 Common.ASNP.ASNPUp          = ASNP: 위
 Common.ASNP.ASNPDown        = ASNP: 아래
 Common.ASNP.ASNPOn          = ASNP: 전원
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = 운전실 환풍기 세기: -
