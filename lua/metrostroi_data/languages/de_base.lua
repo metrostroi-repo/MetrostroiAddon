@@ -21,6 +21,15 @@ Workshop.ErrorEnhancers     = Dieses Addon enthält Grafikverbesserer, die das k
 Workshop.Error1             = Es werden veraltete Scripts von Metrostroi verwendet. Dies kann zu Problemen fuehren!
 Workshop.ErrorOld           = Veraltete Modelle entdeckt! Bitte veralteten Content löschen, Cache leeren und neu installieren!
 
+#Station list GUI
+StationList.Title           = Station list
+StationList.Name            = Name
+StationList.NamePos         = Position
+StationList.Select          = Select station
+StationList.Teleport        = Teleport
+StationList.NoConfig        = This map is not configured
+StationList.NoULX           = ULX not installed
+
 #Client settings
 Panel.Admin             = Admin
 Panel.RequireThirdRail  = Stromschiene wird gebraucht
@@ -37,6 +46,7 @@ Panel.ScreenshotMode    = Screenshot modus (NIEDRIGE FPS)
 Panel.ShadowsHeadlight  = Schatten der Scheinwerfer aktivieren
 Panel.RedLights         = Enable dynamic light\nof red lights
 Panel.ShadowsOther      = Schatten von anderen\nLichtquellen
+Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
 Panel.MinimizedShow     = Elemente beibehalten\nwenn minimiert
 Panel.PanelLights       = Enable dynamic lights\nfrom panel lamps #NEW
 Panel.RouteNumber       = Route number #NEW
@@ -57,6 +67,8 @@ Panel.SoftReloadLang    = Spawnmenue nicht neuladen
 
 
 #Common train
+
+#Cameras
 Train.Common.Camera0        = Fahrersitz
 Train.Common.RouteNumber    = Umlauf
 Train.Common.LastStation    = Letzte Station
@@ -111,9 +123,12 @@ Train.Buttons.Speed          = %d km/h #NEW
 Train.Buttons.SpeedAll       = %d km/h Speed limit:%s km/h #NEW
 Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
 Train.Buttons.04             = NF #NEW
-Train.Buttons.BCPressure     = %.1f bar #NEW
-Train.Buttons.BLTLPressure   = TL: %.1f bar BL:%.1f bar #NEW
+Train.Buttons.BCPressure     = %.1f kgf/cm² #NEW
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL:%.1f kgf/cm² #NEW (TL: Train line, BL: Brake line acronyms)
+Train.Buttons.Locked         = Locked #NEW
+Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Zugbasis
@@ -184,6 +199,16 @@ Spawner.Close                           = Schließen
 Spawner.Trains1                         = erlaubte Wagen
 Spawner.Trains2                         = pro Spieler
 Spawner.WagNum                          = Anzahl der Wagen
+Spawner.PresetTitle                     = Presets #NEW
+Spawner.Preset.New                      = New preset #NEW
+Spawner.Preset.Unsaved                  = Save current preset #NEW
+Spawner.Preset.NewTooltip               = Create #NEW
+Spawner.Preset.UpdateTooltip            = Update #NEW
+Spawner.Preset.RemoveTooltip            = Delete #NEW
+Spawner.Presets.NamePlaceholder         = Preset name #NEW
+Spawner.Presets.Name                    = Name #NEW
+Spawner.Presets.NameError               = Invalid name #NEW
+Spawner.Preset.NotSelected              = Preset not selected #NEW
 Common.Spawner.Texture                  = Aussehen (aussen)
 Common.Spawner.PassTexture              = Aussehen (innen)
 Common.Spawner.CabTexture               = Aussehen (Fuehrerstand)
@@ -336,6 +361,7 @@ Common.ARS.VRD                              = VRD: Bewegen erlauben(wenn 0 auf A
 Common.ARS.KB                               = KB: Wachsam-Knopf
 Common.ARS.KVT                              = KVT: Bremsempfehlung wahrgenommen
 Common.ARS.KVTR                             = KVT: ARS-R Bremsempfehlung wahrgenommen
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OCh: Keine ARS Frequenz
 Common.ARS.N4                               = NCh: Keine ARS Frequenz
 Common.ARS.0                                = 0: ARS Zwangshalt
@@ -403,6 +429,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menue
 Common.ASNP.ASNPUp          = ASNP: Hoch
 Common.ASNP.ASNPDown        = ASNP: Runter
 Common.ASNP.ASNPOn          = ASNP: Strom
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = Lüftung verringern

@@ -43,17 +43,17 @@ Common.707.SEQ                  = Лампа вращения РК
 Common.707.TAH                  = Тумблер аварийного хода для движения без АРС
 Common.710.LKVT                 = ЛКВТ: Лампа кнопки восприятия торможения
 
-Common.710.SAMMSchemeOff        = Кнопка выключения тяги автоведения
-Common.710.SAMMStart            = Кнопка пуска от автоведения
-Common.710.SAMMReset            = Кнопка сброса
-Common.710.SAMMXTLamp           = Кнопка сбора схемы от автоведения в ход/тормоз
-Common.710.SAMMSignal1          = @[Common.ALL.Unsused1]
-Common.710.SAMMSignal2          = @[Common.ALL.Unsused1]
-Common.710.SAMMOn               = Включение САММ
-Common.710.SAMMUnit             = Включение исполнительного блока САММ
-Common.710.SAMMX2               = Режим Х2
-Common.710.SAMMAhead            = Режим нагона
-Common.710.SAMMAccept           = Подтверждение
+Common.710.SAMMSchemeOff        = САММ: Кнопка выключения тяги автоведения
+Common.710.SAMMStart            = САММ: Кнопка пуска от автоведения
+Common.710.SAMMReset            = САММ: Кнопка сброса
+Common.710.SAMMXTLamp           = САММ: Лампа сбора схемы от автоведения в ход/тормоз
+Common.710.SAMMSignal1          = САММ: @[Common.ALL.Unsused1]
+Common.710.SAMMSignal2          = САММ: @[Common.ALL.Unsused1]
+Common.710.SAMMOn               = САММ: Включение САММ
+Common.710.SAMMUnit             = САММ: Включение исполнительного блока САММ
+Common.710.SAMMX2               = САММ: Режим Х2
+Common.710.SAMMAhead            = САММ: Режим нагона
+Common.710.SAMMAccept           = САММ: Подтверждение
 
 #gmod_subway_81-702
 Entities.gmod_subway_81-702.Buttons.Battery.VBToggle        = @[Common.ALL.VB] @[Common.ALL.VB2]

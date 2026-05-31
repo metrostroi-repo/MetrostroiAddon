@@ -21,6 +21,15 @@ Workshop.ErrorEnhancers     = Ez a kiegészítő grafikus javításokat tartalma
 Workshop.Error1             = Ez a kiegészítő a Metrostroi régi szkriptjeit tartalmazza, amelyek zavarhatják a jelenlegieket. "Szkript hiba" és instabil működés léphet föl.
 Workshop.ErrorOld           = Régi modellek észlelhetők (81-702 és 81-717 régi modelljei). Ellenőrizd és töröld a régi Metrostroi fájlokat, távolítsd el a "cache", "download" és "downloads" mappákat a "garrysmod" könyvtárból.
 
+#Station list GUI
+StationList.Title           = Station list #NEW
+StationList.Name            = Name #NEW
+StationList.NamePos         = Position #NEW
+StationList.Select          = Select station #NEW
+StationList.Teleport        = Teleport #NEW
+StationList.NoConfig        = This map is not configured #NEW
+StationList.NoULX           = ULX not installed #NEW
+
 #Client settings
 Panel.Admin             = Admin
 Panel.RequireThirdRail  = Harmadik sín szükséges
@@ -37,7 +46,10 @@ Panel.ScreenshotMode    = Képernyőmentés mód (ALACSONY FPS)
 Panel.ShadowsHeadlight  = Fényszóró árnyékok bekapcsolása
 Panel.RedLights         = \nZárjelző lámpák dinamikus fényének bekapcsolása
 Panel.ShadowsOther      = \nEgyéb forrásokból származó árnyékok bekapcsolása
+Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
 Panel.MinimizedShow     = Ne töltse be az elemeket, \nha a program tálcán van
+Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
+Panel.RouteNumber       = Route number #NEW
 Panel.FOV               = FOV
 Panel.Z                 = Kamera magassága
 Panel.RenderDistance    = Renderelési távolság
@@ -55,6 +67,8 @@ Panel.SoftReloadLang    = Ne töltsön be új spawnmenü-t
 
 
 #Common train
+
+#Cameras
 Train.Common.Camera0        = Vezető ülés
 Train.Common.RouteNumber    = Forgalmi szám
 Train.Common.LastStation    = Végállomás
@@ -64,7 +78,57 @@ Train.Common.PneumoPanels   = Pneumatikus szelepek
 Train.Common.Voltmeters     = Volt- és ampermérők
 Train.Common.CouplerCamera  = Csatlás
 Common.ARM.Monitor1         = Monitor 1 ARM
+
 Train.Buttons.Sealed        = Leplombált
+Train.Buttons.Active        = Active #NEW
+Train.Buttons.Auto          = Auto #NEW
+Train.Buttons.On            = On #NEW
+Train.Buttons.Off           = Off #NEW
+Train.Buttons.Closed        = Closed #NEW
+Train.Buttons.Opened        = Opened #NEW
+Train.Buttons.Disconnected  = Disconnected #NEW
+Train.Buttons.Connected     = Connected #NEW
+Train.Buttons.UAVAOff       = Control circuits is open #NEW (OFF)
+Train.Buttons.UAVAOn        = Control circuits is closed #NEW (ON)
+Train.Buttons.Freq1/5       = 1/5 autoblocking #NEW
+Train.Buttons.Freq2/6       = 2/6 ALS-ARS #NEW
+Train.Buttons.Left          = Left #NEW
+Train.Buttons.Right         = Right #NEW
+Train.Buttons.Low           = Low #NEW
+Train.Buttons.High          = High #NEW #FIXME
+Train.Buttons.LFar          = Bright #NEW #FIXME (headlights)
+Train.Buttons.LNear         = Dim #NEW #FIXME (headlights)
+Train.Buttons.0             = 0 #NEW
+Train.Buttons.1             = 1 #NEW
+Train.Buttons.2             = 2 #NEW
+Train.Buttons.3             = 3 #NEW
+Train.Buttons.4             = 4 #NEW
+Train.Buttons.Forward       = Forward #NEW
+Train.Buttons.Back          = Backward #NEW
+Train.Buttons.VentHalf      = 1/2 of speed #NEW (of ventilation)
+Train.Buttons.VentFull      = Full speed #NEW (of ventilation)
+Train.Buttons.VTRF          = Forward oriented wagons #NEW
+Train.Buttons.VTRB          = Back oriented wagons #NEW
+Train.Buttons.VTR1          = Even wagons #NEW
+Train.Buttons.VTR2          = Odd wagons #NEW
+Train.Buttons.VTRH1         = First half of train #NEW
+Train.Buttons.VTRH2         = Second half of train #NEW
+Train.Buttons.VTRAll        = All wagons #NEW
+
+Train.Buttons.BatteryVoltage = %d V #NEW
+Train.Buttons.HighVoltage    = %d V #NEW
+Train.Buttons.BatteryCurrent = %d A #NEW
+Train.Buttons.EnginesCurrent = %d A #NEW
+Train.Buttons.Speed          = %d km/h #NEW
+Train.Buttons.SpeedAll       = %d km/h\nSpeed limit: %s km/h #NEW #FIXME
+Train.Buttons.SpeedLimit     = %s km/h #NEW
+Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
+Train.Buttons.04             = NF #NEW (no frequency)
+Train.Buttons.BCPressure     = %.1f kgf/cm²
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL: %.1f kgf/cm² #NEW (TL: Train line, BL: Brake line acronyms)
+Train.Buttons.Locked         = Locked #NEW
+Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Metrókocsi alap
@@ -297,6 +361,7 @@ Common.ARS.VRD                              = VRD: Mozgatás engedély(ALS 0-ás
 Common.ARS.KB                               = KB: Éberségi gomb/pedál
 Common.ARS.KVT                              = KVT: Féknyugtázó gomb
 Common.ARS.KVTR                             = KVT: ARS-R féknyugtázó gomb
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OCh: Nincs ARS frekvencia
 Common.ARS.N4                               = NCh: Nincs ARS frekvencia
 Common.ARS.0                                = 0: ARS stop jelzés
@@ -364,6 +429,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menü
 Common.ASNP.ASNPUp          = ASNP: Fel
 Common.ASNP.ASNPDown        = ASNP: Le
 Common.ASNP.ASNPOn          = ASNP: Áramellátás
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = Fülkeszellőztetés erejének csökkentése

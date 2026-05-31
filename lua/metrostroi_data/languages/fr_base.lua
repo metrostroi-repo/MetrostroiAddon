@@ -21,6 +21,15 @@ Workshop.ErrorEnhancers     = Cet addon contient un mod graphique susceptible d'
 Workshop.Error1             = Cette extension contient un ancien code de script de Metrostroi qui crée un conflit avec l'actuel. Cela peut créer des "Scripts errors" et une instabilité de l'extension.
 Workshop.ErrorOld           = Anciens modèles détectés (ancien modèles des 81-702 et 81-717). Supprimez les anciens fichiers de contenu de Metrostroi du dossier "Addons", supprimez les fichiers "Cache", "Download" et "Downloads", du dossier principal Garry's Mod.
 
+#Station list GUI
+StationList.Title           = Station list
+StationList.Name            = Name
+StationList.NamePos         = Position
+StationList.Select          = Select station
+StationList.Teleport        = Teleport
+StationList.NoConfig        = This map is not configured
+StationList.NoULX           = ULX not installed
+
 #Client settings
 Panel.Admin             = Administrateur
 Panel.RequireThirdRail  = Requiert un troisième rail
@@ -37,6 +46,7 @@ Panel.ScreenshotMode    = Mode screenshot (IPS bas)
 Panel.ShadowsHeadlight  = Active les ombres des phares
 Panel.RedLights         = Activer la lumière dynamique\ndes feux rouges
 Panel.ShadowsOther      = Active les ombres d'autres\nsources de lumière
+Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
 Panel.MinimizedShow     = Empêche la \ndisparition d'éléments
 Panel.PanelLights       = Enable dynamic lights\nfrom panel lamps #NEW
 Panel.RouteNumber       = Route number #NEW
@@ -57,6 +67,8 @@ Panel.SoftReloadLang    = Désactive la recharge du spawnmenu
 
 
 #Common train
+
+#Cameras
 Train.Common.Camera0        = Siège du conducteur
 Train.Common.RouteNumber    = Numéro de route
 Train.Common.LastStation    = Dernière station
@@ -111,9 +123,12 @@ Train.Buttons.Speed          = %d km/h #NEW
 Train.Buttons.SpeedAll       = %d km/h Speed limit:%s km/h #NEW
 Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
 Train.Buttons.04             = NF #NEW
-Train.Buttons.BCPressure     = %.1f bar #NEW
-Train.Buttons.BLTLPressure   = TL: %.1f bar BL:%.1f bar #NEW
+Train.Buttons.BCPressure     = %.1f kgf/cm² #NEW
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL:%.1f kgf/cm² #NEW
+Train.Buttons.Locked         = Locked #NEW
+Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Base de métro
@@ -346,6 +361,7 @@ Common.ARS.VRD                              = VRD: Autoriser le mouvement(si 0 s
 Common.ARS.KB                               = KB: Bouton d'avertissement
 Common.ARS.KVT                              = KVT: Bouton de confirmation de freinage
 Common.ARS.KVTR                             = KVT: Bouton de confirmation d'ARS-R
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OCh: Absence de fréquence ARS
 Common.ARS.0                                = 0 : Signal d'arrêt ARS
 Common.ARS.N4                               = NCh: Absence de fréquence ARS
@@ -413,6 +429,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menu
 Common.ASNP.ASNPUp          = ASNP: Haut
 Common.ASNP.ASNPDown        = ASNP: Bas
 Common.ASNP.ASNPOn          = ASNP: Alimentation
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = Réduit l'alimentation de la ventilation en cabine

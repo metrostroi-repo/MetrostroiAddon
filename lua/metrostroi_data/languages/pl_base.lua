@@ -21,6 +21,15 @@ Workshop.ErrorEnhancers     = This addon contain a graphic enhancers that may in
 Workshop.Error1             = Ten addon zawiera stary kod modu Metrostroi, który nie jest kompatybilny z zainstalowanym. Mogą pojawić się "Script errors" i zachodzić niestabilność addonu.
 Workshop.ErrorOld           = Old models detected (81-702 and 81-717 old models). Check and remove old metrostroi content files, remove cache, download and downloads folders from garrysmod folder.
 
+#Station list GUI
+StationList.Title           = Station list
+StationList.Name            = Name
+StationList.NamePos         = Position
+StationList.Select          = Select station
+StationList.Teleport        = Teleport
+StationList.NoConfig        = This map is not configured
+StationList.NoULX           = ULX not installed
+
 #Client settings
 Panel.Admin             = Admin
 Panel.RequireThirdRail  = Wymagaj trzeciej szyny
@@ -37,6 +46,7 @@ Panel.ScreenshotMode    = Tryb fotografii (NISKI FPS!)
 Panel.ShadowsHeadlight  = Włącz dynamiczne cienie (lampy)
 Panel.RedLights         = Enable dynamic light\nof red lights
 Panel.ShadowsOther      = Włącz dynamiczne cienie (inne źródła)
+Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
 Panel.MinimizedShow     = Nie zwalniaj zasobów podczas minimalizacji
 Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
 Panel.RouteNumber       = Route number #NEW
@@ -113,9 +123,10 @@ Train.Buttons.Speed          = %d km/h #NEW
 Train.Buttons.SpeedAll       = %d km/h\nSpeed limit: %s km/h #NEW #FIXME
 Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
 Train.Buttons.04             = NF #NEW (no frequency)
-Train.Buttons.BCPressure     = %.1f bar
-Train.Buttons.BLTLPressure   = TL: %.1f bar\nBL: %.1f bar #NEW (TL: Train line, BL: Brake line acronyms)
+Train.Buttons.BCPressure     = %.1f kgf/cm²
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL: %.1f kgf/cm² #NEW (TL: Train line, BL: Brake line acronyms)
 Train.Buttons.Locked         = Locked #NEW
 Train.Buttons.Unlocked       = Unlocked #NEW
 
@@ -350,6 +361,7 @@ Common.ARS.VRD                              = VRD: Zezwolenie jazdy podczas sygn
 Common.ARS.KB                               = KB: Przycisk czuwaka
 Common.ARS.KVT                              = KVT: Przycisk kasowania hamowania
 Common.ARS.KVTR                             = KVT: Przycisk kasowania hamowania w trybie ARS-R
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OCh: Brak sygnału ARS
 Common.ARS.N4                               = NCh: No ARS frequency #FIXME (same as OCh but NCh)
 Common.ARS.0                                = 0: Sygnał "stój"
@@ -417,6 +429,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menu
 Common.ASNP.ASNPUp          = ASNP: W górę
 Common.ASNP.ASNPDown        = ASNP: W dół
 Common.ASNP.ASNPOn          = Wyłącznik ASNP
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = Decrease cabin ventilation power #FIXME

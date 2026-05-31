@@ -21,6 +21,15 @@ Workshop.ErrorEnhancers     = Tento addon obsahuje vylepšení grafiky, které m
 Workshop.Error1             = Tento addon obsahuje starý script kód módu Metrostroi, který není kompatibilní se současnou verzí. Může se zobrazit hláška "Scrips errors", a může se projevit nestabilita addonu.
 Workshop.ErrorOld           = Nalezeny staré modely (81-702 a 81-717). Odstraňte původní herní obsah hry Metrostroi (složka garrysmod/addons), a odstraňte složky "cache", "download" a "downloads" ze složky "garrysmod".
 
+#Station list GUI
+StationList.Title           = Station list
+StationList.Name            = Name
+StationList.NamePos         = Position
+StationList.Select          = Select station
+StationList.Teleport        = Teleport
+StationList.NoConfig        = This map is not configured
+StationList.NoULX           = ULX not installed
+
 #Client settings
 Panel.Admin             = Admin
 Panel.RequireThirdRail  = Zapnout nutnost přítomnosti přívodní kolejnice
@@ -37,6 +46,7 @@ Panel.ScreenshotMode    = Mód snímku obrazovky (NÍZKÉ FPS)
 Panel.RedLights         = Zapnout dynamická červená světla
 Panel.ShadowsHeadlight  = Zapnout odrazy reflektorů
 Panel.ShadowsOther      = Zapnout odrazy ostatních\nzdrojů světla
+Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
 Panel.MinimizedShow     = Nenačítat znovu součásti\npři minimalizování
 Panel.PanelLights       = Enable dynamic lights\nfrom panel lamps #NEW
 Panel.RouteNumber       = Route number #NEW
@@ -57,6 +67,8 @@ Panel.SoftReloadLang    = Znovu nenahrávat spawnovací menu
 
 
 #Common train
+
+#Cameras
 Train.Common.Camera0        = Sedadlo strojvedoucího
 Train.Common.RouteNumber    = Číslo turnusu
 Train.Common.LastStation    = Konečná stanice
@@ -111,9 +123,12 @@ Train.Buttons.Speed          = %d km/h #NEW
 Train.Buttons.SpeedAll       = %d km/h Speed limit:%s km/h #NEW
 Train.Buttons.SpeedLimit     = %s km/h #NEW
 Train.Buttons.SpeedLimitNext = %s km/h #NEW
+Train.Buttons.Acceleration   = % 4.2f m/s #NEW
 Train.Buttons.04             = NF #NEW
 Train.Buttons.BCPressure     = %.1f kgf/cm² #NEW #FIXME bar?
-Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm² BL:%.1f kgf/cm² #NEW #FIXME bar?
+Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL:%.1f kgf/cm² #NEW #FIXME
+Train.Buttons.Locked         = Locked #NEW
+Train.Buttons.Unlocked       = Unlocked #NEW
 
 #Train entities
 Entities.gmod_subway_base.Name        = Vozová základna
@@ -346,6 +361,7 @@ Common.ARS.VRD                              = VRD: Jízda proti návěsti Stůj!
 Common.ARS.KB                               = KB: Tlačítko bdělosti
 Common.ARS.KVT                              = KVT: Tlačítko bdělosti
 Common.ARS.KVTR                             = KVT: Tlačítko bdělosti (režim ARS-R)
+Common.ARS.AO                               = AO: Absolute stop signal #NEW
 Common.ARS.04                               = OČ: Bez kódu
 Common.ARS.N4                               = NČ: Bez kódu
 Common.ARS.0                                = 0: Kód 0 (Návěst zastavení)
@@ -413,6 +429,7 @@ Common.ASNP.ASNPMenu        = ASNP: Menu
 Common.ASNP.ASNPUp          = ASNP: Nahoru
 Common.ASNP.ASNPDown        = ASNP: Dolů
 Common.ASNP.ASNPOn          = ASNP: Napájení
+Common.ASNP.ASNPPath        = ASNP: Set path #NEW
 
 #PVK
 Common.CabVent.PVK-         = Snížit výkon ventilace v kabině
