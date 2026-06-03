@@ -690,10 +690,10 @@ Entities.gmod_subway_81-719.Buttons.couch_cap.CouchCap                          
 
 Entities.gmod_subway_81-719.Buttons.Battery.VBToggle    = @[Common.ALL.VB]
 
-Entities.gmod_subway_81-719.Buttons.Voltages.!BatteryVoltage    = @[Common.ALL.BatteryVoltage] #NEW
-Entities.gmod_subway_81-719.Buttons.Voltages.!BatteryCurrent    = @[Common.ALL.BatteryCurrent] #NEW
-Entities.gmod_subway_81-719.Buttons.Pressures.!BCPressure       = @[Common.ALL.BLTLPressure] #NEW
-Entities.gmod_subway_81-719.Buttons.Pressures.!BLTLPressure     = @[Common.ALL.BCPressure] #NEW
+Entities.gmod_subway_81-719.Buttons.Voltages.!BatteryVoltage    = @[Common.ALL.BatteryVoltage]
+Entities.gmod_subway_81-719.Buttons.Voltages.!BatteryCurrent    = @[Common.ALL.BatteryCurrent]
+Entities.gmod_subway_81-719.Buttons.Pressures.!BCPressure       = @[Common.ALL.BLTLPressure]
+Entities.gmod_subway_81-719.Buttons.Pressures.!BLTLPressure     = @[Common.ALL.BCPressure]
 
 #Spawner:
 Entities.gmod_subway_81-718.Spawner.Texture.Name     = @[Common.Spawner.Texture]

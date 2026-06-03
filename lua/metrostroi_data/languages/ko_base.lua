@@ -1,9 +1,9 @@
 return [[
-#Base text for English language
+#Base text for Korean language
 
-[kr]
+[ko]
 lang        = 한국어                           #Full language name
-AuthorText  = Translation Author: Archerity      #Author text
+AuthorText  = Translation Author: Lunasyel      #Author text
 
 #Workshop errors
 Workshop.Title              = 컨텐츠 매니저
@@ -22,13 +22,13 @@ Workshop.Error1             = 이 애드온은 현재 버전과 충돌을 일으
 Workshop.ErrorOld           = 이전 버전의 모델이 감지되었습니다 (81-702, 81-717 의 옛날 모델). 이전 버전의 Metrostroi 컨텐츠가 남아 있는지 확인 후 삭제하고, 게리모드 폴더에 있는 "cache","download","downloads" 폴더를 삭제해주세요.
 
 #Station list GUI
-StationList.Title           = Station list #NEW
-StationList.Name            = Name #NEW
-StationList.NamePos         = Position #NEW
-StationList.Select          = Select station #NEW
-StationList.Teleport        = Teleport #NEW
-StationList.NoConfig        = This map is not configured #NEW
-StationList.NoULX           = ULX not installed #NEW
+StationList.Title           = 정거장 목록 
+StationList.Name            = 이름 
+StationList.NamePos         = 위치 
+StationList.Select          = 정거장 선택 
+StationList.Teleport        = 이동 
+StationList.NoConfig        = 이 맵의 설정 파일을 찾을 수 없습니다. 
+StationList.NoULX           = ULX가 설치되어 있지 않습니다. 
 
 #Client settings
 Panel.Admin             = 관리자
@@ -40,20 +40,20 @@ Panel.DrawCams          = 카메라 렌더링
 Panel.DisableHUD        = 운전석 착석시 HUD 비활성
 Panel.DisableCamAccel   = 시점 흔들림 사용 안함
 Panel.DisableHoverText  = 주석 텍스트 표시 안함
-Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW
-Panel.DisableSeatShadows= Disable seat shadows #NEW
+Panel.DisableHoverTextP = 주석 텍스트에서 추가 정보 숨기기 
+Panel.DisableSeatShadows= 의자 그림자 비활성 
 Panel.ScreenshotMode    = 스크린샷 모드 (낮은 FPS)
 Panel.ShadowsHeadlight  = 전조등 그림자 활성
-Panel.RedLights         = 적색등의 다이나믹 라이트 사용
+Panel.RedLights         = 적색등의 동적 조명 사용
 Panel.ShadowsOther      = 기타 광원 그림자 활성
-Panel.PanelSprites      = Enable sprites from control\npanel lamps #NEW
+Panel.PanelSprites      = 운전대 표시등의 스프라이트 표현 사용 
 Panel.MinimizedShow     = 창 최소화시 구성요소 언로드 하지 않기
-Panel.PanelLights       = Enable dynamic lights\nfrom control panel lamps #NEW
-Panel.RouteNumber       = Route number #NEW
+Panel.PanelLights       = 운전대 표시등의 동적 조명 사용 
+Panel.RouteNumber       = 열차 번호 
 Panel.FOV               = 시야각(FOV)
 Panel.Z                 = 시점 높이
 Panel.RenderDistance    = 렌더링 거리
-Panel.RenderSignals     = Traced signals #NEW #FIXME
+Panel.RenderSignals     = 신호등 묘사 
 Panel.ReloadClient      = 사용자 시스템 다시 불러오기
 
 Panel.ClientAdvanced    = 사용자 (고급설정)
@@ -70,7 +70,7 @@ Panel.SoftReloadLang    = 스폰 메뉴 다시 불러오지 않기
 
 #Cameras
 Train.Common.Camera0        = 운전석
-Train.Common.RouteNumber    = 경로 번호
+Train.Common.RouteNumber    = 열차 번호
 Train.Common.LastStation    = 종착역
 Train.Common.HelpersPanel   = 보조석 패널
 Train.Common.UAVA           = UAVA
@@ -80,55 +80,55 @@ Train.Common.CouplerCamera  = 연결기
 Common.ARM.Monitor1         = ARM 모니터 1
 
 Train.Buttons.Sealed        = 봉인 됨
-Train.Buttons.Active        = Active #NEW
-Train.Buttons.Auto          = Auto #NEW
-Train.Buttons.On            = On #NEW
-Train.Buttons.Off           = Off #NEW
-Train.Buttons.Closed        = Closed #NEW
-Train.Buttons.Opened        = Opened #NEW
-Train.Buttons.Disconnected  = Disconnected #NEW
-Train.Buttons.Connected     = Connected #NEW
-Train.Buttons.UAVAOff       = Control circuits is open #NEW (OFF)
-Train.Buttons.UAVAOn        = Control circuits is closed #NEW (ON)
-Train.Buttons.Freq1/5       = 1/5 autoblocking #NEW
-Train.Buttons.Freq2/6       = 2/6 ALS-ARS #NEW
-Train.Buttons.Left          = Left #NEW
-Train.Buttons.Right         = Right #NEW
-Train.Buttons.Low           = Low #NEW
-Train.Buttons.High          = High #NEW #FIXME
-Train.Buttons.LFar          = Bright #NEW #FIXME (headlights)
-Train.Buttons.LNear         = Dim #NEW #FIXME (headlights)
-Train.Buttons.0             = 0 #NEW
-Train.Buttons.1             = 1 #NEW
-Train.Buttons.2             = 2 #NEW
-Train.Buttons.3             = 3 #NEW
-Train.Buttons.4             = 4 #NEW
-Train.Buttons.Forward       = Forward #NEW
-Train.Buttons.Back          = Backward #NEW
-Train.Buttons.VentHalf      = 1/2 of speed #NEW (of ventilation)
-Train.Buttons.VentFull      = Full speed #NEW (of ventilation)
-Train.Buttons.VTRF          = Forward oriented wagons #NEW
-Train.Buttons.VTRB          = Back oriented wagons #NEW
-Train.Buttons.VTR1          = Even wagons #NEW
-Train.Buttons.VTR2          = Odd wagons #NEW
-Train.Buttons.VTRH1         = First half of train #NEW
-Train.Buttons.VTRH2         = Second half of train #NEW
-Train.Buttons.VTRAll        = All wagons #NEW
+Train.Buttons.Active        = 활성 
+Train.Buttons.Auto          = 자동 
+Train.Buttons.On            = 켜짐 
+Train.Buttons.Off           = 꺼짐 
+Train.Buttons.Closed        = 닫힘 
+Train.Buttons.Opened        = 열림 
+Train.Buttons.Disconnected  = 분리 됨 
+Train.Buttons.Connected     = 연결 됨 
+Train.Buttons.UAVAOff       = 제어 회로 개방 
+Train.Buttons.UAVAOn        = 제어 회로 접촉 
+Train.Buttons.Freq1/5       = 1/5 자동폐색식 
+Train.Buttons.Freq2/6       = 2/6 ALS-ARS 
+Train.Buttons.Left          = 좌 
+Train.Buttons.Right         = 우 
+Train.Buttons.Low           = 저 
+Train.Buttons.High          = 고 
+Train.Buttons.LFar          = 상향등 
+Train.Buttons.LNear         = 반감 
+Train.Buttons.0             = 0 
+Train.Buttons.1             = 1 
+Train.Buttons.2             = 2 
+Train.Buttons.3             = 3 
+Train.Buttons.4             = 4 
+Train.Buttons.Forward       = 전진 
+Train.Buttons.Back          = 후진 
+Train.Buttons.VentHalf      = 1/2 속도 
+Train.Buttons.VentFull      = 최대 속도 
+Train.Buttons.VTRF          = 정방향 객차 
+Train.Buttons.VTRB          = 역방향 객차 
+Train.Buttons.VTR1          = 짝수 객차 
+Train.Buttons.VTR2          = 홀수 객차 
+Train.Buttons.VTRH1         = 전부 1/2  
+Train.Buttons.VTRH2         = 후부 1/2  
+Train.Buttons.VTRAll        = 전체 
 
-Train.Buttons.BatteryVoltage = %d V #NEW
-Train.Buttons.HighVoltage    = %d V #NEW
-Train.Buttons.BatteryCurrent = %d A #NEW
-Train.Buttons.EnginesCurrent = %d A #NEW
-Train.Buttons.Speed          = %d km/h #NEW
-Train.Buttons.SpeedAll       = %d km/h\nSpeed limit: %s km/h #NEW #FIXME
-Train.Buttons.SpeedLimit     = %s km/h #NEW
-Train.Buttons.SpeedLimitNext = %s km/h #NEW
-Train.Buttons.Acceleration   = % 4.2f m/s #NEW
-Train.Buttons.04             = NF #NEW (no frequency)
+Train.Buttons.BatteryVoltage = %d V 
+Train.Buttons.HighVoltage    = %d V 
+Train.Buttons.BatteryCurrent = %d A 
+Train.Buttons.EnginesCurrent = %d A 
+Train.Buttons.Speed          = %d km/h 
+Train.Buttons.SpeedAll       = %d km/h\n제한 속도: %s km/h
+Train.Buttons.SpeedLimit     = %s km/h 
+Train.Buttons.SpeedLimitNext = %s km/h 
+Train.Buttons.Acceleration   = % 4.2f m/s 
+Train.Buttons.04             = NF 
 Train.Buttons.BCPressure     = %.1f kgf/cm²
-Train.Buttons.BLTLPressure   = TL: %.1f kgf/cm²\nBL: %.1f kgf/cm² #NEW (TL: Train line, BL: Brake line acronyms)
-Train.Buttons.Locked         = Locked #NEW
-Train.Buttons.Unlocked       = Unlocked #NEW
+Train.Buttons.BLTLPressure   = 주공기관: %.1f kgf/cm²\n제동관: %.1f kgf/cm² 
+Train.Buttons.Locked         = 잠김 
+Train.Buttons.Unlocked       = 풀림 
 
 #Train entities
 Entities.gmod_subway_base.Name        = Subway base
@@ -317,12 +317,12 @@ Common.ALL.KRP                              = KRP: 비상 기동 버튼
 Common.ALL.VZP                              = VZP: 출발 스위치
 Common.ALL.VZD                              = VZD: 출입문 스위치
 Common.ALL.VAV                              = VAV: 자동 운전 버튼
-Common.ALL.RouteNumber1+                    = 경로 번호: 첫째 자리 증가
-Common.ALL.RouteNumber1-                    = 경로 번호: 첫째 자리 감소
-Common.ALL.RouteNumber2+                    = 경로 번호: 둘째 자리 증가
-Common.ALL.RouteNumber2-                    = 경로 번호: 둘째 자리 감소
-Common.ALL.RouteNumber3+                    = 경로 번호: 셋째 자리 증가
-Common.ALL.RouteNumber3-                    = 경로 번호: 셋째 자리 감소
+Common.ALL.RouteNumber1+                    = 열차 번호: 첫째 자리 증가
+Common.ALL.RouteNumber1-                    = 열차 번호: 첫째 자리 감소
+Common.ALL.RouteNumber2+                    = 열차 번호: 둘째 자리 증가
+Common.ALL.RouteNumber2-                    = 열차 번호: 둘째 자리 감소
+Common.ALL.RouteNumber3+                    = 열차 번호: 셋째 자리 증가
+Common.ALL.RouteNumber3-                    = 열차 번호: 셋째 자리 감소
 Common.ALL.LastStation+                     = 다음 종착역
 Common.ALL.LastStation-                     = 이전 종착역
 Common.ALL.RRP                              = RP: 과전류 계전기 확인등 (적색) (전원 회로 연결 실패)
@@ -360,7 +360,7 @@ Common.ARS.VRD                              = VRD: 주행 허용 (ALS 신호 0 �
 Common.ARS.KB                               = KB: 확인 버튼
 Common.ARS.KVT                              = KVT: 제동 확인 버튼
 Common.ARS.KVTR                             = KVT: ARS-R 제동 확인 버튼
-Common.ARS.AO                               = AO: Absolute stop signal #NEW
+Common.ARS.AO                               = AO: 절대 정지 신호 
 Common.ARS.04                               = OCh: ARS 신호 없음
 Common.ARS.N4                               = NCh: ARS 신호 없음
 Common.ARS.0                                = 0: ARS 정지 신호
@@ -428,7 +428,7 @@ Common.ASNP.ASNPMenu        = ASNP: 메뉴
 Common.ASNP.ASNPUp          = ASNP: 위
 Common.ASNP.ASNPDown        = ASNP: 아래
 Common.ASNP.ASNPOn          = ASNP: 전원
-Common.ASNP.ASNPPath        = ASNP: Set path #NEW
+Common.ASNP.ASNPPath        = ASNP: 경로 설정 
 
 #PVK
 Common.CabVent.PVK-         = 운전실 환풍기 세기: -

@@ -1,7 +1,7 @@
 return [[
 #81-720
 
-[kr]
+[ko]
 
 #######Buttons###########
 #Cameras

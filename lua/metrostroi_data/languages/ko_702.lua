@@ -1,7 +1,7 @@
 return [[
 #D/E-based types
 
-[kr]
+[ko]
 
 #Cameras:
 Train.702.Breakers1 = 배터리 스위치

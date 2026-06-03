@@ -193,7 +193,9 @@ Entities.gmod_subway_81-502.Buttons.BCPressure.!BCPressure               = @[Com
 Entities.gmod_subway_81-502.Buttons.HVMeters.!EnginesVoltage             = @[Common.ALL.EnginesVoltage]
 Entities.gmod_subway_81-502.Buttons.HVMeters.!EnginesCurrent             = @[Common.ALL.EnginesCurrent]
 Entities.gmod_subway_81-502.Buttons.BatteryVoltage.!BatteryVoltage       = @[Common.ALL.BatteryVoltage]
+
 Entities.gmod_subway_81-502.Buttons.PanelLamp.PanelLampToggle            = @[Common.ALL.PanelLights]
+
 #gmod_subway_81-501
 Entities.gmod_subway_81-501.Buttons.AV.KPVUToggle               = @[Entities.gmod_subway_81-502.Buttons.AV.KPVUToggle]
 Entities.gmod_subway_81-501.Buttons.AV.KSDToggle                = @[Entities.gmod_subway_81-502.Buttons.AV.KSDToggle]

@@ -1,7 +1,7 @@
 return [[
 #81-722
 
-[kr]
+[ko]
 
 #Cameras:
 Train.722.Breakers      = 회로 차단기

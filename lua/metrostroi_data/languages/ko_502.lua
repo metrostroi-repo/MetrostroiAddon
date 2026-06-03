@@ -1,7 +1,7 @@
 return [[
 #81-502
 
-[kr]
+[ko]
 
 #######Buttons###########
 #Common
