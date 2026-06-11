@@ -669,7 +669,7 @@ local function enableDebug()
                 if ent.ButtonMap ~= nil then
                     draw.NoTexture()
                     for kp,panel in pairs(ent.ButtonMap) do
-                        if kp ~= "BaseClass" and LocalPlayer():GetPos():DistToSqr(ent:LocalToWorld(panel.pos)) < 262144 then
+                        if kp ~= "BaseClass" and LocalPlayer():GetPos():DistToSqr(ent:LocalToWorld(panel.pos)) < 1048576 then
                             ent:DrawOnPanel(kp,function()
                                 surface.SetDrawColor(0,0,255)
                                 if not ent:ShouldDrawPanel(kp) then surface.SetDrawColor(255,0,0) end
@@ -1065,7 +1065,7 @@ function ENT:Think()
     end    
 
     if (GetConVar("metrostroi_disablecamaccel"):GetInt() == 0) then
-        self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Float("Accel",0)+1)/2),0,1, 4, 1)*30-15)
+        self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Int("Accel",0)/20+1)/2),0,1, 4, 1)*30-15)
     else
         self.HeadAcceleration = 0
     end
@@ -2706,7 +2706,7 @@ function ENT:SetLightPower(index,power,brightness)
 end
 
 function ENT:OnStyk(soundid,location,range,pitch)
-    local speed = self:GetNW2Float("TrainSpeed",0)/100
+    local speed = self:GetNW2Int("TrainSpeed",0)*0.0001
     --local str = ""
     if self.TunnelCoeff > 0.01 then
         --local snd = Format("b%dtunnel_%d%s",pitch,range%10+1,soundid)

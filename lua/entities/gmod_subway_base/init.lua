@@ -260,6 +260,7 @@ function ENT:Initialize()
 
     -- Speed and acceleration of train
     self.Speed = 0
+    self.OldSpeed = 0
     self.SpeedSign = 0
     self.Acceleration = 0
 
@@ -2004,9 +2005,10 @@ function ENT:Think()
     end
     self.OldSpeed = self.Speed]]
     -- Go to next think
-    self:SetNW2Float("Accel",math.Round((self.OldSpeed or 0) - (self.Speed or 0)*(self.SpeedSign or 0),2))
-    self:SetNW2Float("TrainSpeed",self.Speed)
-    self.OldSpeed = (self.Speed or 0)*(self.SpeedSign or 0)
+    local accel = self.OldSpeed - self.Speed*self.SpeedSign
+    self:SetNW2Int("Accel", accel*20)
+    self:SetNW2Int("TrainSpeed", self.Speed*100)
+    self.OldSpeed = self.Speed*self.SpeedSign
 
     for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
     self:NextThink(CurTime()+0.05)
@@ -2490,8 +2492,8 @@ function ENT:GenerateJerks()
     elseif self.Speed > 2 then
         self.PrepareStart = false
     elseif self.Speed >= 0.5-math.max(0.25,(1.5-accel)*0.25) and accel > 0.5 and self.PrepareStart then
-        if IsValid(self.FrontBogey) then self.FrontBogey:EmitSound(table.Random(self.SoundNames["junk_enginestart_speed"]), 68, 1.2*math.random(96,110)) end
-        if IsValid(self.RearBogey) then self.RearBogey:EmitSound(table.Random(self.SoundNames["junk_enginestart_speed"]), 68, 1.2*math.random(96,110)) end
+        self.FrontBogey:EmitSound(table.Random(self.SoundNames["junk_enginestart_speed"]), 68, 1.2*math.random(96,110))
+        self.RearBogey:EmitSound(table.Random(self.SoundNames["junk_enginestart_speed"]), 68, 1.2*math.random(96,110))
         self.PrepareStart = false
     end
 end

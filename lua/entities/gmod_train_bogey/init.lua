@@ -661,7 +661,7 @@ function ENT:Think()
     self.RattleRandom = self.RattleRandom or 0.5+math.random()*0.2
     local PnF1 = math.Clamp((BCPress-0.6)/0.6,0,2)
     local PnF2 = math.Clamp((BCPress-self.RattleRandom)/0.6,0,2)
-    local brakeSqueal1 = (PnF1*PnF2)*pneumaticFactor
+    local brakeSqueal = (PnF1*PnF2)*pneumaticFactor
 
     --local brakeSqueal2 = (PnF1*PnF3)*pneumaticFactor
     -- Send parameters to client
@@ -670,11 +670,7 @@ function ENT:Think()
     end
 
     if self.DisableSound < 2 then
-        if self:GetNWBool("Async") then
-            self:SetNW2Float("BrakeSqueal",(self.BrakeCylinderPressure-0.9)/1.7)
-        else
-            self:SetNW2Float("BrakeSqueal1",brakeSqueal1)
-        end
+        self:SetNW2Int("BrakeSqueal",(self:GetNWBool("Async") and (self.BrakeCylinderPressure-0.9)/1.7 or brakeSqueal)*20)
     end
     if self.DisableSound < 3 then
         self:SetSpeed(absSpeed)

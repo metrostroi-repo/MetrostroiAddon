@@ -248,8 +248,8 @@ function ENT:Think()
         self.Async = self:GetNWBool("Async")
     end
 
+    local brakeSqueal = self:GetNW2Int("BrakeSqueal",0) / 20
     if self.Async then
-        local brakeSqueal = self:GetNW2Float("BrakeSqueal",0)
         if (brakeSqueal) > 0.0 then
             local nominalSqueal = self:GetNWFloat("SqualPitch",1)
             local secondSqueal = math.Clamp(1-(speed-2)/5,0,1)
@@ -265,8 +265,7 @@ function ENT:Think()
         end
         self.CurrentBrakeSqueal = brakeSqueal
     else
-        local brakeSqueal1 = math.max(0.0,math.min(2,self:GetNW2Float("BrakeSqueal1")))
-        if not self.SquealVolume or brakeSqueal1 <= 0 and self.CurrentBrakeSqueal > 0 or self.SquealType ~= self:GetNW2Int("SquealType",1) then
+        if not self.SquealVolume or brakeSqueal <= 0 and self.CurrentBrakeSqueal > 0 or self.SquealType ~= self:GetNW2Int("SquealType",1) then
             self.SquealType = self:GetNW2Int("SquealType",1)
             self.SquealSound1 = "brake_loop"..self.SquealType
             self.SquealVolume = self.SquealType == 1 and 0.2 or 1
@@ -278,19 +277,19 @@ function ENT:Think()
             self:SetSoundState("brake_loopb",0,0)
             self:SetSoundState("brake2_loop1",0,0)
             self:SetSoundState("brake2_loop2",0,0)
-        elseif brakeSqueal1 > 0 then
+        elseif brakeSqueal > 0 then
             --local brakeRamp1 = math.min(1.0,math.max(0.0,(speed-10)/50.0))^1.5
             local brakeRamp2 = math.min(1.0,math.max(0.0,speed/3.0))
             local ramp = 0.3+math.Clamp((40-speed)/40,0,1)*0.7
             if self.SquealType <= 4 then
-                self:SetSoundState(self.SquealSound1,soundsmul*brakeSqueal1*ramp*self.SquealVolume,1+0.05*(1.0-brakeRamp2))
-                --[[self:SetSoundState("brake_loop1",typ==1 and soundsmul*brakeSqueal1*ramp*0.2 or 0,1+0.05*(1.0-brakeRamp2))
-                self:SetSoundState("brake_loop2",typ==2 and soundsmul*brakeSqueal1*ramp or 0,1+0.05*(1.0-brakeRamp2))
-                self:SetSoundState("brake_loop3",typ==3 and soundsmul*brakeSqueal1*ramp or 0,1+0.05*(1.0-brakeRamp2))
-                self:SetSoundState("brake_loop4",typ==4 and soundsmul*brakeSqueal1*ramp or 0,1+0.05*(1.0-brakeRamp2))
-                self:SetSoundState("brake_loopb",typ<=4 and 0*soundsmul*brakeSqueal1*ramp*0.4 or 0,1+0.05*(1.0-brakeRamp2))]]
+                self:SetSoundState(self.SquealSound1,soundsmul*brakeSqueal*ramp*self.SquealVolume,1+0.05*(1.0-brakeRamp2))
+                --[[self:SetSoundState("brake_loop1",typ==1 and soundsmul*brakeSqueal*ramp*0.2 or 0,1+0.05*(1.0-brakeRamp2))
+                self:SetSoundState("brake_loop2",typ==2 and soundsmul*brakeSqueal*ramp or 0,1+0.05*(1.0-brakeRamp2))
+                self:SetSoundState("brake_loop3",typ==3 and soundsmul*brakeSqueal*ramp or 0,1+0.05*(1.0-brakeRamp2))
+                self:SetSoundState("brake_loop4",typ==4 and soundsmul*brakeSqueal*ramp or 0,1+0.05*(1.0-brakeRamp2))
+                self:SetSoundState("brake_loopb",typ<=4 and 0*soundsmul*brakeSqueal*ramp*0.4 or 0,1+0.05*(1.0-brakeRamp2))]]
             elseif self.SquealType <= 7 then
-                local loop_h = soundsmul*brakeSqueal1*ramp*0.5
+                local loop_h = soundsmul*brakeSqueal*ramp*0.5
                 if loop_h > 0.1 and speed > 1.5 then
                     if not self.HighLoop then
                         self.HighLoop = math.random()>0.5 and "brake_squeal2" or "brake_squeal1"
@@ -310,7 +309,7 @@ function ENT:Think()
                 end
             end
         end
-        self.CurrentBrakeSqueal = brakeSqueal1
+        self.CurrentBrakeSqueal = brakeSqueal
     end
 
     -- Generate procedural landscape thingy
