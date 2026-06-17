@@ -417,6 +417,10 @@ if SERVER then
     else print("Metrostroi: Simulation acceleration DISABLED")
     end
 
+    -- Load ConVars
+    include("metrostroi/convars.lua")
+    AddCSLuaFile("metrostroi/convars.lua")
+
     -- Load all lua translations
     local files = file.Find("metrostroi_data/languages/*.lua","LUA")
     for _,filename in pairs(files) do
@@ -426,15 +430,12 @@ if SERVER then
     files = file.Find("metrostroi/sv_*.lua","LUA")
     for _,filename in pairs(files) do include("metrostroi/"..filename) end
     -- Load all shared files serverside
-
-    include("metrostroi/convars.lua")
     files = file.Find("metrostroi/sh_*.lua","LUA")
     for _,filename in pairs(files) do include("metrostroi/"..filename) end
 
     files = file.Find("metrostroi/cl_*.lua","LUA")
     for _,filename in pairs(files) do AddCSLuaFile("metrostroi/"..filename) end
     -- Add all shared files
-    AddCSLuaFile("metrostroi/convars.lua")
     files = file.Find("metrostroi/sh_*.lua","LUA")
     for _,filename in pairs(files) do AddCSLuaFile("metrostroi/"..filename) end
     -- Add all system files
@@ -454,15 +455,9 @@ if SERVER then
         include("metrostroi/maps/"..filename)
     end
 else
-    --[[
-    concommand.Add( "metrostroi_reload_spawnmenu", function()
-    if IsValid( g_SpawnMenu ) then
-        g_SpawnMenu:Remove()
-        g_SpawnMenu = nil
-    end
-        hook.Call("OnGamemodeLoaded")
-    end)]]
+    -- Load ConVars
     include("metrostroi/convars.lua")
+
     -- Load all clientside files
     local files = file.Find("metrostroi/cl_*.lua","LUA")
     for _,filename in pairs(files) do include("metrostroi/"..filename) end

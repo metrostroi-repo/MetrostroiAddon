@@ -7,6 +7,8 @@ end
 
 --]=]
 
+local C_DrawDebug = GetConVar("metrostroi_drawdebug")
+
 
 Metrostroi.Languages = Metrostroi.Languages or {}
 Metrostroi.ChoosedLang = GetConVar("metrostroi_language"):GetString()
@@ -28,17 +30,17 @@ end
 if not file.Exists("metrostroi_data","DATA") then file.CreateDir("metrostroi_data") end
 if not file.Exists("metrostroi_data/languages","DATA") then file.CreateDir("metrostroi_data/languages") end
 local function debugmsg(...)
-    if GetConVar("metrostroi_drawdebug"):GetInt() == 0 then return end
+    if not C_DrawDebug:GetBool() then return end
     MsgC(...)
     MsgC("\n")
 end
 local function errmsg(...)
-    if GetConVar("metrostroi_drawdebug"):GetInt() == 0 then return end
+    if not C_DrawDebug:GetBool() then return end
     MsgC(...)
     ErrorNoHalt("\n")
 end
 local function errnhmsg(...)
-    if GetConVar("metrostroi_drawdebug"):GetInt() == 0 then return end
+    if not C_DrawDebug:GetBool() then return end
     ErrorNoHalt(...)
 end
 function Metrostroi.LoadLanguage(lang,force)

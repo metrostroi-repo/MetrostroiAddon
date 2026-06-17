@@ -1,8 +1,8 @@
 --[[-------------------------------------------------------------------------
 Addons checker for metrostroi addon
 ---------------------------------------------------------------------------]]
-CreateClientConVar("metrostroi_addons_check_skip_error",0,true)
-CreateClientConVar("metrostroi_addons_check_ignore",0,true)
+local C_CheckSkipError = CreateClientConVar("metrostroi_addons_check_skip_error",0,true)
+local C_CheckIgnore = CreateClientConVar("metrostroi_addons_check_ignore",0,true)
 
 if SERVER then return end
 local RequiredAddons = {
@@ -310,11 +310,11 @@ local function showAddons(ply)
         else
             v.message = Metrostroi.GetPhrase("N\\A")
         end
-        if GetConVar("metrostroi_addons_check_ignore"):GetInt() > 0 and (v.error or not v.message) then
-            RunConsoleCommand("metrostroi_addons_check_ignore",0)
+        if C_CheckIgnore:GetBool() and (v.error or not v.message) then
+            C_CheckIgnore:SetBool(false)
         end
     end
-    if GetConVar("metrostroi_addons_check_ignore"):GetInt() > 0 and not ply or WaitAddons > 0 then return end
+    if C_CheckIgnore:GetBool() and not ply or WaitAddons > 0 then return end
 
     if IsValid(MetrostroiWorkshopVGUI) then  MetrostroiWorkshopVGUI:Close() end
     local badCount = 0
@@ -332,7 +332,7 @@ local function showAddons(ply)
     local scrollPanel = vgui.Create( "DScrollPanel", frame )
     --scrollPanel:SetMinimumSize(nil,450)
     for i,a in ipairs(RequiredAddons) do
-        if badCount ~= 0 and not showall and GetConVar("metrostroi_addons_check_skip_error"):GetInt() > 0 and not a.error and a.message ~= "N\\A"  or not a.error and a.reason then continue end
+        if badCount ~= 0 and not showall and C_CheckSkipError:GetBool() and not a.error and a.message ~= "N\\A"  or not a.error and a.reason then continue end
 
         --local a = v[1]
         local addon = vgui.Create("DPanel")

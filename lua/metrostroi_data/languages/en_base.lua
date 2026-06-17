@@ -41,6 +41,7 @@ Panel.DisableHUD        = Disable HUD in the driver seat
 Panel.DisableCamAccel   = Disable camera acceleration
 Panel.DisableHoverText  = Disable tooltips
 Panel.DisableHoverTextP = Disable additional information\nin tooltips #NEW #FIXME
+Panel.HoverTextDelay    = Tooltip show delay #NEW #FIXME
 Panel.DisableSeatShadows= Disable seat shadows #NEW #FIXME
 Panel.ScreenshotMode    = Screenshot mode (LOW FPS)
 Panel.ShadowsHeadlight  = Enable headlight shadows

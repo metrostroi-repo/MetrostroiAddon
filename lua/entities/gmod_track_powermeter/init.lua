@@ -1,7 +1,8 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
-local OldVoltage
+
+local C_Voltage = GetConVar("metrostroi_voltage")
 function ENT:Initialize()
 	self:SetModel("models/z-o-m-b-i-e/metro_2033/electro/m33_electro_box_12_4.mdl")
 	
@@ -17,11 +18,11 @@ end
 function ENT:Use(ply)
 	--if not ply:IsAdmin() then return end
 	if Metrostroi.Voltage == 0 then
-		RunConsoleCommand("metrostroi_voltage",Metrostroi.OldVoltage ~= 0 and Metrostroi.OldVoltage or 750)
+		C_Voltage:SetInt(Metrostroi.OldVoltage > 0 and Metrostroi.OldVoltage or 750)
 		Metrostroi.OldVoltage = 0
 	else
-		Metrostroi.OldVoltage = GetConVar("metrostroi_voltage"):GetInt()
-		RunConsoleCommand("metrostroi_voltage",0)
+		Metrostroi.OldVoltage = C_Voltage:GetInt()
+		C_Voltage:SetInt(0)
 		Metrostroi.Voltage = 0
 		Metrostroi.VoltageOffByPlayerUse = true
 	end
@@ -51,7 +52,7 @@ end
 
 function ENT:OnRemove()
 	if Metrostroi.Voltage == 0 then
-		RunConsoleCommand("metrostroi_voltage",Metrostroi.OldVoltage ~= 0 and Metrostroi.OldVoltage or 750)
+		RunConsoleCommand("metrostroi_voltage",Metrostroi.OldVoltage > 0 and Metrostroi.OldVoltage or 750)
 	end
 end
 

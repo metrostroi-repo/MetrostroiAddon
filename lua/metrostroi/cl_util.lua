@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 -- Clientside utility functions
 --------------------------------------------------------------------------------
+local C_DrawCams = GetConVar("metrostroi_drawcams")
+local C_StopHelper = GetConVar("metrostroi_stop_helper")
+
 local bitmap_font_1 = {
     [10] = {
         0,0,0,0,
@@ -631,13 +634,10 @@ local A = 0
 local D1true = 0
 local D2true = 0
 local prevTime
-hook.Add("PostDrawOpaqueRenderables", "metrostroi-draw-stopmarker",function()
+local function drawStopMarker(bDrawingDepth,bDrawingSkybox,isDraw3DSkybox)
     prevTime = prevTime or RealTime()
     local dT = math.max(0.001,RealTime() - prevTime)
     prevTime = RealTime()
-
-    -- Skip if disabled
-    if GetConVar("metrostroi_stop_helper"):GetInt() ~= 1 then return end
 
     -- Get train
     local train = LocalPlayer().InMetrostroiTrain
@@ -713,10 +713,17 @@ hook.Add("PostDrawOpaqueRenderables", "metrostroi-draw-stopmarker",function()
         surface.DrawRect(-6,-96,6,192)
         surface.DrawRect(8*20,-96,4,192)
     cam.End3D2D()
-end)
+end
 
-
-
+local function enableStopHelper()
+    if C_StopHelper:GetBool() then 
+        hook.Add("PostDrawOpaqueRenderables", "metrostroi-draw-stopmarker", drawStopMarker)
+    else
+        hook.Remove("PostDrawOpaqueRenderables", "metrostroi-draw-stopmarker")
+    end
+end
+cvars.AddChangeCallback("metrostroi_stop_helper", enableStopHelper)
+enableStopHelper()
 
 --------------------------------------------------------------------------------
 -- Fix for gm_metrostroi 3D sky
@@ -740,12 +747,10 @@ net.Receive("metrostroi_cam_update",function()
 end)
 
 local CamRT = surface.GetTextureID( "pp/rt" )
-local CamWork = GetConVar("metrostroi_drawcams")
 Metrostroi.CamTimers = Metrostroi.CamTimers or {}
 Metrostroi.CamQueue = Metrostroi.CamQueue or {}
 function Metrostroi.RenderCamOnRT(train,cpos,name,time,RT,post,pos,ang,x,y,scale,xmin,ymin)
-    if not CamWork then  CamWork = GetConVar("metrostroi_drawcams") return end
-    if not CamWork:GetBool() then return end
+    if not C_DrawCams:GetBool() then return end
     name = train:EntIndex()..name
     --print(name,Metrostroi.CamQueue[name])
     if (not Metrostroi.CamTimers[name] or RealTime()-Metrostroi.CamTimers[name] > time) and not Metrostroi.CamQueue[name] then

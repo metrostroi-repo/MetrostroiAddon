@@ -90,6 +90,7 @@ end
 local C_MaxWagons = GetConVar("metrostroi_maxwagons")
 local C_MaxTrains = GetConVar("metrostroi_maxtrains")
 local C_MaxTrainsOnPly = GetConVar("metrostroi_maxtrains_onplayer")
+local C_WriteTelemetry = GetConVar("metrostroi_write_telemetry")
 
 function ENT:Initialize()
     self.Joints = {}
@@ -135,7 +136,7 @@ function ENT:Initialize()
     -- Initialize highspeed interface
     self:InitializeHighspeedLayout()
     -- Add telemetry recording module if required
-    if GetConVar("metrostroi_write_telemetry"):GetInt() == 1 then
+    if C_WriteTelemetry:GetInt() > 0 then
         self:LoadSystem("Telemetry")
     end
     self:LoadSystem("FailSim")

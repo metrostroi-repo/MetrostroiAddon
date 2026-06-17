@@ -41,6 +41,7 @@ Panel.DisableHUD        = Откл. HUD в кресле машиниста
 Panel.DisableCamAccel   = Откл. симуляцию качания головы
 Panel.DisableHoverText  = Откл. всплывающий текст
 Panel.DisableHoverTextP = Откл. дополнительную информацию\nв всплывающем тексте
+Panel.HoverTextDelay    = Задержка\nвсплывающего\nтекста #NEW #FIXME
 Panel.DisableSeatShadows= Откл. тени от кресел
 Panel.ScreenshotMode    = Режим съёмки (НИЗКИЙ ФПС)
 Panel.ShadowsHeadlight  = Вкл. тени от фар

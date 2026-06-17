@@ -213,6 +213,8 @@ function ENT:SetSoundState(sound,volume,pitch,timeout,range)
 	self.Sounds[sound]:SetSoundLevel(100*(range or default_range))
 end
 ]]
+local C_DrawDebug = GetConVar("metrostroi_drawdebug")
+
 local function PauseBASS(snd)
 	snd:Pause()
 	snd:SetTime(0)
@@ -229,7 +231,7 @@ function ENT:CreateBASSSound(name,callback,noblock,onerr)
 			if err ~= 41 then
 				MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s\n",name,err,errName))
 				if onerr then callback(false) end
-			elseif GetConVar("metrostroi_drawdebug"):GetInt() ~= 0 then
+			elseif C_DrawDebug:GetBool() then
 				MsgC(Color(255,255,0),Format("Sound:%s\n\tBASS_ERROR_UNKNOWN (it's normal),ErrCode:%s, ErrName:%s\n",name,err,errName))
 				self:CreateBASSSound(name,callback)
 			end
@@ -461,7 +463,7 @@ else
 							if err == 4 or err == 37 then self.StopSounds = true end
 							if err ~= 41 then
 								MsgC(Color(255,0,0),Format("Sound:%s\n\tErrCode:%s, ErrName:%s\n",name,err,errName))
-							elseif GetConVar("metrostroi_drawdebug"):GetInt() ~= 0 then
+							elseif C_DrawDebug:GetBool() then
 								MsgC(Color(255,255,0),Format("Sound:%s\n\tBASS_ERROR_UNKNOWN (it's normal),ErrCode:%s, ErrName:%s\n",name,err,errName))
 								--self:PlayOnce(soundid,location,range,pitch,randoff)
 							end
@@ -477,10 +479,13 @@ else
 							end
 							table.insert(ent.BASSSounds,snd)
 							snd:Play()
-							--local siz1,siz2 = snd:Get3DFadeDistance()
-							--debugoverlay.Sphere(snd:GetPos(),4,2,Color(0,255,0),true)
-							--debugoverlay.Sphere(snd:GetPos(),siz1,2,Color(255,0,0,100),false)
-							--debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
+
+							if C_DrawDebug:GetInt() > 1 then
+								local siz1,siz2 = snd:Get3DFadeDistance()
+								debugoverlay.Sphere(snd:GetPos(),0.2,2,Color(255,200,0),true)
+								debugoverlay.Sphere(snd:GetPos(),siz1,2,Color(255,0,0,100),false)
+								debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
+							end
 						end
 					end)
 				end
@@ -505,6 +510,13 @@ else
 			self.Sounds[soundid] = snd
 			self:SetBassParameters(self.Sounds[soundid],pitch,range,tbl,false)
 			snd:Play()
+
+			if C_DrawDebug:GetInt() > 1 then
+				local siz1,siz2 = snd:Get3DFadeDistance()
+				debugoverlay.Sphere(snd:GetPos(),0.2,2,Color(255,200,0),true)
+				debugoverlay.Sphere(snd:GetPos(),siz1,2,Color(255,0,0,100),false)
+				debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
+			end
 		end)
 	end
 end

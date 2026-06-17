@@ -3,6 +3,8 @@
 TOOL.AddToMenu = false
 
 local C_MaxWagons = GetConVar("metrostroi_maxwagons")
+local C_MaxTrains = GetConVar("metrostroi_maxtrains")
+local C_MaxTrainsOnPly = GetConVar("metrostroi_maxtrains_onplayer")
 
 if CLIENT then
     language.Add("Tool.train_spawner.name", "Train Spawner")
@@ -452,8 +454,8 @@ function TOOL:LeftClick(trace)
             self.Settings.WagNum = C_MaxWagons:GetInt()
         end
 
-        if Metrostroi.TrainCountOnPlayer(self:GetOwner()) + self.Settings.WagNum > GetConVar("metrostroi_maxtrains_onplayer"):GetInt()*C_MaxWagons:GetInt()
-            or Metrostroi.TrainCount() + self.Settings.WagNum > GetConVar("metrostroi_maxtrains"):GetInt()*C_MaxWagons:GetInt() then
+        if Metrostroi.TrainCountOnPlayer(self:GetOwner()) + self.Settings.WagNum > C_MaxTrainsOnPly:GetInt()*C_MaxWagons:GetInt()
+            or Metrostroi.TrainCount() + self.Settings.WagNum > C_MaxTrains:GetInt()*C_MaxWagons:GetInt() then
                 self:GetOwner():LimitHit("train_limit")
             return true
         end

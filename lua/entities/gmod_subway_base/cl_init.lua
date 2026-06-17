@@ -296,6 +296,10 @@ function ENT:CreateRT(name, w, h)
 end
 
 local C_DisableHUD          = GetConVar("metrostroi_disablehud")
+local C_DisableCamAccel     = GetConVar("metrostroi_disablecamaccel")
+local C_DisableHoverText    = GetConVar("metrostroi_disablehovertext")
+local C_DisableHoverTextP   = GetConVar("metrostroi_disablehovertextpos")
+local C_TooltipDelay        = GetConVar("metrostroi_tooltip_delay")
 local C_RenderDistance      = GetConVar("metrostroi_renderdistance")
 local C_SoftDraw            = GetConVar("metrostroi_softdrawmultipier")
 local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
@@ -311,6 +315,7 @@ local C_Shadows4            = GetConVar("metrostroi_shadows4")
 local C_AA                  = GetConVar("mat_antialias")
 local C_Sprites             = GetConVar("metrostroi_sprites")
 local C_DisableSeatShadows  = GetConVar("metrostroi_disableseatshadows")
+
 local whitelist = {
     ["CHudChat"] = true,
     ["CHudDeathNotice"] = true,
@@ -661,7 +666,7 @@ hook.Add("PostDrawTranslucentRenderables", "metrostroi_base_draw", function(_,is
 end)
 
 local function enableDebug()
-    if C_DrawDebug:GetInt() > 0 then
+    if C_DrawDebug:GetBool() then
         hook.Add("PostDrawTranslucentRenderables","MetrostroiTrainDebug",function(bDrawingDepth,bDrawingSkybox)
             if bDrawingSkybox then return end
             for ent in pairs(Metrostroi.SpawnedTrains) do
@@ -1064,10 +1069,10 @@ function ENT:Think()
         self.DisableSeatShadows = disableSeatShadows
     end    
 
-    if (GetConVar("metrostroi_disablecamaccel"):GetInt() == 0) then
-        self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Int("Accel",0)/20+1)/2),0,1, 4, 1)*30-15)
-    else
+    if C_DisableCamAccel:GetBool() then
         self.HeadAcceleration = 0
+    else
+        self.HeadAcceleration = (self:Animate("accel",((self:GetNW2Int("Accel",0)/20+1)/2),0,1, 4, 1)*30-15)
     end
     -- Simulate systems
     if self.Systems then
@@ -2279,8 +2284,8 @@ hook.Add("Think","metrostroi-cabin-panel",function()
         end
 
         -- Tooltips
-        local ttdelay = GetConVar("metrostroi_tooltip_delay"):GetFloat()
-        if GetConVar("metrostroi_disablehovertext"):GetInt() == 0 and ttdelay and ttdelay >= 0 then
+        local ttdelay = C_TooltipDelay:GetFloat()
+        if not C_DisableHoverText:GetBool() and ttdelay and ttdelay >= 0 then
             local button = findAimButton(ply,train)
             --print(train.ClientProps[button.ID].button)
             if button and
@@ -2295,7 +2300,7 @@ hook.Add("Think","metrostroi-cabin-panel",function()
 
             if button then
                 if ttdelay == 0 or CurTime() - lastAimButtonChange > ttdelay then
-                    if C_DrawDebug:GetInt() > 0 then
+                    if C_DrawDebug:GetBool() then
                         toolTipText,toolTipColor = button.ID,Color(255,0,255)
                     elseif button.plombed then
                         toolTipText,_,toolTipColor = button.plombed(train)
@@ -2308,7 +2313,7 @@ hook.Add("Think","metrostroi-cabin-panel",function()
                         toolTipText = toolTipText..newTT
                         toolTipPosition = Metrostroi.GetPhrase(newTTpos)
                     end]]
-                    if GetConVar("metrostroi_disablehovertextpos"):GetInt() == 0 and button.tooltipState and button.tooltip then
+                    if not C_DisableHoverTextP:GetBool() and button.tooltipState and button.tooltip then
                         toolTipText = toolTipText..button.tooltipState(train)
                     end
                 end
