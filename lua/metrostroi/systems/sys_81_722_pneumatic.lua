@@ -257,7 +257,7 @@ end
 -------------------------------------------------------------------------------
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
-    self.WeightLoadRatio = math.max(0,math.min(1,(Train:GetNW2Float("PassengerCount")/200)))
+    self.WeightLoadRatio = math.max(0,math.min(1,(Train.PaxCount/200)))
 
     -- Apply specific rate to equalize pressure
 

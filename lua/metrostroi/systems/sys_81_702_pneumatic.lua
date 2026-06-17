@@ -110,7 +110,7 @@ function TRAIN_SYSTEM:Initialize(parameters)
     self.EmergencyValve = false
     self.OldValuePos = self.DriverValvePosition
 
-    self.WeightLoadRatio = 0--math.max(0,math.min(1,(self.Train:GetNW2Float("PassengerCount",0)/200)))
+    self.WeightLoadRatio = 0
 end
 
 function TRAIN_SYSTEM:Inputs()
@@ -269,7 +269,7 @@ end
 -------------------------------------------------------------------------------
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
-    self.WeightLoadRatio = math.max(0,math.min(1,(Train:GetNW2Float("PassengerCount")/200)))
+    self.WeightLoadRatio = math.max(0,math.min(1,(Train.PaxCount/200)))
 
     ----------------------------------------------------------------------------
     -- Accumulate derivatives

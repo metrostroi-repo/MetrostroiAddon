@@ -40,7 +40,13 @@ function ENT:GetStandingArea()
 end
 
 function ENT:BoardPassengers(delta)
-	self:SetNW2Float("PassengerCount", math.max(0,math.min(self:PassengerCapacity(),self:GetNW2Float("PassengerCount") + delta)))
+	local curr = self.PaxCount
+	local avail = (self:PassengerCapacity() - curr)
+	local change = (delta > 0 and math.min(delta, avail)) or (delta < 0 and math.max(-curr, delta)) or 0
+	self.PaxCount = curr + change
+	
+	if change ~= 0 then self:SetNW2Float("PassengerCount", self.PaxCount) end -- TODO: Change to GetNW2Int
+	return (avail > 0)
 end
 
 ENT.LeftDoorPositions = { Vector(0,0,0) }

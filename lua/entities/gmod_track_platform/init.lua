@@ -351,7 +351,7 @@ function ENT:Think()
                 if self.PlatformLast then proportion = 1 end
                 if (trainTbl.AnnouncementToLeaveWagon == true) then proportion = 1 end
                 -- Total count
-                trainTbl.PassengersToLeave = math.floor(proportion * train:GetNW2Float("PassengerCount") + 0.5)
+                trainTbl.PassengersToLeave = math.floor(proportion * trainTbl.PaxCount + 0.5)
             end
             -- Check for announcement
             if trainTbl.AnnouncementToLeaveWagon and not trainTbl.AnnouncementToLeaveWagonAcknowledged then
@@ -364,7 +364,7 @@ function ENT:Think()
             local door_count = #trainTbl.LeftDoorPositions
             if not left_side then door_count = #trainTbl.RightDoorPositions end
 
-            local trainPassCount = train:GetNW2Float("PassengerCount")
+            local trainPassCount = trainTbl.PaxCount
             -- Get maximum boarding rate for normal russian subway train doors
             local max_boarding_rate = getPassengerRate(trainPassCount) * 1.4 * door_count * dT
             --print(Format("R:%.2f\tS:%.2f\tP:% 3d",max_boarding_rate,getPassengerRate(trainPassCount),trainPassCount))
@@ -400,56 +400,63 @@ function ENT:Think()
             if math.random() <= math.Clamp(17-passenger_count,0,17)/17*0.5 then boarded = 0 end
             if math.random() <= math.Clamp(17-trainTbl.PassengersToLeave,0,17)/17*0.5 then left = 0 end
             local passenger_delta = boarded - left
-            -- People board from platform
-            if boarded > 0 then
-                PeopleGoing = true
-                self.WindowStart = (self.WindowStart + boarded) % self:PoolSize()
-            end
-            -- People leave to
-            if left > 0 then
-                PeopleGoing = true
-                if IsValid(driver) then
-                    driver:AddFrags(left)
-                    driver.MTransportedPassengers = (driver.MTransportedPassengers or 0) + left
-                end
 
-                -- Move passengers
-                trainTbl.PassengersToLeave = trainTbl.PassengersToLeave - left
-                self.PassengersLeft = self.PassengersLeft + left
-                if trainTbl.AnnouncementToLeaveWagonAcknowledged and not self.PlatformLast then
-                    if math.random() > 0.3 then
+            -- Change number of people in train
+            local canBoard = train:BoardPassengers(passenger_delta)
+            if canBoard then
+                -- People board from platform
+                if boarded > 0 then
+                    PeopleGoing = true
+                    self.WindowStart = (self.WindowStart + boarded) % self:PoolSize()
+                end
+                -- People leave to
+                if left > 0 then
+                    PeopleGoing = true
+                    if IsValid(driver) then
+                        driver:AddFrags(left)
+                        driver.MTransportedPassengers = (driver.MTransportedPassengers or 0) + left
+                    end
+
+                    -- Move passengers
+                    trainTbl.PassengersToLeave = trainTbl.PassengersToLeave - left
+                    self.PassengersLeft = self.PassengersLeft + left
+                    if trainTbl.AnnouncementToLeaveWagonAcknowledged and not self.PlatformLast then
+                        if math.random() > 0.3 then
+                            self.WindowStart = (self.WindowStart - left) % self:PoolSize()
+                        end
+                    elseif not self.PlatformLast and math.random() > 0.9 then
                         self.WindowStart = (self.WindowStart - left) % self:PoolSize()
                     end
-                elseif not self.PlatformLast and math.random() > 0.9 then
-                    self.WindowStart = (self.WindowStart - left) % self:PoolSize()
                 end
+
+                -- Keep list of door positions
+                if left_side then
+                    for k, vec in ipairs(trainTbl.LeftDoorPositions) do
+                        table.insert(boardingDoorList, train:LocalToWorld(vec))
+                    end
+                else
+                    for k, vec in ipairs(trainTbl.RightDoorPositions) do
+                        table.insert(boardingDoorList, train:LocalToWorld(vec))
+                    end
+                end
+            else
+                boarded = 0
+                left = 0
             end
+            
             --[[ People boarded train
             if boarded > 0 then
                 if IsValid(driver) then
                     driver:AddDeaths(boarded)
                 end
             end]]
-            -- Change number of people in train
-            train:BoardPassengers(passenger_delta)
-
-            -- Keep list of door positions
-            if left_side then
-                for k, vec in ipairs(trainTbl.LeftDoorPositions) do
-                    table.insert(boardingDoorList, train:LocalToWorld(vec))
-                end
-            else
-                for k, vec in ipairs(trainTbl.RightDoorPositions) do
-                    table.insert(boardingDoorList, train:LocalToWorld(vec))
-                end
-            end
             if trainTbl.AnnouncementToLeaveWagonAcknowledged then
                 BoardTime = math.max(BoardTime,8+7*self.HorliftStation+(trainTbl.PassengersToLeave or 0)*dT*0.6)
             else
                 BoardTime = math.max(BoardTime,8+7*self.HorliftStation+math.max((trainTbl.PassengersToLeave or 0)*dT,self:PopulationCount()*dT)*0.5)
             end
             -- Add doors to boarding list
-            --print("BOARDING",boarding_rate,"DELTA = "..passenger_delta,self.PlatformLast,train:GetNW2Float("PassengerCount"))
+            --print("BOARDING",boarding_rate,"DELTA = "..passenger_delta,self.PlatformLast,trainTbl.PaxCount)
         end
         if trainTbl.UPO then trainTbl.UPO.AnnouncerPlay = self.AnnouncerPlay end
         trainTbl.BoardTimer = self.BoardTimer

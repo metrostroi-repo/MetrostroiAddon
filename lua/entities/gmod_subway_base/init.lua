@@ -272,6 +272,7 @@ function ENT:Initialize()
     if not Turbostroi or self.DontAccelerateSimulation then self.DataCache = {} end
 
     -- Passenger related data (must be set by derived trains to allow boarding)
+    self.PaxCount = 0
     self.LeftDoorsOpen = false
     --self.LeftDoorsBlocked = false
     self.PrevLeftDoorsOpening = false
@@ -1738,8 +1739,8 @@ function ENT:Think()
     -- Get angular velocity
     --self:SetTrainAngularVelocity(math.pi*self:GetPhysicsObject():GetAngleVelocity()/180)
     -- Apply mass of passengers
-    if self.NormalMass then self:GetPhysicsObject():SetMass(self.NormalMass + 60*self:GetNW2Float("PassengerCount")) end
-    if self.AnnouncementToLeaveWagon and self:GetNW2Float("PassengerCount") == 0  then self.AnnouncementToLeaveWagon = false end
+    if self.NormalMass then self:GetPhysicsObject():SetMass(self.NormalMass + 60*self.PaxCount) end
+    if self.AnnouncementToLeaveWagon and self.PaxCount == 0 then self.AnnouncementToLeaveWagon = false end
 
     -- Hack for VAH switch on non-supported maps so you don't have to hold space all the time
     if not self.NonSupportedChecked then

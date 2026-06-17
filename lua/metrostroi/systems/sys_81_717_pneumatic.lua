@@ -313,7 +313,7 @@ end
 -------------------------------------------------------------------------------
 function TRAIN_SYSTEM:Think(dT)
     local Train = self.Train
-    self.WeightLoadRatio = math.max(0,math.min(1,(Train:GetNW2Float("PassengerCount")/200)))
+    self.WeightLoadRatio = math.max(0,math.min(1,(Train.PaxCount/200)))
     --self.WeightLoadRatio = (Train.R_ZS and Train.R_ZS.Value > 0 and 0.5 or 0) + (Train.R_G and Train.R_G.Value > 0 and 0.5 or 0)
     ----------------------------------------------------------------------------
     -- Accumulate derivatives
