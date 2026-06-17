@@ -1187,13 +1187,19 @@ end
 -- Create an entity for the seat
 --------------------------------------------------------------------------------
 function ENT:CreateSeatEntity(seat_info)
+    local pos = seat_info.offset
+    local ang = seat_info.angle+Angle(0,-90,0)
+    
     -- Create seat entity
     local seat = ents.Create("prop_vehicle_prisoner_pod")
     seat:SetModel(seat_info.model or "models/nova/jeep_seat.mdl") --jalopy
-    seat:SetPos(self:LocalToWorld(seat_info.offset))
-    seat:SetAngles(self:GetAngles()+Angle(0,-90,0)+seat_info.angle)
+    seat:SetPos(self:LocalToWorld(pos))
+    seat:SetAngles(self:GetAngles()+ang)
     seat:SetKeyValue("limitview",0)
     seat:Spawn()
+    seat.SpawnPos = pos
+    seat.SpawnAng = ang
+    seat.LeavePos = seat_info.leavepos
     seat:GetPhysicsObject():SetMass(10)
     seat:SetCollisionGroup(COLLISION_GROUP_WORLD)
     self:DrawShadow(false)
@@ -1229,13 +1235,27 @@ end
 --------------------------------------------------------------------------------
 -- Create a seat position
 --------------------------------------------------------------------------------
-function ENT:CreateSeat(type,offset,angle,model)
+function ENT:CreateSeat(type,offset,angle,model,leavepos)
+    -- Define leave position
+    if not leavepos then
+        if (type == "driver") then
+            leavepos = Vector(0,10,-17)
+        elseif (type == "instructor") then
+            leavepos = Vector(5,-10,-17)
+        elseif (type == "passenger") then
+            leavepos = Vector(10,0,-17)
+        else
+            leavepos = Vector(0,0,0)
+        end
+    end
+
     -- Add a new seat
     local seat_info = {
         type = type,
         offset = offset,
         model = model,
         angle = angle or Angle(0,0,0),
+        leavepos = leavepos,
     }
     table.insert(self.Seats,seat_info)
 
@@ -2295,19 +2315,11 @@ local function HandleExitingPlayer(ply, vehicle)
         ply.lastTrainSeat = vehicle
         -- Move exiting player
         local seattype = vehicle:GetNW2String("SeatType")
-        local offset
-
-        if (seattype == "driver") then
-            offset = Vector(0,10,-17)
-        elseif (seattype == "instructor") then
-            offset = Vector(5,-10,-17)
-        elseif (seattype == "passenger") then
-            offset = Vector(10,0,-17)
-        end
-
+        local offset = Vector(0,0,0)
+        offset:Set(vehicle.LeavePos)
         offset:Rotate(train:GetAngles())
-        ply:SetPos(vehicle:GetPos()+offset)
 
+        ply:SetPos(vehicle:GetPos()+offset)
         ply:SetEyeAngles(vehicle:GetForward():Angle())
 
         -- Server
@@ -2349,8 +2361,8 @@ end
 
 hook.Add("JoystickInitialize","metroistroi_cabin",JoystickRegister)
 
-hook.Add("PlayerLeaveVehicle", "gmod_subway_81-717-cabin-exit", HandleExitingPlayer )
-hook.Add("CanPlayerEnterVehicle","gmod_subway_81-717-cabin-entry", CanPlayerEnter )
+hook.Add("CanPlayerEnterVehicle","Metrostroi_CheckSeatEnter", CanPlayerEnter )
+hook.Add("PlayerLeaveVehicle", "Metrostroi_SeatExit", HandleExitingPlayer )
 
 function ENT:BrokePlomb(but,ply,nosnd)
     if ply then

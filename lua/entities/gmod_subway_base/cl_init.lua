@@ -2254,8 +2254,8 @@ hook.Add("Think","metrostroi-cabin-panel",function()
         end
 
         -- Loop trough every panel
-        for k2,panel in pairs(train.ButtonMap) do
-            if not train:ShouldDrawPanel(kp2) then continue end
+        for kp,panel in pairs(train.ButtonMap) do
+            if not train:ShouldDrawPanel(kp) then panel.aimedAt = false continue end
             local pang = train:LocalToWorldAngles(panel.ang)
 
             if plyaimvec:Dot(pang:Up()) < 0 then
