@@ -397,6 +397,7 @@ function ENT:SpawnCSEnt(k,override)
         local model = v.model
         if v.modelcallback then model = v.modelcallback(self) or v.model end
         local cent = ClientsideModel(model,RENDERGROUP_OPAQUE)
+        cent.Name = k
         cent.GetBodyColor = function()
             if not IsValid(self) then return Vector(1) end
             return self:GetBodyColor()
@@ -474,20 +475,23 @@ function ENT:SpawnCSEnt(k,override)
 
         cent.BASSSounds = {}
         cent.DestroySound = self.DestroySound
-        cent.Think = function(ent)
-            for k,v in pairs(ent.BASSSounds) do
-                if not IsValid(v) or v:GetState() == GMOD_CHANNEL_STOPPED then
-                    self:DestroySound(v)
-                    table.remove(ent.BASSSounds,k)
-                end
-            end
-            ent:SetNextClientThink(CurTime()+0.5)
-            return true
-        end
         cent.CalcAbsolutePosition = function(ent,pos,ang)
-            for k,v in pairs(ent.BASSSounds) do
-                if IsValid(v) and v:GetState() ~= GMOD_CHANNEL_STOPPED then
-                    v:SetPos(pos,ang:Forward())
+            local sounds = ent.BASSSounds
+            local c = #sounds
+            if c > 0 then
+                for i=c,1,-1 do
+                    local snd = sounds[i]
+                    if snd and snd:IsValid() then
+                        if snd:GetState() == GMOD_CHANNEL_STOPPED then
+                            ent:DestroySound(snd)
+                            table.remove(sounds, i)
+                        else
+                            snd:SetPos(pos,ang:Forward())
+                        end
+                    else
+                        ent:DestroySound(snd)
+                        table.remove(sounds, i)
+                    end
                 end
             end
         end

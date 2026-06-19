@@ -289,10 +289,6 @@ function ENT:SetBassParameters(snd,pitch,volume,tbl,looping,spec)
 	end
 	snd:EnableLooping(looping or false)
 	snd:SetPlaybackRate(pitch)
-	local siz1,siz2 = snd:Get3DFadeDistance()--[[]
-	debugoverlay.Sphere(snd:GetPos(),4,2,Color(0,255,0),true)
-	debugoverlay.Sphere(snd:GetPos(),siz1,2,Color(255,0,0,100),false)]]
-	--debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
 end
 function ENT:SetSoundState(soundid,volume,pitch,time)
 	--volume = (input.IsKeyDown( KEY_LALT ) and soundid == "horn") and 0 or 1+math.sin(CurTime()*3)*0.2
@@ -352,7 +348,7 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 		end
 
 		if not IsValid(snd) then return end
-		local default_range = 0.80
+		-- local default_range = 0.80
 		if ((volume <= 0) or (pitch <= 0)) then
 			if snd:GetTime() > 0 then
 				PauseBASS(snd)
@@ -374,8 +370,8 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 	end
 
 
-	if soundid == "switch" then default_range = 0.50 end
-	local pch = math.floor(math.max(0,math.min(255,100*pitch)) + math.random())
+	-- if soundid == "switch" then default_range = 0.50 end
+	-- local pch = math.floor(math.max(0,math.min(255,100*pitch)) + math.random())
 	--self.Sounds[soundid]:SetSoundLevel(100*(range or default_range))
 	--local vol = math.max(0,math.min(255,2.55*volume)) + (0.001/2.55) + (0.001/2.55)*math.random()
 	--self.Sounds[soundid]:PlayEx(vol,pch+1)
@@ -488,6 +484,7 @@ else
 
 							if C_DrawDebug:GetInt() > 1 then
 								local siz1,siz2 = snd:Get3DFadeDistance()
+								debugoverlay.Text(snd:GetPos(),soundid or "",2,false)
 								debugoverlay.Sphere(snd:GetPos(),0.2,2,Color(255,200,0),true)
 								debugoverlay.Sphere(snd:GetPos(),siz1,2,Color(255,0,0,100),false)
 								debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
@@ -519,6 +516,7 @@ else
 
 			if C_DrawDebug:GetInt() > 1 then
 				local siz1,siz2 = snd:Get3DFadeDistance()
+				debugoverlay.Text(snd:GetPos(),soundid or "",2,false)
 				debugoverlay.Sphere(snd:GetPos(),0.2,2,Color(255,200,0),true)
 				debugoverlay.Sphere(snd:GetPos(),siz1,2,Color(255,0,0,100),false)
 				debugoverlay.Sphere(snd:GetPos(),siz2,2,Color(0,0,255,100),false)
