@@ -266,7 +266,7 @@ function ENT:Think()
     local TrainArrivedDist
 
     local PeopleGoing = false
-    local boarding = false
+    local arrived = false
 
     local BoardTime = 8+7*self.HorliftStation
     for train,trainTbl in pairs(trains) do
@@ -307,7 +307,7 @@ function ENT:Think()
         end
 
         -- Check horizontal lift station logic
-        local passengers_can_board = false
+        local doors_opened = false
         if self.HorliftStation > 0 then
             -- Check fine stop
             local stopped_fine = false
@@ -328,13 +328,13 @@ function ENT:Think()
             end
 
             -- Allow boarding
-            if self.HorliftTimer2 and self:GetDoorState() then passengers_can_board = doors_open end
+            if self.HorliftTimer2 and self:GetDoorState() then doors_opened = doors_open end
         else
-            passengers_can_board = doors_open
+            doors_opened = doors_open
         end
 
         -- Board passengers
-        if passengers_can_board then
+        if doors_opened then
             -- Find player of the train
             local driver = getTrainDriver(v)
 
@@ -402,8 +402,8 @@ function ENT:Think()
             local passenger_delta = boarded - left
 
             -- Change number of people in train
-            local canBoard = train:BoardPassengers(passenger_delta)
-            if canBoard then
+            local can_board = train:BoardPassengers(passenger_delta)
+            if can_board then
                 -- People board from platform
                 if boarded > 0 then
                     PeopleGoing = true
@@ -460,7 +460,7 @@ function ENT:Think()
         end
         if trainTbl.UPO then trainTbl.UPO.AnnouncerPlay = self.AnnouncerPlay end
         trainTbl.BoardTimer = self.BoardTimer
-        boarding = boarding or passengers_can_board
+        arrived = arrived or doors_opened
     end
     --if not boarding then CurrentTrain = nil end
     self.BoardTime = BoardTime
@@ -472,7 +472,7 @@ function ENT:Think()
     end
 
     --PUI Timer
-    if boarding and not self.Timer then self.Timer = math.max(CurTime()+20,CurTime()+self.BoardTime) end
+    if arrived and not self.Timer then self.Timer = math.max(CurTime()+20,CurTime()+self.BoardTime) end
     if not self.CurrentTrain and self.Timer then self.Timer = nil end
     if self.Timer then
         self.BoardTimer = -(CurTime()-self.Timer)

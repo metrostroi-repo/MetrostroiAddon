@@ -43,9 +43,11 @@ function ENT:BoardPassengers(delta)
 	local curr = self.PaxCount
 	local avail = (self:PassengerCapacity() - curr)
 	local change = (delta > 0 and math.min(delta, avail)) or (delta < 0 and math.max(-curr, delta)) or 0
-	self.PaxCount = curr + change
 	
-	if change ~= 0 then self:SetNW2Float("PassengerCount", self.PaxCount) end -- TODO: Change to GetNW2Int
+	if change ~= 0 then
+		self.PaxCount = curr + change
+		self:SetNW2Int("PassengerCount", self.PaxCount)
+	end
 	return (avail > 0)
 end
 

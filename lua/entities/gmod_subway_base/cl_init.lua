@@ -1397,16 +1397,17 @@ function ENT:Think()
                 SafeRemoveEntity(stucked[-i])
             end
         end
-        if #self.PassengerEnts ~= self:GetNW2Float("PassengerCount") then
+        local paxCount = self:GetNW2Int("PassengerCount")
+        if #self.PassengerEnts ~= paxCount then
             -- Passengers go out
-            while #self.PassengerEnts > self:GetNW2Float("PassengerCount") do
+            while #self.PassengerEnts > paxCount do
                 local ent = self.PassengerEnts[#self.PassengerEnts]
                 table.remove(self.PassengerPositions,#self.PassengerPositions)
                 table.remove(self.PassengerEnts,#self.PassengerEnts)
                 ent:Remove()
             end
             -- Passengers go in
-            while #self.PassengerEnts < self:GetNW2Float("PassengerCount") do
+            while #self.PassengerEnts < paxCount do
                 local min,max = self:GetStandingArea()
                 local pos = min + Vector((max.x-min.x)*math.random(),(max.y-min.y)*math.random(),(max.z-min.z)*math.random())
 
