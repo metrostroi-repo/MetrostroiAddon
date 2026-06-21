@@ -37,7 +37,6 @@ function ENT:Use(_,ply)
         local phys = self.Cover:GetPhysicsObject()
         phys:ApplyForceCenter(self.Cover:GetUp()*phys:GetMass()*40+self.Cover:GetRight()*phys:GetMass()*35 )
         if IsValid(self.Owner) then
-            self.Cover:SetPlayer(self.Owner)
             if CPPI then self.Cover:CPPISetOwner(self.Owner) end
         end
         if self.Code then self:SetNW2Int("Code",self.Code) end
