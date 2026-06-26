@@ -986,11 +986,39 @@ hook.Add("Think","MetrostroiGetTrain",function()
     local ply = LocalPlayer()
     local train = ply:GetTrain()
     if IsValid(train) then
-        ply.InMetrostroiTrain =  train
+        ply.InMetrostroiTrain = train
     else
         ply.InMetrostroiTrain = false
     end
 end)
+
+--------------------------------------------------------------------------------
+-- Checks if the player is view on train and outside or not
+--------------------------------------------------------------------------------
+function Metrostroi.CheckTrainView(ply)
+    if ply.InMetrostroiTrain then
+        return ply.InMetrostroiTrain, false
+    end
+
+    local weapon = IsValid(ply:GetActiveWeapon()) and ply:GetActiveWeapon():GetClass()
+    if weapon ~= "train_kv_wrench" and weapon ~= "train_kv_wrench_gold" then
+        return NULL, true
+    end
+
+    local train = util.TraceLine({
+        start = ply:GetPos(),
+        endpos = ply:GetPos() - ply:GetAngles():Up() * 100,
+        filter = function(ent) return (ent.ButtonMap ~= nil) end
+    }).Entity
+    if not IsValid(train) then
+        train = util.TraceLine({
+            start = ply:EyePos(),
+            endpos = ply:EyePos() + ply:EyeAngles():Forward() * 300,
+            filter = function(ent) return (ent.ButtonMap ~= nil) end
+        }).Entity
+    end
+    return train, true
+end
 
 RunConsoleCommand("r_rootlod",0) -- Train models only visible with High model quality
 

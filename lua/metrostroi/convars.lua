@@ -114,4 +114,7 @@ local function reload()
 end
 cvars.AddChangeCallback("metrostroi_shadows1",reload,"reload_shadows")
 cvars.AddChangeCallback("metrostroi_shadows2",reload,"reload_shadows")
-CreateClientConVar("metrostroi_tooltip_delay",0,true)
+CreateClientConVar("metrostroi_tooltip_delay","0",true)
+CreateClientConVar("metrostroi_crosshair_delay","3",true,false,
+    "Delay time in seconds before metrostroi crosshair will be hidden (<1 - disabled)"
+)

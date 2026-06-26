@@ -295,11 +295,7 @@ function ENT:CreateRT(name, w, h)
     return RT
 end
 
-local C_DisableHUD          = GetConVar("metrostroi_disablehud")
 local C_DisableCamAccel     = GetConVar("metrostroi_disablecamaccel")
-local C_DisableHoverText    = GetConVar("metrostroi_disablehovertext")
-local C_DisableHoverTextP   = GetConVar("metrostroi_disablehovertextpos")
-local C_TooltipDelay        = GetConVar("metrostroi_tooltip_delay")
 local C_RenderDistance      = GetConVar("metrostroi_renderdistance")
 local C_SoftDraw            = GetConVar("metrostroi_softdrawmultipier")
 local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
@@ -316,14 +312,6 @@ local C_AA                  = GetConVar("mat_antialias")
 local C_Sprites             = GetConVar("metrostroi_sprites")
 local C_DisableSeatShadows  = GetConVar("metrostroi_disableseatshadows")
 
-local whitelist = {
-    ["CHudChat"] = true,
-    ["CHudDeathNotice"] = true,
-    ["CHudGMod"] = true,
-}
-hook.Add("HUDShouldDraw","MetrostroiHUDHider",function(name)
-    if LocalPlayer().InMetrostroiTrain and C_DisableHUD:GetBool() and not whitelist[name] then return false end
-end)
 --------------------------------------------------------------------------------
 -- Buttons layout
 --------------------------------------------------------------------------------
@@ -352,15 +340,6 @@ ENT.ClientProps = {}
 --------------------------------------------------------------------------------
 -- Clientside entities support
 --------------------------------------------------------------------------------
-local lastButton
-local lastTouch
-local drawCrosshair
-local canDrawCrosshair
-local toolTipText
-local toolTipColor
-local lastAimButtonChange
-local lastAimButton
-
 function ENT:ShouldRenderClientEnts()
     return not self:IsDormant() and math.abs(LocalPlayer():GetPos().z - self:GetPos().z) < 500 and (system.HasFocus() or C_MinimizedShow:GetBool()) and (not Metrostroi or not Metrostroi.ReloadClientside)
 end
@@ -593,27 +572,6 @@ function ENT:RemoveCSEnts()
 end
 
 
--- Checks if the player is driving a train, also returns said train
-local function isValidTrainDriver(ply)
-    if IsValid(ply.InMetrostroiTrain) then return ply.InMetrostroiTrain end
-
-    local weapon = IsValid(LocalPlayer():GetActiveWeapon()) and LocalPlayer():GetActiveWeapon():GetClass()
-    if weapon ~= "train_kv_wrench" and weapon ~= "train_kv_wrench_gold" then return end
-
-    local train = util.TraceLine({
-        start = LocalPlayer():GetPos(),
-        endpos = LocalPlayer():GetPos() - LocalPlayer():GetAngles():Up() * 100,
-        filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
-    }).Entity
-    if not IsValid(train) then
-        train = util.TraceLine({
-            start = LocalPlayer():EyePos(),
-            endpos = LocalPlayer():EyePos() + LocalPlayer():EyeAngles():Forward() * 300,
-            filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
-        }).Entity
-    end
-    return IsValid(train) and train, true
-end
 --------------------------------------------------------------------------------
 -- Clientside initialization
 --------------------------------------------------------------------------------
@@ -853,11 +811,6 @@ function ENT:UpdateWagonNumber() end
 ENT.Cameras = {}
 function ENT:OnRemove(nfinal)
     self.RenderBlock = RealTime()
-    if nfinal then
-        drawCrosshair = false
-        canDrawCrosshair = false
-        toolTipText = nil
-    end
     self:RemoveCSEnts()
     self.RenderClientEnts = false
 
@@ -1508,7 +1461,7 @@ end
 
 local OldTrainHandle,OldSeat
 hook.Add("Think","metrostroi_mouse_handle",function()
-    local train, outside = isValidTrainDriver(LocalPlayer())
+    local train, outside = Metrostroi.CheckTrainView(LocalPlayer())
     if outside then train = nil end
 
     if OldTrainHandle ~= train then
@@ -2168,166 +2121,6 @@ hook.Add("CalcVehicleView", "Metrostroi_TrainView", function(seat,ply,tbl)
     return
 end)
 
-
-
-
---------------------------------------------------------------------------------
--- Buttons/panel clicking
---------------------------------------------------------------------------------
---Thanks old gmod wiki!
---[[
-Converts from world coordinates to Draw3D2D screen coordinates.
-vWorldPos is a vector in the world nearby a Draw3D2D screen.
-vPos is the position you gave Start3D2D. The screen is drawn from this point in the world.
-scale is a number you also gave to Start3D2D.
-aRot is the angles you gave Start3D2D. The screen is drawn rotated according to these angles.
-]]--
-
-local function WorldToScreen(vWorldPos, vPos, vScale, aRot)
-    vWorldPos = vWorldPos - vPos
-    vWorldPos:Rotate(Angle(0, -aRot.y, 0))
-    vWorldPos:Rotate(Angle(-aRot.p, 0, 0))
-    vWorldPos:Rotate(Angle(0, 0, -aRot.r))
-
-    return vWorldPos.x / vScale, (-vWorldPos.y) / vScale
-end
-
--- Calculates line-plane intersect location
-local function LinePlaneIntersect(PlanePos,PlaneNormal,LinePos,LineDir)
-    local dot = LineDir:Dot(PlaneNormal)
-    local fac = LinePos-PlanePos
-    local dis = -PlaneNormal:Dot(fac) / dot
-    return LineDir * dis + LinePos
-end
-
-local function findAimButton(ply,train)
-    local panel,panelDist = nil,1e9
-    for kp,pan in pairs(train.ButtonMap) do
-        if not train:ShouldDrawPanel(kp) then continue end
-        --If player is looking at this panel
-        if pan.aimedAt and (pan.buttons or pan.sensor or pan.mouse) and pan.aimedAt < panelDist then
-            panel = pan
-            panelDist = pan.aimedAt
-        end
-    end
-    if not panel then return false end
-    if panel.aimX and panel.aimY and (panel.sensor or panel.mouse) and math.InRangeXY(panel.aimX,panel.aimY,0,0,panel.width,panel.height) then return false,panel.aimX,panel.aimY,panel.system end
-    if not panel.buttons then return false end
-
-    local buttonTarget
-    for _,button in pairs(panel.buttons) do
-        if (train.Hidden[button.PropName] or train.Hidden.button[button.PropName]) and (not train.ClientProps[button.PropName] or not train.ClientProps[button.PropName].config or not train.ClientProps[button.PropName].config.staylabel) then continue end
-        if (train.Hidden[button.ID] or train.Hidden.button[button.ID])  and (not train.ClientProps[button.ID] or not train.ClientProps[button.ID].config or not train.ClientProps[button.ID].config.staylabel) then  continue end
-        if button.w and button.h then
-            if  panel.aimX >= button.x and panel.aimX <= (button.x + button.w) and
-                    panel.aimY >= button.y and panel.aimY <= (button.y + button.h) then
-                buttonTarget = button
-                --table.insert(foundbuttons,{button,panel.aimedAt})
-            end
-        else
-            --If the aim location is withing button radis
-            local dist = math.Distance(button.x,button.y,panel.aimX,panel.aimY)
-            if dist < (button.radius or 10) then
-                buttonTarget = button
-                --table.insert(foundbuttons,{button,panel.aimedAt})
-            end
-        end
-    end
-
-    if not buttonTarget then return false end
-
-    return buttonTarget
-end
-
--- Checks what button/panel is being looked at and check for custom crosshair
-hook.Add("Think","metrostroi-cabin-panel",function()
-    local ply = LocalPlayer()
-    if not IsValid(ply) then return end
-
-    toolTipText = nil
-    drawCrosshair = false
-    canDrawCrosshair = false
-
-    local train, outside = isValidTrainDriver(ply)
-    if not IsValid(train) then return end
-    if gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
-    if train.ButtonMap ~= nil then
-        canDrawCrosshair = true
-        local plyaimvec
-        if outside then
-            plyaimvec = ply:GetAimVector()
-        else
-            local x,y = input.GetCursorPos()
-            --plyaimvec = util.AimVector( train.CamAngles, train.CamFOV,x,y,ScrW(),ScrH())
-            --plyaimvec = ply:GetAimVector()
-            plyaimvec = gui.ScreenToVector(x,y) -- ply:GetAimVector() is unreliable when in seats
-        end
-
-        -- Loop trough every panel
-        for kp,panel in pairs(train.ButtonMap) do
-            if not train:ShouldDrawPanel(kp) then panel.aimedAt = false continue end
-            local pang = train:LocalToWorldAngles(panel.ang)
-
-            if plyaimvec:Dot(pang:Up()) < 0 then
-                local campos = not outside and train.CamPos or ply:EyePos()
-                local ppos = train:LocalToWorld(panel.pos)-- - Vector(math.Round((not outside and train.HeadAcceleration or 0),2),0,0))
-                local isectPos = LinePlaneIntersect(ppos,pang:Up(),campos,plyaimvec)
-                local localx,localy = WorldToScreen(isectPos,ppos,panel.scale,pang)
-
-                panel.aimX = localx
-                panel.aimY = localy
-                if plyaimvec:Dot(isectPos - campos)/(isectPos-campos):Length() > 0 and localx > 0 and localx < panel.width and localy > 0 and localy < panel.height then
-                    panel.aimedAt = isectPos:Distance(campos)
-                    drawCrosshair = panel.aimedAt
-                else
-                    panel.aimedAt = false
-                end
-                panel.outside = outside
-            else
-                panel.aimedAt = false
-            end
-        end
-
-        -- Tooltips
-        local ttdelay = C_TooltipDelay:GetFloat()
-        if not C_DisableHoverText:GetBool() and ttdelay and ttdelay >= 0 then
-            local button = findAimButton(ply,train)
-            --print(train.ClientProps[button.ID].button)
-            if button and
-                ((train.Hidden[button.ID] or train.Hidden[button.PropName]) and (not train.ClientProps[button.ID].config or not train.ClientProps[button.ID].config.staylabel) or
-                (train.Hidden.button[button.ID] or train.Hidden.button[button.PropName]) and (not train.ClientProps[button.PropName].config or not train.ClientProps[button.PropName].config.staylabel)) then
-                return
-            end
-            if button ~= lastAimButton then
-                lastAimButtonChange = CurTime()
-                lastAimButton = button
-            end
-
-            if button then
-                if ttdelay == 0 or CurTime() - lastAimButtonChange > ttdelay then
-                    if C_DrawDebug:GetBool() then
-                        toolTipText,toolTipColor = button.ID,Color(255,0,255)
-                    elseif button.plombed then
-                        toolTipText,_,toolTipColor = button.plombed(train)
-                    else
-                        toolTipText,toolTipColor = button.tooltip
-                    end
-                    --[[toolTipPosition = nil
-                    if button.tooltipState then
-                        local newTT,newTTpos = button.tooltipState(train)
-                        toolTipText = toolTipText..newTT
-                        toolTipPosition = Metrostroi.GetPhrase(newTTpos)
-                    end]]
-                    if not C_DisableHoverTextP:GetBool() and button.tooltipState and button.tooltip then
-                        toolTipText = toolTipText..button.tooltipState(train)
-                    end
-                end
-            end
-        end
-    end
-end)
-
-
 -- Takes button table, sends current status
 local function sendButtonMessage(button,train,outside)
     local tooltip,buttID = nil,button.ID
@@ -2394,17 +2187,18 @@ function ENT:HidePanel(kp,hide)
     end
 end
 -- Args are player, IN_ enum and bool for press/release
+local lastButton, lastTouch
 local function handleKeyEvent(ply,key,pressed)
     if not game.SinglePlayer() and not IsFirstTimePredicted() then return end
-    if gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
+    if g_SpawnMenu:IsVisible() or gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
     if key ~= MOUSE_LEFT and key ~= MOUSE_RIGHT then return end
-    local train, outside = isValidTrainDriver(ply)
+    local train, outside = Metrostroi.CheckTrainView(ply)
 
     if not IsValid(train) then return end
     if train.ButtonMap == nil then return end
     if key == MOUSE_LEFT and not pressed then train:ClearButtons() end
     if pressed then
-        local button,x,y,system = findAimButton(ply,train)
+        local button,x,y,system = Metrostroi.FindAimButton(train)
         local plombed = false
         if button and button.ID and button.ID[1] ~= "!" and (key ~= MOUSE_LEFT or not button.plombed or not ({button.plombed(train)})[3]) then
             button.state = true
@@ -2455,7 +2249,7 @@ local camEnd = 1
 local function handleCam(ply,button)
     if not game.SinglePlayer() and not IsFirstTimePredicted() then return end
     if not input.IsShiftDown() then return end
-    local train, outside = isValidTrainDriver(ply)
+    local train, outside = Metrostroi.CheckTrainView(ply)
     if not IsValid(train) or outside then return end
     if not train.Cameras then return end
     local oldCam = train.CurrentCamera
@@ -2509,7 +2303,7 @@ end
 local Gradient = Material("vgui/gradient-d")
 local oldTrain
 hook.Add( "HUDPaint", "metrostroi-draw-cameras", function()
-    local train, outside = isValidTrainDriver(LocalPlayer())
+    local train, outside = Metrostroi.CheckTrainView(LocalPlayer())
     if not IsValid(train) or not train.Cameras or outside then
         if IsValid(oldTrain) then
             oldTrain.CurrentCamera = 0
@@ -2547,53 +2341,6 @@ hook.Add( "HUDPaint", "metrostroi-draw-cameras", function()
 
     render.SetStencilEnable(false)
     render.SetScissorRect(0,0,0,0,false)]]
-end)
-local ppMat = Material("pp/blurx")
-hook.Add( "HUDPaint", "metrostroi-draw-crosshair-tooltip", function()
-    --if not drawCrosshair then return end
-    if IsValid(LocalPlayer()) then
-        local scrX,scrY = ScrW(),ScrH()
-
-        if canDrawCrosshair then
-            surface.DrawCircle(scrX/2,scrY/2,4.1,drawCrosshair and Color(255,0,0) or Color(255,255,150))
-        end
-
-        if toolTipText ~= nil then
-            surface.SetFont("MetrostroiLabels")
-            local w,h = surface.GetTextSize("SomeText")
-            local height = h*1.1
-            local texts = string.Explode("\n",toolTipText)
-            surface.SetDrawColor(0,0,0,125)
-            for i,v in ipairs(texts) do
-                local y = scrY/2+height*(i)
-                if #v==0 then continue end
-                local w2,h2 = surface.GetTextSize(v)
-                surface.DrawRect(scrX/2-w2/2-5, scrY/2-h2/2+height*(i), w2+10, h2)
-                --[[if toolTipPosition and i==#texts then
-                    local st,en = v:find(toolTipPosition)
-                    local textSt,textEn = v:sub(1,st-1),v:sub(en+1,-1)
-                    local x1 = 0-w2/2
-                    local x2 = surface.GetTextSize(textSt)-w2/2
-                    local x3 = surface.GetTextSize(textSt)+surface.GetTextSize(toolTipPosition)-w2/2
-                    draw.SimpleText(textSt,"MetrostroiLabels",scrX/2+x1,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(toolTipPosition,"MetrostroiLabels",scrX/2+x2,y, toolTipColor or Color(0,255,0),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    draw.SimpleText(textEn,"MetrostroiLabels",scrX/2+x3,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-                    Metrostroi.DrawLine(scrX/2+x2,y+h/2-3,scrX/2+x3,y+h/2-3,toolTipColor or Color(0,255,0),1)
-                else]]
-                    draw.SimpleText(v,"MetrostroiLabels",scrX/2,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-                --end
-            end
-            --[[
-            local w1 = surface.GetTextSize(text1)
-            local w2 = surface.GetTextSize(text2)
-
-            surface.SetTextColor(toolTipColor or Color(255,255,255))
-            surface.SetTextPos((scrX-w1)/2,scrY/2+10)
-            surface.DrawText(text1)
-            surface.SetTextPos((scrX-w2)/2,scrY/2+30)
-            surface.DrawText(text2)]]
-        end
-    end
 end)
 
 language.Add("SBoxLimit_train_limit","Wagons limit")

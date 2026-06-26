@@ -42,6 +42,7 @@ Panel.DisableCamAccel   = Откл. симуляцию качания голов
 Panel.DisableHoverText  = Откл. всплывающий текст
 Panel.DisableHoverTextP = Откл. дополнительную информацию\nв всплывающем тексте
 Panel.HoverTextDelay    = Задержка\nвсплывающего\nтекста #NEW #FIXME
+Panel.CrosshairHideDelay = Задержка\nскрытия курсора #NEW
 Panel.DisableSeatShadows= Откл. тени от кресел
 Panel.ScreenshotMode    = Режим съёмки (НИЗКИЙ ФПС)
 Panel.ShadowsHeadlight  = Вкл. тени от фар
