@@ -16,7 +16,7 @@ function ENT:Think()
     end
 
     for k, v in pairs(self.DigitPositions) do
-        if not IsValid(self.Digits[k]) then
+        if not IsValidEnt(self.Digits[k]) then
             local model
             if v[2] then
                 model = "models/metrostroi/mus_clock/ind_"..(self:GetNW2Bool("Type") and "spb" or "msk").."_type"..tostring(self:GetNW2Int("Light",1)).."_dot.mdl"
@@ -44,12 +44,12 @@ function ENT:Think()
     --local interval = -dT + os.time() - (self:GetIntervalResetTime()+GetGlobalFloat("MetrostroiTY"))
     local interval = Metrostroi.GetSyncTime() - (self:GetIntervalResetTime() + GetGlobalFloat("MetrostroiTY"))
     if (interval <= (9 * 60 + 59)) and (interval >= 0) then
-        if IsValid(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(interval / 60)) end
-        if IsValid(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor((interval % 60) / 10)) end
-        if IsValid(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor((interval % 60) % 10)) end
+        if IsValidEnt(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(interval / 60)) end
+        if IsValidEnt(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor((interval % 60) / 10)) end
+        if IsValidEnt(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor((interval % 60) % 10)) end
     else
         for i = 1, 3 do
-            if IsValid(self.Digits[i]) then
+            if IsValidEnt(self.Digits[i]) then
                 self.Digits[i]:SetSkin(10)
             end
         end

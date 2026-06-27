@@ -10,7 +10,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	local physobj = self:GetPhysicsObject()
-	if physobj:IsValid() then physobj:SetMass(25) end
+	if IsValidPhysObj(physobj) then physobj:SetMass(25) end
 end
 
 local function removeWeldBetweenEnts(ent1,ent2)
@@ -22,7 +22,7 @@ local function removeWeldBetweenEnts(ent1,ent2)
 	end
 end
 function ENT:Use(ply)
-	if IsValid(self.Coupled) then
+	if IsValidEnt(self.Coupled) then
 		sound.Play("buttons/lever8.wav",self:GetPos())
 		removeWeldBetweenEnts(self,self.Coupled)
 		removeWeldBetweenEnts(self.Coupled,self)
@@ -41,7 +41,7 @@ function ENT:Think()
 	if self.Timer and CurTime() - self.Timer > 0 then
 		self.Timer = nil
 	end
-	if IsValid(self.Coupled) then
+	if IsValidEnt(self.Coupled) then
 		local coupled = false
 		for k,v in pairs(constraint.FindConstraints(self,"Weld")) do
 			if (v.Ent1 == self or v.Ent1 == self.Coupled) and (v.Ent2 == self or v.Ent2 == self.Coupled) then

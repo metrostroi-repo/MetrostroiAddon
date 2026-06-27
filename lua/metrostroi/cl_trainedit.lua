@@ -533,7 +533,7 @@ end
 
 local function markEntity(self)
 	ent = LocalPlayer():GetEyeTrace().Entity
-	if IsEntity(ent) and IsValid(ent) and ent.Base == "gmod_subway_base" then
+	if IsValidEnt(ent) and ent.Base == "gmod_subway_base" then
 		Train = ent
 		if not Train.ClientPropsOv then Train.ClientPropsOv = {} end
 		Frame.MessageLabel:SetText("Current train:"..tostring(Train:EntIndex()))
@@ -568,7 +568,7 @@ local xxx
 
 local function OpenConfigWindow()
 	--Main frame
-	if not IsValid(Frame) then
+	if not IsValidPanel(Frame) then
 		Frame = vgui.Create("DFrame")
 		Frame:SetPos(ScrW()/5,ScrH()/3)
 		Frame:SetSize(250,100)

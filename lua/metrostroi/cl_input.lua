@@ -214,7 +214,7 @@ local drawGUIOverlay = Metrostroi.DrawGUIOverlay
 --------------------------------------------------------------------------------
 local lastCursorX, lastCursorY, lastMouseMove = 0,0,0
 function Metrostroi.AimCabinPanel()
-    if g_SpawnMenu:IsVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
+    if g_SpawnMenu:IsVisible() or IsValidPanel(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
 
     -- Get cursor position
     local inputCursorX, inputCursorY = input.GetCursorPos()
@@ -237,7 +237,7 @@ function Metrostroi.AimCabinPanel()
     -- Get player's train
     local ply = LocalPlayer()
     local train, outside = Metrostroi.CheckTrainView(ply)
-    if not IsValid(train) or train.ButtonMap == nil then return end
+    if not IsValidEnt(train) or train.ButtonMap == nil then return end
 
     -- Get aimed panel and draw crosshair
     local panel = calcPanelAim(ply,train,outside,cursorX,cursorY)

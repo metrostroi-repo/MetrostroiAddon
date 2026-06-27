@@ -2055,10 +2055,10 @@ function ENT:UpdateWagonNumber()
     self.TrainNumberL = false
     for i=0,3 do
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 
@@ -2110,7 +2110,7 @@ function ENT:Think()
     end
     local BAsnd = math.floor(self.TrueBrakeAngle/10)
     if self.BrakeAngleSND ~= BAsnd then
-        if not IsValid(self.Sounds["parking_brake_rolling"]) or self.Sounds["parking_brake_rolling"]:GetState() ~= GMOD_CHANNEL_PLAYING then
+        if not IsValidSndCh(self.Sounds["parking_brake_rolling"]) or self.Sounds["parking_brake_rolling"]:GetState() ~= GMOD_CHANNEL_PLAYING then
             self:PlayOnce("parking_brake_rolling","bass",1,1)
         end
         self.BrakeAngleSND = BAsnd
@@ -2185,11 +2185,11 @@ function ENT:Think()
     
         self:ShowHide("rcars_wrench",self.RCARSResetTime and CurTime()-self.RCARSResetTime<1.5)
         self:ShowHide("rcbps_wrench",self.RCBPSResetTime and CurTime()-self.RCBPSResetTime<1.5)
-        if IsValid(self.ClientEnts.rcars_wrench) and self.Anims.RCARSToggle then
+        if IsValidEnt(self.ClientEnts.rcars_wrench) and self.Anims.RCARSToggle then
             self.ClientEnts.rcars_wrench:SetPoseParameter("position",1-self.Anims.RCARSToggle.value)
         end
 
-        if IsValid(self.ClientEnts.rcbps_wrench) and self.Anims.RCBPSToggle then
+        if IsValidEnt(self.ClientEnts.rcbps_wrench) and self.Anims.RCBPSToggle then
             self.ClientEnts.rcbps_wrench:SetPoseParameter("position",1-self.Anims.RCBPSToggle.value)
         end
         if self.LastRCARSValue ~= self:GetPackedBool("RCARS") then
@@ -2213,13 +2213,13 @@ function ENT:Think()
         self:ShowHide("rcav3_wrench",self.RCAV3ResetTime and CurTime()-self.RCAV3ResetTime<1.5)
         self:ShowHide("rcav4_wrench",self.RCAV4ResetTime and CurTime()-self.RCAV4ResetTime<1.5)
         self:ShowHide("rcav5_wrench",self.RCAV5ResetTime and CurTime()-self.RCAV5ResetTime<1.5)
-        if IsValid(self.ClientEnts.rcav3_wrench) and self.Anims.RCAV3Toggle then
+        if IsValidEnt(self.ClientEnts.rcav3_wrench) and self.Anims.RCAV3Toggle then
             self.ClientEnts.rcav3_wrench:SetPoseParameter("position",1-self.Anims.RCAV3Toggle.value)
         end
-        if IsValid(self.ClientEnts.rcav4_wrench) and self.Anims.RCAV4Toggle then
+        if IsValidEnt(self.ClientEnts.rcav4_wrench) and self.Anims.RCAV4Toggle then
             self.ClientEnts.rcav4_wrench:SetPoseParameter("position",1-self.Anims.RCAV4Toggle.value)
         end
-        if IsValid(self.ClientEnts.rcav5_wrench) and self.Anims.RCAV5Toggle then
+        if IsValidEnt(self.ClientEnts.rcav5_wrench) and self.Anims.RCAV5Toggle then
             self.ClientEnts.rcav5_wrench:SetPoseParameter("position",1-self.Anims.RCAV5Toggle.value)
         end
         if self.LastRCAV3Value ~= self:GetPackedBool("RCAV3") then
@@ -2396,8 +2396,8 @@ function ENT:Think()
     self:ShowHide("SSpeed1",self:GetPackedBool("LUDS"))
     self:ShowHide("SSpeed2",self:GetPackedBool("LUDS"))
     local speed = self:GetPackedRatio("CPS_Speed")*100.0
-    if IsValid(self.ClientEnts["SSpeed1"])then self.ClientEnts["SSpeed1"]:SetSkin(math.floor(speed)%10) end
-    if IsValid(self.ClientEnts["SSpeed2"])then self.ClientEnts["SSpeed2"]:SetSkin(math.floor(speed/10)%10) end
+    if IsValidEnt(self.ClientEnts["SSpeed1"])then self.ClientEnts["SSpeed1"]:SetSkin(math.floor(speed)%10) end
+    if IsValidEnt(self.ClientEnts["SSpeed2"])then self.ClientEnts["SSpeed2"]:SetSkin(math.floor(speed/10)%10) end
 
     -- Brake-related sounds
     local dT = self.DeltaTime
@@ -2504,7 +2504,7 @@ function ENT:Think()
 
     self.BPSNBuzzVolume = self.BPSNBuzzVolume or 0
     local buzzvolume = volume
-    if self.Sounds["announcer1"] and IsValid(self.Sounds["announcer1"]) then buzzvolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 end
+    if self.Sounds["announcer1"] and IsValidSndCh(self.Sounds["announcer1"]) then buzzvolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 end
     if self.BPSNBuzzVolume > buzzvolume then
         self.BPSNBuzzVolume = math.Clamp(self.BPSNBuzzVolume + 8*(buzzvolume-self.BPSNBuzzVolume)*dT,0.1,1)
     else
@@ -2519,7 +2519,7 @@ function ENT:Think()
         end
     end
     for k,v in ipairs(self.AnnouncerPositions) do
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*volume or 0) end
+        if IsValidSndCh(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*volume or 0) end
     end
 end
 
@@ -2540,7 +2540,7 @@ end
 
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

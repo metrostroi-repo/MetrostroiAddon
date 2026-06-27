@@ -129,7 +129,7 @@ function ENT:Think()
     self:SetPackedBool("AnnPlay",self.Panel.AnnouncerPlaying > 0)
 
     self.AsyncInverter:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = self.AsyncInverter.Torque
         self.FrontBogey.MotorForce = 43000+9000*(A < 0 and 1 or 0)--35300
         self.FrontBogey.Reversed = self.Electric.Reverser < 0

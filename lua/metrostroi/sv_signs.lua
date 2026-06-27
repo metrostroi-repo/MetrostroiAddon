@@ -64,7 +64,7 @@ function Metrostroi.AddStationSign(ent)
 		end
 
 		local sign = ents.Create("gmod_track_sign")
-		if IsValid(sign) then
+		if IsValidEnt(sign) then
 			if tr.Hit then
 				sign:SetPos(tr.HitPos + tr.HitNormal*4)
 				sign:SetAngles(tr.HitNormal:Angle())
@@ -199,7 +199,7 @@ function Metrostroi.AddStationSignal(ent)
 	local pos = platformEnd + Vector(0,0,64) + platformN*96 + platformD*(192-32)
 	local tr = trace(pos,platformN*384)
 	local sign = ents.Create("gmod_track_horlift_signal")
-	if IsValid(sign) then
+	if IsValidEnt(sign) then
 		sign.VMF = sign.VMF or {}
 		sign.VMF.Type = "0"
 		if tr.Hit then

@@ -316,7 +316,7 @@ local function showAddons(ply)
     end
     if C_CheckIgnore:GetBool() and not ply or WaitAddons > 0 then return end
 
-    if IsValid(MetrostroiWorkshopVGUI) then  MetrostroiWorkshopVGUI:Close() end
+    if IsValidPanel(MetrostroiWorkshopVGUI) then  MetrostroiWorkshopVGUI:Close() end
     local badCount = 0
     for i,a in ipairs(RequiredAddons) do if a.error or a.message == "N\\A" then badCount = badCount + 1 end end
     local frame = vgui.Create("DFrame")

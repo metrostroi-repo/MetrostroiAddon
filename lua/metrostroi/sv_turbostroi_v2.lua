@@ -31,7 +31,7 @@ if Turbostroi and not TURBOSTROI then
     end
     hook.Add("OnEntityCreated","Turbostroi",function(ent)
         timer.Simple(0,function()
-            if IsValid(ent) and ent.Base == "gmod_subway_base" and not ent.NoTrain and not ent.DontAccelerateSimulation then
+            if IsValidEnt(ent) and ent.Base == "gmod_subway_base" and not ent.NoTrain and not ent.DontAccelerateSimulation then
                 turbostroiTrains[ent] = true
             end
         end)
@@ -76,7 +76,7 @@ if Turbostroi and not TURBOSTROI then
             end
         end,
         [6] = function (train)
-            if IsValid(Player(index)) then
+            if IsValidEnt(Player(index)) then
                 if value==0 then
                     Player(index):PrintMessage( HUD_PRINTCONSOLE, "--START" )
                     -- print("--START")
@@ -152,9 +152,9 @@ if Turbostroi and not TURBOSTROI then
     end
     if Turbostroi then
         concommand.Add("metrostroi_turbostroi_run",function(ply,_,_,cmd)
-            if not IsValid(ply) or not ply:IsSuperAdmin() then return end
+            if not IsValidEnt(ply) or not ply:IsSuperAdmin() then return end
             local train = ply:GetTrain()
-            if IsValid(train) then
+            if IsValidEnt(train) then
                 -- print(cmd:sub(1,2),cmd:sub(3,4))
                 SendMessage(train,6,cmd:sub(1,255),cmd:sub(256,511),ply:UserID(),0)
             end

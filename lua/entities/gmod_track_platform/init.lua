@@ -16,7 +16,7 @@ function ENT:PlayAnnounce(arriving,Ann)
             timer.Adjust( "metrostroi_station_announce_"..self:EntIndex(), snd[2]+math.random(10,30),0,function() self:PlayAnnounce() end)
             if self.SyncAnnounces and not Ann then
                 local ent = Metrostroi.Stations[self.StationIndex][self.PlatformIndex == 2 and 1 or 2].ent
-                if IsValid(ent) then ent:PlayAnnounce(nil,snd) end
+                if IsValidEnt(ent) then ent:PlayAnnounce(nil,snd) end
             end
         else
             timer.Remove("metrostroi_station_announce_"..self:EntIndex())
@@ -61,17 +61,17 @@ function ENT:Initialize()
 
     -- Drop to floor
     self:DropToFloor()
-    if IsValid(self.PlatformStart) then self.PlatformStart:DropToFloor() end
-    if IsValid(self.PlatformEnd) then self.PlatformEnd:DropToFloor() end
+    if IsValidEnt(self.PlatformStart) then self.PlatformStart:DropToFloor() end
+    if IsValidEnt(self.PlatformEnd) then self.PlatformEnd:DropToFloor() end
 
     -- Positions
     self.Pos = self:GetPos()
-    if IsValid(self.PlatformStart) then
+    if IsValidEnt(self.PlatformStart) then
         self.PlatformStart = self.PlatformStart:GetPos()
     else
         self.PlatformStart = Vector(0,0,0)
     end
-    if IsValid(self.PlatformEnd) then
+    if IsValidEnt(self.PlatformEnd) then
         self.PlatformEnd = self.PlatformEnd:GetPos()
     else
         self.PlatformEnd = Vector(0,0,0)
@@ -189,12 +189,12 @@ local function getTrainDriver(train,checked)
         for k,v in pairs(empty_checked) do empty_checked[k] = nil end
         checked = empty_checked
     end
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     if checked[train] then return end
     checked[train] = true
 
     local ply = train:GetDriver()
-    if IsValid(ply) then -- and (train.KV.ReverserPosition ~= 0)
+    if IsValidEnt(ply) then -- and (train.KV.ReverserPosition ~= 0)
         return ply
     end
 
@@ -412,7 +412,7 @@ function ENT:Think()
                 -- People leave to
                 if left > 0 then
                     PeopleGoing = true
-                    if IsValid(driver) then
+                    if IsValidEnt(driver) then
                         driver:AddFrags(left)
                         driver.MTransportedPassengers = (driver.MTransportedPassengers or 0) + left
                     end
@@ -446,7 +446,7 @@ function ENT:Think()
             
             --[[ People boarded train
             if boarded > 0 then
-                if IsValid(driver) then
+                if IsValidEnt(driver) then
                     driver:AddDeaths(boarded)
                 end
             end]]
@@ -482,9 +482,9 @@ function ENT:Think()
         self.BoardTimer = 20
         self.AnnouncerPlay = false
     end
-    if IsValid(self.PUI) then
+    if IsValidEnt(self.PUI) then
         local train = self.CurrentTrain
-        if IsValid(train) and Metrostroi.EndStations and Metrostroi.EndStations[1] and type(train.SignsIndex) == "number" then
+        if IsValidEnt(train) and Metrostroi.EndStations and Metrostroi.EndStations[1] and type(train.SignsIndex) == "number" then
             local id = Metrostroi.EndStations[1][1]
             for k,v in pairs(train.SignsList or {}) do
                 if v == train.SignsIndex then id = k; break end
@@ -504,7 +504,7 @@ function ENT:Think()
         else
             self.PUI.Last = 0
         end
-        if IsValid(self.CurrentTrain) and IsValid(self.PUI) and self.Timer then
+        if IsValidEnt(self.CurrentTrain) and IsValidEnt(self.PUI) and self.Timer then
             if not self.PUI.Work then self.PUI.Work = true end
 
 
@@ -523,7 +523,7 @@ function ENT:Think()
             if false and self.CurrentTrain.SignsList and (self.CurrentTrain.SignsList[self.CurrentTrain.SignsIndex] == "" or self.CurrentTrain.SignsList[self.CurrentTrain.SignsIndex] and self.CurrentTrain.SignsList[self.CurrentTrain.SignsIndex][3]) then
                 ent:PlayAnnounce(2,self.NoEntry.arr)
                 timer.Simple(20,function()
-                    if not IsValid(self.CurrentTrain) then return end
+                    if not IsValidEnt(self.CurrentTrain) then return end
                     ent:PlayAnnounce(2,self.NoEntry.dep)
                     if self.CurrentTrain.SignsIndex == #self.CurrentTrain.SignsList-3 then
                         timer.Simple(15,function() ent:PlayAnnounce(2,self.NoEntry.depot) end)
@@ -544,7 +544,7 @@ function ENT:Think()
                 if spec then
                     ent:PlayAnnounce(2,self.NoEntry.specarr)
                     timer.Simple(20,function()
-                        if not IsValid(self.CurrentTrain) then return end
+                        if not IsValidEnt(self.CurrentTrain) then return end
                         ent:PlayAnnounce(2,self.NoEntry.specdep)
                     end)
                 else

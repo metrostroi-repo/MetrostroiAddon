@@ -1567,10 +1567,10 @@ function ENT:UpdateWagonNumber()
     self.TrainNumberL = false
     for i=0,3 do
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 
@@ -1606,7 +1606,7 @@ function ENT:Think()
     end
     local BAsnd = math.floor(self.TrueBrakeAngle/10)
     if self.BrakeAngleSND ~= BAsnd then
-        if not IsValid(self.Sounds["parking_brake_rolling"]) or self.Sounds["parking_brake_rolling"]:GetState() ~= GMOD_CHANNEL_PLAYING then
+        if not IsValidSndCh(self.Sounds["parking_brake_rolling"]) or self.Sounds["parking_brake_rolling"]:GetState() ~= GMOD_CHANNEL_PLAYING then
             self:PlayOnce("parking_brake_rolling","bass",1,1)
         end
         self.BrakeAngleSND = BAsnd
@@ -1706,7 +1706,7 @@ function ENT:Think()
 
 
     self:ShowHide("rum_wrench",self.RUMResetTime and CurTime()-self.RUMResetTime<1.5)
-    if IsValid(self.ClientEnts.rum_wrench) and self.Anims.RUMToggle then
+    if IsValidEnt(self.ClientEnts.rum_wrench) and self.Anims.RUMToggle then
         self.ClientEnts.rum_wrench:SetPoseParameter("position",1-self.Anims.RUMToggle.value)
     end
     if self.LastRUMValue ~= self:GetPackedBool("RUM") then
@@ -1924,13 +1924,13 @@ function ENT:Think()
     end--]]
 
     local noisevolume = 1
-    if work and self.Sounds["announcer1"] and IsValid(self.Sounds["announcer1"]) then noisevolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*1 end
+    if work and self.Sounds["announcer1"] and IsValidSndCh(self.Sounds["announcer1"]) then noisevolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*1 end
     if self.NoiseVolume > noisevolume then
         self.NoiseVolume = math.Clamp(self.NoiseVolume + 8*(noisevolume-self.NoiseVolume)*dT,0.1,1)
     else
         self.NoiseVolume = math.Clamp(self.NoiseVolume + 0.5*(noisevolume-self.NoiseVolume)*dT,0.1,1)
     end
-    local annvolume = self.Sounds.announcer1 and IsValid(self.Sounds.announcer1) and self.Sounds.announcer1:GetLevel()*math.Rand(0.9,3) or 0
+    local annvolume = self.Sounds.announcer1 and IsValidSndCh(self.Sounds.announcer1) and self.Sounds.announcer1:GetLevel()*math.Rand(0.9,3) or 0
 
     local lamp = math.max(annvolume,noise and self.NoiseVolume or 0)
 
@@ -1940,7 +1940,7 @@ function ENT:Think()
         for i=1,2 do
             self:SetSoundState(Format("announcer_noise%d_%d",i,k),noise and (k ~= 1 and work or k==1 and cabspeaker) and self.NoiseVolume*(v[3] or 1) or 0,1)
         end
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume((k ~= 1 and work or k==1 and cabspeaker) and (v[3] or 1) or 0) end
+        if IsValidSndCh(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume((k ~= 1 and work or k==1 and cabspeaker) and (v[3] or 1) or 0) end
     end
 end
 
@@ -1990,7 +1990,7 @@ end
 
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

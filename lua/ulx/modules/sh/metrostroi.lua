@@ -23,7 +23,7 @@ function ulx.wagoncount( calling_ply )
             end
         end
         for k,v in pairs(N) do
-            ulx.fancyLog("#s wagons have #s",v,(type(k) == "Player" and IsValid(k)) and k:GetName() or k)
+            ulx.fancyLog("#s wagons have #s",v,(type(k) == "Player" and IsValidEnt(k)) and k:GetName() or k)
         end
     end
     ulx.fancyLog("Max trains: #s.\nMax wagons: #s.\nMax trains per player: #s", GetConVar("metrostroi_maxtrains"):GetInt(), GetConVar("metrostroi_maxwagons"):GetInt(), GetConVar("metrostroi_maxtrains_onplayer"):GetInt())
@@ -109,7 +109,7 @@ function ulx.trains( calling_ply, ToP )
             if ent.NoTrain or trains[ent] or (ent.FrontTrain and ent.RearTrain) or not ent.WagonList then continue end
 
             local owner = CPPI and ent:CPPIGetOwner() or ent:GetPlayer()
-            local canShow = not ToP or ToP == "" or IsValid(owner) and owner:GetName():find(ToP)
+            local canShow = not ToP or ToP == "" or IsValidEnt(owner) and owner:GetName():find(ToP)
 
             if not canShow and not tonumber(ToP) then continue end
 
@@ -130,10 +130,10 @@ function ulx.trains( calling_ply, ToP )
                 end
 
                 local ALSCoil = tr.ALSCoil
-                if ALSCoil and ALSCoil.Enabled > 0 and IsValid(ALSCoil.Signal) and (IsValid(ent:GetDriver()) or not signal) then
+                if ALSCoil and ALSCoil.Enabled > 0 and IsValidEnt(ALSCoil.Signal) and (IsValidEnt(ent:GetDriver()) or not signal) then
                     signal = ALSCoil.Signal
                 end
-                if IsValid(tr.DriverSeat) and IsValid(tr.DriverSeat:GetDriver()) then
+                if IsValidEnt(tr.DriverSeat) and IsValidEnt(tr.DriverSeat:GetDriver()) then
                     if drivers ~= "" then drivers = drivers.."," end
                     drivers = drivers..string.format("%s in %04d driver",tr.DriverSeat:GetDriver():GetName(),tr:GetWagonNumber())
                 end
@@ -149,7 +149,7 @@ function ulx.trains( calling_ply, ToP )
                 signal and string.format("%s %s",signal.Name,(signal.Red or signal:GetARS(0,true)) and "(prohibited)" or "") or "N/A"
             )]]
             ulx.fancyLog("Consist #s:",consist)
-            if IsValid(owner) then   ulx.fancyLog("\tOwner #s",owner:GetName()) end
+            if IsValidEnt(owner) then   ulx.fancyLog("\tOwner #s",owner:GetName()) end
             ulx.fancyLog("\tType #s",ent:GetClass():gsub("gmod_subway_",""))
             if routelist~="" then ulx.fancyLog("\tRoute number: #s",routelist) end
             if signal then ulx.fancyLog("\tSignal: #s",string.format("%s %s",signal.Name,(signal.Red or signal:GetARS(0,true)) and "(prohibited)" or "")) end
@@ -166,14 +166,14 @@ trains:help( "Shows you the detailed info about all consits" )
 
 
 function ulx.traingoto( calling_ply, ToP)
-    if not IsValid(calling_ply) then return end
+    if not IsValidEnt(calling_ply) then return end
     --if lasttimeusage + waittime > CurTime() then
         --ULib.tsayError( calling_ply, "Please wait " .. math.Round(lasttimeusage + waittime - CurTime()) .. " seconds before using this command again", true )
         --return
     --end
 
     --lasttimeusage = CurTime()
-    local train = not ToP and IsValid(calling_ply.lastTrain) and calling_ply.lastTrain
+    local train = not ToP and IsValidEnt(calling_ply.lastTrain) and calling_ply.lastTrain
 
     for k,v in pairs(Metrostroi.TrainClasses) do
         if  v == "gmod_subway_base" then continue end
@@ -201,7 +201,7 @@ function ulx.traingoto( calling_ply, ToP)
         if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
         calling_ply:SetMoveType(MOVETYPE_NOCLIP)
 
-        if IsValid(train.DriverSeat) then
+        if IsValidEnt(train.DriverSeat) then
             calling_ply:SetPos(train.DriverSeat:LocalToWorld(Vector(-10,0,0)))
             calling_ply:SetEyeAngles(train:LocalToWorldAngles(-train.DriverSeat:GetAngles()))
             calling_ply:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!
@@ -222,8 +222,8 @@ traingoto:addParam{ type=ULib.cmds.StringArg, hint="Filter by player or wagon nu
 traingoto:help( "Teleport you to trains" )
 
 function ulx.trainback( calling_ply )
-    if not IsValid(calling_ply) then return end
-    if not IsValid(calling_ply.lastTrain) then
+    if not IsValidEnt(calling_ply) then return end
+    if not IsValidEnt(calling_ply.lastTrain) then
         ULib.tsayError( calling_ply, "Train not found",true)
         return
     end
@@ -239,22 +239,22 @@ function ulx.trainback( calling_ply )
     --lasttimeusage = CurTime()
     local train = calling_ply.lastTrain
 
-    local seat = IsValid(calling_ply.lastTrainSeat) and not IsValid(calling_ply.lastTrainSeat:GetDriver()) and calling_ply.lastTrainSeat
+    local seat = IsValidEnt(calling_ply.lastTrainSeat) and not IsValidEnt(calling_ply.lastTrainSeat:GetDriver()) and calling_ply.lastTrainSeat
 
-    if not seat and IsValid(train.DriverSeat) and not IsValid(train.DriverSeat:GetDriver()) then
+    if not seat and IsValidEnt(train.DriverSeat) and not IsValidEnt(train.DriverSeat:GetDriver()) then
         seat = train.DriverSeat
     end
 
-    if not seat and IsValid(train.InstructorsSeat) and not IsValid(train.InstructorsSeat:GetDriver()) then
+    if not seat and IsValidEnt(train.InstructorsSeat) and not IsValidEnt(train.InstructorsSeat:GetDriver()) then
         seat = train.InstructorsSeat
     end
     if not seat then
         for i=1,5 do
-            if IsValid(train["InstructorsSeat"..i]) and not IsValid(train["InstructorsSeat"..i]:GetDriver()) then
+            if IsValidEnt(train["InstructorsSeat"..i]) and not IsValidEnt(train["InstructorsSeat"..i]:GetDriver()) then
                 seat = train["InstructorsSeat"..i]
                 break
             end
-            if IsValid(train["ExtraSeat"..i]) and not IsValid(train["ExtraSeat"..i]:GetDriver()) then
+            if IsValidEnt(train["ExtraSeat"..i]) and not IsValidEnt(train["ExtraSeat"..i]:GetDriver()) then
                 seat = train["ExtraSeat"..i]
                 break
             end
@@ -275,7 +275,7 @@ trainback:help( "Teleport you back to your train" )
 
 
 local function takeSeat(Player, OtherSeat)
-    if not IsValid(OtherSeat) or IsValid(OtherSeat:GetDriver()) or not IsValid(OtherSeat:GetParent()) then
+    if not IsValidEnt(OtherSeat) or IsValidEnt(OtherSeat:GetDriver()) or not IsValidEnt(OtherSeat:GetParent()) then
         return false
     end
 
@@ -292,7 +292,7 @@ local function takeSeat(Player, OtherSeat)
     local timerName = "change_cab_"..OtherSeat:EntIndex()
 
     timer.Create(timerName, 0, 0, function()
-        if not IsValid(Player) or not IsValid(OtherSeat) or IsValid(Player:GetVehicle()) then
+        if not IsValidEnt(Player) or not IsValidEnt(OtherSeat) or IsValidEnt(Player:GetVehicle()) then
             timer.Remove(timerName)
 
             Player:SetMoveType(OldMoveType)
@@ -303,7 +303,7 @@ local function takeSeat(Player, OtherSeat)
 
         Player:EnterVehicle(OtherSeat)
 
-        if not IsValid(Player:GetVehicle()) then return end
+        if not IsValidEnt(Player:GetVehicle()) then return end
 
         timer.Remove(timerName)
 
@@ -318,16 +318,16 @@ local function takeSeat(Player, OtherSeat)
 end
 
 function ulx.changecab( calling_ply )
-    if not IsValid(calling_ply) then return end
+    if not IsValidEnt(calling_ply) then return end
     local Wagon = calling_ply:GetTrain()
-    if not IsValid(Wagon) then
+    if not IsValidEnt(Wagon) then
         ULib.tsayError( calling_ply, "You must sit in train",true)
         return
     end
 
     local TargetWagon
     for i, wag in ipairs(Wagon.WagonList) do
-        if not IsValid(wag) or Wagon == wag or (wag.FrontTrain and wag.RearTrain) then continue end
+        if not IsValidEnt(wag) or Wagon == wag or (wag.FrontTrain and wag.RearTrain) then continue end
         TargetWagon = wag
         break
     end
@@ -419,7 +419,7 @@ function ulx.tps(calling_ply,station)
     
     -- Check stations table
     if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply,"This map is not configured",true) return end
-    if not IsValid(calling_ply) then return end
+    if not IsValidEnt(calling_ply) then return end
     
     -- Open GUI with station list
     if station == "" then
@@ -507,9 +507,9 @@ tps:help( "Teleport between stations." )
 
 
 function ulx.sroutes( calling_ply, sig )
-    if not IsValid(calling_ply) then return end
+    if not IsValidEnt(calling_ply) then return end
     local Train = calling_ply:GetTrain()
-    if IsValid(Train) and (not sig or sig == "") then       
+    if IsValidEnt(Train) and (not sig or sig == "") then       
         local signal
         -- Get train position
         local pos = Metrostroi.TrainPositions[Train]

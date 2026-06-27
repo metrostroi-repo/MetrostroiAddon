@@ -277,11 +277,11 @@ function ENT:TrainSpawnerUpdate()
     self:SetNW2Float("UPOBuzzVolume",math.Rand(0.6,0.9))
 
     local pneumoPow = 1.3+(math.random()^1.2)*0.3
-    if IsValid(self.FrontBogey) then
+    if IsValidEnt(self.FrontBogey) then
         self.FrontBogey:SetNW2Int("SquealType",math.floor(math.random()*7)+1)
         self.FrontBogey.PneumaticPow = pneumoPow
     end
-    if IsValid(self.RearBogey) then
+    if IsValidEnt(self.RearBogey) then
         self.RearBogey:SetNW2Int("SquealType",math.floor(math.random()*7)+1)
         self.RearBogey.PneumaticPow = pneumoPow
     end
@@ -386,7 +386,7 @@ function ENT:Think()
 
     self:SetPackedRatio("Speed", self.Speed/100)
     self.Engines:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = 2*self.Engines.BogeyMoment
         --self.FrontBogey.MotorForce = 27000+1000*(A < 0 and 1 or 0)
         --self.RearBogey.MotorForce  = 27000+1000*(A < 0 and 1 or 0)

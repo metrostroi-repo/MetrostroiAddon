@@ -13,7 +13,7 @@ end
 
 Metrostroi.UsedNumbers = Metrostroi.UsedNumbers or {}
 function Metrostroi.RemoveNumber(ent)
-    if IsValid(ent) and ent.WagonNumber then
+    if IsValidEnt(ent) and ent.WagonNumber then
         local typ = ent.SubwayTrain and ent.SubwayTrain.Type or ent:GetClass()
         local tbl = Metrostroi.UsedNumbers[typ]
         if not tbl then return end
@@ -24,7 +24,7 @@ end
 hook.Add("EntityRemoved","WagonNumberRemove",Metrostroi.RemoveNumber)
 function Metrostroi.GenerateNumber(train,tbl,func,retry)
     Metrostroi.RemoveNumber(train)
-    if not tbl or not IsValid(train) then return 0 end
+    if not tbl or not IsValidEnt(train) then return 0 end
     local typ = train.SubwayTrain and train.SubwayTrain.Type or train:GetClass()
     if not Metrostroi.UsedNumbers[typ] then Metrostroi.UsedNumbers[typ] = {} end
     for i=1,1000 do
@@ -170,18 +170,18 @@ end
 local Player = FindMetaTable("Player")
 
 function Player:CanDriveTrains()
-    return IsValid(self:GetWeapon("train_kv_wrench")) or self:IsAdmin()
+    return IsValidEnt(self:GetWeapon("train_kv_wrench")) or self:IsAdmin()
 end
 
 function Player:GetTrain()
     local seat = self:GetVehicle()
-    if IsValid(seat) then
+    if IsValidEnt(seat) then
         return seat:GetNW2Entity("TrainEntity"),seat
     end
 end
 
 hook.Add("PlayerEnteredVehicle","MetrostroiPlayerTrain",function(ply,veh)
-    ply.InMetrostroiTrain = IsValid(veh:GetNW2Entity("TrainEntity")) and veh:GetNW2Entity("TrainEntity")
+    ply.InMetrostroiTrain = IsValidEnt(veh:GetNW2Entity("TrainEntity")) and veh:GetNW2Entity("TrainEntity")
 end)
 hook.Add("PlayerLeaveVehicle","MetrostroiPlayerTrain",function(ply,veh)
     ply.InMetrostroiTrain = false
@@ -252,7 +252,7 @@ end)
 -- Simple hack to get a driving schedule
 --------------------------------------------------------------------------------
 concommand.Add("metrostroi_schedule", function(ply, _, args)
-    if not IsValid(ply) then return end
+    if not IsValidEnt(ply) then return end
     local train = ply:GetTrain()
     local pos = Metrostroi.TrainPositions[train]
     --if pos and pos[1] then
@@ -300,7 +300,7 @@ end)
 
 concommand.Add("metrostroi_fail", function(ply, _, args)
     local trainList = {}
-    if not IsValid(ply) then
+    if not IsValidEnt(ply) then
         for _,class in pairs(Metrostroi.TrainClasses) do
             local trains = ents.FindByClass(class)
             for _,train in pairs(trains) do
@@ -309,7 +309,7 @@ concommand.Add("metrostroi_fail", function(ply, _, args)
         end
     else
         local train = ply:GetTrain()
-        if IsValid(train) then
+        if IsValidEnt(train) then
             train:UpdateWagonList()
             for k,v in pairs(train.WagonList) do
                 trainList[k] = v
@@ -319,7 +319,7 @@ concommand.Add("metrostroi_fail", function(ply, _, args)
 
     local train = table.Random(trainList)
     if train then
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"Generating random failure in your train!")
             print(tostring(ply).." generated random failure in train "..train:EntIndex())
         else
@@ -327,7 +327,7 @@ concommand.Add("metrostroi_fail", function(ply, _, args)
         end
         train:TriggerInput("FailSimFail",1)
     else
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"You must be inside a train to generate a failure!")
         end
     end
@@ -335,7 +335,7 @@ end)
 
 concommand.Add("metrostroi_fail_reset", function(ply, _, args)
     local trainList = {}
-    if not IsValid(ply) then
+    if not IsValidEnt(ply) then
         for _,class in pairs(Metrostroi.TrainClasses) do
             local trains = ents.FindByClass(class)
             for _,train in pairs(trains) do
@@ -344,7 +344,7 @@ concommand.Add("metrostroi_fail_reset", function(ply, _, args)
         end
     else
         local train = ply:GetTrain()
-        if IsValid(train) then
+        if IsValidEnt(train) then
             train:UpdateWagonList()
             for k,v in pairs(train.WagonList) do
                 trainList[k] = v
@@ -353,7 +353,7 @@ concommand.Add("metrostroi_fail_reset", function(ply, _, args)
     end
 
     if #trainList > 0 then
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"Reset all failures in your train!")
             print(tostring(ply).." reset all failures in train "..trainList[1]:EntIndex())
         else
@@ -361,7 +361,7 @@ concommand.Add("metrostroi_fail_reset", function(ply, _, args)
         end
         for _,v in pairs(trainList) do v:TriggerInput("FailSimReset") end
     else
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"You must be inside a train to reset all failures!")
         end
     end
@@ -369,7 +369,7 @@ end)
 
 concommand.Add("metrostroi_wire", function(ply, _, args)
     local trainList = {}
-    if not IsValid(ply) then
+    if not IsValidEnt(ply) then
         for _,class in pairs(Metrostroi.TrainClasses) do
             local trains = ents.FindByClass(class)
             for _,train in pairs(trains) do
@@ -378,7 +378,7 @@ concommand.Add("metrostroi_wire", function(ply, _, args)
         end
     else
         local train = ply:GetTrain()
-        if IsValid(train) then
+        if IsValidEnt(train) then
             --train:UpdateWagonList()
             for k,v in pairs(train.WagonList) do
                 trainList[k] = v
@@ -388,7 +388,7 @@ concommand.Add("metrostroi_wire", function(ply, _, args)
 
     local train = table.Random(trainList)
     if train then
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             args[1] = tonumber(args[1])
             if not args[1] then ply:PrintMessage(HUD_PRINTCONSOLE,"1st argument must be a number") return end
             if args[2] and not tonumber(args[2]) then ply:PrintMessage(HUD_PRINTCONSOLE,"2nd argument must be a number") return end
@@ -403,14 +403,14 @@ concommand.Add("metrostroi_wire", function(ply, _, args)
         train.TrainWireOutsideFrom[args[1]] = args[2]
         --if train.WriteTrainWire then train:WriteTrainWire(args[1],1) end
     else
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"You must be inside a train!")
         end
     end
 end)
 concommand.Add("metrostroi_wire_reset", function(ply, _, args)
     local trainList = {}
-    if not IsValid(ply) then
+    if not IsValidEnt(ply) then
         for _,class in pairs(Metrostroi.TrainClasses) do
             local trains = ents.FindByClass(class)
             for _,train in pairs(trains) do
@@ -419,7 +419,7 @@ concommand.Add("metrostroi_wire_reset", function(ply, _, args)
         end
     else
         local train = ply:GetTrain()
-        if IsValid(train) then
+        if IsValidEnt(train) then
             --train:UpdateWagonList()
             for k,v in pairs(train.WagonList) do
                 trainList[k] = v
@@ -428,7 +428,7 @@ concommand.Add("metrostroi_wire_reset", function(ply, _, args)
     end
 
     if #trainList > 0 then
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             if args[1] and not tonumber(args[1]) then ply:PrintMessage(HUD_PRINTCONSOLE,"Argument must be a number") return end
             ply:PrintMessage(HUD_PRINTCONSOLE,"reset "..(args[1] and args[1].." " or "").."wire outside power in train!")
             print(tostring(ply).." reset "..(args[1] and args[1].." wire " or "").."outside power in train ")
@@ -448,15 +448,15 @@ concommand.Add("metrostroi_wire_reset", function(ply, _, args)
             end
         end
     else
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             ply:PrintMessage(HUD_PRINTCONSOLE,"You must be inside a train!")
         end
     end
 end)
 concommand.Add("metrostroi_can", function(ply, _, args)
-    if not IsValid(ply) or not IsValid(ply:GetVehicle()) then return end
+    if not IsValidEnt(ply) or not IsValidEnt(ply:GetVehicle()) then return end
     local train = ply:GetVehicle():GetNW2Entity("TrainEntity")
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     if not args[4] then return end
     local system = args[1]
     local id = tonumber(args[2])
@@ -515,8 +515,8 @@ hook.Add("Think", "Metrostroi_ElectricConsumptionThink", function()
         if tbl.Electric.EnergyChange then Metrostroi.TotalRateWatts = Metrostroi.TotalRateWatts + math.max(0, tbl.Electric.EnergyChange) end
         local current = math.max(0, tbl.Electric.Itotal or 0) -  math.max(0, tbl.Electric.Iexit or 0)
 
-        local fB = IsValid(tbl.FrontBogey) and tbl.FrontBogey:GetTable()
-        local rB = IsValid(tbl.RearBogey) and tbl.RearBogey:GetTable()
+        local fB = IsValidEnt(tbl.FrontBogey) and tbl.FrontBogey:GetTable()
+        local rB = IsValidEnt(tbl.RearBogey) and tbl.RearBogey:GetTable()
 
         local fBDropByPeople = fb and fB.DropByPeople or 0
         local rBDropByPeople = rb and rB.DropByPeople or 0
@@ -585,7 +585,7 @@ concommand.Add("metrostroi_electric", function(ply, _, args) -- (%.2f$) Metrostr
     local m = Format("[%25s] %010.3f kWh, %.3f kW (%5.1f v, %4.0f A)","<total>",
         Metrostroi.TotalkWh,Metrostroi.TotalRateWatts*1e-3,
         Metrostroi.Voltage,Metrostroi.Current)
-    if IsValid(ply)
+    if IsValidEnt(ply)
     then ply:PrintMessage(HUD_PRINTCONSOLE,m)
     else print(m)
     end
@@ -609,7 +609,7 @@ concommand.Add("metrostroi_electric", function(ply, _, args) -- (%.2f$) Metrostr
         for player,_ in pairs(U) do --, n=%.0f%%
             --local m = Format("[%20s] %08.1f KWh (lost %08.1f KWh)",player,U[player]/(3.6e6),D[player]/(3.6e6)) --,100*D[player]/U[player]) --,D[player])
             local m = Format("[%25s] %010.3f kWh (%.2f$)",player,U[player]/(3.6e6),Metrostroi.GetEnergyCost(U[player]/(3.6e6)))
-            if IsValid(ply)
+            if IsValidEnt(ply)
             then ply:PrintMessage(HUD_PRINTCONSOLE,m)
             else print(m)
             end
@@ -629,7 +629,7 @@ timer.Create("Metrostroi_ElectricConsumptionTimer",0.5,0,function()
             end
         end
         for player,_ in pairs(U) do
-            if IsValid(player) then
+            if IsValidEnt(player) then
                 player:SetDeaths(10*U[player]/(3.6e6))
                 player.MUsedEnergy = (player.MUsedEnergy or 0) + 10*U[player]/(3.6e6)
             end
@@ -697,7 +697,7 @@ function Metrostroi.MapHasFullSupport(typ)
 end
 
 concommand.Add("metrostroi_insert_signs", function(ply,_,args)
-    if IsValid(ply) then error("Metrostroi: This command can be run only from server console!") end
+    if IsValidEnt(ply) then error("Metrostroi: This command can be run only from server console!") end
     local MAP_NAME = game.GetMap() --"gm_mus_loopline_a3"
     local MAP_VERSION = args and args[1] or ""
 
@@ -743,7 +743,7 @@ concommand.Add("metrostroi_insert_signs", function(ply,_,args)
 end)
 SafeRemoveEntity(Metrostroi.RTCamera)
 function Metrostroi.GetCam()
-    if not IsValid(Metrostroi.RTCamera) then
+    if not IsValidEnt(Metrostroi.RTCamera) then
         Metrostroi.RTCamera = ents.Create( "point_camera" )
         Metrostroi.RTCamera:SetKeyValue( "GlobalOverride", 1 )
         Metrostroi.RTCamera:SetKeyValue( "fogEnable", 1 )
@@ -935,7 +935,7 @@ function Metrostroi.FindNextStation(src,stationsPath,stations)
     return scan(src,stations,true,{signals={},stations={},sensors={},slopes={}},0,{}) or scan(src,stations,false,{signals={},stations={},sensors={},slopes={}},0,{})
 end
 concommand.Add("metrostroi_pam_genconfig", function(ply, _, args)
-    if not IsValid(ply) or not ply:IsAdmin() then return end
+    if not IsValidEnt(ply) or not ply:IsAdmin() then return end
 
     if args[1] == "clear" then
         ply:PrintMessage(HUD_PRINTCONSOLE,"Cleared!")
@@ -1007,7 +1007,7 @@ function Metrostroi.PARebuildStations()
 end
 
 concommand.Add("metrostroi_pam_add_station", function(ply, _, args)
-    if not IsValid(ply) or not ply:IsAdmin() then return end
+    if not IsValidEnt(ply) or not ply:IsAdmin() then return end
 
     local line = tonumber(table.remove(args,1) or false)
     local path = tonumber(table.remove(args,1) or false)
@@ -1024,7 +1024,7 @@ concommand.Add("metrostroi_pam_add_station", function(ply, _, args)
     local PA
     if not dist then
         local train = ply:GetTrain()
-        if IsValid(train) and train.PAM and train.PAM.Distance then
+        if IsValidEnt(train) and train.PAM and train.PAM.Distance then
             dist = train.PAM.Distance
             PA = train.PAM
         end

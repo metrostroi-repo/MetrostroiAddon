@@ -420,7 +420,7 @@ end
 function Metrostroi.AddARSSubSection(node,source)
     if true then return end
     local ent = ents.Create("gmod_track_signal")
-    if not IsValid(ent) then return end
+    if not IsValidEnt(ent) then return end
 
     local tr = Metrostroi.RerailGetTrackData(node.pos - node.dir*32,node.dir)
     if not tr then return end
@@ -450,7 +450,7 @@ function Metrostroi.UpdateARSSections()
         local signal = Metrostroi.GetARSJoint(v.node1,v.x,true)
 
         --Metrostroi.GetNextTrafficLight(v.node1,v.x,not v.forward,true)
-        if IsValid(k) and signal then
+        if IsValidEnt(k) and signal then
             local pos = Metrostroi.SignalEntityPositions[signal]
             --debugoverlay.Line(k:GetPos(),signal:GetPos(),10,Color(0,0,255),true)
 
@@ -522,7 +522,7 @@ function Metrostroi.ScanTrack(itype, start_node, func, start_x, start_dir)
             local signals = sigEntsForNode[node]
             if signals then
                 for _,v_ent in pairs(signals) do
-                    -- if not IsValid(v_ent) then continue end
+                    -- if not IsValidEnt(v_ent) then continue end
                     local v = v_ent:GetTable()
                     if not v then continue end
                     local trackX = v.TrackX
@@ -645,7 +645,7 @@ function Metrostroi.GetNextTrafficLight(src_node,x,dir,include_ars_sections,over
 
         -- For every signal entity in node, check if it rests on path
         for k,v in pairs(Metrostroi.SignalEntitiesForNode[node]) do
-            if IsValid(v) and
+            if IsValidEnt(v) and
                 ((include_ars_sections) and (v.TrackX ~= x) and --(v:GetTrafficLights() > 0) or
                  (v.TrackX >= min_x) and (v.TrackX <= max_x)) then
                 return v
@@ -660,13 +660,13 @@ end
 local function ARSJointScan(node,min_x,max_x,train,dir,x)
     -- If there are no signals in node, keep scanning
     local tnode = Metrostroi.TrainPositions[train] and Metrostroi.TrainPositions[train][1]
-    if IsValid(train) and tnode and Metrostroi.TrainsForNode[node] and #Metrostroi.TrainsForNode[node] > 0 then
+    if IsValidEnt(train) and tnode and Metrostroi.TrainsForNode[node] and #Metrostroi.TrainsForNode[node] > 0 then
         local x1 = tnode.x+train.PosX
         for k,v in pairs(Metrostroi.TrainsForNode[node]) do
             --local found = false
             --for _,train in pairs(train.WagonList) do if v == train then found=true;break end end
             --if found then continue end
-            if v == train or not IsValid(v) then continue end
+            if v == train or not IsValidEnt(v) then continue end
 
             local pos = Metrostroi.TrainPositions[v]
             --[[ if v ~= train and (
@@ -701,7 +701,7 @@ local function ARSJointScan(node,min_x,max_x,train,dir,x)
     end
     -- For every signal entity in node, check if it rests on path
     for k,v in pairs(Metrostroi.SignalEntitiesForNode[node]) do
-        if IsValid(v) then
+        if IsValidEnt(v) then
             --print(dir,v.Name,v.TrackDir,train)
             if dir ~= v.TrackDir then continue end
             if ((v.OutputARS ~= 0) and (v.TrackX ~= x) and
@@ -722,7 +722,7 @@ local function ARSJointScanBack(node,min_x,max_x,train,dir,x,forw)
     if node.path.id ~= node1.path.id then return end
     -- For every signal entity in node, check if it rests on path
     for k,v in pairs(Metrostroi.SignalEntitiesForNode[node]) do
-        if IsValid(v) then
+        if IsValidEnt(v) then
             if dir == v.TrackDir then continue end
             --if forw == v then continue end
             if ((v.OutputARS ~= 0) and (v.TrackX ~= x) and
@@ -757,7 +757,7 @@ function Metrostroi.GetARSJoint(src_node,x,dir,train)
         end
         forw = Metrostroi.ScanTrack("ars",src_node,function(node,min_x,max_x) return ARSJointScan(node,min_x,max_x,train,dir,x) end,x,dir)
         back = Metrostroi.ScanTrack("ars",src_node,function(node,min_x,max_x) return ARSJointScanBack(node,max_x,min_x,train,not dir,x,forw) end,x,not dir)
-        if IsValid(forw) and IsValid(back) and false then
+        if IsValidEnt(forw) and IsValidEnt(back) and false then
             Metrostroi.GetARSJointCache[train:EntIndex()] = {
                 StartX = forw.TrackPosition.x,
                 EndX = back.TrackPosition.x,
@@ -1213,7 +1213,7 @@ function Metrostroi.LoadSigns(name,keep)
     -- Create new entities (add a delay so the old entities clean up)
     for k,v in pairs(signs) do
         local ent = ents.Create(v.Class)
-        if IsValid(ent) then
+        if IsValidEnt(ent) then
             ent:SetPos(v.Pos)
             ent:SetAngles(v.Angles)
             if v.Class == "gmod_track_switch" then
@@ -1280,7 +1280,7 @@ function Metrostroi.LoadAutoSigns(name,keep)
     Metrostroi.HaveAuto = false
     for k,v in pairs(auto) do
         local ent = ents.Create("gmod_track_autodrive_plate")
-        if IsValid(ent) and v.Model then
+        if IsValidEnt(ent) and v.Model then
             ent:SetPos(v.Pos)
             ent:SetAngles(v.Angles)
             ent.PlateType = v.Type
@@ -1334,7 +1334,7 @@ function Metrostroi.LoadPAData(name)
         for k,v in pairs(pa.markers) do
             if not v.TrackPath or not v.TrackX then continue end
             local ent = ents.Create("gmod_track_pa_marker")
-            if IsValid(ent) then
+            if IsValidEnt(ent) then
                 ent:SetPos(v.Pos)
                 ent:SetAngles(v.Angles)
                 if Metrostroi.Paths[v.TrackPath] then
@@ -1580,11 +1580,11 @@ hook.Add("PostCleanupMap", "Metrostroi_PostCleanupMap", function()
 end)
 
 concommand.Add("metrostroi_save", function(ply, _, args)
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return end
     Metrostroi.Save()
 end)
 concommand.Add("metrostroi_reload", function(ply, _, args)
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return end-- Load schedules data
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return end-- Load schedules data
     print("Metrostroi: Loading schedules configuration...")
     local sched_data = util.JSONToTable(file.Read(string.format("metrostroi_data/sched_%s.txt", game.GetMap())) or "")
     if not sched_data then sched_data = util.JSONToTable(file.Read(string.format("metrostroi_data/sched_%s.lua", game.GetMap())) or "","LUA") end
@@ -1596,7 +1596,7 @@ concommand.Add("metrostroi_reload", function(ply, _, args)
 end)
 
 concommand.Add("metrostroi_load", function(ply, _, args)
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return end
     Metrostroi.IgnoreEntityUpdates = true
     local signals_ents = ents.FindByClass("gmod_track_signal")
     for _,v in pairs(signals_ents) do SafeRemoveEntity(v) end
@@ -1620,7 +1620,7 @@ concommand.Add("metrostroi_load", function(ply, _, args)
 end)
 
 concommand.Add("metrostroi_cleanup_signals", function(ply, _, args)
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return end
     Metrostroi.IgnoreEntityUpdates = true
     local signals_ents = ents.FindByClass("gmod_track_signal")
     for k,v in pairs(signals_ents) do SafeRemoveEntity(v) end
@@ -1643,7 +1643,7 @@ concommand.Add("metrostroi_cleanup_signals", function(ply, _, args)
 end)
 
 concommand.Add("metrostroi_pos_info", function(ply, _, args)
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return end
 
     -- Draw nearest nodes
     timer.Simple(0.05,function()
@@ -1669,7 +1669,7 @@ concommand.Add("metrostroi_pos_info", function(ply, _, args)
 end)
 
 concommand.Add("metrostroi_track_main", function(ply, _, args)
-    if (not ply:IsValid()) then return end
+    if (not IsValidEnt(ply)) then return end
 
     -- Trigger all track switches
     local results = Metrostroi.GetPositionOnTrack(ply:GetPos(),ply:GetAimVector():Angle())
@@ -1684,7 +1684,7 @@ concommand.Add("metrostroi_track_main", function(ply, _, args)
 end)
 
 concommand.Add("metrostroi_track_alt", function(ply, _, args)
-    if (not ply:IsValid()) then return end
+    if (not IsValidEnt(ply)) then return end
     print(ply, "changed swtiches")
     -- Trigger all track switches
     local results = Metrostroi.GetPositionOnTrack(ply:GetPos(),ply:GetAimVector():Angle())
@@ -1698,7 +1698,7 @@ concommand.Add("metrostroi_track_alt", function(ply, _, args)
 end)
 
 concommand.Add("metrostroi_track_arstest", function(ply, _, args)
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return end
 
     -- Trigger all track switches
     local results = Metrostroi.GetPositionOnTrack(ply:GetPos(),ply:GetAimVector():Angle())

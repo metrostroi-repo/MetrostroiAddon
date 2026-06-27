@@ -249,7 +249,7 @@ function ENT:Think()
                 end
             else
                 -- Model found that is not in window
-                if IsValid(self.ClientModels[i]) then
+                if IsValidEnt(self.ClientModels[i]) then
                     -- Get nearest door
                     local count = self:GetNW2Int("TrainDoorCount",0)
                     local distance = 1e9
@@ -317,8 +317,8 @@ function ENT:Think()
 
     -- Animate models for cleanup
     for k,v in pairs(self.CleanupModels) do
-    --  if not v or not IsValid(v) then self.CleanupModels[k] = nil return end
-        if not IsValid(v.ent) then
+    --  if not v or not IsValidEnt(v) then self.CleanupModels[k] = nil return end
+        if not IsValidEnt(v.ent) then
             self.CleanupModels[k] = nil
             continue
         end

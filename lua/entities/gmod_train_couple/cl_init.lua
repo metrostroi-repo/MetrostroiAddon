@@ -11,7 +11,7 @@ function ENT:Think()
 end
 
 local c_gui
-if IsValid(c_gui) then c_gui:Close() end
+if IsValidPanel(c_gui) then c_gui:Close() end
 
 local function addButton(parent,stext,state,scolor,btext,benabled,callback)
     --local a = v[1]
@@ -40,7 +40,7 @@ local function addButton(parent,stext,state,scolor,btext,benabled,callback)
 end
 
 function ENT:DrawGUI(tbl)
-    if IsValid(c_gui) then  c_gui:Close() end
+    if IsValidPanel(c_gui) then  c_gui:Close() end
      local c_gui = vgui.Create("DFrame")
         c_gui:SetDeleteOnClose(true)
         c_gui:SetTitle(Metrostroi.GetPhrase("Common.Couple.Title"))
@@ -92,7 +92,7 @@ end
 
 
 function ENT:DrawGUIHTML(tbl)
-    if IsValid(c_gui) then  c_gui:Close() end
+    if IsValidPanel(c_gui) then  c_gui:Close() end
         c_gui = vgui.Create("DFrame")
         c_gui:SetDeleteOnClose(true)
         c_gui:SetTitle(Metrostroi.GetPhrase("Common.Couple.Title"))
@@ -165,7 +165,7 @@ function ENT:DrawGUIHTML(tbl)
 end
 net.Receive("metrostroi-coupler-menu",function()
     local ent = net.ReadEntity()
-    if not IsValid(ent) or IsValid(c_gui) and c_gui.Entity ~= ent then return end
+    if not IsValidEnt(ent) or IsValidPanel(c_gui) and c_gui.Entity ~= ent then return end
     ent:DrawGUI{
         access = net.ReadBool(),
         coupled=net.ReadBool(),

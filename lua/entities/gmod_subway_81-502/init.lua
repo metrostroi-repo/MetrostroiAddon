@@ -214,10 +214,10 @@ function ENT:Initialize()
 end
 
 function ENT:TrainSpawnerUpdate()
-    if IsValid(self.FrontBogey) then
+    if IsValidEnt(self.FrontBogey) then
         self.FrontBogey:SetNW2Int("SquealType",math.floor(math.random()*7)+1)
     end
-    if IsValid(self.RearBogey) then
+    if IsValidEnt(self.RearBogey) then
         self.RearBogey:SetNW2Int("SquealType",math.floor(math.random()*7)+1)
     end
 end
@@ -382,7 +382,7 @@ function ENT:Think()
     self:SetNW2Bool("UPOPlaying",self:ReadTrainWire(47) > 0)
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = 2*self.Engines.BogeyMoment
         self.FrontBogey.MotorForce = 22050+3000*(A < 0 and 1 or 0)
         self.FrontBogey.Reversed = (self.Reverser.NZ > 0.5)

@@ -44,7 +44,42 @@ if SERVER then
 end
 
 
------- --------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Fast IsValid for typed objects (only for nil, false and object type)
+--------------------------------------------------------------------------------
+local isvalid9 = FindMetaTable("Entity").IsValid
+function IsValidEnt(ent)
+    if not ent or (ent == NULL) then return false end
+    return isvalid9(ent)
+end
+
+local isvalid12 = FindMetaTable("PhysObj").IsValid
+function IsValidPhysObj(physObj)
+    if not physObj then return false end
+    return isvalid12(physObj)
+end
+
+if CLIENT then
+    local isvalid22 = FindMetaTable("Panel").IsValid
+    function IsValidPanel(pnl)
+        if not pnl then return false end
+        return isvalid22(pnl)
+    end
+
+    local isvalid38 = FindMetaTable("IGModAudioChannel").IsValid
+    function IsValidSndCh(snd)
+        if not snd then return false end
+        return isvalid38(snd)
+    end
+
+    local isvalid41 = FindMetaTable("ProjectedTexture").IsValid
+    function IsValidProjTex(tex)
+        if not text then return false end
+        return isvalid41(tex)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- Create metrostroi global library
 --------------------------------------------------------------------------------
 if not Metrostroi then
@@ -584,7 +619,7 @@ end
 if SERVER then
     util.AddNetworkString "MetrostroiMessages"
     local function CheckErr(ply)
-        if not Turbostroi and IsValid(ply) and (ply:IsSuperAdmin() or not game.IsDedicated()) then
+        if not Turbostroi and IsValidEnt(ply) and (ply:IsSuperAdmin() or not game.IsDedicated()) then
             net.Start "MetrostroiMessages"
                 net.WriteString("Turbostroi is not installed!\nTurbostroi is accelerating train calculations by using multiple\ncores. Check "..(game.IsDedicated() and "server" or "game").." logs for more information.\nYou can download it at:\nhttps://metrostroi.net/turbostroi")
                 net.WriteString("https://metrostroi.net/turbostroi")
@@ -599,7 +634,7 @@ if SERVER then
     end
     local m_adm = {}
     for _,v in pairs(player.GetHumans()) do
-        if IsValid(v) and v:IsAdmin() then
+        if IsValidEnt(v) and v:IsAdmin() then
             table.insert(m_adm,v)
         end
     end
@@ -705,7 +740,7 @@ if SERVER then
 
     function Metrostroi.GetReverserID(ply,callback,typ)
 
-        if not IsValid(ply) or ply:IsBot() then return end
+        if not IsValidEnt(ply) or ply:IsBot() then return end
         if callback == true then return Metrostroi.ReverserIDs.SG[ply] end
         if game.SinglePlayer() then callback(1) return end
         if not typ then
@@ -716,7 +751,7 @@ if SERVER then
         end
 
         http.Post("https://api.metrostroi.net/get_info",{[typ and "SG" or "SS"]=ply:SteamID()},function(result,_,_,statusCode)
-            if not IsValid(ply) then return end
+            if not IsValidEnt(ply) then return end
             local ID = statusCode == 200 and tonumber(result)
 
             claimID(ply,ID,typ)
@@ -724,7 +759,7 @@ if SERVER then
 
             if typ and not ID then removeGolden(ply) end
         end,function()
-            if not IsValid(ply) then return end
+            if not IsValidEnt(ply) then return end
 
             callback(not typ and getLocalID(ply))
 
@@ -930,7 +965,7 @@ if SERVER then
 
     init()
     concommand.Add("metrostroi_monitoring_start",function(ply)
-        if IsValid(ply) then return end
+        if IsValidEnt(ply) then return end
 
         if not monitoringStarted() and CV_Enabled:GetBool() then
             init()
@@ -943,7 +978,7 @@ if SERVER then
         end
     end,nil,"Try to start monitoring")
     concommand.Add("metrostroi_monitoring_stop",function(ply)
-        if IsValid(ply) then return end
+        if IsValidEnt(ply) then return end
 
         if monitoringStarted() then
             shutdown()
@@ -962,7 +997,7 @@ if SERVER then
         )
     end
     concommand.Add("metrostroi_monitoring_status",function(ply)
-        if IsValid(ply) then return end
+        if IsValidEnt(ply) then return end
 
         if State>0 then
             MsgC(Color(255,0,255),"MetrostroiMon:\t\t",Color(0,255,0),"Watchdog working\n")
@@ -996,14 +1031,14 @@ if SERVER then
     end,nil,"Monitoring status")
     --Restart monitoring, if we want to start it
     concommand.Add("metrostroi_monitoring_restart",function(ply)
-        if IsValid(ply) then return end
+        if IsValidEnt(ply) then return end
 
         RunConsoleCommand("metrostroi_monitoring_stop")
         RunConsoleCommand("metrostroi_monitoring_start")
     end,nil,"Restart monitoring")
 
     concommand.Add("metrostroi_monitoring_confirm",function(ply,_,_,str)
-        if IsValid(ply) then return end
+        if IsValidEnt(ply) then return end
 
         if not monitoringStarted() or State<=1 then
             print("Monitoring is not started. It can be disabled or have a error.")

@@ -223,7 +223,7 @@ function ENT:Think()
         local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
         if math.abs(accel) > 0.1 then
             for k,v in pairs(drivers) do
-                if IsValid(v) and IsValid(v:GetDriver()) then
+                if IsValidEnt(v) and IsValidEnt(v:GetDriver()) then
                     v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,0 or (self.Electric.I13+self.Electric.I24)/2,0 or self.RheostatController.SelectedPosition or 0,accel/self.WagonCount))--(accel/self.WagonCount)))
                 end
             end
@@ -347,7 +347,7 @@ function ENT:Think()
 
     self:SetPackedRatio("Speed", self.Speed)
     self.AsyncInverter:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = self.AsyncInverter.Torque
         self.FrontBogey.MotorForce = 43000+9000*(A < 0 and 1 or 0)--35300
         self.FrontBogey.Reversed = self.Electric.Reverser < 0

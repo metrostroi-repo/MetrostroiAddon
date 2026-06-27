@@ -47,7 +47,7 @@ function ENT:Think()
 
   self.SensingTrain = false
   if self.NoAutoSearch == 0 then
-    if IsValid(self.Signal) then
+    if IsValidEnt(self.Signal) then
       if self.Signal.OccupiedBy and self.Signal.OccupiedBy ~= self.Signal then
         self.SensingTrain = true
       end
@@ -87,7 +87,7 @@ function ENT:Think()
   if (not self.SensingTrain) and (Metrostroi.GetSyncTime() - self.SensingTime > 7.0) then
     self.IntervalReset = false
   end
-  self:NextThink(CurTime() + (self.NoAutoSearch ~= 0 and 2 or not IsValid(self.Signal) and 1 or 0.5))
+  self:NextThink(CurTime() + (self.NoAutoSearch ~= 0 and 2 or not IsValidEnt(self.Signal) and 1 or 0.5))
   return true
 end
 function ENT:AcceptInput( input, activator, called, data )

@@ -60,7 +60,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
     for k,v in pairs(TLM) do
         if type(v) == "string" and not k:find("long") then
             local idx = add and v..add or v
-            if IsValid(self.Models[1][idx]) then break else
+            if IsValidEnt(self.Models[1][idx]) then break else
                 local k_long = k.."_long"
                 if TLM[k_long] and LenseNum >= 7 then
                     self.Models[1][idx] = ClientsideModel(TLM[k_long],RENDERGROUP_OPAQUE)
@@ -77,7 +77,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
 end
 
 function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
-    if not IsValid(self.Models[1][ID]) then
+    if not IsValidEnt(self.Models[1][ID]) then
         self.Models[1][ID] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[1][ID]:SetPos(self:LocalToWorld(pos))
         self.Models[1][ID]:SetAngles(self:LocalToWorldAngles(ang))
@@ -88,7 +88,7 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
     end
     local id = self.RN
     local rouid = id and "rou"..id
-    if rouid and not IsValid(self.Models[1][rouid]) then
+    if rouid and not IsValidEnt(self.Models[1][rouid]) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "2" or "") or "5")
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
         self.Models[1][rouid] = ClientsideModel(LampIndicator.model..rnadd..".mdl",RENDERGROUP_OPAQUE)
@@ -103,7 +103,7 @@ function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
             local ID_glass = tostring(ID).."_glass"
             for i,tbl in pairs(glass) do
                 local ID_glassi = ID_glass..i
-                if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
+                if not IsValidEnt(self.Models[1][ID_glassi]) then  --NEWLENSES
                     self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
                     self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and Vector(-1,1,1) or 1)))
                     self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
@@ -117,7 +117,7 @@ end
 function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
     local IsStateAboveZero = State > 0
     local IDID2 = ID..ID2
-    local IsModelValid = IsValid(self.Models[3][IDID2])
+    local IsModelValid = IsValidEnt(self.Models[3][IDID2])
     if IsModelValid then
         if IsStateAboveZero then 
             if Change then 
@@ -142,7 +142,7 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
     local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials.str
     local LetMaterialsStart = LetMaterials.."let_start"
     local LetMaterialsletter = LetMaterials..letter
-    if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
+    if double ~= false and not IsValidEnt(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
         self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePosition+pos))
@@ -154,7 +154,7 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
         end
     end
     local id = i.."d"
-    if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
+    if not double and not IsValidEnt(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
         self.Models[2][id] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
         self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePosition+pos)*Vector(-1,1,1)))
@@ -181,7 +181,7 @@ end
 
 net.Receive("metrostroi-signal", function()
     local ent = net.ReadEntity()
-    if not IsValid(ent) then return end
+    if not IsValidEnt(ent) then return end
     ent.LightType = net.ReadInt(3)
     ent.Name = net.ReadString()
     --ent.Name = " BUDAPEiT"..string.gsub(ent.Name,"[A-Za-z]*","")
@@ -203,12 +203,12 @@ local C_ScreenshotMode      = GetConVar("metrostroi_screenshotmode")
 
 local timer = CurTime()
 hook.Add("Think","MetrostroiRenderSignals", function()
-    if CurTime() - timer < 1.5 or not IsValid(LocalPlayer()) or C_ScreenshotMode:GetBool() then return end
+    if CurTime() - timer < 1.5 or not IsValidEnt(LocalPlayer()) or C_ScreenshotMode:GetBool() then return end
     timer = CurTime()
     local plyPos = LocalPlayer():GetPos()
     local dist = C_RenderDistance:GetInt()/0.01905
     for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
-        if not IsValid(sig) then continue end
+        if not IsValidEnt(sig) then continue end
         local sigPos = sig:GetPos()
         sig.RenderDisable = sigPos:Distance(plyPos) > dist or math.abs(plyPos.z - sigPos.z) > 1500
     end
@@ -329,7 +329,7 @@ function ENT:Think()
                 self.RN = nil
             end
             if self.AutostopPresent then
-                if not IsValid(self.Models[1]["autostop"]) then
+                if not IsValidEnt(self.Models[1]["autostop"]) then
                     self.Models[1]["autostop"] = ClientsideModel(self.AutostopModel[1],RENDERGROUP_OPAQUE)
                     self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePosition+self.AutostopModel[2]))
                     self.Models[1]["autostop"]:SetAngles(self:GetAngles())
@@ -407,7 +407,7 @@ function ENT:Think()
                 if double and i == 2 then offset = offset + TLM.DoubleOffset end
                 if self.Name[i+1] == " " then continue end
                 if self.Name[i+1] == "/" then min = min + 1; continue end
-                --if not IsValid(self.Models[2][i]) then
+                --if not IsValidEnt(self.Models[2][i]) then
                 self:SpawnLetter(i,TLM.SignLetter.model,offset - Vector(0,0,id*TLM.SignLetter.z),(Metrostroi.LiterWarper[self.Name[i+1]] or self.Name[i+1]))
                 --end
             end
@@ -419,7 +419,7 @@ function ENT:Think()
         else
             local k = "m1"
 
-            if not IsValid(self.Models[1][k]) then
+            if not IsValidEnt(self.Models[1][k]) then
                 local v = TLM["m1"]
                 self.Models[1][k] = ClientsideModel(v,RENDERGROUP_OPAQUE)
                 self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePosition*(self.Left and Vector(-1,1,1) or 1)))
@@ -432,7 +432,7 @@ function ENT:Think()
     else
         --TODO
         if self.AutostopPresent then
-            if IsValid(self.Models[1]["autostop"]) then
+            if IsValidEnt(self.Models[1]["autostop"]) then
                 self.Models[1]["autostop"]:SetPoseParameter("position",self:Animate("Autostop", self:GetNW2Bool("Autostop") and 1 or 0,     0,1, 0.4,false))
             end
         end
@@ -481,7 +481,7 @@ function ENT:Think()
                         self.Signals[ID2].Stop = nil
                     end
                     local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and (RealTime() % 1.2 > 0.4))) and not self.Signals[ID2].Stop) and 1 or 0,  0,1, 128)
-                    if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
+                    if not IsValidEnt(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
                     local offsetAndLongOffset = offset + self.LongOffset
                     if not self.DoubleL then
                         self:SetLight(ID,ID2,self.BasePosition*(self.Left and Vector(-1,1,1) or 1) + offsetAndLongOffset + data[3][i-1]*(self.Left and Vector(-1,1,1) or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
@@ -492,7 +492,7 @@ function ENT:Think()
                     self.Signals[ID2].State = State
                 end
             else
-                if Metrostroi.RoutePointer[self.Num[1]] and IsValid(self.Models[1][self.RouteNumber]) then self.Models[1][self.RouteNumber]:SetSkin(Metrostroi.RoutePointer[self.Num[1]]) end
+                if Metrostroi.RoutePointer[self.Num[1]] and IsValidEnt(self.Models[1][self.RouteNumber]) then self.Models[1][self.RouteNumber]:SetSkin(Metrostroi.RoutePointer[self.Num[1]]) end
             end
 
             ID = ID + 1
@@ -508,7 +508,7 @@ function ENT:Think()
             --if v[3] then
             local rou2k = "rou2"..k
             if v[2] then State2 = self:Animate(rou2k,self.Num:find(v[2])and 1 or 0,     0,1, 256) end
-            if not IsValid(self.Models[3][rou1k]) and State1 > 0 then
+            if not IsValidEnt(self.Models[3][rou1k]) and State1 > 0 then
                 self.Models[3][rou1k] = ClientsideModel(v[3] and LampIndicatorModels_numb_mdl or LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
                 self.Models[3][rou1k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4]))
                 self.Models[3][rou1k]:SetAngles(self:GetAngles())
@@ -517,14 +517,14 @@ function ENT:Think()
                 self.Models[3][rou1k]:SetRenderMode(RENDERMODE_TRANSCOLOR)
                 self.Models[3][rou1k]:SetColor(Color(255, 255, 255, 0))
             end
-            if IsValid(self.Models[3][rou1k]) then
+            if IsValidEnt(self.Models[3][rou1k]) then
                 if State1 > 0 then
                     self.Models[3][rou1k]:SetColor(Color(255,255,255,State1*255))
                 elseif State1 == 0 then
                     self.Models[3][rou1k]:Remove()
                 end
             end
-            if not IsValid(self.Models[3][rou2k]) and v[3] and v[2] and State2 > 0 then
+            if not IsValidEnt(self.Models[3][rou2k]) and v[3] and v[2] and State2 > 0 then
                 self.Models[3][rou2k] = ClientsideModel(LampIndicatorModels_numb_mdl,RENDERGROUP_OPAQUE)
                 self.Models[3][rou2k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4] + TLM.RouteNumberOffset2))
                 self.Models[3][rou2k]:SetAngles(self:GetAngles())
@@ -533,7 +533,7 @@ function ENT:Think()
                 self.Models[3][rou2k]:SetRenderMode(RENDERMODE_TRANSCOLOR)
                 self.Models[3][rou2k]:SetColor(Color(255, 255, 255, 0))
             end
-            if IsValid(self.Models[3][rou2k]) then
+            if IsValidEnt(self.Models[3][rou2k]) then
                 if State2 > 0 then
                     self.Models[3][rou2k]:SetColor(Color(255,255,255,State2*255))
                 elseif State2 == 0 then
@@ -543,7 +543,7 @@ function ENT:Think()
         end
         if self.Arrow then
             local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
-            if not IsValid(self.Models[3]["roua"]) and State > 0 then
+            if not IsValidEnt(self.Models[3]["roua"]) and State > 0 then
                 self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
                 self.SpecRouteNumbers.pos = (self.BasePosition+offset-TLM.SpecRouteNumberOffset)-(self.RouteNumberOffset or Vector(0, 0, 0))+TLM.RouteNumberOffset3
                 if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*TLM.SpecRouteNumberOffset2 end
@@ -562,7 +562,7 @@ function ENT:Think()
                 self.Models[3]["roua"]:SetRenderMode(RENDERMODE_TRANSCOLOR)
                 self.Models[3]["roua"]:SetColor(Color(255, 255, 255, 0))
             end
-            if IsValid(self.Models[3]["roua"]) then
+            if IsValidEnt(self.Models[3]["roua"]) then
                 if State > 0 then
                     self.Models[3]["roua"]:SetColor(Color(255,255,255,State*255))
                 elseif State == 0 then

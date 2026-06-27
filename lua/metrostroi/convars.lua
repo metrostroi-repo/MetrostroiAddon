@@ -26,7 +26,7 @@ if SERVER then
     local function BrokeAndSet(button,state,ply,train)
         local train = ply:GetTrain()
 
-        if IsValid(train) then
+        if IsValidEnt(train) then
             if train[button] then
                 if train.Plombs[button] then train:BrokePlomb(button,ply) end
                 train[button]:TriggerInput("Set",state)
@@ -34,7 +34,7 @@ if SERVER then
         end
     end
     concommand.Add("metrostroi_disablears",function(ply)
-        if not IsValid(ply) then return end
+        if not IsValidEnt(ply) then return end
         local train = ply:GetTrain()
         BrokeAndSet("KAH",1,ply)
         BrokeAndSet("ARS",0,ply)
@@ -69,9 +69,9 @@ if SERVER then
         BrokeAndSet("PB",1,ply)
     end)
     net.Receive("metrostroi_expel_passengers",function(_,ply)
-        if not IsValid(ply) then return end
+        if not IsValidEnt(ply) then return end
         local train = ply:GetTrain()
-        if not IsValid(train) or not train.WagonList or (train.CPPICanPickup and not train:CPPICanPickup(ply)) then return end
+        if not IsValidEnt(train) or not train.WagonList or (train.CPPICanPickup and not train:CPPICanPickup(ply)) then return end
 
         for k,t in pairs(train.WagonList) do t.AnnouncementToLeaveWagon = true end
     end,nil,"Expel passengers from train")

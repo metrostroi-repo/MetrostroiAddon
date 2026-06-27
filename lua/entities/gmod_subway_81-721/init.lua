@@ -134,7 +134,7 @@ function ENT:Think()
     --self:SetLightPower(11,self.BUV.Power and mul > 0, mul)
     --self:SetLightPower(12,self.BUV.Power and mul > 0, mul)
     self.Engines:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = 2*self.Engines.BogeyMoment
         self.FrontBogey.MotorForce = (24000+3000*(A < 0 and 1 or 0))--*add--35300+10000*(A < 0 and 1 or 0)
         self.FrontBogey.Reversed = self.KMR2.Value > 0

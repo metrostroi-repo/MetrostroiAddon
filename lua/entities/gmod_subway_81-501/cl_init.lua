@@ -993,10 +993,10 @@ function ENT:UpdateWagonNumber()
     self.TrainNumberL = false
     for i=0,3 do
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 --------------------------------------------------------------------------------
@@ -1042,7 +1042,7 @@ function ENT:Think()
     end
     local BAsnd = math.floor(self.TrueBrakeAngle/10)
     if self.BrakeAngleSND ~= BAsnd then
-        if not IsValid(self.Sounds["parking_brake_rolling"]) or self.Sounds["parking_brake_rolling"]:GetState() ~= GMOD_CHANNEL_PLAYING then
+        if not IsValidSndCh(self.Sounds["parking_brake_rolling"]) or self.Sounds["parking_brake_rolling"]:GetState() ~= GMOD_CHANNEL_PLAYING then
             self:PlayOnce("parking_brake_rolling","bass",1,1)
         end
         self.BrakeAngleSND = BAsnd
@@ -1288,7 +1288,7 @@ function ENT:Think()
 
     self.BPSNBuzzVolume = self.BPSNBuzzVolume or 0
     local buzzvolume = volume
-    if self.Sounds["announcer1"] and IsValid(self.Sounds["announcer1"]) then buzzvolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 end
+    if self.Sounds["announcer1"] and IsValidSndCh(self.Sounds["announcer1"]) then buzzvolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 end
     if self.BPSNBuzzVolume > buzzvolume then
         self.BPSNBuzzVolume = math.Clamp(self.BPSNBuzzVolume + 8*(buzzvolume-self.BPSNBuzzVolume)*dT,0.1,1)
     else
@@ -1303,7 +1303,7 @@ function ENT:Think()
         end
     end
     for k,v in ipairs(self.AnnouncerPositions) do
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*volume or 0) end
+        if IsValidSndCh(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*volume or 0) end
     end
 end
 
@@ -1323,7 +1323,7 @@ end
 
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

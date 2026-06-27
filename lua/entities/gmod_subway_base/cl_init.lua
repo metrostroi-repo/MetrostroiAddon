@@ -355,7 +355,7 @@ function ENT:ShouldDrawClientEnt(k,v)
     if v.nohide then return true end
     if v.hideseat then
         local seat = LocalPlayer():GetVehicle()
-        if IsValid(seat) and self ~= seat:GetParent() then
+        if IsValidEnt(seat) and self ~= seat:GetParent() then
             return false
         end
         if v.hideseat ~= true then
@@ -371,18 +371,18 @@ end
 function ENT:SpawnCSEnt(k,override)
     if override and (self.Hidden[k] or self.Hidden.anim[k]) or not override and not self:ShouldDrawClientEnt(k,self.ClientProps[k]) then return false end
     local v = self.ClientPropsOv and self.ClientPropsOv[k] or self.ClientProps[k]
-    if v and not IsValid(self.ClientEnts[k]) and  v.model ~= "" then
+    if v and not IsValidEnt(self.ClientEnts[k]) and  v.model ~= "" then
         --local cent = ents.CreateClientProp(LocalPlayer():GetModel())
         local model = v.model
         if v.modelcallback then model = v.modelcallback(self) or v.model end
         local cent = ClientsideModel(model,RENDERGROUP_OPAQUE)
         cent.Name = k
         cent.GetBodyColor = function()
-            if not IsValid(self) then return Vector(1) end
+            if not IsValidEnt(self) then return Vector(1) end
             return self:GetBodyColor()
         end
         cent.GetDirtLevel = function()
-            if not IsValid(self) then return 0.25 end
+            if not IsValidEnt(self) then return 0.25 end
             return self:GetDirtLevel()
         end
         --cent:SetModel( v.model )
@@ -460,7 +460,7 @@ function ENT:SpawnCSEnt(k,override)
             if c > 0 then
                 for i=c,1,-1 do
                     local snd = sounds[i]
-                    if snd and snd:IsValid() then
+                    if IsValidSndCh(snd) then
                         if snd:GetState() == GMOD_CHANNEL_STOPPED then
                             ent:DestroySound(snd)
                             table.remove(sounds, i)
@@ -476,7 +476,7 @@ function ENT:SpawnCSEnt(k,override)
         end
         if v.lamps then
             cent:CallOnRemove("RemoveLights", function(ent)
-                if IsValid(self) then
+                if IsValidEnt(self) then
                     for i,k in ipairs(ent.lamps) do
                         self:SetLightPower(k,false)
                         self.HiddenLamps[k] = true
@@ -514,7 +514,7 @@ end)
 function ENT:SetCSBodygroup(csent,id,value)
     if not self.ClientProps[csent].bodygroup then self.ClientProps[csent].bodygroup = {} end
     self.ClientProps[csent].bodygroup[id] = value
-    if IsValid(self.ClientEnts[csent]) then self.ClientEnts[csent]:SetBodygroup(id,value) end
+    if IsValidEnt(self.ClientEnts[csent]) then self.ClientEnts[csent]:SetBodygroup(id,value) end
 end
 local elapsed = SysTime()
 local spawnedCount = 0
@@ -524,7 +524,7 @@ function ENT:CreateCSEnts()
     local time = mul*0.01
     if self.ClientPropsOv then
         for k in pairs(self.ClientPropsOv) do
-            if k ~= "BaseClass" and not IsValid(self.ClientEnts[k]) and self:SpawnCSEnt(k)then
+            if k ~= "BaseClass" and not IsValidEnt(self.ClientEnts[k]) and self:SpawnCSEnt(k) then
                 if SysTime()-elapsed > time then
                     return false
                 end
@@ -533,7 +533,7 @@ function ENT:CreateCSEnts()
     end
     --RunConsoleCommand("say","1:"..tostring(elapsed))
     for k in pairs(self.ClientProps) do
-        if k ~= "BaseClass" and not IsValid(self.ClientEnts[k]) then
+        if k ~= "BaseClass" and not IsValidEnt(self.ClientEnts[k]) then
             if spawnedCount*mul*3 > 4 and SysTime()-elapsed > time then
                 return false
             end
@@ -554,7 +554,7 @@ end
 function ENT:RemoveCSEnts()
     if self.ClientEnts then
         for _,v in pairs(self.ClientEnts) do
-            if IsValid(v) then
+            if IsValidEnt(v) then
                 v:Remove()
             end
         end
@@ -788,7 +788,7 @@ function ENT:UpdateTextures()
     local passtexture = Metrostroi.Skins["pass"][self.PassTexture]
     local cabintexture = Metrostroi.Skins["cab"][self.CabinTexture]
     for id,ent in pairs(self.ClientEnts) do
-        if not IsValid(ent) then continue end
+        if not IsValidEnt(ent) then continue end
         if self.ClientProps[id].callback then self.ClientProps[id].callback(self,ent) end
         for k in pairs(ent:GetMaterials()) do ent:SetSubMaterial(k-1,"") end
         for k,v in pairs(ent:GetMaterials()) do
@@ -850,7 +850,7 @@ function ENT:CalcAbsolutePosition(pos, ang)
         end
         for k,v in pairs(self.Sounds) do
             if type(v) == "IGModAudioChannel" then
-                if not IsValid(v) then
+                if not IsValidSndCh(v) then
                     self.Sounds[k] = nil
                     continue
                 end
@@ -870,7 +870,7 @@ function ENT:CalcAbsolutePosition(pos, ang)
             local tbl = self.SoundPositions[k]
             for i,stbl in ipairs(v) do
                 local snd = stbl.sound
-                if not IsValid(snd) then continue end
+                if not IsValidSndCh(snd) then continue end
                 if snd:GetState() == GMOD_CHANNEL_PLAYING then
                     if tbl then
                         local lpos,lang = LocalToWorld(tbl[3],Angle(0,0,0),pos,ang)
@@ -935,7 +935,7 @@ function ENT:Think()
             --self:CreateCSEnts()
             --if self.UpdateTextures then self:UpdateTextures() end
             --local _,ent = next(self.ClientEnts)
-            --if not IsValid(ent) then self.RenderClientEnts = false end
+            --if not IsValidEnt(ent) then self.RenderClientEnts = false end
         else
             self:OnRemove(true)
             return
@@ -1007,7 +1007,7 @@ function ENT:Think()
     if self.HasGoldenReverser ~= hasGoldenReverser then
         self.HasGoldenReverser = hasGoldenReverser
         for id,v in pairs(self.ClientProps) do
-            if v.model == "models/metrostroi_train/reversor/reversor_classic.mdl" and v.modelcallback and IsValid(self.ClientEnts[id]) then
+            if v.model == "models/metrostroi_train/reversor/reversor_classic.mdl" and v.modelcallback and IsValidEnt(self.ClientEnts[id]) then
                 self:RemoveCSEnt(id)
                 self:SpawnCSEnt(id)
             end
@@ -1018,7 +1018,7 @@ function ENT:Think()
     if self.DisableSeatShadows ~= disableSeatShadows then
         for i=1,self:GetNW2Int("seats",0) do
             local seat = self:GetNW2Entity("seat_"..i)
-            if IsValid(seat) then
+            if IsValidEnt(seat) then
                 seat:SetRenderMode(disableSeatShadows and RENDERMODE_NONE or RENDERMODE_TRANSALPHA)
                 if disableSeatShadows then seat:AddEffects(EF_NODRAW) else seat:RemoveEffects(EF_NODRAW) end
             end
@@ -1051,7 +1051,7 @@ function ENT:Think()
             if not good then continue end
             for i,stbl in ipairs(v) do
                 local snd = stbl.sound
-                if not IsValid(snd) then continue end
+                if not IsValidSndCh(snd) then continue end
                 if snd:GetState() == GMOD_CHANNEL_PLAYING then
                     self:SetPitchVolume(snd,v.pitch or 1,stbl.volume,tbl)
                     if stbl.volume == 0 and not stbl.time then
@@ -1236,7 +1236,7 @@ function ENT:Think()
         if self.ScreenshotMode ~= screenshotMode then
             self:SetLOD(screenshotMode and 0 or -1)
             for k,cent in pairs(self.ClientEnts) do
-                if IsValid(cent) then
+                if IsValidEnt(cent) then
                     cent:SetLOD(screenshotMode and 0 or -1)
                 end
             end
@@ -1250,16 +1250,16 @@ function ENT:Think()
             local cent = self.ClientEnts[k]
 
             if (v.nohide or screenshotMode) then
-                if not IsValid(cent) then
+                if not IsValidEnt(cent) then
                     self:SpawnCSEnt(k,true)
                 end
                 continue
             end
             local hidden = not self:ShouldDrawClientEnt(k,v)
-            if IsValid(cent) and hidden then
+            if IsValidEnt(cent) and hidden then
                 cent:Remove()
                 self.ClientEnts[k] = nil
-            elseif not IsValid(cent) and not hidden then
+            elseif not IsValidEnt(cent) and not hidden then
                 self:SpawnCSEnt(k,true)
             end
             if v.lamps and hidden then
@@ -1270,7 +1270,7 @@ function ENT:Think()
             end
         end
         for k,v in pairs(self.Sounds) do
-            if type(v) ~= "function" and type(v) ~= "table" and not self.Sounds.isloop[k] and (not IsValid(v) or v:GetState() == GMOD_CHANNEL_STOPPED) then
+            if type(v) ~= "function" and type(v) ~= "table" and not self.Sounds.isloop[k] and (not IsValidSndCh(v) or v:GetState() == GMOD_CHANNEL_STOPPED) then
                 self:DestroySound(v)
                 self.Sounds[k] = nil
             end
@@ -1307,7 +1307,7 @@ function ENT:Think()
     if self.RenderClientEnts and self.PassengerEnts then
         local stucked = self.PassengerEntsStucked
         for i,v in ipairs(self.LeftDoorPositions) do
-            if self:GetPackedBool("DoorLS"..i) and not IsValid(stucked[i]) then
+            if self:GetPackedBool("DoorLS"..i) and not IsValidEnt(stucked[i]) then
                 local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
                 ent:SetPos(self:LocalToWorld(Vector(v.x,v.y,self:GetStandingArea().z)))
                 ent:SetAngles(self:LocalToWorldAngles(Angle(0,v.y < 0 and -90 or 90,0)))
@@ -1324,12 +1324,12 @@ function ENT:Think()
                 else
                     self:PlayOnceFromPos("PassStuckL"..i,"subway_trains/common/door/pass_stuck.mp3",5,0.9+math.random()*0.2,150,400,v)
                 end
-            elseif not self:GetPackedBool("DoorLS"..i) and IsValid(stucked[i]) then
+            elseif not self:GetPackedBool("DoorLS"..i) and IsValidEnt(stucked[i]) then
                 SafeRemoveEntity(stucked[i])
             end
         end
         for i,v in ipairs(self.RightDoorPositions) do
-            if self:GetPackedBool("DoorRS"..i) and not IsValid(stucked[-i]) then
+            if self:GetPackedBool("DoorRS"..i) and not IsValidEnt(stucked[-i]) then
                 local ent = ClientsideModel(table.Random(self.PassengerModels),RENDERGROUP_OPAQUE)
                 ent:SetPos(self:LocalToWorld(Vector(v.x,v.y,self:GetStandingArea().z)))
                 ent:SetAngles(self:LocalToWorldAngles(Angle(0,v.y < 0 and -90 or 90,0)))
@@ -1346,7 +1346,7 @@ function ENT:Think()
                 else
                     self:PlayOnceFromPos("PassStuckR"..i,"subway_trains/common/door/pass_stuck.mp3",5,0.9+math.random()*0.2,150,400,v)
                 end
-            elseif not self:GetPackedBool("DoorRS"..i) and IsValid(stucked[-i]) then
+            elseif not self:GetPackedBool("DoorRS"..i) and IsValidEnt(stucked[-i]) then
                 SafeRemoveEntity(stucked[-i])
             end
         end
@@ -1387,7 +1387,7 @@ function ENT:Think()
     for k,v in pairs(self.CustomThinks) do if k ~= "BaseClass" then v(self) end end
 end
 function ENT:BlockInput(block)
-    if IsValid(LocalPlayer().InMetrostroiTrain) then
+    if IsValidEnt(LocalPlayer().InMetrostroiTrain) then
         if self ~= LocalPlayer().InMetrostroiTrain then
             block = false
         end
@@ -1407,7 +1407,7 @@ function ENT:BlockInput(block)
         self.GUILocker.Think = function(panel)
             if panel.Focus ~= vgui.GetKeyboardFocus() then
                 panel.Focus = vgui.GetKeyboardFocus()
-                if IsValid(panel.Focus) then
+                if IsValidPanel(panel.Focus) then
                     self.GUILocker:SetCursor("")
                 else
                     input.SetCursorPos( ScrW()/2, ScrH()/2)
@@ -1417,7 +1417,7 @@ function ENT:BlockInput(block)
         end
         self.GUILocker.OnCursorMoved = function(panel,cursorX,cursorY )
             if self.GUILocker.LastX ~= cursorX or self.GUILocker.LastY ~= cursorY then
-                if not IsValid(vgui.GetKeyboardFocus()) then
+                if not IsValidPanel(vgui.GetKeyboardFocus()) then
                     local x,y = ScrW()/2, ScrH()/2
                     input.SetCursorPos(x,y)
                     net.Start("metrostroi-mouse-move",true)
@@ -1465,9 +1465,9 @@ hook.Add("Think","metrostroi_mouse_handle",function()
     if outside then train = nil end
 
     if OldTrainHandle ~= train then
-        if IsValid(OldTrainHandle) and OldTrainHandle.BlockInput then OldTrainHandle:BlockInput(false) end
-        if IsValid(train) and train.BlockInput then train:BlockInput(train.HandleMouseInput) end
-        if IsValid(train) then
+        if IsValidEnt(OldTrainHandle) and OldTrainHandle.BlockInput then OldTrainHandle:BlockInput(false) end
+        if IsValidEnt(train) and train.BlockInput then train:BlockInput(train.HandleMouseInput) end
+        if IsValidEnt(train) then
             OldSeat = LocalPlayer():GetVehicle()
             --[=[train.CamAnglesComp = Angle(0,0,0)
             train.OldAng = false
@@ -1478,7 +1478,7 @@ hook.Add("Think","metrostroi_mouse_handle",function()
             OldSeat.CalcAbsolutePosition = function(ent,...)
                 --[[local target_ang = Angle(0,0,0)
                 local train = ent:GetNW2Entity("TrainEntity")
-                if not IsValid(train) then return end
+                if not IsValidEnt(train) then return end
                 target_ang:RotateAroundAxis(ent:GetAngles():Forward(),-train.CamAng.p)
                 target_ang:RotateAroundAxis(ent:GetAngles():Up(),train.CamAng.y)
                 target_ang:RotateAroundAxis(ent:GetAngles():Right(),train.CamAng.r)
@@ -1487,7 +1487,7 @@ hook.Add("Think","metrostroi_mouse_handle",function()
                 return ent:OldCalcAbsolutePosition(...)
             end
             print(OldSeat.OnAngleChangeID)--]=]
-        elseif IsValid(OldSeat) then
+        elseif IsValidEnt(OldSeat) then
             OldSeat.CalcAbsolutePosition = OldSeat.OldCalcAbsolutePosition or OldSeat.CalcAbsolutePosition
             OldSeat.OldCalcAbsolutePosition = nil
             OldSeat = nil
@@ -1497,7 +1497,7 @@ hook.Add("Think","metrostroi_mouse_handle",function()
 end)
 --[[hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
     local train = veh:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         train.CamAnglesComp = Angle(0,0,0)
         train.OldAng = false
         if train.BlockInput then train:BlockInput(train.HandleMouseInput) end
@@ -1505,7 +1505,7 @@ end)
 end)
 hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
     local train = veh:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         train.CamAnglesComp = Angle(0,0,0)
         train.OldAng = false
         if train.BlockInput then train:BlockInput(train.HandleMouseInput) end
@@ -1513,7 +1513,7 @@ hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
 end)]]
 --[[ hook.Add("PlayerEnteredVehicle","metrostroi_mouse_handle",function(ply,veh)
     local train = veh:GetNW2Entity("TrainEntity")
-    if IsValid(train) and train.BlockInput then
+    if IsValidEnt(train) and train.BlockInput then
         train:BlockInput(train.HandleMouseInput)
     end
 end)--]]
@@ -1791,7 +1791,7 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
         anims[id].block = false
     end
     if anims[id].block then
-        if anims[id].reload and IsValid(self.ClientEnts[clientProp]) then
+        if anims[id].reload and IsValidEnt(self.ClientEnts[clientProp]) then
             self.ClientEnts[clientProp]:SetPoseParameter("position",anims[id].value)
             anims[id].reload = false
         end
@@ -1845,7 +1845,7 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
         end
     end
     local retval = min + (max-min)*val
-    if IsValid(self.ClientEnts[clientProp]) then
+    if IsValidEnt(self.ClientEnts[clientProp]) then
         self.ClientEnts[clientProp]:SetPoseParameter("position",retval)
     end
     if math.abs(anims[id].V) == 0 and math.abs(val-value) == 0 and not anims[id].stuck then
@@ -1861,7 +1861,7 @@ end
 function ENT:AnimateFrom(clientProp,from,min,max)
     if not self.Anims[from] then return 0 end
     local val = Lerp(self.Anims[from].value,min or 0,max or 1)
-    if IsValid(self.ClientEnts[clientProp]) then
+    if IsValidEnt(self.ClientEnts[clientProp]) then
         self.ClientEnts[clientProp]:SetPoseParameter("position",val)
     end
     if not self.Anims[clientProp] then self.Anims[clientProp] = {} end
@@ -1871,10 +1871,10 @@ end
 
 function ENT:ShowHide(clientProp, value, over)
     if self.Hidden.override[clientProp] then return end
-    --if IsValid(self.ClientEnts[clientProp]) then
+    --if IsValidEnt(self.ClientEnts[clientProp]) then
     if value == true and (self.Hidden[clientProp] or over) then
         self.Hidden[clientProp] = false
-        if not IsValid(self.ClientEnts[clientProp]) and self:SpawnCSEnt(clientProp) then
+        if not IsValidEnt(self.ClientEnts[clientProp]) and self:SpawnCSEnt(clientProp) then
             self.UpdateRender = true
         end
         --self.ClientEnts[clientProp]:SetRenderMode(RENDERMODE_NORMAL)
@@ -1882,7 +1882,7 @@ function ENT:ShowHide(clientProp, value, over)
         --self.Hidden[clientProp] = false
         return true
     elseif value ~= true and (not self.Hidden[clientProp] or over) then
-        if IsValid(self.ClientEnts[clientProp]) then
+        if IsValidEnt(self.ClientEnts[clientProp]) then
             self.ClientEnts[clientProp]:Remove()
             self.UpdateRender = true
         end
@@ -1902,18 +1902,18 @@ function ENT:HideButton(clientProp, value)
 end
 function ENT:ShowHideSmooth(clientProp, value,color)
     if self.Hidden.override[clientProp] then return value end
-    if not IsValid(self.ClientEnts[clientProp]) and self.SmoothHide[clientProp] then self.SmoothHide[clientProp] = 0 end
+    if not IsValidEnt(self.ClientEnts[clientProp]) and self.SmoothHide[clientProp] then self.SmoothHide[clientProp] = 0 end
     if self.SmoothHide[clientProp] and (self.SmoothHide[clientProp] == value and not color) then return value end
     self.SmoothHide[clientProp] = value
     self.Hidden.anim[clientProp] = value == 0
 
-    if value > 0 and not IsValid(self.ClientEnts[clientProp]) then
+    if value > 0 and not IsValidEnt(self.ClientEnts[clientProp]) then
         if self:ShowHide(clientProp,true) then self.SmoothHide[clientProp] = nil end
     end
-    if value == 0 and IsValid(self.ClientEnts[clientProp]) then
+    if value == 0 and IsValidEnt(self.ClientEnts[clientProp]) then
         if self:ShowHide(clientProp,false) then self.SmoothHide[clientProp] = nil end
     end
-    if IsValid(self.ClientEnts[clientProp]) then
+    if IsValidEnt(self.ClientEnts[clientProp]) then
         local v = self.ClientPropsOv and self.ClientPropsOv[clientProp] or self.ClientProps[clientProp]
         self.ClientEnts[clientProp]:SetRenderMode(RENDERMODE_TRANSALPHA)
         if color then
@@ -2031,11 +2031,11 @@ end
 --------------------------------------------------------------------------------
 --[[hook.Add("InputMouseApply", "Metrostroi_TrainView", function(cmd,x,y,ang)
     local seat = LocalPlayer():GetVehicle()
-    if (not seat) or (not seat:IsValid()) then
+    if (not IsValidEnt(seat)) then
         return
     end
     local train = seat:GetNW2Entity("TrainEntity")
-    if (not train) or (not train:IsValid()) then
+    if (not IsValidEnt(train)) then
         return
     end
     local target_ang = Angle(0,0,0)
@@ -2048,7 +2048,7 @@ end)]]
 
 hook.Add("CalcVehicleView", "Metrostroi_TrainView", function(seat,ply,tbl)
     local train = ply.InMetrostroiTrain
-    if not IsValid(train) then
+    if not IsValidEnt(train) then
         return
     end
 
@@ -2190,11 +2190,11 @@ end
 local lastButton, lastTouch
 local function handleKeyEvent(ply,key,pressed)
     if not game.SinglePlayer() and not IsFirstTimePredicted() then return end
-    if g_SpawnMenu:IsVisible() or gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
+    if g_SpawnMenu:IsVisible() or gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValidPanel(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
     if key ~= MOUSE_LEFT and key ~= MOUSE_RIGHT then return end
     local train, outside = Metrostroi.CheckTrainView(ply)
 
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     if train.ButtonMap == nil then return end
     if key == MOUSE_LEFT and not pressed then train:ClearButtons() end
     if pressed then
@@ -2237,7 +2237,7 @@ end
 -- Hook for clearing the buttons when player exits
 net.Receive("metrostroi-cabin-reset",function()
     local ent = net.ReadEntity()
-    if IsValid(ent) and ent.ClearButtons ~= nil then
+    if IsValidEnt(ent) and ent.ClearButtons ~= nil then
         ent:ClearButtons()
     end
 end)
@@ -2250,7 +2250,7 @@ local function handleCam(ply,button)
     if not game.SinglePlayer() and not IsFirstTimePredicted() then return end
     if not input.IsShiftDown() then return end
     local train, outside = Metrostroi.CheckTrainView(ply)
-    if not IsValid(train) or outside then return end
+    if not IsValidEnt(train) or outside then return end
     if not train.Cameras then return end
     local oldCam = train.CurrentCamera
     if button == KEY_LEFT then
@@ -2304,8 +2304,8 @@ local Gradient = Material("vgui/gradient-d")
 local oldTrain
 hook.Add( "HUDPaint", "metrostroi-draw-cameras", function()
     local train, outside = Metrostroi.CheckTrainView(LocalPlayer())
-    if not IsValid(train) or not train.Cameras or outside then
-        if IsValid(oldTrain) then
+    if not IsValidEnt(train) or not train.Cameras or outside then
+        if IsValidEnt(oldTrain) then
             oldTrain.CurrentCamera = 0
             if oldTrain.CamMoved then oldTrain:CamMoved() end
             oldTrain = nil
@@ -2363,7 +2363,7 @@ function ENT:SetLightPower(index,power,brightness)
     end
 
     if power and IsValid(self.GlowingLights[index]) then
-        if lightData[1] == "headlight" and IsValid(self.GlowingLights[index]) then
+        if lightData[1] == "headlight" then
             -- Check if light already glowing
             if brightness ~= self.LightBrightness[index] then
                 local light = self.GlowingLights[index]

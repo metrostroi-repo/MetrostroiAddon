@@ -11,9 +11,9 @@ function ENT:OnRemove()
 end
 
 function ENT:Think()
-	if not IsValid(self.SignalEntity) then
+	if not IsValidEnt(self.SignalEntity) then
 		self.SignalEntity = Metrostroi.GetSignalByName(self.Signal)
-		if IsValid(self.SignalEntity) then
+		if IsValidEnt(self.SignalEntity) then
 			print(Format("Metrostroi Signal Controller: Linked to signal %s",self.Signal))
 			if not self.SignalEntity.Controllers then
 				self.SignalEntity.Controllers = {}
@@ -63,9 +63,9 @@ function ENT:TriggerOutput(output,_,data)
 end
 
 function ENT:AcceptInput( input, activator, called, data )
-	if not IsValid(self.SignalEntity) then
+	if not IsValidEnt(self.SignalEntity) then
 		self.SignalEntity = Metrostroi.GetSignalByName(self.Signal)
-		if not IsValid(self.SignalEntity) then
+		if not IsValidEnt(self.SignalEntity) then
 			if #ents.FindByClass("gmod_track_signal") > 0 then
 				ErrorNoHalt(Format("\nMetrostroi Signal Controller: Can't find signal %s!\nCheck, that you use official verion of signal\n",self.Signal))
 			else

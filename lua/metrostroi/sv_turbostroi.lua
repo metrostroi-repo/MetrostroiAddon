@@ -23,7 +23,7 @@ if not TURBOSTROI then
 	end
 	hook.Add("OnEntityCreated","Turbostroi",function(ent)
 		timer.Simple(0,function()
-			if IsValid(ent) and ent.Base == "gmod_subway_base" and not ent.NoTrain and not ent.DontAccelerateSimulation then
+			if IsValidEnt(ent) and ent.Base == "gmod_subway_base" and not ent.NoTrain and not ent.DontAccelerateSimulation then
 				turbostroiTrains[ent] = true
 			end
 		end)

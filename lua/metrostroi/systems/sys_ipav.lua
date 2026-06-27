@@ -43,7 +43,7 @@ function TRAIN_SYSTEM:Think(dT)
     local IPAVConfig = Train.SubwayTrain.IPAV
     if not IPAVConfig then return end
     local LeftCoil,RightCoil = Train.LeftAutoCoil,Train.RightAutoCoil
-    if not IsValid(LeftCoil) or not IsValid(RightCoil) then return end
+    if not IsValidEnt(LeftCoil) or not IsValidEnt(RightCoil) then return end
 
     local ProgrammX = false
     local ProgramDoorLeft = IgnoreDoors

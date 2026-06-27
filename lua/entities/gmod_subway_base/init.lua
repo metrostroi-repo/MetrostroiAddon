@@ -6,24 +6,24 @@ include("shared.lua")
 function ENT:PreEntityCopy()
     local BaseDupe = {}
     local Tbl = {}
-    if IsValid(self.FrontBogey) then
+    if IsValidEnt(self.FrontBogey) then
         Tbl[1] = {
             self.FrontBogey:EntIndex(),
             self.FrontBogey.NoPhysics,
             self.FrontBogey:GetAngles(),
         }
     end
-    if IsValid(self.FrontJoin) then
+    if IsValidEnt(self.FrontJoin) then
         Tbl[1][4] = self.FrontJoin:EntIndex()
     end
-    if IsValid(self.RearBogey) then
+    if IsValidEnt(self.RearBogey) then
         Tbl[2] = {
             self.RearBogey:EntIndex(),
             self.RearBogey.NoPhysics,
             self.RearBogey:GetAngles(),
         }
     end
-    if IsValid(self.RearJoin) then
+    if IsValidEnt(self.RearJoin) then
         Tbl[2][4] = self.RearJoin:EntIndex()
     end
 
@@ -39,13 +39,13 @@ function ENT:PostEntityPaste(ply,ent,createdEntities)
         BaseDupe.Tbl[k][1] = createdEntities[BaseDupe.Tbl[k][1]] or nil
         BaseDupe.Tbl[k][4] = createdEntities[BaseDupe.Tbl[k][4]] or nil
     end
-    if IsValid(self.FrontBogey) and IsValid(BaseDupe.Tbl[1][1]) then self.FrontBogey:Remove() end
-    if IsValid(self.RearBogey) and IsValid(BaseDupe.Tbl[2][1]) then self.RearBogey:Remove() end
-    if IsValid(self.FrontJoin) and IsValid(BaseDupe.Tbl[1][4]) then self.FrontJoin:Remove() end
-    if IsValid(self.RearJoin) and IsValid(BaseDupe.Tbl[2][4]) then self.RearJoin:Remove() end
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(BaseDupe.Tbl[1][1]) then self.FrontBogey:Remove() end
+    if IsValidEnt(self.RearBogey) and IsValidEnt(BaseDupe.Tbl[2][1]) then self.RearBogey:Remove() end
+    if IsValidEnt(self.FrontJoin) and IsValidEnt(BaseDupe.Tbl[1][4]) then self.FrontJoin:Remove() end
+    if IsValidEnt(self.RearJoin) and IsValidEnt(BaseDupe.Tbl[2][4]) then self.RearJoin:Remove() end
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         for i = 1,#self.TrainEntities do
-            if IsValid(self.TrainEntities[i]) and self.TrainEntities[i]:GetClass() == "gmod_train_bogey" then
+            if IsValidEnt(self.TrainEntities[i]) and self.TrainEntities[i]:GetClass() == "gmod_train_bogey" then
                 table.remove(self.TrainEntities,i)
             end
         end
@@ -53,12 +53,12 @@ function ENT:PostEntityPaste(ply,ent,createdEntities)
     self.FrontBogey = Tbl[1][1] or nil
     self.RearBogey = Tbl[2][1] or nil
     for k,v in pairs(Tbl) do
-        if IsValid(v[1]) then
+        if IsValidEnt(v[1]) then
             v[1].NoPhysics = v[2] or nil
 
             -- Assign ownership
-            if IsValid(self:GetPlayer()) then v[1]:SetPlayer(self:GetPlayer()) end
-            if CPPI and IsValid(self:CPPIGetOwner()) then v[1]:CPPISetOwner(self:CPPIGetOwner()) end
+            if IsValidEnt(self:GetPlayer()) then v[1]:SetPlayer(self:GetPlayer()) end
+            if CPPI and IsValidEnt(self:CPPIGetOwner()) then v[1]:CPPISetOwner(self:CPPIGetOwner()) end
 
             -- Some shared general information about the bogey
             self.SquealSound = self.SquealSound or math.floor(4*math.random())
@@ -108,7 +108,7 @@ function ENT:Initialize()
     end
     self:SetUseType(SIMPLE_USE)
     -- Prop-protection related
-    if IsValid(self.Owner) then
+    if IsValidEnt(self.Owner) then
         self:SetPlayer(self.Owner)
         if CPPI then self:CPPISetOwner(self.Owner) end
     end
@@ -283,7 +283,7 @@ function ENT:Initialize()
     self.RightDoorsOpening = false
 
     -- Get default train mass
-    if IsValid(self:GetPhysicsObject()) then
+    if IsValidPhysObj(self:GetPhysicsObject()) then
         self.NormalMass = self:GetPhysicsObject():GetMass()
     end
 
@@ -292,7 +292,7 @@ function ENT:Initialize()
 
     --[[GRAVHULL
     if GravHull then
-        if !(IsValid(self) and self:GetMoveType() == MOVETYPE_VPHYSICS and !GravHull.HULLS[self]) then return false end
+        if !(IsValidEnt(self) and self:GetMoveType() == MOVETYPE_VPHYSICS and !GravHull.HULLS[self]) then return false end
         GravHull.RegisterHull(self,-2,100)
         GravHull.UpdateHull(self)
     end
@@ -333,9 +333,9 @@ end
 function ENT:GetDriverName()
     local drv = self:GetDriver()
     local name = tostring(self)
-    if IsValid(drv) then
+    if IsValidEnt(drv) then
         name = drv:GetName().."(sit in driver place)"
-    elseif IsValid(self.Owner) then
+    elseif IsValidEnt(self.Owner) then
         name = self.Owner:GetName().."(owner)"
     end
     return name
@@ -343,9 +343,9 @@ end
 
 function ENT:GetDriverPly()
     local drv = self:GetDriver()
-    if IsValid(drv) then
+    if IsValidEnt(drv) then
         return drv,true
-    elseif IsValid(self.Owner) then
+    elseif IsValidEnt(self.Owner) then
         return self.Owner,false
     else
         return self,nil
@@ -378,7 +378,7 @@ end
 function ENT:TriggerInput(name, value)
     -- Custom seat
     if name == "DriverSeat" then
-        if IsValid(value) and value:IsVehicle() then
+        if IsValidEnt(value) and value:IsVehicle() then
             self.DriverSeat = value
         else
             self.DriverSeat = nil
@@ -486,35 +486,35 @@ function ENT:ChooseTrainWireLeader()
 end
 
 function ENT:ElectricConnected(train,isRear)
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     local conf = self.SubwayTrain
 
     if isRear then
         local rT = self.RearTrain
         local rC = rT.SubwayTrain
 
-        if not IsValid(rT) then return end
+        if not IsValidEnt(rT) then return end
         local rTIsFront = rT.FrontTrain==train
 
         if rTIsFront and rC and rC.NoFrontEKK then return end
         if rC and conf and conf.EKKType ~= rC.EKKType then return end
         if rTIsFront and rT.FrontCoupledBogeyDisconnect or not rTIsFront and rT.RearCoupledBogeyDisconnect or self.RearCoupledBogeyDisconnect then return end
-        if not IsValid(self.RearCouple) or self.RearCouple:ElectricDisconnected() or (
-            rT.FrontTrain == self and (not IsValid(rT.FrontCouple) or rT.FrontCouple:ElectricDisconnected())
-            or rT.RearTrain == self and (not IsValid(rT.RearCouple) or rT.RearCouple:ElectricDisconnected())) then return end
+        if not IsValidEnt(self.RearCouple) or self.RearCouple:ElectricDisconnected() or (
+            rT.FrontTrain == self and (not IsValidEnt(rT.FrontCouple) or rT.FrontCouple:ElectricDisconnected())
+            or rT.RearTrain == self and (not IsValidEnt(rT.RearCouple) or rT.RearCouple:ElectricDisconnected())) then return end
     else
         local fT = self.FrontTrain
         local fC = fT.SubwayTrain
 
-        if not IsValid(fT) then return end
+        if not IsValidEnt(fT) then return end
         local fTIsFront = fT.FrontTrain==train
 
         if conf.NoFrontEKK or fTIsFront and fC and fC.NoFrontEKK then return end
         if fC and conf and conf.EKKType ~= fC.EKKType then return end
         if fTIsFront and fT.FrontCoupledBogeyDisconnect or not fTIsFront and fT.RearCoupledBogeyDisconnect or self.FrontCoupledBogeyDisconnect then return end
-        if IsValid(self.FrontCouple) and self.FrontCouple:ElectricDisconnected() or (
-            fT.FrontTrain == self and (not IsValid(fT.FrontCouple) or fT.FrontCouple:ElectricDisconnected())
-            or fT.RearTrain == self and (not IsValid(fT.RearCouple) or fT.RearCouple:ElectricDisconnected())) then return end
+        if IsValidEnt(self.FrontCouple) and self.FrontCouple:ElectricDisconnected() or (
+            fT.FrontTrain == self and (not IsValidEnt(fT.FrontCouple) or fT.FrontCouple:ElectricDisconnected())
+            or fT.RearTrain == self and (not IsValidEnt(fT.RearCouple) or fT.RearCouple:ElectricDisconnected())) then return end
     end
     return true
 end
@@ -527,14 +527,14 @@ function ENT:UpdateWagonList(selfupdate)
     self.WagonList = {}
     self.WagonListIDs = {}
     local function populateList(train,checked)
-        if IsValid(train) then
+        if IsValidEnt(train) then
             if checked[train] then return end
             checked[train] = true
 
             self.WagonListIDs[train] = table.insert(self.WagonList,train)
             local conf = train.SubwayTrain
             local fT = train.FrontTrain
-            if IsValid(fT) then
+            if IsValidEnt(fT) then
                 local fC = fT.SubwayTrain
                 --if not conf.NoFrontEKK and (fT.FrontTrain~=train or not fC.NoFrontEKK) and not train.FrontCoupledBogeyDisconnect and conf.EKKType == fC.EKKType then
                 if train:ElectricConnected(fT,false) then
@@ -542,7 +542,7 @@ function ENT:UpdateWagonList(selfupdate)
                 end
             end
             local rT = train.RearTrain
-            if IsValid(rT) then
+            if IsValidEnt(rT) then
                 local rC = rT.SubwayTrain
                 --if (rT.FrontTrain~=train or not rC.NoFrontEKK) and not train.RearCoupledBogeyDisconnect and conf.EKKType == rC.EKKType then
                 if train:ElectricConnected(rT,true) then
@@ -700,8 +700,9 @@ function ENT:ReadCell(Address)
         local variableAddress = Address % 65536
         ---self:UpdateWagonList()
 
-        if self.WagonList[wagonIndex] and IsValid(self.WagonList[wagonIndex]) then
-            return self.WagonList[wagonIndex]:ReadCell(variableAddress)
+        local wag = self.WagonList[wagonIndex]
+        if IsValidEnt(wag) then
+            return wag:ReadCell(variableAddress)
         else
             return 0
         end
@@ -741,8 +742,9 @@ function ENT:WriteCell(Address, value)
         local variableAddress = Address % 65536
         ---self:UpdateWagonList()
 
-        if self.WagonList[wagonIndex] and IsValid(self.WagonList[wagonIndex]) then
-            return self.WagonList[wagonIndex]:WriteCell(variableAddress,value)
+        local wag = self.WagonList[wagonIndex]
+        if IsValidEnt(wag) then
+            return wag:WriteCell(variableAddress,value)
         else
             return false
         end
@@ -881,7 +883,7 @@ function ENT:UpdateIndexes()
 
         local conf = train.SubwayTrain
         local fT = train.FrontTrain
-        if IsValid(fT) then
+        if IsValidEnt(fT) then
             local fC = fT.SubwayTrain
             --if not conf.NoFrontEKK and (fT.FrontTrain~=train or not fC.NoFrontEKK) and not train.FrontCoupledBogeyDisconnect and conf.EKKType == fC.EKKType then
             if train:ElectricConnected(fT,false) then
@@ -893,7 +895,7 @@ function ENT:UpdateIndexes()
             end
         end
         local rT = train.RearTrain
-        if IsValid(rT) then
+        if IsValidEnt(rT) then
             local rC = rT.SubwayTrain
             --if (rT.FrontTrain~=train or not rC.NoFrontEKK) and not train.RearCoupledBogeyDisconnect and conf.EKKType == rC.EKKType then
             if train:ElectricConnected(rT,true) then
@@ -927,7 +929,7 @@ function ENT:OnCouple(bogey,isfront)
     end
 
     local train = bogey:GetNW2Entity("TrainEntity")
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     hook.Run("MetrostroiCoupled",self,train)
     --print(Format("%s(%05d) coupled with %s(%05d)",self,self:GetWagonNumber(),train,train:GetWagonNumber()))
     --Don't update train wires when there's no parent train
@@ -941,17 +943,17 @@ function ENT:OnCouple(bogey,isfront)
     end--]]
     --[[GRAVHULL
     if GravHull then
-        if IsValid(ent) and self:GetMoveType() == MOVETYPE_VPHYSICS then
+        if IsValidEnt(ent) and self:GetMoveType() == MOVETYPE_VPHYSICS then
             if !GravHull.SHIPS[self] then
                 self = self.MyShip or (self.Ghost and self.Ghost.MyShip)
             end
         end
-        if IsValid(self) then
+        if IsValidEnt(self) then
             self:GetOwner():ChatPrint("Removed a local physics system.")
             GravHull.UnHull(self)
         end
 
-        if !(IsValid(self) and self:GetMoveType() == MOVETYPE_VPHYSICS and !GravHull.HULLS[self]) then return false end
+        if !(IsValidEnt(self) and self:GetMoveType() == MOVETYPE_VPHYSICS and !GravHull.HULLS[self]) then return false end
         GravHull.RegisterHull(self,-2,100)
         GravHull.UpdateHull(self)
     end
@@ -971,17 +973,17 @@ function ENT:OnDecouple(isfront)
     if self.OnDecoupled then self:OnDecoupled() end
     --[[GRAVHULL
     if GravHull then
-        if IsValid(ent) and self:GetMoveType() == MOVETYPE_VPHYSICS then
+        if IsValidEnt(ent) and self:GetMoveType() == MOVETYPE_VPHYSICS then
             if !GravHull.SHIPS[self] then
                 self = self.MyShip or (self.Ghost and self.Ghost.MyShip)
             end
         end
-        if IsValid(self) then
+        if IsValidEnt(self) then
             self:GetOwner():ChatPrint("Removed a local physics system.")
             GravHull.UnHull(self)
         end
 
-        if !(IsValid(self) and self:GetMoveType() == MOVETYPE_VPHYSICS and !GravHull.HULLS[self]) then return false end
+        if !(IsValidEnt(self) and self:GetMoveType() == MOVETYPE_VPHYSICS and !GravHull.HULLS[self]) then return false end
         GravHull.RegisterHull(self,-2,100)
         GravHull.UpdateHull(self)
     end
@@ -1007,7 +1009,7 @@ function ENT:OnBogeyConnect(bogey,isfront)
     end
 
     local train = bogey:GetNW2Entity("TrainEntity")
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     --Don't update train wires when there's no parent train
 
     self:OnConnectDisconnect()
@@ -1041,8 +1043,8 @@ function ENT:CreateBogey(pos,ang,forward,typ)
     table.insert(self.BogeyPositions, pos)
 
     -- Assign ownership
-    if IsValid(self:GetPlayer()) then bogey:SetPlayer(self:GetPlayer()) end
-    if CPPI and IsValid(self:CPPIGetOwner()) then bogey:CPPISetOwner(self:CPPIGetOwner()) end
+    if IsValidEnt(self:GetPlayer()) then bogey:SetPlayer(self:GetPlayer()) end
+    if CPPI and IsValidEnt(self:CPPIGetOwner()) then bogey:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Some shared general information about the bogey
     self.SquealSound = self.SquealSound or math.floor(4*math.random())
@@ -1066,9 +1068,9 @@ function ENT:CreateBogey(pos,ang,forward,typ)
         constraint.Axis(bogey,self,0,0,
             Vector(0,0,0),Vector(0,0,0),
             0,0,0,1,Vector(0,0,1),false)
-        if forward and IsValid(self.FrontCouple) then
+        if forward and IsValidEnt(self.FrontCouple) then
             constraint.NoCollide(bogey,self.FrontCouple,0,0)
-        elseif not forward and IsValid(self.RearCouple) then
+        elseif not forward and IsValidEnt(self.RearCouple) then
             constraint.NoCollide(bogey,self.RearCouple,0,0)
         end
     end
@@ -1079,8 +1081,8 @@ function ENT:CreateBogey(pos,ang,forward,typ)
 end
 function ENT:AddLightSensor(pos,ang,model)
     local sensor = ents.Create("gmod_train_autodrive_coil")
-    if IsValid(self:GetPlayer()) then sensor:SetPlayer(self:GetPlayer()) end
-    if CPPI and IsValid(self:CPPIGetOwner()) then sensor:CPPISetOwner(self:CPPIGetOwner()) end
+    if IsValidEnt(self:GetPlayer()) then sensor:SetPlayer(self:GetPlayer()) end
+    if CPPI and IsValidEnt(self:CPPIGetOwner()) then sensor:CPPISetOwner(self:CPPIGetOwner()) end
     sensor:SetPos(self:LocalToWorld(pos))
     sensor:SetAngles(self:LocalToWorldAngles(ang))
     sensor:SetParent(self)
@@ -1093,7 +1095,7 @@ end
 function ENT:AddAutodriveCoil(bogey,right)
     -- Create bogey entity
     local coil = right and bogey.CoilR or not right and bogey.CoilL
-    if not IsValid(coil) then
+    if not IsValidEnt(coil) then
         coil = ents.Create("gmod_train_autodrive_coil")
         coil:Spawn()
         if right then
@@ -1102,8 +1104,8 @@ function ENT:AddAutodriveCoil(bogey,right)
             bogey.CoilL = coil
         end
     -- Assign ownership
-        if IsValid(self:GetPlayer()) then coil:SetPlayer(self:GetPlayer()) end
-        if CPPI and IsValid(self:CPPIGetOwner()) then coil:CPPISetOwner(self:CPPIGetOwner()) end
+        if IsValidEnt(self:GetPlayer()) then coil:SetPlayer(self:GetPlayer()) end
+        if CPPI and IsValidEnt(self:CPPIGetOwner()) then coil:CPPISetOwner(self:CPPIGetOwner()) end
     end
     if right then
         coil:SetPos(bogey:LocalToWorld(Vector(-54,70,-30)))
@@ -1128,8 +1130,8 @@ function ENT:CreateCouple(pos,ang,forward,typ)
     coupler:Spawn()
 
     -- Assign ownership
-    if IsValid(self:GetPlayer()) then coupler:SetPlayer(self:GetPlayer()) end
-    if CPPI and IsValid(self:CPPIGetOwner()) then coupler:CPPISetOwner(self:CPPIGetOwner()) end
+    if IsValidEnt(self:GetPlayer()) then coupler:SetPlayer(self:GetPlayer()) end
+    if CPPI and IsValidEnt(self:CPPIGetOwner()) then coupler:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Some shared general information about the bogey
     coupler:SetNW2Bool("IsForwardCoupler", forward)
@@ -1168,9 +1170,9 @@ function ENT:CreateCouple(pos,ang,forward,typ)
             1 --nocollide
         )
 
-        if forward and IsValid(self.FrontBogey) then
+        if forward and IsValidEnt(self.FrontBogey) then
             constraint.NoCollide(self.FrontBogey,coupler,0,0)
-        elseif not forward and IsValid(self.RearBogey) then
+        elseif not forward and IsValidEnt(self.RearBogey) then
             constraint.NoCollide(self.RearBogey,coupler,0,0)
         end
         --[[
@@ -1207,8 +1209,8 @@ function ENT:CreateSeatEntity(seat_info)
     self:DrawShadow(false)
 
     --Assign ownership
-    if IsValid(self:GetPlayer()) then seat:SetCreator(self:GetPlayer()) end
-    if CPPI and IsValid(self:CPPIGetOwner()) then seat:CPPISetOwner(self:CPPIGetOwner()) end
+    if IsValidEnt(self:GetPlayer()) then seat:SetCreator(self:GetPlayer()) end
+    if CPPI and IsValidEnt(self:CPPIGetOwner()) then seat:CPPISetOwner(self:CPPIGetOwner()) end
 
     -- Hide the entity visually
     if seat_info.type == "passenger" then
@@ -1272,19 +1274,18 @@ function ENT:IsWrenchPresent()
     if self.DriversWrenchPresent then return true end
     if self.DriversWrenchMissing then return false end
     for k,v in pairs(self.Seats) do
-        if IsValid(v.entity) and v.entity.GetPassenger and
+        if IsValidEnt(v.entity) and v.entity.GetPassenger and
             ((v.type == "driver") or (v.type == "instructor")) then
-            local player = v.entity:GetPassenger(0)
-            if player and player:IsValid() then return true end
+            if IsValidEnt(v.entity:GetPassenger(0)) then return true end
         end
     end
     return false
 end
 
 function ENT:GetDriver()
-    if IsValid(self.DriverSeat) then
+    if IsValidEnt(self.DriverSeat) then
         local ply = self.DriverSeat:GetPassenger(0)
-        if IsValid(ply) then return ply end
+        if IsValidEnt(ply) then return ply end
     end
 end
 
@@ -1588,7 +1589,7 @@ end
 
 local function HandleKeyHook(ply,k,state)
     local train = ply:GetTrain()
-    if IsValid(train) then
+    if IsValidEnt(train) then
         train.KeyMap[k] = state or nil
     end
 end
@@ -1616,7 +1617,7 @@ function ENT:HandleKeyboardInput(ply)
 end
 hook.Add("PlayerButtonUp","metrostroi_button",function(ply, button)
     local train,seat = ply:GetTrain()
-    if IsValid(train) and train.KeyBuffer then
+    if IsValidEnt(train) and train.KeyBuffer then
         if train.KeyBuffer[button] then
             train.KeyBuffer[button] = nil
             train:OnKeyEvent(button,false,ply,train.DriverSeat ~= seat)
@@ -1625,7 +1626,7 @@ hook.Add("PlayerButtonUp","metrostroi_button",function(ply, button)
 end)
 hook.Add("PlayerButtonDown","metrostroi_button",function(ply, button)
     local train,seat = ply:GetTrain()
-    if IsValid(train) and train.KeyBuffer then
+    if IsValidEnt(train) and train.KeyBuffer then
         if train.KeyBuffer[button] == nil then
             train.KeyBuffer[button] = true
             train:OnKeyEvent(button,true,ply,train.DriverSeat ~= seat)
@@ -1706,9 +1707,9 @@ function ENT:Think()
                         if 1<iD and iD<#self.JointPositions then
                             ch = iD
                         else
-                            if (iD==1 and dist>first) and IsValid(self.FrontTrain) then
+                            if (iD==1 and dist>first) and IsValidEnt(self.FrontTrain) then
                                 self.FrontTrain:CreateJointSound(j.type)
-                            elseif (iD~=1 and dist<last) and IsValid(self.RearTrain) then
+                            elseif (iD~=1 and dist<last) and IsValidEnt(self.RearTrain) then
                                 self.RearTrain:CreateJointSound(j.type)
                             end
                             table.remove(self.Joints, i)
@@ -1768,13 +1769,13 @@ function ENT:Think()
 
     -- Keyboard input is done via PlayerButtonDown/Up hooks that call ENT:OnKeyEvent
     -- Joystick input
-    if IsValid(self.DriverSeat) then
+    if IsValidEnt(self.DriverSeat) then
         local ply = self.DriverSeat:GetPassenger(0)
 
-        if IsValid(ply) then
+        if IsValidEnt(ply) then
             --if self.KeyMap then self:HandleKeyboardInput(ply) end
             if joystick then self:HandleJoystickInput(ply) end
-            self:SetNW2Bool("GoldenReverser",IsValid(ply) and IsValid(ply:GetWeapon("train_kv_wrench_gold")))
+            self:SetNW2Bool("GoldenReverser",IsValidEnt(ply:GetWeapon("train_kv_wrench_gold")))
         end
 
     end
@@ -1959,7 +1960,7 @@ function ENT:Think()
 
     -- Calculate own speed and acceleration
     local speed,acceleration = 0,0
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         self.Speed = (self.FrontBogey.Speed + self.RearBogey.Speed)/2
         self.SpeedSign = self.FrontBogey.SpeedSign or 1
         self.Acceleration = (self.FrontBogey.Acceleration + self.RearBogey.Acceleration)/2
@@ -2015,7 +2016,7 @@ function ENT:Think()
     self.Acceleration = acceleration
 ]]
     --[[
-    if(self.DriverSeat and IsValid(self.DriverSeat)) then
+    if(IsValidEnt(self.DriverSeat)) then
         if not self.DriverSeatPos then self.DriverSeatPos = self.DriverSeat:GetPos() end
         if self:GetDriver() then
             self.HeadAcceleration = math.Clamp((self.HeadAcceleration or 0)*0.95 + ((self.OldSpeed or 0) - self.Speed)*1.1, -10, 10)
@@ -2231,7 +2232,7 @@ end
 -- Receiver for CS buttons, Checks if people are the legit driver and calls buttonevent on the train
 net.Receive("metrostroi-mouse-move", function(len, ply)
     local train = net.ReadEntity()
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
     if train.CursorMove then
         local sys = net.ReadString()
         local dX = net.ReadFloat()
@@ -2247,12 +2248,12 @@ net.Receive("metrostroi-cabin-button", function(len, ply)
     local seat = ply:GetVehicle()
     local outside = net.ReadBool()
     if outside then
-        if not IsValid(train) then return end
+        if not IsValidEnt(train) then return end
         if outside and (train.CPPICanPickup and not train:CPPICanPickup(ply)) then return end
         if not outside and ply != train.DriverSeat.lastDriver then return end
         if not outside and train.DriverSeat.lastDriverTime and (CurTime() - train.DriverSeat.lastDriverTime) > 1 then return end
     else
-        if not IsValid(train) then return end
+        if not IsValidEnt(train) then return end
         if (seat != train.DriverSeat) and (seat != train.InstructorsSeat) and (train.CPPICanPhysgun and not train:CPPICanPhysgun(ply)) and not button:find("Door") then return end
     end
     train:ButtonEvent(button,(eventtype > 0),ply)
@@ -2268,14 +2269,14 @@ net.Receive("metrostroi-panel-touch", function(len, ply)
     local seat = ply:GetVehicle()
     local train
 
-    if seat and IsValid(seat) and not outside then
+    if IsValidEnt(seat) and not outside then
         -- Player currently driving
         train = seat:GetNW2Entity("TrainEntity")
-        if (not train) or (not train:IsValid()) then return end
+        if (not IsValidEnt(train)) then return end
         if (seat != train.DriverSeat) and (seat != train.InstructorsSeat) and (not train.CPPICanPhysgun or not train:CPPICanPhysgun(ply)) then return end
     else
         -- Player not driving, check recent train
-        train = IsValid(ply.lastVehicleDriven) and ply.lastVehicleDriven:GetNW2Entity("TrainEntity") or NULL
+        train = IsValidEnt(ply.lastVehicleDriven) and ply.lastVehicleDriven:GetNW2Entity("TrainEntity") or NULL
         if outside then
             local trace = util.TraceLine({
                 start = ply:EyePos(),
@@ -2284,7 +2285,7 @@ net.Receive("metrostroi-panel-touch", function(len, ply)
             })
             train = trace.Entity
         end
-        if !IsValid(train) then return end
+        if not IsValidEnt(train) then return end
         if outside and train.CPPICanPickup and not train:CPPICanPickup(ply) then return end
         if not outside and ply != train.DriverSeat.lastDriver then return end
         if not outside and train.DriverSeat.lastDriverTime and (CurTime() - train.DriverSeat.lastDriverTime) > 1 then return end
@@ -2300,7 +2301,7 @@ end)
 local function CanPlayerEnter(ply,vec,role)
     local train = vec:GetNW2Entity("TrainEntity")
 
-    if IsValid(train) and IsValid(ply.lastVehicleDriven) and ply.lastVehicleDriven.lastDriverTime != nil then
+    if IsValidEnt(train) and IsValidEnt(ply.lastVehicleDriven) and ply.lastVehicleDriven.lastDriverTime != nil then
         if CurTime() - ply.lastVehicleDriven.lastDriverTime < 1 then return false end
     end
 end
@@ -2312,7 +2313,7 @@ local function HandleExitingPlayer(ply, vehicle)
     ply.lastVehicleDriven = vehicle
 
     local train = vehicle:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         ply.lastTrain = train
         ply.lastTrainSeat = vehicle
         -- Move exiting player
@@ -2466,7 +2467,7 @@ function ENT:UpdateWagonNumber() end
 -- Common functions for RKSU(81-71) trains
 --------------------------------------------------------------------------------
 function ENT:GenerateJerks()
-    if not IsValid(self.FrontBogey) or not IsValid(self.RearBogey) then return end
+    if not IsValidEnt(self.FrontBogey) or not IsValidEnt(self.RearBogey) then return end
     local jerk = math.abs((self.Acceleration - (self.PrevAcceleration or 0)) / self.DeltaTime)
 
     local roll = self:GetLocalAngles().roll
@@ -2541,7 +2542,7 @@ end
         local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
         if math.abs(accel) > 0.1 then
             for k,v in pairs(drivers) do
-                if IsValid(v) and IsValid(v:GetDriver()) then
+                if IsValidEnt(v) and IsValidEnt(v:GetDriver()) then
                     v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/self.WagonCount))--(accel/self.WagonCount)))
                 end
             end
@@ -2570,7 +2571,7 @@ end
         local drivers = {self.DriverSeat,self.InstructorsSeat,self.ExtraSeat1,self.ExtraSeat2}
         if math.abs(accel) > 0.1 then
             for k,v in pairs(drivers) do
-                if IsValid(v) and IsValid(v:GetDriver()) then
+                if IsValidEnt(v) and IsValidEnt(v:GetDriver()) then
                     v:GetDriver():ChatPrint(Format("v=%.2f I=%.2f RK=%02d a=%.2f",self.Speed,(self.Electric.I13+self.Electric.I24)/2,self.RheostatController.SelectedPosition or 0,accel/self.WagonCount))--(accel/self.WagonCount)))
                 end
             end

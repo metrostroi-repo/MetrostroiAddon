@@ -465,7 +465,7 @@ ENT.Spawner = {
                 ent.R_ASNPOn:TriggerInput("Set",val<=2 and 1 or 0)
                 if val==1 then
                     timer.Simple(1,function()
-                        if not IsValid(ent) then return end
+                        if not IsValidEnt(ent) then return end
                         ent.BUKP.State=2
                     end)
                 end

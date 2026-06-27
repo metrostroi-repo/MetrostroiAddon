@@ -56,7 +56,7 @@ end
 local function cmdinithandler(ply,cmd,args,fullstring)
 	if not C_DebugEnabled:GetBool() then return end
 	local ent = ply:GetEyeTrace().Entity
-	if not IsValid(ent) or not ent.GetDebugVars then return end
+	if not IsValidEnt(ent) or not ent.GetDebugVars then return end
 
 	AddClient(ply,ent)
 end
@@ -65,7 +65,7 @@ concommand.Add("metrostroi_debugtrainsystems", cmdinithandler, nil, "Add aimed a
 -- Automatically engage debugger for train owner
 function Metrostroi.DebugTrain(train,ply)
 	if not ply then ply = train:GetPlayer() end
-	if (not IsValid(train)) or (not IsValid(ply)) then return end
+	if (not IsValidEnt(train)) or (not IsValidEnt(ply)) then return end
 
 	AddClient(ply,train)
 end

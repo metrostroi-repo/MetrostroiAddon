@@ -17,16 +17,16 @@ function SWEP:SetCode(code)
 end
 function SWEP:Equip(ply)
     local reverser = ply:GetWeapon("train_kv_wrench_gold")
-    if IsValid(reverser) and not reverser.Removing then
+    if IsValidEnt(reverser) and not reverser.Removing then
         ply:StripWeapon("train_kv_wrench_gold")
     end
 end
 --[[
 function SWEP:Holster()
 
-    if CLIENT and IsValid(self.Owner) then
+    if CLIENT and IsValidEnt(self.Owner) then
         local vm = self.Owner:GetViewModel()
-        if IsValid(vm) then
+        if IsValidEnt(vm) then
             self:ResetBonePositions(vm)
         end
     end
@@ -53,7 +53,7 @@ function SWEP:Reload()
         owner:Give("train_kv_wrench_gold")
         owner:SelectWeapon("train_kv_wrench_gold")
         local reverser = owner:GetWeapon("train_kv_wrench_gold")
-        if IsValid(reverser) then
+        if IsValidEnt(reverser) then
             reverser:SetCode(ID)
         end
         owner:StripWeapon("train_kv_wrench")
@@ -63,7 +63,7 @@ end
 
 function SWEP:OwnerChanged()
     Metrostroi.GetReverserID(self:GetOwner(),function(code)
-        if not IsValid(self) then return end
+        if not IsValidEnt(self) then return end
         self:SetCode(code)
     end)
 end

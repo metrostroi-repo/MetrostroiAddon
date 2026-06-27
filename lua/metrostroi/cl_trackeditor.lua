@@ -63,7 +63,7 @@ end)
 
 net.Receive("metrostroi_trackeditor_message",function(len,ply) 
 	ServerMessage = net.ReadString()
-	if MessageLabel and ServerMessage and IsValid(MessageLabel) then
+	if IsValidPanel(MessageLabel) and ServerMessage then
 		MessageLabel:SetText(ServerMessage)
 	end
 end)

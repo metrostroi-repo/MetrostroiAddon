@@ -598,7 +598,7 @@ end
 --[[
 timer.Simple(1,function()
     for k,ent in pairs(Metrostroi.PrecacheModels) do
-        if ent==true or not IsValid(ent) then
+        if ent==true or not IsValidEnt(ent) then
             local model = ClientsideModel(k)
             model:SetPos(LocalPlayer():GetPos())
             Metrostroi.PrecacheModels[k] = model
@@ -606,7 +606,7 @@ timer.Simple(1,function()
     end
     timer.Simple(2,function()
         for k,ent in pairs(Metrostroi.PrecacheModels) do
-            if IsValid(ent) then
+            if IsValidEnt(ent) then
                 SafeRemoveEntity(ent)
             end
         end
@@ -641,7 +641,7 @@ local function drawStopMarker(bDrawingDepth,bDrawingSkybox,isDraw3DSkybox)
 
     -- Get train
     local train = LocalPlayer().InMetrostroiTrain
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
 
     -- Calculate acceleration
     local V = train:GetNW2Float("V",train:GetVelocity():Length()*0.01905)*0.277778
@@ -732,7 +732,7 @@ local player_state = {}
 if string.sub(game.GetMap(),1,13) == "gm_metrostroi" then
     timer.Create("Metrostroi_3DSkyFix",1.0,0,function()
         local player = LocalPlayer()
-        if not IsValid(player) then return end
+        if not IsValidEnt(player) then return end
 
         RunConsoleCommand("r_3dsky", (player:GetPos().z < -1024) and "0" or "1")
     end)
@@ -758,20 +758,20 @@ function Metrostroi.RenderCamOnRT(train,cpos,name,time,RT,post,pos,ang,x,y,scale
     end
 end
 function Metrostroi.SetCamPosAng(pos,ang)
-    if IsValid(Metrostroi.RTCamera) then
+    if IsValidEnt(Metrostroi.RTCamera) then
         Metrostroi.RTCamera:SetPos(pos)
         Metrostroi.RTCamera:SetAngles(ang)
     end
 end
 hook.Add("Think","metrostroi_camera_move",function()
-    if IsValid(Metrostroi.RTCamera) then
+    if IsValidEnt(Metrostroi.RTCamera) then
         Metrostroi.RTCamera:SetPos(Vector(0,0,-2^16))
         Metrostroi.RTCamera:SetAngles(Angle(90,0,0))
     end
     if Metrostroi.RenderCam and Metrostroi.RenderedCam ~= RealTime() then
         local camera = Metrostroi.RenderCam
         Metrostroi.RenderCam = nil
-        if IsValid(camera[1]) then
+        if IsValidEnt(camera[1]) then
             local distance = camera[1]:LocalToWorld(camera[2]):DistToSqr(LocalPlayer():GetPos())
             if distance > 65536 then return end
             local x,y = camera[9],camera[10]
@@ -792,7 +792,7 @@ hook.Add("Think","metrostroi_camera_move",function()
         local cam = table.remove(Metrostroi.CamQueue,1)
         Metrostroi.CamQueue[cam[3]] = nil
         local name,time,post,pos,ang = cam[3],cam[4],cam[6],cam[7],cam[8]
-        if IsValid(post) then
+        if IsValidEnt(post) then
             debugoverlay.Sphere(post:LocalToWorld(pos),1,time,Color( 150, 105, 200 ),true)
             debugoverlay.Text(post:LocalToWorld(pos),name,time,Color( 150, 105, 200 ),true)
             debugoverlay.Line(post:LocalToWorld(pos),post:LocalToWorld(pos)+post:LocalToWorldAngles(ang):Forward()*25,time,Color( 150, 105, 200 ),true)
@@ -939,13 +939,13 @@ concommand.Add("metrostroi_capture_rt",function(_,_,args)
     local RTs = #args > 0 and args or Metrostroi.RenderTargetNames
 
     local train = LocalPlayer().InMetrostroiTrain
-    if not IsValid(train) then return end
+    if not IsValidEnt(train) then return end
 
     print("Close menu window for capture RenderTarget train")
 
     hook.Add("HUDPaint","Metrostroi.CaptureRT",function() -- gui.HideGameUI() not working and deprecated
         local train = LocalPlayer().InMetrostroiTrain
-        if IsValid(train) then
+        if IsValidEnt(train) then
             local oldRt = render.GetRenderTarget() -- we'll save the old screen and draw on a new one!
             file.CreateDir("rt_captures")
             for i,v in ipairs(RTs) do
@@ -978,14 +978,14 @@ local Player = FindMetaTable("Player")
 
 function Player:GetTrain()
     local seat = self:GetVehicle()
-    if IsValid(seat) then
+    if IsValidEnt(seat) then
         return seat:GetNW2Entity("TrainEntity"),seat
     end
 end
 hook.Add("Think","MetrostroiGetTrain",function()
     local ply = LocalPlayer()
     local train = ply:GetTrain()
-    if IsValid(train) then
+    if IsValidEnt(train) then
         ply.InMetrostroiTrain = train
     else
         ply.InMetrostroiTrain = false
@@ -1000,7 +1000,7 @@ function Metrostroi.CheckTrainView(ply)
         return ply.InMetrostroiTrain, false
     end
 
-    local weapon = IsValid(ply:GetActiveWeapon()) and ply:GetActiveWeapon():GetClass()
+    local weapon = IsValidEnt(ply:GetActiveWeapon()) and ply:GetActiveWeapon():GetClass()
     if weapon ~= "train_kv_wrench" and weapon ~= "train_kv_wrench_gold" then
         return NULL, true
     end
@@ -1010,7 +1010,7 @@ function Metrostroi.CheckTrainView(ply)
         endpos = ply:GetPos() - ply:GetAngles():Up() * 100,
         filter = function(ent) return (ent.ButtonMap ~= nil) end
     }).Entity
-    if not IsValid(train) then
+    if not IsValidEnt(train) then
         train = util.TraceLine({
             start = ply:EyePos(),
             endpos = ply:EyePos() + ply:EyeAngles():Forward() * 300,

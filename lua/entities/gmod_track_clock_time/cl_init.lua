@@ -16,7 +16,7 @@ end
 function ENT:Think()
     if self:IsDormant() then self:OnRemove();return end
     for k,v in pairs(self.DigitPositions) do
-        if not IsValid(self.Digits[k]) and (not v[2] or self:GetNW2Bool("Type") or not self:GetNW2Bool("Type") and k==7) then
+        if not IsValidEnt(self.Digits[k]) and (not v[2] or self:GetNW2Bool("Type") or not self:GetNW2Bool("Type") and k==7) then
             local model
             if v[2] then
                 model = "models/metrostroi/mus_clock/ind_"..(self:GetNW2Bool("Type") and "spb" or "msk").."_type"..tostring(self:GetNW2Int("Light",1)).."_dot.mdl"
@@ -39,12 +39,12 @@ function ENT:Think()
     end
 
     local d = os.date("!*t",Metrostroi.GetSyncTime())
-    if IsValid(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(d.hour / 10)) end
-    if IsValid(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor(d.hour % 10)) end
-    if IsValid(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor(d.min  / 10)) end
-    if IsValid(self.Digits[4]) then self.Digits[4]:SetSkin(math.floor(d.min  % 10)) end
-    if IsValid(self.Digits[5]) then self.Digits[5]:SetSkin(math.floor(d.sec  / 10)) end
-    if IsValid(self.Digits[6]) then self.Digits[6]:SetSkin(math.floor(d.sec  % 10)) end
+    if IsValidEnt(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(d.hour / 10)) end
+    if IsValidEnt(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor(d.hour % 10)) end
+    if IsValidEnt(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor(d.min  / 10)) end
+    if IsValidEnt(self.Digits[4]) then self.Digits[4]:SetSkin(math.floor(d.min  % 10)) end
+    if IsValidEnt(self.Digits[5]) then self.Digits[5]:SetSkin(math.floor(d.sec  / 10)) end
+    if IsValidEnt(self.Digits[6]) then self.Digits[6]:SetSkin(math.floor(d.sec  % 10)) end
 end
 function ENT:OnRemove()
         for _,v in pairs(self.Digits) do

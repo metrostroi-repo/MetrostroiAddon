@@ -13,7 +13,7 @@ end
 function ENT:Think()
   if self:IsDormant() then self:OnRemove();return end
 	for k,v in pairs(self.DigitPositions) do
-        if not IsValid(self.Digits[k]) then
+        if not IsValidEnt(self.Digits[k]) then
             --self.Digits[k] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
             --self.Digits[k]:SetModel(("models/mus/ussr_clock_model/num_"..(k == 1 and "no" or "").."zero.mdl"))
             --hook.Add("MetrostroiBigLag",self.Digits[k],function(ent)
@@ -31,10 +31,10 @@ function ENT:Think()
 	end
 
 	local d = os.date("!*t",Metrostroi.GetSyncTime())
-	if IsValid(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(d.hour / 10)) end
-	if IsValid(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor(d.hour % 10)) end
-	if IsValid(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor(d.min  / 10)) end
-	if IsValid(self.Digits[4]) then self.Digits[4]:SetSkin(math.floor(d.min  % 10)) end
+	if IsValidEnt(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(d.hour / 10)) end
+	if IsValidEnt(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor(d.hour % 10)) end
+	if IsValidEnt(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor(d.min  / 10)) end
+	if IsValidEnt(self.Digits[4]) then self.Digits[4]:SetSkin(math.floor(d.min  % 10)) end
 end
 
 function ENT:OnRemove()

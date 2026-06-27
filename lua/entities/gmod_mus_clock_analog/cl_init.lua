@@ -8,7 +8,7 @@ end
 
 function ENT:Think()
     for i=1,3 do
-        if not IsValid(self.Arrows[i]) then
+        if not IsValidEnt(self.Arrows[i]) then
             local model = "models/metrostroi/signals/clock_analog_arrow_"..(i==1 and "h" or i==2 and "m" or "s")..".mdl"
             --self.Arrows[i] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
             --self.Arrows[i]:SetModel( model )

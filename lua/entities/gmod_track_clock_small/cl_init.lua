@@ -36,7 +36,7 @@ end
 function ENT:Think()
   if self:IsDormant() then self:OnRemove();return end
 	for k,v in pairs(self.DigitPositions[self:GetNW2Int("Type") == 2 and 2 or 1]) do
-		if not IsValid(self.Digits[k]) then
+		if not IsValidEnt(self.Digits[k]) then
       local model
       if v[2] then
         if self:GetNW2Int("Type") == 2 then
@@ -67,22 +67,22 @@ function ENT:Think()
   end
 
 	local d = os.date("!*t",Metrostroi.GetSyncTime())
-	if IsValid(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(d.hour / 10)) end
-	if IsValid(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor(d.hour % 10)) end
-	if IsValid(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor(d.min  / 10)) end
-	if IsValid(self.Digits[4]) then self.Digits[4]:SetSkin(math.floor(d.min  % 10)) end
-	if IsValid(self.Digits[5]) then self.Digits[5]:SetSkin(math.floor(d.sec  / 10)) end
-	if IsValid(self.Digits[6]) then self.Digits[6]:SetSkin(math.floor(d.sec  % 10)) end
+	if IsValidEnt(self.Digits[1]) then self.Digits[1]:SetSkin(math.floor(d.hour / 10)) end
+	if IsValidEnt(self.Digits[2]) then self.Digits[2]:SetSkin(math.floor(d.hour % 10)) end
+	if IsValidEnt(self.Digits[3]) then self.Digits[3]:SetSkin(math.floor(d.min  / 10)) end
+	if IsValidEnt(self.Digits[4]) then self.Digits[4]:SetSkin(math.floor(d.min  % 10)) end
+	if IsValidEnt(self.Digits[5]) then self.Digits[5]:SetSkin(math.floor(d.sec  / 10)) end
+	if IsValidEnt(self.Digits[6]) then self.Digits[6]:SetSkin(math.floor(d.sec  % 10)) end
 
 	--local dT = Metrostroi.GetTimedT()
 	local interval = Metrostroi.GetSyncTime() - (self:GetIntervalResetTime()+GetGlobalFloat("MetrostroiTY"))
 	if (interval <= (9*60+59)) and (interval >= 0) then
-		if IsValid(self.Digits[9])  then self.Digits[9]:SetSkin(math.floor(interval/60)) end
-		if IsValid(self.Digits[10]) then self.Digits[10]:SetSkin(math.floor((interval%60)/10)) end
-		if IsValid(self.Digits[11]) then self.Digits[11]:SetSkin(math.floor((interval%60)%10)) end
+		if IsValidEnt(self.Digits[9])  then self.Digits[9]:SetSkin(math.floor(interval/60)) end
+		if IsValidEnt(self.Digits[10]) then self.Digits[10]:SetSkin(math.floor((interval%60)/10)) end
+		if IsValidEnt(self.Digits[11]) then self.Digits[11]:SetSkin(math.floor((interval%60)%10)) end
 	else
 		for i = 9,11 do
-			if IsValid(self.Digits[i]) then
+			if IsValidEnt(self.Digits[i]) then
 				self.Digits[i]:SetSkin(10)
 			end
 		end

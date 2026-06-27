@@ -120,7 +120,7 @@ function TOOL:SpawnSignal(ply,trace,param)
         net.Send(self:GetOwner())
     else
         if not ent then ent = ents.Create("gmod_track_signal") end
-        if IsValid(ent) then
+        if IsValidEnt(ent) then
             if param ~= 2 then
                 ent:SetPos(tr.centerpos - tr.up * 9.5)
                 ent:SetAngles((-tr.right):Angle())
@@ -191,7 +191,7 @@ function TOOL:SpawnSign(ply,trace,param)
         net.Send(self:GetOwner())
     else
         if not ent then ent = ents.Create("gmod_track_signs") end
-        if IsValid(ent) then
+        if IsValidEnt(ent) then
             if param ~= 2 then
                 ent:SetPos(tr.centerpos - tr.up * 9.5)
                 ent:SetAngles((-tr.right):Angle() + Angle(0,90,0))
@@ -281,7 +281,7 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
     else
         if self.Auto.Type ~= 5 then
             if not ent then ent = ents.Create("gmod_track_autodrive_plate") end
-            if IsValid(ent) then
+            if IsValidEnt(ent) then
                 local angle = (-tr.right):Angle()
                 angle:RotateAroundAxis(tr.up,90)
 
@@ -395,7 +395,7 @@ function TOOL:SpawnAutoPlate(ply,trace,param)
             end
         else
             if not ent then ent = ents.Create("gmod_track_pa_marker") end
-            if IsValid(ent) then
+            if IsValidEnt(ent) then
                 local angle = (tr.forward):Angle()
                 local center = (tr.centerpos - tr.up * 9.5)
                 --angle:RotateAroundAxis(tr.up,90)
@@ -437,7 +437,7 @@ function TOOL:LeftClick(trace)
     --self.Signal = util.JSONToTable(self:GetClientInfo("signaldata"):replace("''","\""))
     --if not self.Signal then return end
     local ply = self:GetOwner()
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return false end
     if not trace then return false end
     if trace.Entity and trace.Entity:IsPlayer() then return false end
 
@@ -460,26 +460,26 @@ function TOOL:RightClick(trace)
     end
 
     local ply = self:GetOwner()
-    if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
+    if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return false end
     if not trace then return false end
     if trace.Entity and trace.Entity:IsPlayer() then return false end
 
     local entlist = ents.FindInSphere(trace.HitPos,(self.Type == 3 and self.Auto.Type == 5) and 192 or 64)
     for k,v in pairs(entlist) do
         if v:GetClass() == "gmod_track_signal" and self.Type == 1 then
-            if IsValid(v) then SafeRemoveEntity(v) end
+            v:Remove()
         end
         if v:GetClass() == "gmod_track_switch" then
-            if IsValid(v) then SafeRemoveEntity(v) end
+            v:Remove()
         end
         if v:GetClass() == "gmod_track_signs" and self.Type == 2 then
-            if IsValid(v) then SafeRemoveEntity(v) end
+            v:Remove()
         end
         if v:GetClass() == "gmod_track_autodrive_plate" and self.Type == 3 and self.Auto.Type == v.PlateType then
-            if IsValid(v) then SafeRemoveEntity(v) end
+            v:Remove()
         end
         if v:GetClass() == "gmod_track_pa_marker" and self.Type == 3 and self.Auto.Type == 5 then
-            if IsValid(v) then SafeRemoveEntity(v) end
+            v:Remove()
         end
     end
     return true
@@ -490,7 +490,7 @@ function TOOL:Reload(trace)
     --self.Signal = util.JSONToTable(self:GetClientInfo("signaldata"):replace("''","\""))
 
     local ply = self:GetOwner()
-    --if not (ply:IsValid()) and (not ply:IsAdmin()) then return false end
+    --if not (IsValidEnt(ply)) and (not ply:IsAdmin()) then return false end
     if not trace then return false end
     if trace.Entity and trace.Entity:IsPlayer() then return false end
     local ent

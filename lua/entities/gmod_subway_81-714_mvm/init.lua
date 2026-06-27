@@ -292,10 +292,10 @@ function ENT:TrainSpawnerUpdate()
     self:UpdateLampsColors()
 
     local pneumoPow = 0.8+(math.random()^1.55)*0.4
-    if IsValid(self.FrontBogey) then
+    if IsValidEnt(self.FrontBogey) then
         self.FrontBogey.PneumaticPow = pneumoPow
     end
-    if IsValid(self.RearBogey) then
+    if IsValidEnt(self.RearBogey) then
         self.RearBogey.PneumaticPow = pneumoPow
     end
     self.Pneumatic.VDLoud = math.random()<0.06 and 0.9+math.random()*0.2
@@ -414,7 +414,7 @@ function ENT:Think()
     self:SetPackedBool("AnnPlay",Panel.AnnouncerPlaying > 0)
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = 2*self.Engines.BogeyMoment
         --self.FrontBogey.MotorForce = 27000+1000*(A < 0 and 1 or 0)
         --self.RearBogey.MotorForce  = 27000+1000*(A < 0 and 1 or 0)

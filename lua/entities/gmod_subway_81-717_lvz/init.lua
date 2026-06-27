@@ -362,7 +362,7 @@ function ENT:TrainSpawnerUpdate()
         else
             self.UPO.Buzz = math.random() > 0.4 and 2 or math.random() > 0.4 and 1
         end
-        if not IsValid(self.LightSensor) then
+        if not IsValidEnt(self.LightSensor) then
             self.LightSensor = self:AddLightSensor(Vector(0,0,0),Angle(0,0,0),"models/metrostroi_train/81-717/rfid_reader.mdl")
         end
         SafeRemoveEntity(self.LeftAutoCoil)
@@ -382,14 +382,14 @@ function ENT:TrainSpawnerUpdate()
         self:SetNW2Int("RingTypePA",puring)
         self.UPO.Buzz = math.random() > 0.6 and 2 or math.random() > 0.6 and 1
         if self.SBPP then
-            if not IsValid(self.SBPPSensor) then
+            if not IsValidEnt(self.SBPPSensor) then
                 self.SBPPSensor = self:AddLightSensor(Vector(0,0,0),Angle(0,0,0),"models/metrostroi_train/81-717/dkp_reader.mdl")
             end
             SafeRemoveEntity(self.LeftAutoCoil)
             SafeRemoveEntity(self.RightAutoCoil)
         else
-            if not IsValid(self.LeftAutoCoil) then self.LeftAutoCoil = self:AddAutodriveCoil(self.FrontBogey,false) end
-            if not IsValid(self.RightAutoCoil) then self.RightAutoCoil = self:AddAutodriveCoil(self.FrontBogey,true) end
+            if not IsValidEnt(self.LeftAutoCoil) then self.LeftAutoCoil = self:AddAutodriveCoil(self.FrontBogey,false) end
+            if not IsValidEnt(self.RightAutoCoil) then self.RightAutoCoil = self:AddAutodriveCoil(self.FrontBogey,true) end
             SafeRemoveEntity(self.SBPPSensor)
         end
         SafeRemoveEntity(self.LightSensor)
@@ -414,7 +414,7 @@ function ENT:TrainSpawnerUpdate()
         self:SetNW2Int("RingTypePA",math.ceil(math.random()*3))
         self.UPO.Buzz = math.random() > 0.6 and 2 or math.random() > 0.6 and 1
 
-        if not IsValid(self.LightSensor) then self.LightSensor = self:AddLightSensor(Vector(0,0,0),Angle(0,0,0),"models/metrostroi_train/81-717/rfid_reader.mdl") end
+        if not IsValidEnt(self.LightSensor) then self.LightSensor = self:AddLightSensor(Vector(0,0,0),Angle(0,0,0),"models/metrostroi_train/81-717/rfid_reader.mdl") end
         SafeRemoveEntity(self.LeftAutoCoil)
         SafeRemoveEntity(self.RightAutoCoil)
         SafeRemoveEntity(self.SBPPSensor)
@@ -461,11 +461,11 @@ function ENT:TrainSpawnerUpdate()
     self:SetNW2String("RelaysConfig",str)
 
     local pneumoPow = 1.3+(math.random()^1.2)*0.3
-    if IsValid(self.FrontBogey) then
+    if IsValidEnt(self.FrontBogey) then
         self.FrontBogey:SetNW2Int("SquealType",math.floor(math.random()*7)+1)
         self.FrontBogey.PneumaticPow = pneumoPow
     end
-    if IsValid(self.RearBogey) then
+    if IsValidEnt(self.RearBogey) then
         self.RearBogey:SetNW2Int("SquealType",math.floor(math.random()*7)+1)
         self.RearBogey.PneumaticPow = pneumoPow
     end
@@ -709,7 +709,7 @@ function ENT:Think()
 
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         -- These corrections are required to beat source engine friction at very low values of motor power
         local A = 2*self.Engines.BogeyMoment
         local P = math.max(0,0.04449 + 1.06879*math.abs(A) - 0.465729*A^2)

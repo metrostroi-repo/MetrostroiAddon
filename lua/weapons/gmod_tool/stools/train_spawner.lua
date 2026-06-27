@@ -69,7 +69,7 @@ function UpdateGhostPos(pl)
     local tbl =  Metrostroi.RerailGetTrackData(trace.HitPos,pl:GetAimVector())
 
     if not tbl then tbl = Trace(pl, trace) end
-    local class = IsValid(trace.Entity) and trace.Entity:GetClass()
+    local class = IsValidEnt(trace.Entity) and trace.Entity:GetClass()
 
     local pos,ang = Vector(0,0,0),Angle(0,0,0)
     if tbl[3] ~= nil then
@@ -142,7 +142,7 @@ function TOOL:Think()
     --self.int = self.tbl.Prom > 0 or !Trains[self.tbl.Train][1]:find("Ezh3")
     if CLIENT and self.Train.Spawner.model then
         if not self.GhostEntities  then self.GhostEntities = {} end
-        if not IsValid(self.GhostEntities[1]) or self.Model ~= self.Train.Spawner.model then
+        if not IsValidEnt(self.GhostEntities[1]) or self.Model ~= self.Train.Spawner.model then
             self.Model = self.Train.Spawner.model
             for _,e in pairs(self.GhostEntities) do SafeRemoveEntity(e) end
             self.GhostEntities = {}
@@ -306,7 +306,7 @@ function TOOL:SpawnWagon(trace)
         ent:SetMoveType(MOVETYPE_NONE)
         ent.FrontBogey:SetMoveType(MOVETYPE_NONE)
         ent.RearBogey:SetMoveType(MOVETYPE_NONE)
-        if IsValid(ent.FrontCouple) then
+        if IsValidEnt(ent.FrontCouple) then
             ent.FrontCouple:SetMoveType(MOVETYPE_NONE)
             ent.RearCouple:SetMoveType(MOVETYPE_NONE)
         end]]
@@ -329,10 +329,10 @@ function TOOL:SpawnWagon(trace)
         ent:UpdateTextures()
         ent.FrontAutoCouple = i > 1 and i < self.Settings.WagNum
         ent.RearAutoCouple = self.Settings.WagNum > 1
-        if IsValid(ent.FrontCouple) then
+        if IsValidEnt(ent.FrontCouple) then
             ent.FrontCouple.TrainSpawnerCoupleFix = ent.FrontAutoCouple
         end
-        if IsValid(ent.RearCouple) then
+        if IsValidEnt(ent.RearCouple) then
             ent.RearCouple.TrainSpawnerCoupleFix = ent.RearAutoCouple
         end
         LastEnt = ent
@@ -344,7 +344,7 @@ function TOOL:SpawnWagon(trace)
     --if self.Settings.AutoCouple and #trains > 1 then
         local CoupledTrains,WagNum = 0,self.Settings.WagNum
         local function StopCoupling()
-            if not IsValid(trains[1]) or not trains[1].IgnoreEngine then return end
+            if not IsValidEnt(trains[1]) or not trains[1].IgnoreEngine then return end
             for _,train in ipairs(trains) do
                 train.FrontBogey.BrakeCylinderPressure = 3
                 train.RearBogey.BrakeCylinderPressure = 3
@@ -390,7 +390,7 @@ end
 function TOOL:Reload(trace)
     if CLIENT then return end
     local ply = self:GetOwner()
-    if IsValid(trace.Entity) and trace.Entity._Settings then
+    if IsValidEnt(trace.Entity) and trace.Entity._Settings then
         ply:ConCommand("gmod_tool train_spawner")
         ply:SelectWeapon("gmod_tool")
         local tool = ply:GetTool("train_spawner")
@@ -409,7 +409,7 @@ function TOOL:Reload(trace)
 end
 function TOOL:LeftClick(trace)
     if not self.Train then return end
-    local class = IsValid(trace.Entity) and trace.Entity:GetClass()
+    local class = IsValidEnt(trace.Entity) and trace.Entity:GetClass()
     if class and (trace.Entity.Spawner or class ~= "func_door" and class ~= "prop_door_rotating")  then
         if SERVER then
             if trace.Entity.ClassName == (self.Train.Spawner.head or self.Train.ClassName) or trace.Entity.ClassName == self.Train.Spawner.interim then
@@ -470,7 +470,7 @@ end
 
 function TOOL:RightClick(trace)
     if not self.Train then return end
-    if IsValid(trace.Entity) then
+    if IsValidEnt(trace.Entity) then
         if SERVER then
             if trace.Entity.ClassName == (self.Train.Spawner.head or self.Train.ClassName) or trace.Entity.ClassName == self.Train.Spawner.interim then
                 local LastEnt

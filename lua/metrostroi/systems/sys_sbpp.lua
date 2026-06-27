@@ -51,7 +51,7 @@ function TRAIN_SYSTEM:Think(dT)
     end
 
     local Sensor = Train.SBPPSensor
-    if not IsValid(Sensor) then return end
+    if not IsValidEnt(Sensor) then return end
 
     local ProgrammType
     local Programm

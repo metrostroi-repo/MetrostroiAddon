@@ -17,7 +17,7 @@ function ENT:Think()
 	self:SetNextClientThink(CurTime()+5)
 	--if self.SendReq == nil or (self.SendReq and CurTime() - self.SendReq <= 0) then return true elseif self.SendReq then self.SendReq = false end
 	if self:IsDormant() or Metrostroi and Metrostroi.ReloadClientside then
-		if IsValid(self.Model) then
+		if IsValidEnt(self.Model) then
 			self.Model:Remove()
 			self.Model = nil
 		end
@@ -37,7 +37,7 @@ function ENT:Think()
 		self:SetNextClientThink(CurTime()+1)
 		return true
 	end
-	if not IsValid(self.Model) then
+	if not IsValidEnt(self.Model) then
 		--ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
 	    --hook.Add("MetrostroiBigLag",self.Model,function(ent)
 		--		ent:SetPos(self:LocalToWorld(pos))

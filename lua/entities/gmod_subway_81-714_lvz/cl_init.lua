@@ -855,11 +855,11 @@ function ENT:UpdateWagonNumber()
     for i=0,4 do
         self:ShowHide("TrainNumberR"..i, i<count)
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         self:ShowHide("TrainNumberL"..i, i<count)
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 
@@ -891,20 +891,20 @@ function ENT:Think()
         self.PassSchemesDone = false
         self.Scheme = self:GetNW2Int("Scheme",1)
     end
-    if not self.PassSchemesDone and IsValid(self.ClientEnts.schemes) then
+    if not self.PassSchemesDone and IsValidEnt(self.ClientEnts.schemes) then
         local scheme = Metrostroi.Skins["717_new_schemes"] and Metrostroi.Skins["717_new_schemes"][self.Scheme]
         self.ClientEnts.schemes:SetSubMaterial(1,scheme and scheme[1])
         self.PassSchemesDone = true
     end
     if self.NewBlueSeats ~= self:GetNW2Bool("NewSeatsBlue") then
         self.NewBlueSeats = self:GetNW2Bool("NewSeatsBlue")
-        if IsValid(self.ClientEnts.seats_new) then
+        if IsValidEnt(self.ClientEnts.seats_new) then
             self.ClientEnts.seats_new:SetSubMaterial(0,self.NewBlueSeats and "models/metrostroi_train/81-717/interior_kvr_blue" or "")
         end
-        if IsValid(self.ClientEnts.seats_new_cap_o) then
+        if IsValidEnt(self.ClientEnts.seats_new_cap_o) then
             self.ClientEnts.seats_new_cap_o:SetSubMaterial(0,self.NewBlueSeats and "models/metrostroi_train/81-717/interior_kvr_blue" or "")
         end
-        if IsValid(self.ClientEnts.seats_new_cap) then
+        if IsValidEnt(self.ClientEnts.seats_new_cap) then
             self.ClientEnts.seats_new_cap:SetSubMaterial(0,self.NewBlueSeats and "models/metrostroi_train/81-717/interior_kvr_blue" or "")
         end
     end
@@ -1187,7 +1187,7 @@ function ENT:Think()
     local volume = self:GetNW2Float("UPOVolume",1)
     local noisevolume = self:GetNW2Float("UPONoiseVolume",1)
     local buzzvolume = volume
-    if self.Sounds["announcer1"] and IsValid(self.Sounds["announcer1"]) then buzzvolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 end
+    if self.Sounds["announcer1"] and IsValidSndCh(self.Sounds["announcer1"]) then buzzvolume = (1-(self.Sounds["announcer1"]:GetLevel())*math.Rand(0.9,3))*buzzvolume*2 end
     if self.BPSNBuzzVolume > buzzvolume then
         self.BPSNBuzzVolume = math.Clamp(self.BPSNBuzzVolume + 8*(buzzvolume-self.BPSNBuzzVolume)*dT,0.1,1)
     else
@@ -1202,7 +1202,7 @@ function ENT:Think()
         for i=1,2 do
             self:SetSoundState(Format("announcer_buzz%d_%d",i,k),(work and i==buzz) and v[3]*volume*self.BPSNBuzzVolume*self:GetNW2Float("UPOBuzzVolume",1) or 0,1)
         end
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*volume or 0) end
+        if IsValidSndCh(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(work and v[3]*volume or 0) end
     end
 end
 
@@ -1221,7 +1221,7 @@ function ENT:DrawPost()
 end
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

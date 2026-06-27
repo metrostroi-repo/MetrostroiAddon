@@ -38,7 +38,7 @@ end
 timer.Create("metrostroi_language_sender",0.5,0,function()
   if #Metrostroi.LanguageCache > 0 then
     local tbl = table.remove(Metrostroi.LanguageCache,1)
-    if tbl and (not tbl[8] or IsValid(tbl[8])) then
+    if tbl and (not tbl[8] or IsValidEnt(tbl[8])) then
       print(Format("Send [%s] %01d/%01d %01d/%01d %d",tbl[1],tbl[3],tbl[2],tbl[5],tbl[4],tbl[6]))
       net.Start("metrostroi_language_sync")
         net.WriteFloat(tbl[1]) -- ID of packet
@@ -48,7 +48,7 @@ timer.Create("metrostroi_language_sender",0.5,0,function()
         net.WriteUInt(tbl[5],8) -- Current packet
         net.WriteUInt(tbl[6],32) --Count of datasize
         net.WriteData(tbl[7],tbl[6]) --Data
-      if IsValid(tbl[8]) then net.Send(tbl[8]) else net.Broadcast() end
+      if IsValidEnt(tbl[8]) then net.Send(tbl[8]) else net.Broadcast() end
     end
   end
 end)

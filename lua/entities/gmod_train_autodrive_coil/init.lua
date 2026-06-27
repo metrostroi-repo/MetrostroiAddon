@@ -22,7 +22,7 @@ end
 function ENT:Trigger(plate)
     if self.IsSensor then
         --print("Sensor:TRIGGERED!")
-        if IsValid(self.Train) and self.Train.TriggerLightSensor then self.Train:TriggerLightSensor(self,plate) end
+        if IsValidEnt(self.Train) and self.Train.TriggerLightSensor then self.Train:TriggerLightSensor(self,plate) end
     end
 end
 function ENT:Think()

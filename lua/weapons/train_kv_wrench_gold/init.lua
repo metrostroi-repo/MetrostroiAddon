@@ -10,7 +10,7 @@ SWEP.AutoSwitchFrom     = true
 function SWEP:Initialize()
     if not self.Code then
         Metrostroi.GetReverserID(self.Owner,function(code)
-            if not IsValid(self) then return end
+            if not IsValidEnt(self) then return end
             self:SetCode(code)
         end,true)
     end
@@ -19,9 +19,9 @@ end
 --[[
 function SWEP:Holster()
 
-    if CLIENT and IsValid(self.Owner) then
+    if CLIENT and IsValidEnt(self.Owner) then
         local vm = self.Owner:GetViewModel()
-        if IsValid(vm) then
+        if IsValidEnt(vm) then
             self:ResetBonePositions(vm)
         end
     end
@@ -41,7 +41,7 @@ end
 function SWEP:Equip(ply)
     if self.Code and CurTime()-self.LastCheck > 30 then
         Metrostroi.GetReverserID(ply,function(code)
-            if not IsValid(self) then return end
+            if not IsValidEnt(self) then return end
             self:SetCode(code)
         end,true)
     end

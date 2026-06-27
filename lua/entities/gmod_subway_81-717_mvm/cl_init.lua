@@ -2678,11 +2678,11 @@ function ENT:UpdateWagonNumber()
     for i=0,4 do
         self:ShowHide("TrainNumberR"..i, i<count)
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         self:ShowHide("TrainNumberL"..i, i<count)
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 
@@ -2708,7 +2708,7 @@ function ENT:Think()
         self.RelaysConfig = self:GetNW2String("RelaysConfig")
         self:SetRelays()
     end
-    if not self.PassSchemesDone and IsValid(self.ClientEnts.schemes) then
+    if not self.PassSchemesDone and IsValidEnt(self.ClientEnts.schemes) then
         local scheme = Metrostroi.Skins["717_new_schemes"] and Metrostroi.Skins["717_new_schemes"][self.Scheme]
         self.ClientEnts.schemes:SetSubMaterial(1,scheme and scheme[1])
         self.PassSchemesDone = true
@@ -2836,10 +2836,10 @@ function ENT:Think()
     self:SetLightPower(43,(ARSType==4 or ARSType==5) and self:GetPackedBool("PanelLights"))
     local speed = self:GetPackedRatio("Speed")*100.0
     if self:GetPackedBool("LUDS") then
-        if ARSType == 1 and IsValid(self.ClientEnts["SSpeed1"])then self.ClientEnts["SSpeed1"]:SetSkin(math.floor(speed)%10) end
-        if ARSType == 1 and IsValid(self.ClientEnts["SSpeed2"])then self.ClientEnts["SSpeed2"]:SetSkin(math.floor(speed/10)%10) end
-        if (ARSType == 2 or ARSType == 3) and IsValid(self.ClientEnts["RSpeed1"])then self.ClientEnts["RSpeed1"]:SetSkin(math.floor(speed)%10) end
-        if (ARSType == 2 or ARSType == 3) and IsValid(self.ClientEnts["RSpeed2"])then self.ClientEnts["RSpeed2"]:SetSkin(math.floor(speed/10)%10) end
+        if ARSType == 1 and IsValidEnt(self.ClientEnts["SSpeed1"])then self.ClientEnts["SSpeed1"]:SetSkin(math.floor(speed)%10) end
+        if ARSType == 1 and IsValidEnt(self.ClientEnts["SSpeed2"])then self.ClientEnts["SSpeed2"]:SetSkin(math.floor(speed/10)%10) end
+        if (ARSType == 2 or ARSType == 3) and IsValidEnt(self.ClientEnts["RSpeed1"])then self.ClientEnts["RSpeed1"]:SetSkin(math.floor(speed)%10) end
+        if (ARSType == 2 or ARSType == 3) and IsValidEnt(self.ClientEnts["RSpeed2"])then self.ClientEnts["RSpeed2"]:SetSkin(math.floor(speed/10)%10) end
     end
 
     local handrails = self:GetNW2Bool("HandRails")
@@ -3324,7 +3324,7 @@ function ENT:Think()
         self:SetSoundState("announcer_buzz_o"..k,(buzz and     buzz_old and (k ~= 1 and work or k==1 and cabspeaker)) and 1 or 0,1)
     end
     for k,v in ipairs(self.AnnouncerPositions) do
-        if IsValid(self.Sounds["announcer"..k]) then
+        if IsValidSndCh(self.Sounds["announcer"..k]) then
             self.Sounds["announcer"..k]:SetVolume((k ~= 1 and work or k==1 and cabspeaker) and (v[3] or 1)  or 0)
         end
     end
@@ -3381,7 +3381,7 @@ end
 
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

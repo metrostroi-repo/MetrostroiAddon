@@ -31,7 +31,7 @@ function ENT:Think()
         return
     end
     if self.StationID then
-        if not IsValid(self.Station) then
+        if not IsValidEnt(self.Station) then
             local stationT = Metrostroi.Stations[tonumber(self.StationID)]
             local platformT = stationT and stationT[tonumber(self.StationPath)]
             if platformT then
@@ -187,7 +187,7 @@ function ENT:EndTouch( ent )
     self.Touches[ent] = nil
 end
 function ENT:PassesTriggerFilters(ent)
-    return IsValid(ent) and ent:GetClass() == "gmod_train_autodrive_coil"
+    return IsValidEnt(ent) and ent:GetClass() == "gmod_train_autodrive_coil"
 end
 function ENT:OnRemove()
     if self.Touches then

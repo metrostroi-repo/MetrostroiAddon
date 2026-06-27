@@ -108,7 +108,7 @@ local function TeleEnd(args,ply)
 end
 
 local function TeleEntStart(args,ply)
-	if #args > 0 and IsValid(Train) then
+	if #args > 0 and IsValidEnt(Train) then
 		Train:SetPos(Metrostroi.TrackEditor.Paths[tonumber(args[1])][1])
 
 		if Train.Base == "gmod_subway_base" then
@@ -118,7 +118,7 @@ local function TeleEntStart(args,ply)
 end
 
 local function TeleEntEnd(args,ply)
-	if #args > 0 and IsValid(Train) then
+	if #args > 0 and IsValidEnt(Train) then
         local tbl = Metrostroi.TrackEditor.Paths[tonumber(args[1])]
 		Train:SetPos(ply:SetPos(tbl[#tbl]))
 
@@ -165,7 +165,7 @@ end
 
 local function Mark(args,ply)
 	ent = ply:GetEyeTrace().Entity
-	if IsEntity(ent) and IsValid(ent) then
+	if IsValidEnt(ent) then
 		Train = ent
 		print(Train," marked")
 		SendClientMsg(ply,tostring(Train).." marked")

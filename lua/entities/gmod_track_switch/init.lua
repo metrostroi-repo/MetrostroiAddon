@@ -97,9 +97,9 @@ function ENT:Think()
 			end
 		end
 		if self.AlternateTrack then
-			for k,v in pairs(self.TrackSwitches) do if IsValid(v) then v:Fire(self.Invertred and "Close" or "Open","","0") end end
+			for k,v in pairs(self.TrackSwitches) do if IsValidEnt(v) then v:Fire(self.Invertred and "Close" or "Open","","0") end end
 		else
-			for k,v in pairs(self.TrackSwitches) do if IsValid(v) then v:Fire(self.Invertred and "Open" or "Close","","0") end end
+			for k,v in pairs(self.TrackSwitches) do if IsValidEnt(v) then v:Fire(self.Invertred and "Open" or "Close","","0") end end
 		end
 		-- Return switch to original position
 		if (self.InhibitSwitching == false) and (self.AlternateTrack == true) and

@@ -49,7 +49,7 @@ function ENT:Think()
     self.PrevTime = RealTime()
     if self:IsDormant() then self:OnRemove();return end
     for k,v in pairs(self.DigitPositions) do
-        if not IsValid(self.Digits[k]) and (k>6 or (k>1 or self:GetNWInt("Time",0) < 0) and k<=6 and self:GetNWBool("Work",false)) then
+        if not IsValidEnt(self.Digits[k]) and (k>6 or (k>1 or self:GetNWInt("Time",0) < 0) and k<=6 and self:GetNWBool("Work",false)) then
             --self.Digits[k] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
             --self.Digits[k]:SetModel("models/metrostroi/mus_clock/pui_ind_"..v[2]..".mdl")
             --hook.Add("MetrostroiBigLag",self.Digits[k],function(ent)
@@ -63,14 +63,14 @@ function ENT:Think()
             self.Digits[k]:SetAngles(self:GetAngles())
             self.Digits[k]:SetSkin(1)
             self.Digits[k]:SetParent(self)
-        elseif IsValid(self.Digits[k]) and(
+        elseif IsValidEnt(self.Digits[k]) and(
             (k>1 or self:GetNWInt("Time",0) >= 0 or not self:GetNWBool("Work",false))
             and k<=6 and (k == 1 or not self:GetNWBool("Work",false))) then
             SafeRemoveEntity(self.Digits[k])
         end
     end
     local lamp = self:Animate("Lamp",self:GetNWBool("Lamp",false) and 1 or 0,   0,1, 1024)
-    if not IsValid(self.Digits[0]) and lamp > 0 then
+    if not IsValidEnt(self.Digits[0]) and lamp > 0 then
         --self.Digits[0] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
         --self.Digits[0]:SetModel("models/metrostroi/mus_clock/pui_lamp.mdl")
         --hook.Add("MetrostroiBigLag",self.Digits[0],function(ent)
@@ -85,22 +85,22 @@ function ENT:Think()
         self.Digits[0]:SetParent(self)
         self.Digits[0]:SetRenderMode( RENDERMODE_TRANSALPHA )
         self.Digits[0]:SetColor(Color(255,255,255,lamp*255))
-    elseif IsValid(self.Digits[0]) and lamp > 0 then
+    elseif IsValidEnt(self.Digits[0]) and lamp > 0 then
         self.Digits[0]:SetColor(Color(255,255,255,lamp*255))
-    elseif IsValid(self.Digits[0]) and lamp == 0 then
+    elseif IsValidEnt(self.Digits[0]) and lamp == 0 then
         SafeRemoveEntity(self.Digits[0])
     end
     if self:GetNWBool("Work",false) then
         local time = Format("%02d%02d",math.floor(math.abs((self:GetNWInt("Time"))/60)),math.abs(self:GetNWInt("Time"))%60)
-        if IsValid(self.Digits[2]) then self.Digits[2]:SetSkin(time[1]) end
-        if IsValid(self.Digits[3]) then self.Digits[3]:SetSkin(time[2]) end
-        if IsValid(self.Digits[5]) then self.Digits[5]:SetSkin(time[3]) end
-        if IsValid(self.Digits[6]) then self.Digits[6]:SetSkin(time[4]) end
+        if IsValidEnt(self.Digits[2]) then self.Digits[2]:SetSkin(time[1]) end
+        if IsValidEnt(self.Digits[3]) then self.Digits[3]:SetSkin(time[2]) end
+        if IsValidEnt(self.Digits[5]) then self.Digits[5]:SetSkin(time[3]) end
+        if IsValidEnt(self.Digits[6]) then self.Digits[6]:SetSkin(time[4]) end
     end
     if self:GetNWInt("Last",0) == 0 then
-        if IsValid(self.Digits[7]) then self.Digits[7]:SetSkin(0) end
+        if IsValidEnt(self.Digits[7]) then self.Digits[7]:SetSkin(0) end
     else
-        if IsValid(self.Digits[7]) then self.Digits[7]:SetSkin(self.StationConverter[self:GetNWInt("Last",0)] or 8) end
+        if IsValidEnt(self.Digits[7]) then self.Digits[7]:SetSkin(self.StationConverter[self:GetNWInt("Last",0)] or 8) end
     end
 end
 function ENT:OnRemove()

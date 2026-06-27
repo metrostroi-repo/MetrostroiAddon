@@ -489,10 +489,10 @@ function ENT:UpdateWagonNumber()
     self.TrainNumberL = false
     for i=0,4 do
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 
@@ -510,7 +510,7 @@ function ENT:Think()
     if not self.PassSchemesDone then
         local sarmat,sarmatr = self.ClientEnts.sarmat,self.ClientEnts.sarmatr
         local scheme = Metrostroi.Skins["722_schemes"] and Metrostroi.Skins["722_schemes"][self.Scheme]
-        if IsValid(sarmat) and IsValid(sarmatr) and scheme then
+        if IsValidEnt(sarmat) and IsValidEnt(sarmatr) and scheme then
             if sarmatInvert then
                 sarmat:SetSubMaterial(0,scheme[2])
                 sarmatr:SetSubMaterial(0,scheme[1])
@@ -591,10 +591,10 @@ function ENT:Think()
         self:ShowHide("led_r_f"..i,not invR)
         self:ShowHide("led_r_b"..i,invR)
         
-        if IsValid(self.ClientEnts["led_l_f"..i]) then self.ClientEnts["led_l_f"..i]:SetSkin(math.Clamp(currL-((i-1)*8),0,8)) end
-        if IsValid(self.ClientEnts["led_l_b"..i]) then self.ClientEnts["led_l_b"..i]:SetSkin(math.Clamp(currL-((i-1)*8),0,8)) end
-        if IsValid(self.ClientEnts["led_r_f"..i]) then self.ClientEnts["led_r_f"..i]:SetSkin(math.Clamp(currR-((i-1)*8),0,8)) end
-        if IsValid(self.ClientEnts["led_r_b"..i]) then self.ClientEnts["led_r_b"..i]:SetSkin(math.Clamp(currR-((i-1)*8),0,8)) end
+        if IsValidEnt(self.ClientEnts["led_l_f"..i]) then self.ClientEnts["led_l_f"..i]:SetSkin(math.Clamp(currL-((i-1)*8),0,8)) end
+        if IsValidEnt(self.ClientEnts["led_l_b"..i]) then self.ClientEnts["led_l_b"..i]:SetSkin(math.Clamp(currL-((i-1)*8),0,8)) end
+        if IsValidEnt(self.ClientEnts["led_r_f"..i]) then self.ClientEnts["led_r_f"..i]:SetSkin(math.Clamp(currR-((i-1)*8),0,8)) end
+        if IsValidEnt(self.ClientEnts["led_r_b"..i]) then self.ClientEnts["led_r_b"..i]:SetSkin(math.Clamp(currR-((i-1)*8),0,8)) end
     end
 
     local playL = false
@@ -731,7 +731,7 @@ function ENT:Think()
             self:SetSoundState(Format("announcer_noise%d_%d",i,k),(UPO and i==noise) and targetVol*noisevolume or 0,1)
         end
 
-        if IsValid(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(targetVol) end
+        if IsValidSndCh(self.Sounds["announcer"..k]) then self.Sounds["announcer"..k]:SetVolume(targetVol) end
     end
 end
 
@@ -761,7 +761,7 @@ end
 
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

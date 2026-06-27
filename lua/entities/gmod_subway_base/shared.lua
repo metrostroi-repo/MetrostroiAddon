@@ -14,7 +14,7 @@ ENT.CustomThinks = ENT.CustomThinks or {}
 ENT.CustomSpawnerUpdates = ENT.CustomSpawnerUpdates or {}
 
 local function destroySound(snd,nogc)
-	if IsValid(snd) then snd:Stop() end
+	if IsValidSndCh(snd) then snd:Stop() end
 	if not nogc and snd and snd.__gc then snd:__gc() end
 end
 function ENT:DestroySound(snd,nogc)
@@ -192,7 +192,7 @@ function ENT:SetSoundState(sound,volume,pitch,timeout,range)
 				if self.SoundPositions[sound] == "cabin" then ent_nwID = "seat_driver" end
 
 				local ent = self:GetNW2Entity(ent_nwID)
-				if IsValid(ent) then
+				if IsValidEnt(ent) then
 					self.Sounds[sound] = CreateSound(ent, Sound(name))
 				else
 					return
@@ -232,7 +232,7 @@ function ENT:CreateBASSSound(name,callback,noblock,onerr)
 	--if self.SoundSpawned and name:find(".wav") then return end
 	--self.SoundSpawned = true
 	sound.PlayFile(Sound("sound/"..name), "3d noplay mono"..(noblock and " noblock" or ""), function( snd,err,errName )
-		if not IsValid(self) then destroySound(snd) return end
+		if not IsValidEnt(self) then destroySound(snd) return end
 		if err then
 			self:DestroySound(snd)
 			if err == 4 or err == 37 then self.StopSounds = true end
@@ -253,7 +253,7 @@ function ENT:CreateBASSSound(name,callback,noblock,onerr)
 	end )
 end
 function ENT:SetPitchVolume(snd,pitch,volume,tbl)
-	if not IsValid(snd) then return end
+	if not IsValidSndCh(snd) then return end
 	if tbl then
 		if tbl[4] then
 			snd:SetVolume(tbl[4]*volume)
@@ -306,7 +306,7 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 		if pitch > 0 then sndtbl.pitch = pitch end
 		for i,v in ipairs(name) do
 			if not sndtbl[i] then sndtbl[i] = {} end
-			if not IsValid(sndtbl[i].sound) and sndtbl[i].sound ~= false then
+			if not IsValidSndCh(sndtbl[i].sound) then
 				self:CreateBASSSound(v,function(snd)
 					if not snd then
 						destroySound(sndtbl[i].sound)
@@ -333,7 +333,7 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 	else
 		if looptbl then name = name[1] end
 		local snd = self.Sounds[soundid]
-		if not IsValid(snd) and name and snd ~= false then
+		if not IsValidSndCh(snd) and name then
 			self:CreateBASSSound(name,function(snd)
 				if not snd then
 					destroySound(self.Sounds[soundid])
@@ -349,7 +349,7 @@ function ENT:SetSoundState(soundid,volume,pitch,time)
 			return
 		end
 
-		if not IsValid(snd) then return end
+		if not IsValidSndCh(snd) then return end
 		-- local default_range = 0.80
 		if ((volume <= 0) or (pitch <= 0)) then
 			if snd:GetTime() > 0 then
@@ -397,7 +397,7 @@ if SERVER then
 else
 	net.Receive("metrostroi_client_sound", function(size)
 		local train = net.ReadEntity()
-		if not IsValid(train) or not train.PlayOnce or not train:ShouldRenderClientEnts() then return end
+		if not IsValidEnt(train) or not train.PlayOnce or not train:ShouldRenderClientEnts() then return end
 		local snd = net.ReadString()
 		local pos = net.ReadString()
 		local range = net.ReadFloat()
@@ -458,10 +458,10 @@ else
 				local soundname = self.SoundNames[soundid]
 				if not soundname then print("NO SOUND",soundname,soundid) continue end
 				if type(soundname) == "table" then soundname = table.Random(soundname) end
-				if IsValid(self.ClientEnts[esnd[1]]) and not self.ClientEnts[esnd[1]].snd then
+				if IsValidEnt(self.ClientEnts[esnd[1]]) and not self.ClientEnts[esnd[1]].snd then
 					local ent = self.ClientEnts[esnd[1]]
 					sound.PlayFile( "sound/"..soundname, "3d noplay mono", function( snd,err,errName )
-						if not IsValid(self) then destroySound(snd) return end
+						if not IsValidEnt(self) then destroySound(snd) return end
 						if err then
 							self:DestroySound(snd)
 							if err == 4 or err == 37 then self.StopSounds = true end
@@ -472,7 +472,7 @@ else
 								--self:PlayOnce(soundid,location,range,pitch,randoff)
 							end
 							return
-						elseif not IsValid(ent) then
+						elseif not IsValidEnt(ent) then
 							self:DestroySound(snd)
 						else
 							snd:SetPos(ent:GetPos(),ent:LocalToWorldAngles(esnd[7]):Forward())
@@ -507,7 +507,7 @@ else
 			return
 		end
 
-		if IsValid(self.Sounds[soundid]) then
+		if IsValidSndCh(self.Sounds[soundid]) then
 			self:DestroySound(self.Sounds[soundid])
 			self.Sounds[soundid] = nil
 		end

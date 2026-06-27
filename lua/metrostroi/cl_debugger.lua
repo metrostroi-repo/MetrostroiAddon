@@ -600,7 +600,7 @@ end
 local function ShouldDrawGroup(group,id)
 	if not group.Enabled then return false end
 	local ent = ents.GetByIndex(id)
-	if not IsValid(ent) then return false end
+	if not IsValidEnt(ent) then return false end
 	for k,v in pairs(group.Ents) do
 		if v[1]=="#" then
 			if string.Right(v,string.len(v)-1) == ent.Base then return true end
@@ -624,9 +624,9 @@ hook.Add( "HUDPaint", "metrostroi-draw-system-debugger", function()
 			localy = 77
 		end
 
-		if IsValid(LocalPlayer()) then
+		if IsValidEnt(LocalPlayer()) then
 			local wep = LocalPlayer():GetActiveWeapon()
-			if IsValid(wep) and wep:GetClass() == "gmod_tool" then
+			if IsValidEnt(wep) and wep:GetClass() == "gmod_tool" then
 				localy = 178
 			end
 		end

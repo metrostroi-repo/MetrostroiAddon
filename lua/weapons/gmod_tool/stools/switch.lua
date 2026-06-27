@@ -18,7 +18,7 @@ function TOOL:LeftClick(trace)
 	if CLIENT then return true end
 
 	local ply = self:GetOwner()
-	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
+	if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return false end
 	if not trace then return false end
 	if trace.Entity and trace.Entity:IsPlayer() then return false end
 
@@ -40,7 +40,7 @@ function TOOL:RightClick(trace)
 	if CLIENT then return true end
 --[[
 	local ply = self:GetOwner()
-	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
+	if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return false end
 	if not trace then return false end
 	if trace.Entity and trace.Entity:IsPlayer() then return false end
 
@@ -58,7 +58,7 @@ function TOOL:Reload(trace)
 	if CLIENT then return true end
 
 	local ply = self:GetOwner()
-	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
+	if (IsValidEnt(ply)) and (not ply:IsAdmin()) then return false end
 	if not trace then return false end
 	if trace.Entity and trace.Entity:IsPlayer() then return false end
 

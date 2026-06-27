@@ -313,7 +313,7 @@ local function getPresetName(name, presets, ignoreOwn)
 end
 
 local function createPresetsFrame()
-	if IsValid(pFrame) then return end
+	if IsValidPanel(pFrame) then return end
 	pFrame = vgui.Create("DFrame",frame)
 	pFrame:SetTitle(Metrostroi.GetPhrase("Spawner.PresetTitle"))
 	pFrame:SetDrawOnTop(false)
@@ -327,7 +327,7 @@ local function createPresetsFrame()
 	pFrame:SetSize(262+10, 58+24*1)
 	--pFrame:Center()
 	pFrame.OnRemove = function()
-		if IsValid(WFrame) then
+		if IsValidPanel(WFrame) then
 			VGUI.WFrame()
 		end
 	end
@@ -402,7 +402,7 @@ local function createPresetsFrame()
 	end
 
 	VGUI["PFrame"] = function(firstDraw)
-		if not IsValid(pFrame) then return end
+		if not IsValidPanel(pFrame) then return end
 		local presets = Settings[Settings.Train] and Settings[Settings.Train].Presets
 
 		Presets:Clear()
@@ -492,7 +492,7 @@ local function createPresetsFrame()
 	VGUI.PFrame(true)
 end
 local function createWagonsFrame()
-	if IsValid(wFrame) then return end
+	if IsValidPanel(wFrame) then return end
 	wFrame = vgui.Create("DFrame",frame)
 	wFrame:SetTitle(Metrostroi.GetPhrase("Spawner.WagonsTitle"))
 	wFrame:SetDrawOnTop(true)
@@ -507,12 +507,12 @@ local function createWagonsFrame()
 	wFrame:SetSize(262 + 262*math.floor((1-1)/MaxHorisontal)+10, 58+24*math.min(MaxHorisontal,1))
 	--wFrame:Center()
 	VGUI["WFrame"] = function()
-		if not IsValid(wFrame) then return end
+		if not IsValidPanel(wFrame) then return end
 		local posX,posY = frame:GetPos()
 		wFrame:SetPos(posX+7,posY+32)
 	end
 	wFrame.OnRemove = function()
-		if IsValid(PFrame) then
+		if IsValidPanel(PFrame) then
 			VGUI.PFrame()
 		end
 	end
@@ -522,7 +522,7 @@ local function createFrame()
 	MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
 	MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
 	--if GetConVar("gmod_toolmode"):GetString() == "train_spawner" then RunConsoleCommand("gmod_toolmode", "weld") end
-	if IsValid(frame) then return end
+	if IsValidPanel(frame) then return end
 	Pos = 0
 	VGUI = {}
 	frame = vgui.Create("DFrame")
@@ -535,8 +535,8 @@ local function createFrame()
 	frame:SetSizable(false)
 	frame:MakePopup()
 	frame.OnRemove = function(panel)
-		if IsValid(pFrame) then pFrame:Remove() end
-		if IsValid(wFrame) then wFrame:Remove() end
+		if IsValidPanel(pFrame) then pFrame:Remove() end
+		if IsValidPanel(wFrame) then wFrame:Remove() end
 		UpdateConCMD()
 	end
 
@@ -551,7 +551,7 @@ local function createFrame()
 		frame:Close()
 	end
 	VGUI["Close"] = function()
-		if IsValid(Close) and IsValid(frame) then Close:SetPos(5, frame:GetTall() - Close:GetTall() - 5) end
+		if IsValidPanel(Close) and IsValidPanel(frame) then Close:SetPos(5, frame:GetTall() - Close:GetTall() - 5) end
 	end
 
 	local spawn = vgui.Create("DButton", frame)
@@ -559,7 +559,7 @@ local function createFrame()
 	spawn:SetPos(frame:GetWide() - Close:GetWide() - 5, frame:GetTall() - Close:GetTall() - 5)
 	spawn:SetText(Metrostroi.GetPhrase("Spawner.Spawn"))
 	VGUI["spawn"] = function()
-		if IsValid(spawn) and IsValid(frame) then spawn:SetPos(frame:GetWide() - Close:GetWide() - 5, frame:GetTall() - Close:GetTall() - 5) end
+		if IsValidPanel(spawn) and IsValidPanel(frame) then spawn:SetPos(frame:GetWide() - Close:GetWide() - 5, frame:GetTall() - Close:GetTall() - 5) end
 	end
 
 	spawn.DoClick = function()
@@ -592,14 +592,14 @@ local function createFrame()
 	Presets:SetImage("icon16/book.png")
 
 	Presets.DoClick = function()
-		if IsValid(pFrame) then pFrame:Remove() else
+		if IsValidPanel(pFrame) then pFrame:Remove() else
 			createPresetsFrame()
-			pFrame.OnRemove = function() if IsValid(Presets) then Presets:SetImage("icon16/book.png") end end
+			pFrame.OnRemove = function() if IsValidPanel(Presets) then Presets:SetImage("icon16/book.png") end end
 		end
-		Presets:SetImage(IsValid(pFrame) and "icon16/book_edit.png" or "icon16/book.png")
+		Presets:SetImage(IsValidPanel(pFrame) and "icon16/book_edit.png" or "icon16/book.png")
 	end
 	VGUI["Presets"] = function()
-		if not IsValid(Presets) or not IsValid(frame) then return end
+		if not IsValidPanel(Presets) or not IsValidPanel(frame) then return end
 		local posX,posY,width = Close:GetBounds()
 		Presets:SetPos(posX + width + 5, posY)
 	end
@@ -611,14 +611,14 @@ local function createFrame()
 	Wagons:SetImage("icon16/table.png")
 
 	Wagons.DoClick = function()
-		if IsValid(wFrame) then wFrame:Remove() else
+		if IsValidPanel(wFrame) then wFrame:Remove() else
 			createWagonsFrame()
 			wFrame.OnRemove = function() Wagons:SetImage("icon16/table.png") end
 		end
-		Wagons:SetImage(IsValid(wFrame) and "icon16/table_edit.png" or "icon16/table.png")
+		Wagons:SetImage(IsValidPanel(wFrame) and "icon16/table_edit.png" or "icon16/table.png")
 	end
 	VGUI["Wagons"] = function()
-		if not IsValid(Wagons) or not IsValid(frame) then return end
+		if not IsValidPanel(Wagons) or not IsValidPanel(frame) then return end
 		local posX,posY,width = Presets:GetBounds()
 		Wagons:SetPos(posX + width + 5, posY)
 	end
@@ -639,12 +639,12 @@ net.Receive("MetrostroiTrainSpawner",createFrame)
 net.Receive("MetrostroiMaxWagons", function()
 	MaxWagons = GetGlobalInt("metrostroi_maxtrains")*GetGlobalInt("metrostroi_maxwagons")
 	MaxWagonsOnPlayer = GetGlobalInt("metrostroi_maxtrains_onplayer")*GetGlobalInt("metrostroi_maxwagons")
-	if trainTypeT and trainTypeT:IsValid() then
+	if IsValidPanel(trainTypeT) then
 		trainTypeT:SetText(Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer))
 	end
 end)
 net.Receive("MetrostroiTrainCount", function()
-	if trainTypeT and trainTypeT:IsValid() then
+	if IsValidPanel(trainTypeT) then
 		trainTypeT:SetText(Format("%s(%d/%d)\n%s:%d",Metrostroi.GetPhrase("Spawner.Trains1"),GetGlobalInt("metrostroi_train_count"),MaxWagons,Metrostroi.GetPhrase("Spawner.Trains2"),MaxWagonsOnPlayer))
 	end
 end)

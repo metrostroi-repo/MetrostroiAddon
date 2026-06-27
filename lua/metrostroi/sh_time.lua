@@ -69,7 +69,7 @@ metrostroi_time_set +3
 metrostroi_time_set 0 to reset]]
 
 concommand.Add("metrostroi_time_set",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
 
     local tMinArr = os.date("*t")
     local tArr = os.date("!*t")
@@ -132,13 +132,13 @@ end
 local CV_PassScale = CreateConVar("metrostroi_passengers_scale",50,FCVAR_ARCHIVE,"Global passengers scale")
 concommand.Add("metrostroi_time", function(ply, _, args)
     local time = Metrostroi.GetSyncTime()
-    if IsValid(ply) then
+    if IsValidEnt(ply) then
         ply:PrintMessage(HUD_PRINTCONSOLE, os.date("!Server date: %d.%m.%Y Server time: %H:%M:%S ",time)..Format("Current scale %.1f (%d%%)",Metrostroi.PassengersScale,Metrostroi.PassengersScale/CV_PassScale:GetFloat()*100))
 
         --[=[local t = (time/60)%(60*24)
         local printed = false
         local train = ply:GetTrain()
-        if IsValid(train) and train.Schedule then
+        if IsValidEnt(train) and train.Schedule then
             for k,v in ipairs(train.Schedule) do
                 local prefix = ""
                 if (not printed) and (t < v[3]) then
@@ -213,7 +213,7 @@ local function printArray(id)
     end
 end
 concommand.Add("metrostroi_time_codepoints",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     printArray()
 end,nil,"Print current codepoints array")
 
@@ -250,7 +250,7 @@ local function checkTime(v1,v2,afterMid,id,arr)
 end
 
 concommand.Add("metrostroi_time_add",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
 
     local v1, e1 = getTime(fargs)
     local v2, e2 = getTime(fargs,e1)
@@ -283,7 +283,7 @@ concommand.Add("metrostroi_time_add",function(ply,_,_,fargs)
 end,nil,"Adds a new codepoint. metrostroi_time_add to more info.")
 
 concommand.Add("metrostroi_time_edit",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     local _,e1,id = tonumberVar(string.find(fargs,"([^%s]+)"))
     local v1, e2 = getTime(fargs,e1 and e1+1)
     local v2, e3 = getTime(fargs,e2)
@@ -322,7 +322,7 @@ concommand.Add("metrostroi_time_edit",function(ply,_,_,fargs)
 end,nil,"Edits an exist codepoint. metrostroi_time_edit to more info.")
 
 concommand.Add("metrostroi_time_remove",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     local id = tonumber(fargs)
     if not id then
         print("metrostroi_time_remove usage:\nEnter codepoint id to remove it\nExamples:\nmetrostroi_time_remove 2")
@@ -340,14 +340,14 @@ concommand.Add("metrostroi_time_remove",function(ply,_,_,fargs)
 end,nil,"Removes an exist codepoint. metrostroi_time_remove to more info.")
 
 concommand.Add("metrostroi_time_clear",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     Metrostroi.CodePoints = {}
     printArray()
     print("Codepoints array cleared ")
 end,nil,"Fully clears codepoint array.")
 
 concommand.Add("metrostroi_time_reset",function(ply,_,_,fargs)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     Metrostroi.CodePoints = {
         {23,1,0.2},
         {5.5,8.5,3},
@@ -412,12 +412,12 @@ function Metrostroi.SaveCodepoints()
 end
 Metrostroi.LoadCodepoints()
 concommand.Add("metrostroi_time_save", function(ply, _, args)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     Metrostroi.SaveCodepoints()
 end,nil,"Save current codepoint array.")
 
 concommand.Add("metrostroi_time_load", function(ply, _, args)
-    if IsValid(ply) then return end
+    if IsValidEnt(ply) then return end
     Metrostroi.LoadCodepoints()
 end,nil,"Load current codepoint array.")
 

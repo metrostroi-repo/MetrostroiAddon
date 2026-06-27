@@ -989,7 +989,7 @@ ENT.Spawner = {
             end
             if val == 1 then
                 timer.Simple(1,function()
-                    if not IsValid(ent) then return end
+                    if not IsValidEnt(ent) then return end
                     ent.BV:TriggerInput("Enable",1)
                 end)
             end

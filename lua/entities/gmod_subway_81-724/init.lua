@@ -114,7 +114,7 @@ function ENT:Think()
 
     self:SetPackedBool("AnnPlay",self.Panel.AnnouncerPlaying > 0)
 
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         --local A = 2*self.Engines.BogeyMoment
         self.FrontBogey.MotorForce = 35300
         self.FrontBogey.Reversed = self:ReadTrainWire(13) > 0

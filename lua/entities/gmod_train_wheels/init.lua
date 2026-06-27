@@ -23,7 +23,7 @@ function ENT:Think(dT)
 	self.PrevTime = CurTime()
 	local Bogey = self:GetNW2Entity("TrainBogey")
 
-	--if not IsValid(Bogey) then return end
+	--if not IsValidEnt(Bogey) then return end
 	--self.Meters = self.Meters + self.dT * Bogey.Speed * Bogey.SpeedSign
 
 
@@ -31,7 +31,7 @@ end
 --]]
 function ENT:PhysicsCollide(data,physobj)
 	-- Generate junction sounds
-	if data.HitEntity and data.HitEntity:IsValid() and data.HitEntity:GetClass() == "prop_door_rotating" then
+	if IsValidEnt(data.HitEntity) and data.HitEntity:GetClass() == "prop_door_rotating" then
 		self.LastJunctionTime = self.LastJunctionTime or CurTime()
 		local dt = CurTime() - self.LastJunctionTime
 

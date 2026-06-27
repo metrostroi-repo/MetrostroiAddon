@@ -30,7 +30,7 @@ function TRAIN_SYSTEM:Think(dT)
 	local fB,rB = self.Train.FrontBogey,self.Train.RearBogey
 
 	self.Main750V = 0
-	if IsValid(fB) then
+	if IsValidEnt(fB) then
 		self.Main750V = math.max(self.Main750V,fB.Voltage)
 		self.ContactState1 = fB.NextStates[1] and 1 or 0
 		self.ContactState2 = fB.NextStates[2] and 1 or 0
@@ -38,7 +38,7 @@ function TRAIN_SYSTEM:Think(dT)
 		self.ContactState1 = 0
 		self.ContactState2 = 0
 	end
-	if IsValid(rB) then
+	if IsValidEnt(rB) then
 		self.Main750V = math.max(self.Main750V,rB.Voltage)
 		self.ContactState3 = rB.NextStates[1] and 1 or 0
 		self.ContactState4 = rB.NextStates[2] and 1 or 0

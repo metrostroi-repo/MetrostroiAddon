@@ -195,7 +195,7 @@ end
 function TRAIN_SYSTEM:equalizeCouplePressure(dT,pressure,train,valve_status,rate,close_rate)
     if not valve_status then return 0 end
     local other
-    if IsValid(train) then other = train.Pneumatic end
+    if IsValidEnt(train) then other = train.Pneumatic end
 
     -- Get second pressure
     local P2 = 0
@@ -240,12 +240,12 @@ function TRAIN_SYSTEM:UpdatePressures(Train,dT)
     local frontTrainOpen = Train.FrontTrainLineIsolation.Value == 0
     local rearTrainOpen = Train.RearTrainLineIsolation.Value == 0
 
-    local Ft = IsValid(Train.FrontTrain) and Train.FrontTrain
-    local Rt = IsValid(Train.RearTrain) and Train.RearTrain
+    local Ft = IsValidEnt(Train.FrontTrain) and Train.FrontTrain
+    local Rt = IsValidEnt(Train.RearTrain) and Train.RearTrain
     local Fc, Rc = Train.FrontCouple or Train.FrontBogey, Train.RearCouple or Train.RearBogey
     local Fb,Rb
-    if IsValid(Fc) and Fc.DepotPneumo then Fb = Fc.DepotPneumo end
-    if IsValid(Rc) and Rc.DepotPneumo then Rb = Rc.DepotPneumo end
+    if IsValidEnt(Fc) and Fc.DepotPneumo then Fb = Fc.DepotPneumo end
+    if IsValidEnt(Rc) and Rc.DepotPneumo then Rb = Rc.DepotPneumo end
 
     local frontBrakeLeak = false
     local rearBrakeLeak = false
@@ -617,7 +617,7 @@ function TRAIN_SYSTEM:Think(dT)
     Train.AVU:TriggerInput("Close",self.BrakeLinePressure > 3.5) -- 3.5 - 3.7
     Train.SOT:TriggerInput("Open", self.EPKPressure < 1.3) -- 2.7 - 2.9
     Train.SOT:TriggerInput("Close", self.EPKPressure > 1.5) -- 2.7 - 2.9
-    Train.BPT:TriggerInput("Set",  (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.3)
+    Train.BPT:TriggerInput("Set",  (IsValidEnt(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.3)
     Train.DKPT:TriggerInput("Set", self.BrakeCylinderPressure > 0.3) -- 1.8 - 2.0
     Train.SQ3:TriggerInput("Set",  Train.PassengerDoor and 0 or 1)
 

@@ -12,14 +12,14 @@ function ENT:Initialize()
     self:PhysicsInit(SOLID_VPHYSICS)
     self:SetUseType(SIMPLE_USE)
     local phys = self:GetPhysicsObject()
-    if IsValid(phys) then phys:Wake() end
+    if IsValidPhysObj(phys) then phys:Wake() end
     self.Owner._RevBlockSpawn = true
 end
 
 function ENT:OnRemove()
     -- Remove all linked objects
     constraint.RemoveAll(self)
-    if IsValid(self.Cover) then
+    if IsValidEnt(self.Cover) then
         SafeRemoveEntity(self.Cover)
     end
     self.Owner._RevBlockSpawn = false
@@ -36,7 +36,7 @@ function ENT:Use(_,ply)
         self.Cover:Spawn()
         local phys = self.Cover:GetPhysicsObject()
         phys:ApplyForceCenter(self.Cover:GetUp()*phys:GetMass()*40+self.Cover:GetRight()*phys:GetMass()*35 )
-        if IsValid(self.Owner) then
+        if IsValidEnt(self.Owner) then
             if CPPI then self.Cover:CPPISetOwner(self.Owner) end
         end
         if self.Code then self:SetNW2Int("Code",self.Code) end
@@ -45,7 +45,7 @@ function ENT:Use(_,ply)
         ply:Give("train_kv_wrench_gold")
         ply:SelectWeapon("train_kv_wrench_gold")
         local reverser = ply:GetWeapon("train_kv_wrench_gold")
-        if IsValid(reverser) then
+        if IsValidEnt(reverser) then
             reverser:SetCode(self.Code)
         end
         self:SetModel("models/metrostroi_train/reversor/reversor_collection_box_empty.mdl")
@@ -85,7 +85,7 @@ function ENT:SpawnFunction(ply,tr,className)
     --ent:Activate()
 
     Metrostroi.GetReverserID(ply,function(code)
-        if not IsValid(ent) then return end
+        if not IsValidEnt(ent) then return end
         ply.SpawningReverser = false
         self:SpawnReverser(ent,code)
     end,true)

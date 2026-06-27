@@ -82,7 +82,7 @@ function ENT:Initialize()
     self:SetUseType(SIMPLE_USE)
 
     -- Set proper parameters for the bogey
-    if IsValid(self:GetPhysicsObject()) then
+    if IsValidPhysObj(self:GetPhysicsObject()) then
         self.PhysObj = self:GetPhysicsObject()
         self.Mass = 5000
         self.PhysObj:SetMass(self.Mass)
@@ -135,7 +135,7 @@ end
 
 function ENT:InitializeWheels()
     -- Create missing wheels
-    if IsValid(self.Wheels) then SafeRemoveEntity(self.Wheels) end
+    if IsValidEnt(self.Wheels) then SafeRemoveEntity(self.Wheels) end
     local wheels = ents.Create("gmod_train_wheels")
     local typ = self.Types[self.BogeyType or "717"]
     wheels.Model = typ[4]
@@ -154,19 +154,19 @@ function ENT:InitializeWheels()
 
     -- Assign ownership
     local train = self:GetNW2Entity("TrainEntity")
-    if IsValid(self:GetPlayer()) then
+    if IsValidEnt(self:GetPlayer()) then
         wheels:SetPlayer(self:GetPlayer())
-    elseif IsValid(train) and IsValid(train:GetPlayer()) then
+    elseif IsValidEnt(train) and IsValidEnt(train:GetPlayer()) then
         wheels:SetPlayer(train:GetPlayer())
     end
 
-    if CPPI and IsValid(self:CPPIGetOwner()) then
+    if CPPI and IsValidEnt(self:CPPIGetOwner()) then
         wheels:CPPISetOwner(self:CPPIGetOwner())
-    elseif CPPI and IsValid(train) and IsValid(train:CPPIGetOwner()) then
+    elseif CPPI and IsValidEnt(train) and IsValidEnt(train:CPPIGetOwner()) then
         wheels:CPPISetOwner(train:CPPIGetOwner())
     end
 
-    if (IsValid(wheels:GetPhysicsObject())) then
+    if (IsValidPhysObj(wheels:GetPhysicsObject())) then
         wheels.PhysObj = wheels:GetPhysicsObject()
     end
     
@@ -218,7 +218,7 @@ end]]
 
 -- Adv ballsockets ents by their CouplingPointOffset
 function ENT:Couple(ent)
-    if IsValid(constraint.AdvBallsocket(
+    if IsValidEnt(constraint.AdvBallsocket(
         self,
         ent,
         0, --bone
@@ -312,18 +312,18 @@ end)
 function ENT:ConnectDisconnect(status)
     local isfront = self:GetNW2Bool("IsForwardBogey")
     local train = self:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         if status ~= nil then
             if status then train:OnBogeyConnect(self, isfront) else train:OnBogeyDisconnect(self, isfront) end
         else
             if (train.FrontCoupledBogeyDisconnect and isfront) or (train.RearCoupledBogeyDisconnect and not isfront) then
                 train:OnBogeyConnect(self, isfront)
-                if IsValid(self.CoupledBogey) then self.CoupledBogey:ConnectDisconnect(true) end
+                if IsValidEnt(self.CoupledBogey) then self.CoupledBogey:ConnectDisconnect(true) end
                 return
             end
             if (not train.FrontCoupledBogeyDisconnect and isfront) or (not train.RearCoupledBogeyDisconnect and not isfront) then
                 train:OnBogeyDisconnect(self, isfront)
-                if IsValid(self.CoupledBogey) then self.CoupledBogey:ConnectDisconnect(false) end
+                if IsValidEnt(self.CoupledBogey) then self.CoupledBogey:ConnectDisconnect(false) end
                 return
             end
         end
@@ -333,7 +333,7 @@ end
 function ENT:GetConnectDisconnect()
     local isfront = self:GetNW2Bool("IsForwardBogey")
     local train = self:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         if (train.FrontCoupledBogeyDisconnect and isfront) or (train.RearCoupledBogeyDisconnect and not isfront) then
             return false
         end
@@ -374,7 +374,7 @@ function ENT:OnCouple(ent)
     --Call OnCouple on our parent train as well
     local parent = self:GetNW2Entity("TrainEntity")
     local isforward = self:GetNW2Bool("IsForwardBogey")
-    if IsValid(parent) then
+    if IsValidEnt(parent) then
         parent:OnCouple(ent,isforward)
     end
     if self.OnCoupleSpawner then self:OnCoupleSpawner() end
@@ -385,7 +385,7 @@ function ENT:OnDecouple()
     local parent = self:GetNW2Entity("TrainEntity")
     local isforward = self:GetNW2Bool("IsForwardBogey")
 
-    if IsValid(parent) then
+    if IsValidEnt(parent) then
         parent:OnDecouple(isforward)
     end
 end
@@ -451,7 +451,7 @@ function ENT:CheckContact(pos,dir,id,cpos)
             --local vec = Vector(pos.y < 0 and 1 or 1.1,pos.y < 0 and -1 or 1.05, 1)
             traceEnt:SetPos(self:LocalToWorld(cpos))
             traceEnt:SetAngles(self:GetAngles())
-            if IsValid(constraint.Weld(self,traceEnt,0,0,33000,true,false)) then
+            if IsValidEnt(constraint.Weld(self,traceEnt,0,0,33000,true,false)) then
                 traceEnt:SetPos(self:LocalToWorld(cpos))
                 traceEnt:SetAngles(self:GetAngles())
                 traceEnt.Coupled = self
@@ -528,7 +528,7 @@ function ENT:CheckVoltage(dT)
     for i=1,2 do
         if self.ContactStates[i] then
             self.Voltage = volt + self.VoltageDrop
-        elseif IsValid(self.Connectors[i]) and self.Connectors[i].Coupled == self then
+        elseif IsValidEnt(self.Connectors[i]) and self.Connectors[i].Coupled == self then
             self.Voltage = self.Connectors[i].Power and Metrostroi.Voltage or 0
         end
     end
@@ -541,11 +541,11 @@ end
 
 function ENT:Think()
     -- Re-initialize wheels
-    if not IsValid(self.Wheels) or self.Wheels:GetNW2Entity("TrainBogey") ~= self then
+    if not IsValidEnt(self.Wheels) or self.Wheels:GetNW2Entity("TrainBogey") ~= self then
         self:InitializeWheels()
 
         constraint.NoCollide(self.Wheels,self,0,0)
-        if IsValid(self:GetNW2Entity("TrainEntity")) then
+        if IsValidEnt(self:GetNW2Entity("TrainEntity")) then
             constraint.NoCollide(self.Wheels,self:GetNW2Entity("TrainEntity"),0,0)
         end
     end
@@ -559,7 +559,7 @@ function ENT:Think()
     self:CheckVoltage(self.DeltaTime)
 
     -- Skip physics related stuff
-    if self.NoPhysics or not self.Wheels.PhysObj:IsValid() then
+    if self.NoPhysics or not IsValidPhysObj(self.Wheels.PhysObj) then
         self:SetMotorPower(self.MotorPower or 0)
         self:SetSpeed(self.Speed or 0)
         self:NextThink(CurTime())

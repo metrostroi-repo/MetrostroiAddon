@@ -88,10 +88,10 @@ function TRAIN_SYSTEM:Think(dT)
                 ars,arsback = Metrostroi.GetARSJoint(pos.node1,pos.x,Metrostroi.TrainDirections[Train], Train)
             end
             if autostop then
-                if IsValid(arsback) then
+                if IsValidEnt(arsback) then
                     if arsback == self.AutostopSignal then
                         local ply,mode = Train:GetDriverPly()
-                        local nomsg = IsValid(Train.FrontTrain) and IsValid(Train.RearTrain) or hook.Run("MetrostroiPassedRed",Train,ply,mode,arsback)
+                        local nomsg = IsValidEnt(Train.FrontTrain) and IsValidEnt(Train.RearTrain) or hook.Run("MetrostroiPassedRed",Train,ply,mode,arsback)
                         if self.AutostropEnabled then
                             Train.Pneumatic:TriggerInput("Autostop",nomsg and 0 or 1)
                         end
@@ -101,7 +101,7 @@ function TRAIN_SYSTEM:Think(dT)
                         self.AutostopSignal = nil
                     end
                 end
-                if IsValid(ars) then
+                if IsValidEnt(ars) then
                     if ars.Red then
                         self.AutostopSignal = ars
                         self.AutostropEnabled = ars.AutoEnabled
@@ -113,7 +113,7 @@ function TRAIN_SYSTEM:Think(dT)
 
             self.Signal = ars
 
-            if self.Enabled > 0 and IsValid(ars) then
+            if self.Enabled > 0 and IsValidEnt(ars) then
                 if not ars:GetARS(1,Train) then
                     self.F1 = ars:GetARS(8,force1_5,force2_6) and 1 or 0
                     self.F2 = ars:GetARS(7,force1_5,force2_6) and 1 or 0

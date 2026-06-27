@@ -1290,7 +1290,7 @@ if CLIENT then
                         -- self.Sounds = {}
                         -- for i, sndU in pairs(snds) do
                             -- sound.PlayURL ( sndU, "3d noplay noblock", function( snd )
-                                -- if ( IsValid( snd ) ) then
+                                -- if ( IsValidSndCh( snd ) ) then
                                     -- self.Sounds[i] = snd
                                 -- end
                             -- end )
@@ -1298,7 +1298,7 @@ if CLIENT then
                         -- self.SoundsTemp = UPD
                     -- end
                     -- for i,snd in pairs(self.Sounds) do
-                        -- if IsValid(snd) then
+                        -- if IsValidSndCh(snd) then
                             -- snd:SetPos(self.Train:LocalToWorld(Vector(443.60,20.10,-4.30)))
                         -- end
                     -- end

@@ -485,10 +485,10 @@ function ENT:UpdateWagonNumber()
     self.TrainNumberL = false
     for i=0,3 do
         local cent = self.ClientEnts["TrainNumberR"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
 
         cent = self.ClientEnts["TrainNumberL"..i]
-        if IsValid(cent) then cent:Remove() end
+        if IsValidEnt(cent) then cent:Remove() end
     end
 end
 
@@ -501,7 +501,7 @@ function ENT:Think()
         local sarmat = self.ClientEnts.PassSchemes
         local sarmatr = self.ClientEnts.PassSchemesR
         local scheme = Metrostroi.Skins["720_schemes"] and Metrostroi.Skins["720_schemes"][self.Scheme]
-        if IsValid(sarmat) and IsValid(sarmatr) and scheme then
+        if IsValidEnt(sarmat) and IsValidEnt(sarmatr) and scheme then
             if self:GetNW2Bool("PassSchemesInvert") then
                 sarmat:SetSubMaterial(0,scheme[2])
                 sarmatr:SetSubMaterial(0,scheme[1])
@@ -570,15 +570,15 @@ function ENT:Think()
     if led_back then
         if ledwork then
             for i=1,5 do
-                if IsValid(self.ClientEnts["led_l_b"..i]) then self.ClientEnts["led_l_b"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
-                if IsValid(self.ClientEnts["led_r_b"..i]) then self.ClientEnts["led_r_b"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
+                if IsValidEnt(self.ClientEnts["led_l_b"..i]) then self.ClientEnts["led_l_b"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
+                if IsValidEnt(self.ClientEnts["led_r_b"..i]) then self.ClientEnts["led_r_b"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
             end
         end
     else
         if ledwork then
             for i=1,5 do
-                if IsValid(self.ClientEnts["led_l_f"..i]) then self.ClientEnts["led_l_f"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
-                if IsValid(self.ClientEnts["led_r_f"..i]) then self.ClientEnts["led_r_f"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
+                if IsValidEnt(self.ClientEnts["led_l_f"..i]) then self.ClientEnts["led_l_f"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
+                if IsValidEnt(self.ClientEnts["led_r_f"..i]) then self.ClientEnts["led_r_f"..i]:SetSkin(math.Clamp(led-((i-1)*6),0,6)) end
             end
         end
     end
@@ -661,7 +661,7 @@ function ENT:Think()
         local vol1 = math.max(0,self.VentVol[i]-1)
         local vol2 = math.max(0,(self.VentVol[i-1] or self.VentVol[i+1])-1)
         self:SetSoundState("vent"..i,vol1*(0.7+vol2*0.3),0.5+0.5*vol1+math.Rand(-0.01,0.01))
-        if IsValid(self.ClientEnts["vent"..i]) then
+        if IsValidEnt(self.ClientEnts["vent"..i]) then
             self.ClientEnts["vent"..i]:SetPoseParameter("position",self.VentState[i])
         end
     end
@@ -705,7 +705,7 @@ function ENT:Think()
 
     local work = self:GetPackedBool("AnnPlay")
     for k,v in ipairs(self.AnnouncerPositions) do
-        if IsValid(self.Sounds["announcer"..k]) then
+        if IsValidSndCh(self.Sounds["announcer"..k]) then
             self.Sounds["announcer"..k]:SetVolume(work and (v[3] or 1)  or 0)
         end
     end
@@ -732,7 +732,7 @@ end
 
 function ENT:OnPlay(soundid,location,range,pitch)
     if location == "stop" then
-        if IsValid(self.Sounds[soundid]) then
+        if IsValidSndCh(self.Sounds[soundid]) then
             self.Sounds[soundid]:Pause()
             self.Sounds[soundid]:SetTime(0)
         end

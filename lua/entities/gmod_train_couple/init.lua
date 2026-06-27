@@ -37,7 +37,7 @@ function ENT:Initialize()
     self:SetUseType(SIMPLE_USE)
 
     -- Set proper parameters for the Coupler
-    if IsValid(self:GetPhysicsObject()) then
+    if IsValidPhysObj(self:GetPhysicsObject()) then
         self:GetPhysicsObject():SetMass(5000)
     end
 end
@@ -67,7 +67,7 @@ end
 function ENT:Couple(ent)
     -- local strain = self:GetNW2Entity("TrainEntity")
     -- local etrain = ent:GetNW2Entity("TrainEntity")
-    -- if not IsValid(strain) or not IsValid(etrain) then return end
+    -- if not IsValidEnt(strain) or not IsValidEnt(etrain) then return end
 
     -- self:SetPos(strain:LocalToWorld(self.SpawnPos))
     -- self:SetAngles(strain:LocalToWorldAngles(self.SpawnAng))
@@ -79,7 +79,7 @@ function ENT:Couple(ent)
     self:SetPos(ent:LocalToWorld(ent.CouplingPointOffset+self.CouplingPointOffset*Vector(1,-1,-1)))
     self:SetAngles(ent:LocalToWorldAngles(Angle(0,180,0)))
 
-    if IsValid(constraint.Weld(
+    if IsValidEnt(constraint.Weld(
         self, --ent1
         ent, --ent2
         0, --bone1
@@ -144,7 +144,7 @@ function ENT:Use(ply)
         local isolPresent = false
         local isolated = false
         local noEKK = false
-        if IsValid(train) then
+        if IsValidEnt(train) then
             if isfront and train.FrontBrakeLineIsolation and train.FrontTrainLineIsolation then
                 isolPresent = true
                 isolated = train.FrontBrakeLineIsolation.Value>0 and train.FrontTrainLineIsolation.Value>0
@@ -164,7 +164,7 @@ function ENT:Use(ply)
 end
 
 function ENT:ElectricDisconnected()
-    if not IsValid(self.CoupledEnt) then return end
+    if not IsValidEnt(self.CoupledEnt) then return end
     return self.EKKDisconnected or self.CoupledEnt.EKKDisconnected
 end
 
@@ -177,12 +177,12 @@ net.Receive("metrostroi-coupler-menu",function(_,ply)
     local id = net.ReadUInt(8)
     if id==0 and bogey.CoupledEnt ~= nil then bogey:Decouple() end
     if id==1 then
-        if not IsValid(train) then return end
+        if not IsValidEnt(train) then return end
         if isfront and train.FrontBrakeLineIsolation and train.FrontTrainLineIsolation then
             local state = train.FrontBrakeLineIsolation.Value>0 or train.FrontTrainLineIsolation.Value>0
             train.FrontBrakeLineIsolation:TriggerInput("Set",state and 0 or 1)
             train.FrontTrainLineIsolation:TriggerInput("Set",state and 0 or 1)
-            if IsValid(train.FrontTrain)then
+            if IsValidEnt(train.FrontTrain) then
                 local ftrain = train.FrontTrain
                 if ftrain.RearTrain==train and train.RearBrakeLineIsolation and train.RearTrainLineIsolation then
                     ftrain.RearBrakeLineIsolation:TriggerInput("Set",state and 0 or 1)
@@ -196,7 +196,7 @@ net.Receive("metrostroi-coupler-menu",function(_,ply)
             local state = train.RearBrakeLineIsolation.Value>0 or train.RearTrainLineIsolation.Value>0
             train.RearBrakeLineIsolation:TriggerInput("Set",state and 0 or 1)
             train.RearTrainLineIsolation:TriggerInput("Set",state and 0 or 1)
-            if IsValid(train.RearTrain)then
+            if IsValidEnt(train.RearTrain) then
                 local rtrain = train.RearTrain
                 if rtrain.RearTrain==train and train.RearBrakeLineIsolation and train.RearTrainLineIsolation then
                     rtrain.RearBrakeLineIsolation:TriggerInput("Set",state and 0 or 1)
@@ -212,9 +212,9 @@ net.Receive("metrostroi-coupler-menu",function(_,ply)
         bogey.EKKDisconnected = not bogey.EKKDisconnected
         if bogey.CoupledEnt ~= nil then
             bogey.CoupledEnt.EKKDisconnected = bogey.EKKDisconnected
-            if IsValid(train) then train:OnConnectDisconnect() end
+            if IsValidEnt(train) then train:OnConnectDisconnect() end
             local coupledTrain = bogey.CoupledEnt:GetNW2Entity("TrainEntity")
-            if IsValid(coupledTrain) then coupledTrain:OnConnectDisconnect() end
+            if IsValidEnt(coupledTrain) then coupledTrain:OnConnectDisconnect() end
         end
     end
 end)
@@ -222,18 +222,18 @@ end)
 function ENT:ConnectDisconnect(status)
     local isfront = self:GetNW2Bool("IsForwardCoupler")
     local train = self:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         if status ~= nil then
             if status then train:OnCouplerConnect(self, isfront) else train:OnCouplerDisconnect(self, isfront) end
         else
             if (train.FrontCoupledCouplerDisconnect and isfront) or (train.RearCoupledCouplerDisconnect and not isfront) then
                 train:OnCouplerConnect(self, isfront)
-                if IsValid(self.Coupled) then self.CoupledEnt:ConnectDisconnect(true) end
+                if IsValidEnt(self.Coupled) then self.CoupledEnt:ConnectDisconnect(true) end
                 return
             end
             if (not train.FrontCoupledCouplerDisconnect and isfront) or (not train.RearCoupledCouplerDisconnect and not isfront) then
                 train:OnCouplerDisconnect(self, isfront)
-                if IsValid(self.Coupled) then self.CoupledEnt:ConnectDisconnect(false) end
+                if IsValidEnt(self.Coupled) then self.CoupledEnt:ConnectDisconnect(false) end
                 return
             end
         end
@@ -243,7 +243,7 @@ end
 function ENT:GetConnectDisconnect()
     local isfront = self:GetNW2Bool("IsForwardCoupler")
     local train = self:GetNW2Entity("TrainEntity")
-    if IsValid(train) then
+    if IsValidEnt(train) then
         if (train.FrontCoupledCouplerDisconnect and isfront) or (train.RearCoupledCouplerDisconnect and not isfront) then
             return false
         end
@@ -263,7 +263,7 @@ local function removeAdvBallSocketBetweenEnts(ent1,ent2)
 end
 
 function ENT:Decouple()
-    if IsValid(self.CoupledEnt) then
+    if IsValidEnt(self.CoupledEnt) then
         sound.Play("buttons/lever8.wav",(self:GetPos()+self.CoupledEnt:GetPos())/2)
         removeAdvBallSocketBetweenEnts(self,self.CoupledEnt)
         self.CoupledEnt.CoupledEnt = nil
@@ -283,7 +283,7 @@ function ENT:OnCouple(ent)
     --Call OnCouple on our parent train as well
     local parent = self:GetNW2Entity("TrainEntity")
     local isforward = self:GetNW2Bool("IsForwardCoupler")
-    if IsValid(parent) then
+    if IsValidEnt(parent) then
         parent:OnCouple(ent,isforward)
     end
     if self.OnCoupleSpawner then self:OnCoupleSpawner() end
@@ -294,7 +294,7 @@ function ENT:OnDecouple()
     local parent = self:GetNW2Entity("TrainEntity")
     local isforward = self:GetNW2Bool("IsForwardCoupler")
 
-    if IsValid(parent) then
+    if IsValidEnt(parent) then
         parent:OnDecouple(isforward)
     end
 end
@@ -303,7 +303,7 @@ function ENT:Think()
     if self.TrainSpawnerCoupleFix then
         -- Fixing crazy physics on spawn
         local phy = self:GetPhysicsObject()
-        if IsValid(phy) then
+        if IsValidPhysObj(phy) then
             phy:SetAngleVelocityInstantaneous(-phy:GetAngleVelocity())
         end
         self:NextThink(CurTime())

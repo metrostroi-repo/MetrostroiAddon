@@ -145,7 +145,7 @@ if SERVER then
 else
     net.Receive("metrostroi_announcer", function(len, pl)
         local train = net.ReadEntity()
-        if not IsValid(train) or not train.RenderClientEnts then return end
+        if not IsValidEnt(train) or not train.RenderClientEnts then return end
         local snd = net.ReadString()
         if train.Announcer then
             train.Announcer.AnnTable = net.ReadString()

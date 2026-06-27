@@ -27,7 +27,7 @@ function TRAIN_SYSTEM:Initialize()
     self.NumberState = 42
     if not TURBOSTROI then
         self.Max = 3
-        self.Number = IsValid(self.Train.Owner) and tonumber(self.Train.Owner:GetInfo("metrostroi_route_number","61")) or 777
+        self.Number = IsValidEnt(self.Train.Owner) and tonumber(self.Train.Owner:GetInfo("metrostroi_route_number","61")) or 777
         self.RouteNumber = Format("%03d",self.Number%1000)
         self.Train:SetNW2String("RouteNumber",self.RouteNumber)
     end

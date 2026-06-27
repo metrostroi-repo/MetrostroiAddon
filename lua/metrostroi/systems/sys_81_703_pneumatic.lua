@@ -164,7 +164,7 @@ end
 function TRAIN_SYSTEM:equalizeCouplePressure(dT,pressure,train,valve_status,rate,close_rate)
     if not valve_status then return 0 end
     local other
-    if IsValid(train) then other = train.Pneumatic end
+    if IsValidEnt(train) then other = train.Pneumatic end
 
     -- Get second pressure
     local P2 = 0
@@ -209,12 +209,12 @@ function TRAIN_SYSTEM:UpdatePressures(Train,dT)
     local frontTrainOpen = Train.FrontTrainLineIsolation.Value == 0
     local rearTrainOpen = Train.RearTrainLineIsolation.Value == 0
 
-    local Ft = IsValid(Train.FrontTrain) and Train.FrontTrain
-    local Rt = IsValid(Train.RearTrain) and Train.RearTrain
+    local Ft = IsValidEnt(Train.FrontTrain) and Train.FrontTrain
+    local Rt = IsValidEnt(Train.RearTrain) and Train.RearTrain
     local Fc, Rc = Train.FrontCouple or Train.FrontBogey, Train.RearCouple or Train.RearBogey
     local Fb,Rb
-    if IsValid(Fc) and Fc.DepotPneumo then Fb = Fc.DepotPneumo end
-    if IsValid(Rc) and Rc.DepotPneumo then Rb = Rc.DepotPneumo end
+    if IsValidEnt(Fc) and Fc.DepotPneumo then Fb = Fc.DepotPneumo end
+    if IsValidEnt(Rc) and Rc.DepotPneumo then Rb = Rc.DepotPneumo end
 
     local frontBrakeLeak = false
     local rearBrakeLeak = false

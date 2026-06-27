@@ -40,15 +40,15 @@ end
 -- Go over the enttable, bogeys and train and reset them
 local function resetSolids(enttable,train)
 	for k,v in pairs(enttable) do
-		if IsValid(k) then
+		if IsValidEnt(k) then
 			k:SetSolid(v)
 			k:GetPhysicsObject():EnableMotion(true)
 		end
 	end
-	if train ~= nil and IsValid(train) then
+	if IsValidEnt(train) then
 		train.FrontBogey:GetPhysicsObject():EnableMotion(true)
 		train.RearBogey:GetPhysicsObject():EnableMotion(true)
-		if IsValid(train.FrontCouple) then
+		if IsValidEnt(train.FrontCouple) then
 			train.FrontCouple:GetPhysicsObject():EnableMotion(true)
 			train.RearCouple:GetPhysicsObject():EnableMotion(true)
 		end
@@ -154,7 +154,7 @@ end
 -- ConCMD for rerailer
 local function RerailConCMDHandler(ply,cmd,args,fullstring)
 	local train = ply:GetEyeTrace().Entity
-	if not IsValid(train) then return end
+	if not IsValidEnt(train) then return end
 
 
 	--If we're aiming at bogeys or wheels
@@ -215,9 +215,9 @@ end
 function Metrostroi.RerailTrain(train)
 
 	--Safety checks
-	if not IsValid(train) or train.SubwayTrain == nil then return false end
-	if train.NoPhysics or not IsValid(train:GetPhysicsObject()) then return false end
-	if not IsValid(train.FrontBogey) or not IsValid(train.RearBogey) then return false end
+	if not IsValidEnt(train) or train.SubwayTrain == nil then return false end
+	if train.NoPhysics or not IsValidPhysObj(train:GetPhysicsObject()) then return false end
+	if not IsValidEnt(train.FrontBogey) or not IsValidEnt(train.RearBogey) then return false end
 	if timer.Exists("metrostroi_rerailer_solid_reset_"..train:EntIndex()) then return false end
 	--[[
 	--Trace down to get the track
@@ -294,7 +294,7 @@ function Metrostroi.RerailTrain(train)
 	train.RearBogey:SetAngles(train:LocalToWorldAngles(train.RearBogey.SpawnAng))--reardata.forward:Angle())
 
 
-	if IsValid(train.FrontCouple) then
+	if IsValidEnt(train.FrontCouple) then
 		train.FrontCouple:SetPos(train:LocalToWorld(train.FrontCouple.SpawnPos))
 		train.RearCouple:SetPos(train:LocalToWorld(train.RearCouple.SpawnPos))
 		train.FrontCouple:SetAngles(train:LocalToWorldAngles(train.FrontCouple.SpawnAng))

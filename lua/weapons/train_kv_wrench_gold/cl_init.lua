@@ -86,9 +86,9 @@ function SWEP:Initialize()
     self:CreateModels(self.VElements) --create viewmodels
     self:CreateModels(self.WElements) --create worldmodels
 
-    if IsValid(self.Owner) then
+    if IsValidEnt(self.Owner) then
         local vm = self.Owner:GetViewModel()
-        if IsValid(vm) then
+        if IsValidEnt(vm) then
             --self:ResetBonePositions(vm)
 
             if (self.ShowViewModel == nil or self.ShowViewModel) then
@@ -104,9 +104,9 @@ end
 
 function SWEP:Holster()
 
-    if CLIENT and IsValid(self.Owner) then
+    if CLIENT and IsValidEnt(self.Owner) then
         local vm = self.Owner:GetViewModel()
-        if IsValid(vm) then
+        if IsValidEnt(vm) then
             self:ResetBonePositions(vm)
         end
     end
@@ -122,7 +122,7 @@ SWEP.vRenderOrder = nil
 function SWEP:ViewModelDrawn()
 
     local vm = self.Owner:GetViewModel()
-    if not IsValid(vm) then return end
+    if not IsValidEnt(vm) then return end
 
     if (not self.VElements) then return end
 
@@ -148,7 +148,7 @@ function SWEP:ViewModelDrawn()
         local v = self.VElements[name]
         if (not v) then self.vRenderOrder = nil break end
         if (v.hide) then continue end
-        if not IsValid(v.modelEnt) then
+        if not IsValidEnt(v.modelEnt) then
             self:CreateModels(self.VElements) --create viewmodels
         end
         local model = v.modelEnt
@@ -159,7 +159,7 @@ function SWEP:ViewModelDrawn()
 
         if (not pos) then continue end
 
-        if (v.type == "Model" and IsValid(model)) then
+        if (v.type == "Model" and IsValidEnt(model)) then
 
             model:SetPos(pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z )
             ang:RotateAroundAxis(ang:Up(), v.angle.y)
@@ -228,7 +228,7 @@ function SWEP:DrawWorldModel()
 
     end
 
-    if (IsValid(self.Owner)) then
+    if (IsValidEnt(self.Owner)) then
         bone_ent = self.Owner
     else
         --when the weapon is dropped
@@ -251,13 +251,13 @@ function SWEP:DrawWorldModel()
 
         if (not pos) then continue end
 
-        if not IsValid(v.modelEnt) then
+        if not IsValidEnt(v.modelEnt) then
             self:CreateModels(self.WElements) --create worldmodels
         end
         local model = v.modelEnt
         local sprite = v.spriteMaterial
 
-        if (v.type == "Model" and IsValid(model)) then
+        if (v.type == "Model" and IsValidEnt(model)) then
 
             model:SetPos(pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z )
             ang:RotateAroundAxis(ang:Up(), v.angle.y)
@@ -337,7 +337,7 @@ function SWEP:GetBoneOrientation( basetab, tab, ent, bone_override )
             pos, ang = m:GetTranslation(), m:GetAngles()
         end
 
-        if (IsValid(self.Owner) and self.Owner:IsPlayer() and
+        if (IsValidEnt(self.Owner) and self.Owner:IsPlayer() and
             ent == self.Owner:GetViewModel() and self.ViewModelFlip) then
             ang.r = -ang.r --Fixes mirrored models
         end
@@ -353,12 +353,12 @@ function SWEP:CreateModels( tab )
 
     --Create the clientside models here because Garry says we can't do it in the render hook
     for k, v in pairs( tab ) do
-        if (v.type == "Model" and v.model and v.model ~= "" and (not IsValid(v.modelEnt) or v.createdModel ~= v.model) and
+        if (v.type == "Model" and v.model and v.model ~= "" and (not IsValidEnt(v.modelEnt) or v.createdModel ~= v.model) and
                 string.find(v.model, ".mdl") and file.Exists (v.model, "GAME") ) then
 
             v.modelEnt = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
             v.modelEnt:SetModel(v.model)
-            if (IsValid(v.modelEnt)) then
+            if (IsValidEnt(v.modelEnt)) then
                 v.modelEnt:SetPos(self:GetPos())
                 v.modelEnt:SetAngles(self:GetAngles())
                 v.modelEnt:SetParent(self)
@@ -486,7 +486,7 @@ function SWEP:Think()
         if code > 0 then
             for k,v in pairs(self.VElements) do
                 local ent = v.modelEnt
-                if k=="Reverser" or not IsValid(ent) then continue end
+                if k=="Reverser" or not IsValidEnt(ent) then continue end
                 local i = tonumber(k:sub(6,-1))-1
                 local num = math.floor(code%(10^(i+1))/10^i)
                 ent:SetModel("models/metrostroi_train/reversor/revers_number0"..num..".mdl")
@@ -494,7 +494,7 @@ function SWEP:Think()
             end
             for k,v in pairs(self.WElements) do
                 local ent = v.modelEnt
-                if k=="Reverser" or not IsValid(ent) then continue end
+                if k=="Reverser" or not IsValidEnt(ent) then continue end
                 local i = tonumber(k:sub(6,-1))-1
                 local num = math.floor(code%(10^(i+1))/10^i)
                 ent:SetModel("models/metrostroi_train/reversor/revers_number0"..num..".mdl")

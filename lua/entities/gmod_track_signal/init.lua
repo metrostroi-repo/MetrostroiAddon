@@ -249,11 +249,11 @@ function ENT:PostInitalize()
 			local cursig = ent
 			while true do
 				cursig = Metrostroi.GetARSJoint(cursig.TrackPosition.node1,cursig.TrackPosition.x,cursig.TrackDir,false)
-				if not IsValid(cursig) then break end
+				if not IsValidEnt(cursig) then break end
 				sig = cursig
 				if not cursig.PassOcc then break end
 			end
-			if IsValid(sig) then
+			if IsValidEnt(sig) then
 				self.NextSignals["*"] = sig
 			else
 				self.AutostopOverride = true
@@ -291,7 +291,7 @@ function ENT:PostInitalize()
 		self.SwitchesFunction[i] = function()
 			local GoodSwitches = true
 			for i1 = 1,#self.Switches[i] do
-				if not self.Switches[i][i1] or not IsValid(Metrostroi.GetSwitchByName(self.Switches[i][i1].n)) then continue end
+				if not self.Switches[i][i1] or not IsValidEnt(Metrostroi.GetSwitchByName(self.Switches[i][i1].n)) then continue end
 				if self.Switches[i][i1].s ~= (Metrostroi.GetSwitchByName(self.Switches[i][i1].n):GetSignal() > 0) then
 					GoodSwitches = false
 					break
@@ -412,7 +412,7 @@ function ENT:ARSLogic(tim, ent)
 		if self.FreeBS - (self.OldBSState or self.FreeBS) > 1 then
 			local Free = self.FreeBS
 			timer.Simple(tim+0.1,function()
-				if not IsValid(ent) then return end
+				if not IsValidEnt(ent) then return end
 				if self.NextSignalLink and self.NextSignalLink.FreeBS + 1 - self.OldBSState > 1 then
 					self.FreeBS = Free
 					self.OldBSState = Free
@@ -474,7 +474,7 @@ function ENT:ARSLogic(tim, ent)
 		end
 	end
 	if self.Routes[self.Route] then
-		local nextSignalLinkValid = IsValid(self.NextSignalLink)
+		local nextSignalLinkValid = IsValidEnt(self.NextSignalLink)
 		if nextSignalLinkValid then self.NextSignalLink = self.NextSignalLink:GetTable() end
 		if self.Routes[self.Route or 1].Repeater and nextSignalLinkValid then
 			self.RealName = self.NextSignalLink.RealName or self.Name
@@ -756,7 +756,7 @@ end
 --On receive update request, we send update
 net.Receive("metrostroi-signal", function(_, ply)
 	local ent = net.ReadEntity()
-	if not IsValid(ent) or not ent.SendUpdate then return end
+	if not IsValidEnt(ent) or not ent.SendUpdate then return end
 	ent:SendUpdate(ply)
 end)
 

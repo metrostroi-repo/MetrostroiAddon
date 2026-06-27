@@ -137,7 +137,7 @@ end
 function TRAIN_SYSTEM:equalizeCouplePressure(dT,pressure,train,valve_status,rate,close_rate)
     if not valve_status then return 0 end
     local other
-    if IsValid(train) then other = train.Pneumatic end
+    if IsValidEnt(train) then other = train.Pneumatic end
 
     -- Get second pressure
     local P2 = 0
@@ -182,12 +182,12 @@ function TRAIN_SYSTEM:UpdatePressures(Train,dT)
     local frontTrainOpen = Train.FrontTrainLineIsolation.Value == 0
     local rearTrainOpen = Train.RearTrainLineIsolation.Value == 0
 
-    local Ft = IsValid(Train.FrontTrain) and Train.FrontTrain
-    local Rt = IsValid(Train.RearTrain) and Train.RearTrain
+    local Ft = IsValidEnt(Train.FrontTrain) and Train.FrontTrain
+    local Rt = IsValidEnt(Train.RearTrain) and Train.RearTrain
     local Fc, Rc = Train.FrontCouple or Train.FrontBogey, Train.RearCouple or Train.RearBogey
     local Fb,Rb
-    if IsValid(Fc) and Fc.DepotPneumo then Fb = Fc.DepotPneumo end
-    if IsValid(Rc) and Rc.DepotPneumo then Rb = Rc.DepotPneumo end
+    if IsValidEnt(Fc) and Fc.DepotPneumo then Fb = Fc.DepotPneumo end
+    if IsValidEnt(Rc) and Rc.DepotPneumo then Rb = Rc.DepotPneumo end
 
     local frontBrakeLeak = false
     local rearBrakeLeak = false
@@ -476,7 +476,7 @@ function TRAIN_SYSTEM:Think(dT)
     if self.BrakeLinePressure >= 2.8 and self.SD2~=0 then self.SD2 = 0 end
     if self.BrakeLinePressure <= 2.0 and self.SD3~=1 then self.SD3 = 1  end
     if self.BrakeLinePressure >= 2.2 and self.SD3~=0 then self.SD3 = 0 end    
-    self.SD4 = (IsValid(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.1 and 1 or 0
+    self.SD4 = (IsValidEnt(Train.FrontBogey) and Train.FrontBogey.BrakeCylinderPressure+(not Train.FrontBogey.DisableParking and Train.FrontBogey.ParkingBrakePressure or 0) or self.BrakeCylinderPressure)>0.1 and 1 or 0
     ----------------------------------------------------------------------------
     -- FIXME
     Train:SetNW2Bool("FbI",Train.FrontBrakeLineIsolation.Value ~= 0)

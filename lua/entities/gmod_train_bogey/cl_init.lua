@@ -109,7 +109,7 @@ function ENT:ReinitializeSounds()
     self.Sounds = {}
     for k,v in pairs(self.SoundNames) do
         --[[local e = self
-        if (k == "brake3a") and IsValid(self:GetNW2Entity("TrainWheels")) then
+        if (k == "brake3a") and IsValidEnt(self:GetNW2Entity("TrainWheels")) then
             e = self:GetNW2Entity("TrainWheels")
         end]]
         self.Sounds[k] = CreateSound(self, Sound(v))
@@ -119,7 +119,7 @@ function ENT:ReinitializeSounds()
 end
 function ENT:SetSoundState(sound,volume,pitch,name,level )
     if not self.Sounds[sound] then
-        if self.SoundNames[name or sound] and (not wheels or IsValid(self:GetNW2Entity("TrainWheels"))) then
+        if self.SoundNames[name or sound] and (not wheels or IsValidEnt(self:GetNW2Entity("TrainWheels"))) then
             self.Sounds[sound] = CreateSound(wheels and self:GetNW2Entity("TrainWheels") or self, Sound(self.SoundNames[name or sound]))
         else
             return
@@ -176,7 +176,7 @@ function ENT:Think()
 
     local soundsmul = 1
     local streetC,tunnelC = 0,1
-    if IsValid(train) then
+    if IsValidEnt(train) then
         streetC,tunnelC = train.StreetCoeff or 0,train.TunnelCoeff or 1
         soundsmul = math.Clamp(tunnelC^1.5+(streetC^0.5)*0.2,0,1)
     end
@@ -357,7 +357,7 @@ end
 
 
 local c_gui
-if IsValid(c_gui) then c_gui:Close() end
+if IsValidPanel(c_gui) then c_gui:Close() end
 
 local function addButton(parent,stext,state,scolor,btext,benabled,callback)
     --local a = v[1]
@@ -386,7 +386,7 @@ local function addButton(parent,stext,state,scolor,btext,benabled,callback)
 end
 
 function ENT:DrawGUI(tbl)
-    if IsValid(c_gui) then  c_gui:Close() end
+    if IsValidPanel(c_gui) then  c_gui:Close() end
     c_gui = vgui.Create("DFrame")
         c_gui:SetDeleteOnClose(true)
         c_gui:SetTitle(Metrostroi.GetPhrase("Common.Bogey.Title"))
@@ -430,7 +430,7 @@ end
 
 net.Receive("metrostroi-bogey-menu",function()
     local ent = net.ReadEntity()
-    if not IsValid(ent) or IsValid(c_gui) and c_gui.Entity ~= ent then return end
+    if not IsValidEnt(ent) or IsValidPanel(c_gui) and c_gui.Entity ~= ent then return end
     ent:DrawGUI{
         access = net.ReadBool(),
         relcontact=net.ReadBool(),
@@ -441,7 +441,7 @@ end)
 
 net.Receive("metrostroi_bogey_contact",function()
     local ent = net.ReadEntity()
-    if not IsValid(ent) or not ent.PlayTime then return end
+    if not IsValidEnt(ent) or not ent.PlayTime then return end
     local PantNum = net.ReadUInt(1)+1
     local PantPos = net.ReadVector()
     local Spark = net.ReadUInt(1) > 0

@@ -511,17 +511,6 @@ function ENT:TrainSpawnerUpdate()
     self:SetNW2Float("Crane013Loud",(self.Pneumatic.ValveType == 2 and math.random()>0.9) and 1.1+math.random()*0.3 or 0)
     self:UpdateLampsColors()
     self:UpdateTextures()
-    --[[ local scheme = Metrostroi.Skins["722_schemes"] and Metrostroi.Skins["722_schemes"][self.Scheme]
-    if IsValid(sarmat) and IsValid(sarmatr) and scheme then
-        if self:GetNW2Bool("SarmatInvert") then
-            sarmat:SetSubMaterial(0,scheme[2])
-            sarmatr:SetSubMaterial(0,scheme[1])
-        else
-            sarmat:SetSubMaterial(0,scheme[1])
-            sarmatr:SetSubMaterial(0,scheme[2])
-        end
-        self.PassSchemesDone = true
-    end--]]
     local used = {}
     local str = ""
     for i,k in ipairs(self.PR14XRelaysOrder) do
@@ -538,11 +527,11 @@ function ENT:TrainSpawnerUpdate()
     self:SetNW2String("RelaysConfig",str)
 
     local pneumoPow = 0.8+(math.random()^1.55)*0.4
-    if IsValid(self.FrontBogey) then
+    if IsValidEnt(self.FrontBogey) then
         self.FrontBogey:SetNW2Int("SquealType",math.floor(math.random(4,7)))
         self.FrontBogey.PneumaticPow = pneumoPow
     end
-    if IsValid(self.RearBogey) then
+    if IsValidEnt(self.RearBogey) then
         self.RearBogey:SetNW2Int("SquealType",math.floor(math.random(4,7)))
         self.RearBogey.PneumaticPow = pneumoPow
     end
@@ -640,7 +629,7 @@ function ENT:Think()
     self:SetPackedBool("AR80",Panel.AR80 > 0)
     --]]
     local drv = self:GetDriver()
-    self:SetPackedBool("GLIB",power and IsValid(drv) and drv:SteamID() == "STEAM_0:1:31566374")
+    self:SetPackedBool("GLIB",power and IsValidEnt(drv) and drv:SteamID() == "STEAM_0:1:31566374")
     self:SetPackedBool("LEKK",Panel.LEKK > 0)
     self:SetPackedBool("LN",Panel.LN > 0)
     self:SetPackedBool("ST",Panel.LST > 0)
@@ -736,7 +725,7 @@ function ENT:Think()
     -- Exchange some parameters between engines, pneumatic system, and real world
     self.Engines:TriggerInput("Speed",self.Speed)
     self:SetPackedRatio("Speed", self.Speed/100 or 0.5 or 0.85-(((CurTime()%36/36)^0.8)*8.5)/10 or self.Speed/100)
-    if IsValid(self.FrontBogey) and IsValid(self.RearBogey) and not self.IgnoreEngine then
+    if IsValidEnt(self.FrontBogey) and IsValidEnt(self.RearBogey) and not self.IgnoreEngine then
         local A = 2*self.Engines.BogeyMoment
         --self.FrontBogey.MotorForce = 27000+1000*(A < 0 and 1 or 0)
         --self.RearBogey.MotorForce  = 27000+1000*(A < 0 and 1 or 0)

@@ -82,7 +82,7 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
 end
 ------
 function ENT:AnimateFrom(clientProp,from)
-    if IsValid(self.ClientEnts[clientProp]) then
+    if IsValidEnt(self.ClientEnts[clientProp]) then
         self.ClientEnts[clientProp]:SetPoseParameter("position",self.Anims[from].val)
     end
     return self.Anims[from].val
@@ -115,7 +115,7 @@ function ENT:Think()
         self.OldType = self.Type
     end
     for k,v in pairs(self.DigitPositions[self.Type+1]) do
-        if not IsValid(self.Models[k]) then
+        if not IsValidEnt(self.Models[k]) then
             --self.Models[k] = ents.CreateClientProp("models/metrostroi/81-717/reverser.mdl")
             --self.Models[k]:SetModel(self.ModelNames[v[2]])
             --hook.Add("MetrostroiBigLag",self.Models[k],function(ent)
@@ -137,20 +137,20 @@ function ENT:Think()
     end
     if self.Type == 0 then
         local State = self:Animate("white", self.WhiteSignal and 1 or 0,    0,1, 256)
-        if IsValid(self.Models[1]) then
+        if IsValidEnt(self.Models[1]) then
             self.Models[1]:SetColor(Color(255,255,255,State*255))
         end
         State = self:Animate("white1",  self.PeopleGoing and 1 or 0,    0,1, 256)
-        if IsValid(self.Models[2]) then
+        if IsValidEnt(self.Models[2]) then
             self.Models[2]:SetColor(Color(255,255,255,State*255))
         end
     else
         local State = self:Animate("white", self.WhiteSignal and 1 or 0,    0,1, 256)
-        if IsValid(self.Models[1]) then
+        if IsValidEnt(self.Models[1]) then
             self.Models[1]:SetColor(Color(255,255,255,State*255))
         end
         State = self:Animate("yellow",  self.YellowSignal and 1 or 0,   0,1, 256)
-        if IsValid(self.Models[2]) then
+        if IsValidEnt(self.Models[2]) then
             self.Models[2]:SetColor(Color(255,255,255,State*255))
         end
     end
