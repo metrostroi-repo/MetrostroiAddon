@@ -1020,8 +1020,6 @@ function Metrostroi.CheckTrainView(ply)
     return train, true
 end
 
-RunConsoleCommand("r_rootlod",0) -- Train models only visible with High model quality
-
 local matSprite = {
     ["$basetexture"] = "",
     ["$spriteorientation"] = "vp_parallel",

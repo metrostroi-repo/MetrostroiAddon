@@ -617,16 +617,16 @@ then loadAnn()
 else timer.Simple(0.1, loadAnn)
 end
 if SERVER then
-    util.AddNetworkString "MetrostroiMessages"
+    util.AddNetworkString("MetrostroiMessages")
     local function CheckErr(ply)
         if not Turbostroi and IsValidEnt(ply) and (ply:IsSuperAdmin() or not game.IsDedicated()) then
-            net.Start "MetrostroiMessages"
+            net.Start("MetrostroiMessages")
                 net.WriteString("Turbostroi is not installed!\nTurbostroi is accelerating train calculations by using multiple\ncores. Check "..(game.IsDedicated() and "server" or "game").." logs for more information.\nYou can download it at:\nhttps://metrostroi.net/turbostroi")
                 net.WriteString("https://metrostroi.net/turbostroi")
             net.Send(ply)
         end
         if not game.IsDedicated() then
-            net.Start "MetrostroiMessages"
+            net.Start("MetrostroiMessages")
                 net.WriteString("For comfort and smooth experience, you need to\njoin to server or host a dedicated server.\nIt's required because Garry's mod using only\n1 core, and now it using it for client and server code.\nWhen you join or host server you can separate server\nand client processes to different cores.\nInformation about how to host server:\nhttp://wiki.garrysmod.com/page/Hosting_A_Dedicated_Server")
                 net.WriteString("http://wiki.garrysmod.com/page/Hosting_A_Dedicated_Server")
             net.Send(ply)
@@ -666,27 +666,33 @@ else
             warn:Close()
         end
 
-        local Open = vgui.Create("DButton", warn)
-        Open:SetText("Open link")
-        Open:SetPos(15, size-30)
-        Open:SetSize(80, 25)
-        Open.DoClick = function()
-            Close:SetText("Close window")
-            gui.OpenURL(url)
-        end
+        if #url > 0 then
+            local Open = vgui.Create("DButton", warn)
+            Open:SetText("Open link")
+            Open:SetPos(15, size-30)
+            Open:SetSize(80, 25)
+            Open.DoClick = function()
+                Close:SetText("Close window")
+                gui.OpenURL(url)
+            end
 
-        local Copy = vgui.Create("DButton", warn)
-        Copy:SetText("Copy link")
-        Copy:SetPos(100, size-30)
-        Copy:SetSize(80, 25)
-        Copy.DoClick = function()
-            Close:SetText("Close window")
-            SetClipboardText(url)
+            local Copy = vgui.Create("DButton", warn)
+            Copy:SetText("Copy link")
+            Copy:SetPos(100, size-30)
+            Copy:SetSize(80, 25)
+            Copy.DoClick = function()
+                Close:SetText("Close window")
+                SetClipboardText(url)
+            end
         end
     end
     net.Receive("MetrostroiMessages", function()
         err(net.ReadString(),net.ReadString())
     end)
+
+    if GetConVar("r_rootlod"):GetInt() ~= 0 then
+        err("Train models may be displayed incorrectly.\nPlease, set model detail to High:\nOptions -> Video -> Advanced... -> Model detail -> High", "")
+    end
 end
 hook.Run("MetrostroiLoaded")
 Metrostroi.Loaded = true

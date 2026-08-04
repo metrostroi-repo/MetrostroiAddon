@@ -100,7 +100,7 @@ function Metrostroi.OptimisationPatch()
     local oRemove = ENT.OptRemove or (function() end)
     if SERVER then
         function ENT:OnRemove(...)
-            self:SetTable(cache[self])
+            self:SetTable(cache[self] or {})
             debug.setmetatable(self,FindMetaTable("Entity"))
             cache[self] = {}
             oRemove(self,...)
@@ -108,7 +108,7 @@ function Metrostroi.OptimisationPatch()
     else
         function ENT:OnRemove(fullUpdate,...)
             if fullUpdate == false then
-                self:SetTable(cache[self])
+                self:SetTable(cache[self] or {})
                 debug.setmetatable(self,FindMetaTable("Entity"))
                 cache[self] = {}
             end
