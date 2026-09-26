@@ -937,7 +937,7 @@ function TOOL:BuildCPanelCustom()
         for i = 1,#TypesOfAuto do
             VAType:AddChoice(TypesOfAuto[i])
         end
-        VAType:ChooseOptionID(tool.Auto.Type or 1)
+        VAType:ChooseOptionID((tool.Auto.Type and tool.Auto.Type > 0) and tool.Auto.Type or 1)
         VAType.OnSelect = function(_, index, name)
             VAType:SetValue(name)
             tool.Auto.Type = index
