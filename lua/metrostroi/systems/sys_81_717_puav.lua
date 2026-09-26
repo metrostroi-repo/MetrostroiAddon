@@ -108,7 +108,7 @@ function TRAIN_SYSTEM:Inputs()
     }
 end
 function TRAIN_SYSTEM:Outputs()
-    return { "Ring","RingZero","LK16" , "LAVT", "LOS", "LRS", "LKI1", "LKI2", "NoFreq", "F5", "F4", "F3", "F2", "F1", "TargetKPRK" }
+    return { "Ring","RingZero","LK16" , "LAVT", "LOS", "LRS", "LKI1", "LKI2", "NoFreq", "F5", "F4", "F3", "F2", "F1", "TargetKPRK", "KB", "Vno" } -- KB, Vno: debug for issue #516 (A43/ARS speed cap bypass)
 end
 
 if CLIENT then
@@ -386,6 +386,7 @@ function TRAIN_SYSTEM:Think(dT)
         if self.F5 > 0 and (not KB or Station+self.VRD == 0 or self.VRD > 0 and self.IgnoreF6) then Vno = -1 end
         if NoFreq > 0 and not KB then Vno = -1 end
         if self.VRD > 0 and Vno > 20 then Vno = 20 end
+        self.Vno = Vno -- debug output for issue #516 (A43/ARS speed cap bypass)
         if self.KVARS*self.KTARS > 0 then self:SetDriveMode("OXT") end
 
         local prior = self.CurrentDriveModePriority
