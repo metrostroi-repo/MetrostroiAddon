@@ -63,10 +63,12 @@ local meta = FindMetaTable("MSTrain")
 if not meta then
     print("Metrostroi: Registering metatable...")
 
-    meta = table.Copy(FindMetaTable("Entity"))
+    local metaEnt = FindMetaTable("Entity")
+    meta = table.Copy(metaEnt)
 
     meta.MetaID = nil
     meta.MetaName = nil
+	meta.MetaBaseClass = metaEnt
 
     function meta:__index(key)
         local val = meta[key]
