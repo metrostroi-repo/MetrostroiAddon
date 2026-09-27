@@ -490,7 +490,8 @@ function TRAIN_SYSTEM:Trigger(name,value)
         self.Path = value
         self.Arrived = true
         self.FirstStation = 1
-        self.LastStation = self.Path and 1 or #tbl[self.Line]
+        
+        self.LastStation = tbl[self.Line].Loop and 0 or self.Path and 1 or #tbl[self.Line]
         self.Station = self.Path and #tbl[self.Line] or 1
         self.PlayNextArmed = false
         return
